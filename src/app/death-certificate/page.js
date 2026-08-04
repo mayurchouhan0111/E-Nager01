@@ -4,12 +4,17 @@ import React, { useState, useEffect } from 'react';
 import ServiceHeader from '../../components/ServiceHeader';
 import ApplicationTimeline from '../../components/ApplicationTimeline';
 import DeathCertificateTemplate from '../../components/DeathCertificateTemplate';
+import ApplicationLetterTemplate from '../../components/ApplicationLetterTemplate';
+import DocumentUploader from '../../components/DocumentUploader';
 import { 
   saveDeathCertificateDraft, 
   submitDeathCertificate, 
   getDeathCertificates 
 } from '../../services/deathCertificateService';
-import { FileText, Activity, CheckCircle2, AlertCircle, RefreshCw, Printer, X, History, Plus, Building2, User, Home, HeartPulse, CheckSquare } from 'lucide-react';
+import { 
+  FileText, Activity, CheckCircle2, AlertCircle, RefreshCw, Printer, X, History, Plus, 
+  Building2, User, Home, HeartPulse, CheckSquare, Download 
+} from 'lucide-react';
 
 const defaultDeceasedDetails = {
   fullName: '',
@@ -86,6 +91,7 @@ export default function DeathCertificatePage() {
   const [formErrors, setFormErrors] = useState([]);
   const [selectedApp, setSelectedApp] = useState(null);
   const [showCertModal, setShowCertModal] = useState(false);
+  const [showLetterModal, setShowLetterModal] = useState(false);
 
   // Form State
   const [formData, setFormData] = useState({
@@ -96,10 +102,11 @@ export default function DeathCertificatePage() {
     applicantDetails: { ...defaultApplicantDetails },
     parentSpouseDetails: { ...defaultParentSpouseDetails },
     statisticalDetails: { ...defaultStatisticalDetails },
-    documents: [
-      { name: 'अस्पताल मृत्यु प्रमाण पत्र / दाह संस्कार रसीद (Hospital/Cremation Receipt)', uploaded: true, filename: 'hospital_death_receipt.pdf' },
-      { name: 'आवेदक आधार कार्ड (Applicant Aadhaar)', uploaded: true, filename: 'applicant_aadhaar.pdf' }
-    ]
+    documents: {
+      deathSlip: null,
+      applicantAadhaar: null,
+      addressProof: null
+    }
   });
 
   useEffect(() => {
@@ -159,6 +166,26 @@ export default function DeathCertificatePage() {
         }
       };
     });
+  };
+
+  const handleDocumentUpload = (docKey, uploadObj) => {
+    setFormData(prev => ({
+      ...prev,
+      documents: {
+        ...(typeof prev.documents === 'object' && !Array.isArray(prev.documents) ? prev.documents : {}),
+        [docKey]: uploadObj
+      }
+    }));
+  };
+
+  const handleDocumentRemove = (docKey) => {
+    setFormData(prev => ({
+      ...prev,
+      documents: {
+        ...(typeof prev.documents === 'object' && !Array.isArray(prev.documents) ? prev.documents : {}),
+        [docKey]: null
+      }
+    }));
   };
 
   const validateForm = () => {
@@ -286,6 +313,12 @@ export default function DeathCertificatePage() {
 
     if (res.success) {
       setMessage({ type: 'success', text: `आवेदन जमा हो गया है (Application submitted! App No: ${res.applicationNo})` });
+      
+      // Auto open letter preview for current submitted application
+      const submittedRecord = { ...payload, id: res.id, applicationNo: res.applicationNo, status: 'Submitted', appliedAt: new Date().toISOString() };
+      setSelectedApp(submittedRecord);
+      setShowLetterModal(true);
+
       resetForm();
       loadApplications();
       setActiveTab('track');
@@ -295,7 +328,6 @@ export default function DeathCertificatePage() {
   };
 
   const handleEditForResubmit = (app) => {
-    // Normalize data with default structures if missing
     const normalizedApp = {
       ...app,
       deceasedDetails: {
@@ -310,7 +342,8 @@ export default function DeathCertificatePage() {
         ...defaultStatisticalDetails,
         ...(app.statisticalDetails || {}),
         lifestyleHistory: { ...defaultStatisticalDetails.lifestyleHistory, ...(app.statisticalDetails?.lifestyleHistory || {}) }
-      }
+      },
+      documents: app.documents || { deathSlip: null, applicantAadhaar: null, addressProof: null }
     };
     setFormData(normalizedApp);
     setActiveTab('apply');
@@ -327,10 +360,11 @@ export default function DeathCertificatePage() {
       applicantDetails: JSON.parse(JSON.stringify(defaultApplicantDetails)),
       parentSpouseDetails: JSON.parse(JSON.stringify(defaultParentSpouseDetails)),
       statisticalDetails: JSON.parse(JSON.stringify(defaultStatisticalDetails)),
-      documents: [
-        { name: 'अस्पताल मृत्यु प्रमाण पत्र / दाह संस्कार रसीद (Hospital/Cremation Receipt)', uploaded: true, filename: 'hospital_death_receipt.pdf' },
-        { name: 'आवेदक आधार कार्ड (Applicant Aadhaar)', uploaded: true, filename: 'applicant_aadhaar.pdf' }
-      ]
+      documents: {
+        deathSlip: null,
+        applicantAadhaar: null,
+        addressProof: null
+      }
     });
   };
 
@@ -359,51 +393,14 @@ export default function DeathCertificatePage() {
     return (gender.includes('महिला') || gender.toLowerCase().includes('female')) && age >= 15 && age <= 49;
   };
 
+  const getDoc = (key) => {
+    if (!formData.documents) return null;
+    if (Array.isArray(formData.documents)) return null;
+    return formData.documents[key] || null;
+  };
+
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans antialiased">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "FAQPage",
-            "mainEntity": [
-              {
-                "@type": "Question",
-                "name": "मृत्यु प्रमाण पत्र के लिए ऑनलाइन आवेदन कैसे करें? (How to apply for death certificate online?)",
-                "acceptedAnswer": {
-                  "@type": "Answer",
-                  "text": "नगर पालिका परिषद झाबुआ के ई-नगर पोर्टल पर जाएं। ऑनलाइन फॉर्म भरें, आवश्यक दस्तावेज अपलोड करें और जमा करें। आवेदन संख्या द्वारा स्थिति ट्रैक करें। Visit the e-Nagar portal of Nagar Palika Parishad Jhabua. Fill the online form, upload required documents, and submit. Track status using your application number."
-                }
-              },
-              {
-                "@type": "Question",
-                "name": "मृत्यु प्रमाण पत्र हेतु कौन से दस्तावेज आवश्यक हैं? (What documents are required for death certificate?)",
-                "acceptedAnswer": {
-                  "@type": "Answer",
-                  "text": "आवश्यक दस्तावेज: आवेदक का आधार कार्ड, अस्पताल/डॉक्टर द्वारा जारी मृत्यु प्रमाण पत्र, निवास पता प्रमाण, और पासपोर्ट साइज फोटो। Required documents: Aadhaar card, hospital/doctor issued death certificate, address proof, and passport size photo."
-                }
-              },
-              {
-                "@type": "Question",
-                "name": "प्रमाण पत्र की स्थिति कैसे ट्रैक करें? (How to track death certificate status?)",
-                "acceptedAnswer": {
-                  "@type": "Answer",
-                  "text": "ई-नगर पोर्टल पर 'ट्रैक करें' टैब में अपनी आवेदन संख्या दर्ज करें। आपको रियल-टाइम स्थिति और टाइमलाइन दिखाई देगी। Go to the Track tab on the e-Nagar portal, enter your application number. You will see real-time status and timeline."
-                }
-              },
-              {
-                "@type": "Question",
-                "name": "ई-नगर पोर्टल पर मृत्यु प्रमाण पत्र कितने दिनों में बनता है? (How many days does it take to get death certificate?)",
-                "acceptedAnswer": {
-                  "@type": "Answer",
-                  "text": "सामान्यतः आवेदन जमा करने के 7-15 कार्य दिवसों में प्रमाण पत्र जारी हो जाता है। Generally, the certificate is issued within 7-15 working days after application submission."
-                }
-              }
-            ]
-          })
-        }}
-      />
       <ServiceHeader />
 
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
@@ -421,7 +418,7 @@ export default function DeathCertificatePage() {
               मृतक प्रमाण पत्र ऑनलाइन आवेदन
             </h1>
             <p className="text-slate-200 text-xs sm:text-sm max-w-3xl leading-relaxed">
-              नगर पालिका परिषद झाबुआ (म.प्र.) | जन्म और मृत्यु पंजीकरण अधिनियम, 1969 के अंतर्गत पूर्ण शासकीय मृत्यु पंजीकरण फॉर्म। ऑनलाइन आवेदन करें, स्थिति ट्रैक करें एवं स्वीकृत प्रमाण पत्र डाउनलोड करें।
+              नगर पालिका परिषद झाबुआ (म.प्र.) | जन्म और मृत्यु पंजीकरण अधिनियम, 1969 के अंतर्गत पूर्ण शासकीय मृत्यु पंजीकरण फॉर्म। ऑनलाइन आवेदन करें, स्थिति ट्रैक करें, पावती पत्र डाउनलोड करें एवं स्वीकृत प्रमाण पत्र प्राप्त करें।
             </p>
           </div>
         </div>
@@ -497,7 +494,7 @@ export default function DeathCertificatePage() {
         {activeTab === 'apply' && (
           <form onSubmit={handleSubmit} className="space-y-6">
             
-            {/* Correction Warning Banner if Resubmitting */}
+            {/* Correction Warning Banner */}
             {formData.status === 'Correction Requested' && (
               <div className="bg-amber-50 border border-amber-200 rounded-2xl p-5 text-amber-900 space-y-1 shadow-sm">
                 <div className="flex items-center gap-2 text-amber-800 font-bold text-sm">
@@ -952,56 +949,13 @@ export default function DeathCertificatePage() {
                     className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-slate-900 focus:outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20 font-medium"
                   />
                 </div>
-
-                <div>
-                  <label className="block text-[10px] sm:text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">ग्राम / नगर (Village / City)</label>
-                  <input
-                    type="text"
-                    value={formData.applicantDetails.villageCity}
-                    onChange={(e) => handleInputChange('applicantDetails', 'villageCity', e.target.value)}
-                    placeholder="झाबुआ"
-                    className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-slate-900 focus:outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20 font-medium"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-[10px] sm:text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">जिला (District)</label>
-                  <input
-                    type="text"
-                    value={formData.applicantDetails.district}
-                    onChange={(e) => handleInputChange('applicantDetails', 'district', e.target.value)}
-                    placeholder="झाबुआ"
-                    className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-slate-900 focus:outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20 font-medium"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-[10px] sm:text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">राज्य एवं पिनकोड (State & Pincode)</label>
-                  <div className="grid grid-cols-2 gap-2">
-                    <input
-                      type="text"
-                      value={formData.applicantDetails.state}
-                      onChange={(e) => handleInputChange('applicantDetails', 'state', e.target.value)}
-                      placeholder="मध्य प्रदेश"
-                      className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2.5 text-xs text-slate-900 font-medium"
-                    />
-                    <input
-                      type="text"
-                      maxLength={6}
-                      value={formData.applicantDetails.pincode}
-                      onChange={(e) => handleInputChange('applicantDetails', 'pincode', e.target.value)}
-                      placeholder="457661"
-                      className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2.5 text-xs text-slate-900 font-medium"
-                    />
-                  </div>
-                </div>
               </div>
             </div>
 
             {/* SECTION 5: STATISTICAL & LIFESTYLE DETAILS */}
             <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-sm space-y-6">
               <h2 className="text-sm sm:text-base font-bold text-slate-900 flex items-center gap-2 border-b border-slate-100 pb-3">
-                <span className="p-1.5 rounded-lg bg-emerald-100 text-emerald-800 text-xs">📊</span> 5. सांख्यिकी एवं मृत्यु का कारण (Statistical & Cause of Death Details - Government Part II)
+                <span className="p-1.5 rounded-lg bg-emerald-100 text-emerald-800 text-xs">📊</span> 5. सांख्यिकी एवं मृत्यु का कारण (Statistical & Cause of Death Details)
               </h2>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -1040,118 +994,45 @@ export default function DeathCertificatePage() {
                     className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-slate-900 focus:outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20 font-medium"
                   />
                 </div>
-
-                {isFemaleAge15to49() && (
-                  <div className="sm:col-span-2 bg-pink-50 border border-pink-200 p-4 rounded-2xl">
-                    <label className="block text-xs font-bold text-pink-900 mb-1.5">
-                       क्या मृत्यु गर्भावस्था, प्रसव या प्रसव के 42 दिनों के भीतर हुई? (Female Pregnancy-Related Death Question)
-                    </label>
-                    <select
-                      value={formData.statisticalDetails.pregnancyRelatedDeath}
-                      onChange={(e) => handleInputChange('statisticalDetails', 'pregnancyRelatedDeath', e.target.value)}
-                      className="w-full bg-white border border-pink-300 rounded-xl px-3.5 py-2.5 text-xs text-pink-900 font-medium"
-                    >
-                      <option>नहीं (No)</option>
-                      <option>हाँ, गर्भावस्था के दौरान (Yes, during pregnancy)</option>
-                      <option>हाँ, प्रसव के समय (Yes, during delivery)</option>
-                      <option>हाँ, प्रसव के 42 दिनों के भीतर (Yes, within 42 days of termination)</option>
-                    </select>
-                  </div>
-                )}
               </div>
+            </div>
 
-              {/* Lifestyle / Habit History */}
-              <div className="pt-3 border-t border-slate-100">
-                <h3 className="text-xs font-extrabold text-slate-700 uppercase tracking-wider mb-3">🚬 आदतन जीवन शैली विवरण (Habitual History of Deceased)</h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                  {/* Smoking */}
-                  <div className="bg-slate-50 border border-slate-200 p-3.5 rounded-2xl space-y-2">
-                    <span className="block text-xs font-bold text-slate-700">धूम्रपान की आदत (Smoking History)</span>
-                    <select
-                      value={formData.statisticalDetails.lifestyleHistory.smoking}
-                      onChange={(e) => handleInputChange('statisticalDetails', 'lifestyleHistory', e.target.value, 'smoking')}
-                      className="w-full bg-white border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs font-medium"
-                    >
-                      <option>नहीं (No)</option>
-                      <option>हाँ (Yes)</option>
-                    </select>
-                    {formData.statisticalDetails.lifestyleHistory.smoking === 'हाँ (Yes)' && (
-                      <input
-                        type="number"
-                        placeholder="अवधि (वर्षों में)"
-                        value={formData.statisticalDetails.lifestyleHistory.smokingYears}
-                        onChange={(e) => handleInputChange('statisticalDetails', 'lifestyleHistory', e.target.value, 'smokingYears')}
-                        className="w-full bg-white border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs font-medium"
-                      />
-                    )}
-                  </div>
+            {/* SECTION 6: SUPPORTING DOCUMENT PHOTO UPLOADS */}
+            <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-sm space-y-5">
+              <h2 className="text-sm sm:text-base font-bold text-slate-900 flex items-center gap-2 border-b border-slate-100 pb-3">
+                <span className="p-1.5 rounded-lg bg-emerald-100 text-emerald-800 text-xs">📎</span> 6. आवश्यक दस्तावेज फोटो अपलोड (Supporting Document Uploads)
+              </h2>
+              <p className="text-xs text-slate-500 leading-relaxed">
+                कृपया मृत्यु प्रमाण पत्र सत्यापन हेतु आवश्यक मूल दस्तावेजों की स्पष्ट फोटो या PDF फ़ाइल संलग्न करें।
+              </p>
 
-                  {/* Tobacco */}
-                  <div className="bg-slate-50 border border-slate-200 p-3.5 rounded-2xl space-y-2">
-                    <span className="block text-xs font-bold text-slate-700">तंबाकू सेवन (Tobacco History)</span>
-                    <select
-                      value={formData.statisticalDetails.lifestyleHistory.tobacco}
-                      onChange={(e) => handleInputChange('statisticalDetails', 'lifestyleHistory', e.target.value, 'tobacco')}
-                      className="w-full bg-white border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs font-medium"
-                    >
-                      <option>नहीं (No)</option>
-                      <option>हाँ (Yes)</option>
-                    </select>
-                    {formData.statisticalDetails.lifestyleHistory.tobacco === 'हाँ (Yes)' && (
-                      <input
-                        type="number"
-                        placeholder="अवधि (वर्षों में)"
-                        value={formData.statisticalDetails.lifestyleHistory.tobaccoYears}
-                        onChange={(e) => handleInputChange('statisticalDetails', 'lifestyleHistory', e.target.value, 'tobaccoYears')}
-                        className="w-full bg-white border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs font-medium"
-                      />
-                    )}
-                  </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <DocumentUploader
+                  title="अस्पताल मृत्यु प्रमाण पत्र / दाह संस्कार रसीद"
+                  description="अस्पताल मृत्यु पर्ची या श्मशान/कब्रिस्तान की रसीद"
+                  required={true}
+                  documentData={getDoc('deathSlip')}
+                  onUpload={(doc) => handleDocumentUpload('deathSlip', doc)}
+                  onRemove={() => handleDocumentRemove('deathSlip')}
+                />
 
-                  {/* Gutka / Pan Masala */}
-                  <div className="bg-slate-50 border border-slate-200 p-3.5 rounded-2xl space-y-2">
-                    <span className="block text-xs font-bold text-slate-700">गुटका / पान मसाला (Gutka History)</span>
-                    <select
-                      value={formData.statisticalDetails.lifestyleHistory.gutka}
-                      onChange={(e) => handleInputChange('statisticalDetails', 'lifestyleHistory', e.target.value, 'gutka')}
-                      className="w-full bg-white border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs font-medium"
-                    >
-                      <option>नहीं (No)</option>
-                      <option>हाँ (Yes)</option>
-                    </select>
-                    {formData.statisticalDetails.lifestyleHistory.gutka === 'हाँ (Yes)' && (
-                      <input
-                        type="number"
-                        placeholder="अवधि (वर्षों में)"
-                        value={formData.statisticalDetails.lifestyleHistory.gutkaYears}
-                        onChange={(e) => handleInputChange('statisticalDetails', 'lifestyleHistory', e.target.value, 'gutkaYears')}
-                        className="w-full bg-white border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs font-medium"
-                      />
-                    )}
-                  </div>
+                <DocumentUploader
+                  title="आवेदक आधार कार्ड फोटो"
+                  description="आवेदक का आधार कार्ड (स्पष्ट फोटो)"
+                  required={true}
+                  documentData={getDoc('applicantAadhaar')}
+                  onUpload={(doc) => handleDocumentUpload('applicantAadhaar', doc)}
+                  onRemove={() => handleDocumentRemove('applicantAadhaar')}
+                />
 
-                  {/* Alcohol */}
-                  <div className="bg-slate-50 border border-slate-200 p-3.5 rounded-2xl space-y-2">
-                    <span className="block text-xs font-bold text-slate-700">मद्यपान / शराब (Alcohol History)</span>
-                    <select
-                      value={formData.statisticalDetails.lifestyleHistory.alcohol}
-                      onChange={(e) => handleInputChange('statisticalDetails', 'lifestyleHistory', e.target.value, 'alcohol')}
-                      className="w-full bg-white border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs font-medium"
-                    >
-                      <option>नहीं (No)</option>
-                      <option>हाँ (Yes)</option>
-                    </select>
-                    {formData.statisticalDetails.lifestyleHistory.alcohol === 'हाँ (Yes)' && (
-                      <input
-                        type="number"
-                        placeholder="अवधि (वर्षों में)"
-                        value={formData.statisticalDetails.lifestyleHistory.alcoholYears}
-                        onChange={(e) => handleInputChange('statisticalDetails', 'lifestyleHistory', e.target.value, 'alcoholYears')}
-                        className="w-full bg-white border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs font-medium"
-                      />
-                    )}
-                  </div>
-                </div>
+                <DocumentUploader
+                  title="मृतक का निवास पता प्रमाण फोटो"
+                  description="राशन कार्ड / वोटर ID / बिजली बिल / अन्य"
+                  required={false}
+                  documentData={getDoc('addressProof')}
+                  onUpload={(doc) => handleDocumentUpload('addressProof', doc)}
+                  onRemove={() => handleDocumentRemove('addressProof')}
+                />
               </div>
             </div>
 
@@ -1219,6 +1100,14 @@ export default function DeathCertificatePage() {
                     </div>
 
                     <div className="flex flex-wrap items-center gap-2">
+                      {/* Hard Copy Submission Letter */}
+                      <button
+                        onClick={() => { setSelectedApp(app); setShowLetterModal(true); }}
+                        className="btn btn-secondary btn-sm flex items-center gap-1 font-bold text-emerald-900 bg-emerald-50 hover:bg-emerald-100 border-emerald-200"
+                      >
+                        <Printer className="w-3.5 h-3.5 text-emerald-700" /> 🖨️ आवेदन पत्र (Hard Copy Letter)
+                      </button>
+
                       {/* Resubmit Action if Correction Requested */}
                       {app.status === 'Correction Requested' && (
                         <button
@@ -1244,7 +1133,7 @@ export default function DeathCertificatePage() {
                         onClick={() => setSelectedApp(app)}
                         className="btn btn-secondary btn-sm flex items-center gap-1 font-bold text-slate-700"
                       >
-                        <History className="w-3.5 h-3.5 text-slate-500" /> स्थिति व टाइमलाइन देखें
+                        <History className="w-3.5 h-3.5 text-slate-500" /> स्थिति देखें
                       </button>
                     </div>
                   </div>
@@ -1256,7 +1145,7 @@ export default function DeathCertificatePage() {
         )}
 
         {/* TIMELINE & APPLICATION DETAILS MODAL */}
-        {selectedApp && !showCertModal && (
+        {selectedApp && !showCertModal && !showLetterModal && (
           <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
             <div className="bg-white border border-slate-200 rounded-3xl max-w-3xl w-full p-6 max-h-[90vh] overflow-y-auto shadow-2xl space-y-4">
               <div className="flex items-center justify-between border-b border-slate-100 pb-3">
@@ -1289,8 +1178,43 @@ export default function DeathCertificatePage() {
                 </div>
               </div>
 
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setShowLetterModal(true)}
+                  className="btn btn-secondary btn-sm text-xs font-bold text-emerald-900 bg-emerald-50 hover:bg-emerald-100 flex items-center gap-1"
+                >
+                  <Printer className="w-3.5 h-3.5 text-emerald-700" /> भौतिक पावती पत्र देखें / प्रिंट करें
+                </button>
+              </div>
+
               <h4 className="text-xs uppercase font-extrabold text-slate-500 tracking-wider">आवेदन टाइमलाइन विवरण (Activity Timeline)</h4>
               <ApplicationTimeline timeline={selectedApp.timeline || []} />
+            </div>
+          </div>
+        )}
+
+        {/* APPLICATION SUBMISSION LETTER MODAL */}
+        {selectedApp && showLetterModal && (
+          <div className="fixed inset-0 bg-slate-900/70 backdrop-blur-md z-50 flex items-center justify-center p-4 overflow-y-auto">
+            <div className="bg-white border border-slate-200 rounded-3xl max-w-4xl w-full p-6 my-8 shadow-2xl space-y-4">
+              <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                <h3 className="text-slate-900 font-extrabold text-base flex items-center gap-2">
+                  📄 भौतिक सत्यापन आवेदन पत्र (Application Submission Letter)
+                </h3>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => window.print()}
+                    className="btn btn-primary btn-sm flex items-center gap-1 font-bold text-xs"
+                  >
+                    <Printer className="w-3.5 h-3.5" /> प्रिंट / PDF डाउनलोड करें
+                  </button>
+                  <button onClick={() => { setShowLetterModal(false); setSelectedApp(null); }} className="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100">
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+              </div>
+
+              <ApplicationLetterTemplate record={selectedApp} serviceType="death" />
             </div>
           </div>
         )}
@@ -1306,7 +1230,7 @@ export default function DeathCertificatePage() {
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => window.print()}
-                    className="btn btn-primary btn-sm flex items-center gap-1 font-bold"
+                    className="btn btn-primary btn-sm flex items-center gap-1 font-bold text-xs"
                   >
                     <Printer className="w-3.5 h-3.5" /> प्रिंट / PDF डाउनलोड करें
                   </button>
@@ -1320,45 +1244,6 @@ export default function DeathCertificatePage() {
             </div>
           </div>
         )}
-
-        {/* FAQ Section */}
-        <div className="mt-10 max-w-4xl mx-auto">
-          <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-sm">
-            <h3 className="text-base font-extrabold text-slate-900 mb-6 flex items-center gap-2">
-              <span className="text-lg">❓</span> मृत्यु प्रमाण पत्र संबंधी प्रश्न (Death Certificate FAQ)
-            </h3>
-            <div className="space-y-4">
-              {[
-                {
-                  q: 'मृत्यु प्रमाण पत्र के लिए ऑनलाइन आवेदन कैसे करें? (How to apply for death certificate online?)',
-                  a: 'ऊपर दिए गए "नया ऑनलाइन आवेदन दर्ज करें" टैब में सभी आवश्यक विवरण भरें और "जमा करें" बटन दबाएं। आपको एक आवेदन संख्या (DC-2026-XXXXX) प्राप्त होगी। Fill all required details in the "New Application" tab above and click "Submit". You will receive an application number (DC-2026-XXXXX).'
-                },
-                {
-                  q: 'आवेदन जमा करने के बाद क्या होता है? (What happens after submitting the application?)',
-                  a: 'आवेदन जमा होने के बाद अधिकारी द्वारा समीक्षा की जाती है। स्वीकृति के बाद आप प्रमाण पत्र डाउनलोड कर सकते हैं। हर चरण पर आपको सूचना प्राप्त होती है। After submission, the application is reviewed by an officer. Once approved, you can download the certificate. You receive notifications at every stage.'
-                },
-                {
-                  q: 'क्या मैं अपना आवेदन संपादित कर सकता हूँ? (Can I edit my application?)',
-                  a: 'हाँ, यदि अधिकारी द्वारा सुधार की मांग की जाती है, तो आप विवरण संपादित करके पुनः प्रस्तुत कर सकते हैं। ड्राफ्ट स्थिति में भी संपादन संभव है। Yes, if correction is requested by the officer, you can edit details and resubmit. Editing is also possible in draft status.'
-                },
-                {
-                  q: 'प्रमाण पत्र कितने दिनों में मिलता है? (How many days to get the certificate?)',
-                  a: 'सामान्यतः 7-15 कार्य दिवसों में प्रमाण पत्र जारी हो जाता है। आप "मेरे आवेदन" टैब में स्थिति देख सकते हैं। Generally, the certificate is issued within 7-15 working days. You can check status in the "My Applications" tab.'
-                },
-              ].map((faq, i) => (
-                <details key={i} className="group border border-slate-200 rounded-2xl overflow-hidden">
-                  <summary className="flex items-center justify-between gap-3 px-5 py-4 cursor-pointer bg-slate-50 hover:bg-slate-100 transition-colors text-sm font-bold text-slate-800 select-none">
-                    <span>{faq.q}</span>
-                    <span className="text-emerald-600 group-open:rotate-45 transition-transform text-lg shrink-0">+</span>
-                  </summary>
-                  <div className="px-5 py-4 text-xs text-slate-600 leading-relaxed bg-white border-t border-slate-100">
-                    {faq.a}
-                  </div>
-                </details>
-              ))}
-            </div>
-          </div>
-        </div>
 
       </main>
     </div>
