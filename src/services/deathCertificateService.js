@@ -81,6 +81,19 @@ export async function saveDeathCertificateDraft(data, existingId = null) {
       };
       const docRef = await addDoc(collection(db, COLLECTION_NAME), newDoc);
       syncLocalRecord({ id: docRef.id, ...newDoc });
+
+      await sendNotification({
+        serviceType: 'death_certificate',
+        applicationId: docRef.id,
+        applicationNo,
+        recipientId: 'all',
+        event: 'DRAFT_SAVED',
+        status: 'Draft',
+        message: `📝 मृतक प्रमाण पत्र प्रारूप (${applicationNo}) सहेजा गया। (Death certificate draft saved.)`,
+        officerRemark: '',
+        officerName: 'Citizen System'
+      });
+
       return { success: true, id: docRef.id, applicationNo };
     }
   } catch (error) {
@@ -105,6 +118,19 @@ export async function saveDeathCertificateDraft(data, existingId = null) {
       ]
     };
     syncLocalRecord(localDoc);
+
+    await sendNotification({
+      serviceType: 'death_certificate',
+      applicationId: localId,
+      applicationNo,
+      recipientId: 'all',
+      event: 'DRAFT_SAVED',
+      status: 'Draft',
+      message: `📝 मृतक प्रमाण पत्र प्रारूप (${applicationNo}) सहेजा गया। (Death certificate draft saved.)`,
+      officerRemark: '',
+      officerName: 'Citizen System'
+    });
+
     return { success: true, id: localId, applicationNo };
   }
 }
@@ -287,12 +313,16 @@ export async function updateDeathCertificateStatus({
   } catch (e) {}
 
   let notificationMsg = `आपका मृतक प्रमाण पत्र आवेदन (${existing.applicationNo || id}) की स्थिति बदलकर ${newStatus} कर दी गई है। (Your death certificate application status has been changed to ${newStatus}.)`;
-  if (newStatus === 'Correction Requested') {
+  if (newStatus === 'Under Review') {
+    notificationMsg = `🔍 आपका आवेदन (${existing.applicationNo || id}) अब समीक्षा में है। (Your application is now under review.)`;
+  } else if (newStatus === 'Correction Requested') {
     notificationMsg = `⚠ आपके आवेदन (${existing.applicationNo || id}) में सुधार की आवश्यकता है। कारण: ${remarks.trim()} (Correction required in your application. Reason: ${remarks.trim()})`;
   } else if (newStatus === 'Rejected') {
     notificationMsg = `❌ आपका आवेदन (${existing.applicationNo || id}) निरस्त कर दिया गया है। कारण: ${remarks.trim()} (Your application has been rejected. Reason: ${remarks.trim()})`;
   } else if (newStatus === 'Approved' || newStatus === 'Certificate Generated') {
     notificationMsg = `✅ आपका मृतक प्रमाण पत्र (${existing.applicationNo || id}) स्वीकृत एवं जनरेट कर दिया गया है! (Your death certificate has been approved and generated!)`;
+  } else if (newStatus === 'Certificate Issued') {
+    notificationMsg = `🎉 आपका मृतक प्रमाण पत्र (${existing.applicationNo || id}) जारी कर दिया गया है! आप इसे डाउनलोड कर सकते हैं। (Your death certificate has been issued! You can now download it.)`;
   }
 
   await sendNotification({
