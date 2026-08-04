@@ -278,7 +278,7 @@ export default function AdminPage() {
           <div className="space-y-6 animate-fade-in">
             
             {/* Tab Navigation Menu */}
-            <div className="flex gap-1 bg-white border border-slate-200 rounded-2xl p-1 shadow-sm overflow-x-auto">
+            <div className="flex gap-1 bg-white border border-slate-200 rounded-2xl p-1 shadow-sm">
               {[
                 { key: 'death-certificates', label: 'मृत्यु प्रमाण पत्र', labelShort: 'मृत्यु', icon: FileText },
                 { key: 'audit', label: 'ऑडिट लॉग', labelShort: 'ऑडिट', icon: History },
@@ -288,7 +288,7 @@ export default function AdminPage() {
                   <button 
                     key={tab.key} 
                     onClick={() => setActiveTab(tab.key)}
-                    className={`flex items-center gap-1.5 px-3 sm:px-4 py-2.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
+                    className={`flex-1 flex items-center justify-center gap-1.5 px-3 sm:px-4 py-2.5 rounded-xl text-xs font-bold transition-all ${
                       activeTab === tab.key 
                         ? 'bg-emerald-700 text-white shadow-md' 
                         : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100'
