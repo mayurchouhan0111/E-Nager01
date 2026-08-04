@@ -183,39 +183,39 @@ export default function AdminPage() {
     <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans">
       {/* Header */}
       <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <a href="/" className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-700 to-emerald-800 flex items-center justify-center shadow-lg hover:opacity-90 transition" title="Home">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 sm:h-16 flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <a href="/" className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-700 to-emerald-800 flex items-center justify-center shadow-lg hover:opacity-90 transition shrink-0" title="Home">
               <ShieldAlert className="w-5 h-5 text-white" />
             </a>
-            <div>
-              <div className="flex items-center gap-2">
-                <h1 className="font-extrabold text-slate-900 text-sm tracking-tight">ई-नगर अधिकारी पैनल (e-Nagar Officer Panel)</h1>
-                <span className="text-[10px] font-bold text-emerald-800 tracking-wider bg-emerald-100 px-2 py-0.5 rounded border border-emerald-300 uppercase">कंसोल (Console)</span>
-              </div>
+            <div className="min-w-0">
+              <h1 className="font-extrabold text-slate-900 text-sm tracking-tight truncate">
+                <span className="hidden sm:inline">ई-नगर अधिकारी पैनल</span>
+                <span className="sm:hidden">ई-नगर पैनल</span>
+              </h1>
             </div>
           </div>
 
           <div className="hidden md:flex items-center space-x-2 bg-slate-100 p-1 rounded-xl border border-slate-200">
             <a href="/" className="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-white transition flex items-center gap-1.5">
-              <span>📜</span> मृतक प्रमाण पत्र (Death Cert)
+              <span>📜</span> मृतक प्रमाण पत्र
             </a>
             <a href="/birth-certificate" className="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-white transition flex items-center gap-1.5 opacity-50 cursor-not-allowed">
-              <span>👶</span> जन्म प्रमाण पत्र (Soon)
+              <span>👶</span> जन्म प्रमाण पत्र
             </a>
           </div>
 
           {isAdmin && (
-            <div className="flex items-center gap-3">
-              <span className="inline-flex items-center gap-1.5 text-xs text-emerald-700 bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded-full font-semibold">
+            <div className="flex items-center gap-2 shrink-0">
+              <span className="hidden sm:inline-flex items-center gap-1.5 text-xs text-emerald-700 bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded-full font-semibold">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"/>
-                {username} (Administrator)
+                {username}
               </span>
               <button 
                 onClick={handleLogout} 
                 className="btn btn-secondary btn-sm flex items-center gap-1"
               >
-                <LogOut className="w-3.5 h-3.5" /> लॉगआउट (Logout)
+                <LogOut className="w-3.5 h-3.5" /> <span className="hidden sm:inline">लॉगआउट</span>
               </button>
             </div>
           )}
@@ -278,24 +278,25 @@ export default function AdminPage() {
           <div className="space-y-6 animate-fade-in">
             
             {/* Tab Navigation Menu */}
-            <div className="flex gap-1.5 bg-white border border-slate-200 rounded-2xl p-1.5 w-fit shadow-sm">
+            <div className="flex gap-1 bg-white border border-slate-200 rounded-2xl p-1 shadow-sm overflow-x-auto">
               {[
-                { key: 'death-certificates', label: 'मृत्यु प्रमाण पत्र (Death Certificates)', icon: FileText },
-                { key: 'audit', label: 'ऑडिट लॉग (Audit Logs)', icon: History },
+                { key: 'death-certificates', label: 'मृत्यु प्रमाण पत्र', labelShort: 'मृत्यु', icon: FileText },
+                { key: 'audit', label: 'ऑडिट लॉग', labelShort: 'ऑडिट', icon: History },
               ].map(tab => {
                 const Icon = tab.icon
                 return (
                   <button 
                     key={tab.key} 
                     onClick={() => setActiveTab(tab.key)}
-                    className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all ${
+                    className={`flex items-center gap-1.5 px-3 sm:px-4 py-2.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
                       activeTab === tab.key 
                         ? 'bg-emerald-700 text-white shadow-md' 
                         : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100'
                     }`}
                   >
-                    <Icon className="w-4 h-4" />
-                    {tab.label}
+                    <Icon className="w-4 h-4 shrink-0" />
+                    <span className="hidden sm:inline">{tab.label}</span>
+                    <span className="sm:hidden">{tab.labelShort}</span>
                   </button>
                 )
               })}
@@ -305,40 +306,40 @@ export default function AdminPage() {
             {activeTab === 'death-certificates' && (
               <div className="space-y-6">
                 {/* Search & Stats */}
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div className="flex flex-col gap-4">
                   <div>
-                    <h2 className="text-lg font-extrabold text-slate-900">मृत्यु प्रमाण पत्र आवेदन (Death Certificate Applications)</h2>
-                    <p className="text-xs text-slate-500 mt-0.5">सभी मृत्यु प्रमाण पत्र आवेदनों का प्रबंधन एवं समीक्षा (Manage and review all death certificate applications)</p>
+                    <h2 className="text-base sm:text-lg font-extrabold text-slate-900">मृत्यु प्रमाण पत्र आवेदन</h2>
+                    <p className="text-xs text-slate-500 mt-0.5">सभी आवेदनों का प्रबंधन एवं समीक्षा</p>
                   </div>
                   <div className="flex items-center gap-2">
-                    <div className="relative">
+                    <div className="relative flex-1">
                       <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                       <input
                         type="text"
                         placeholder="नाम, आवेदन क्र. से खोजें..."
                         value={deathSearch}
                         onChange={(e) => setDeathSearch(e.target.value)}
-                        className="input pl-9 w-64"
+                        className="input pl-9 w-full"
                       />
                     </div>
-                    <button onClick={loadDeathRecords} className="btn btn-secondary btn-sm">
+                    <button onClick={loadDeathRecords} className="btn btn-secondary btn-sm shrink-0">
                       <RefreshCw className={`w-3.5 h-3.5 ${deathLoading ? 'animate-spin' : ''}`} />
                     </button>
                   </div>
                 </div>
 
                 {/* Stats Cards */}
-                <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+                <div className="grid grid-cols-3 sm:grid-cols-5 gap-2 sm:gap-3">
                   {[
-                    { label: 'कुल (Total)', count: deathRecords.length, color: 'slate' },
-                    { label: 'जमा (Submitted)', count: deathRecords.filter(r => r.status === 'Submitted').length, color: 'blue' },
-                    { label: 'समीक्षाधीन (Under Review)', count: deathRecords.filter(r => r.status === 'Under Review').length, color: 'amber' },
-                    { label: 'स्वीकृत (Approved)', count: deathRecords.filter(r => r.status === 'Approved' || r.status === 'Certificate Generated').length, color: 'emerald' },
-                    { label: 'अस्वीकृत (Rejected)', count: deathRecords.filter(r => r.status === 'Rejected').length, color: 'red' },
+                    { label: 'कुल', count: deathRecords.length, color: 'slate' },
+                    { label: 'जमा', count: deathRecords.filter(r => r.status === 'Submitted').length, color: 'blue' },
+                    { label: 'समीक्षा', count: deathRecords.filter(r => r.status === 'Under Review').length, color: 'amber' },
+                    { label: 'स्वीकृत', count: deathRecords.filter(r => r.status === 'Approved' || r.status === 'Certificate Generated').length, color: 'emerald' },
+                    { label: 'अस्वीकृत', count: deathRecords.filter(r => r.status === 'Rejected').length, color: 'red' },
                   ].map((stat) => (
-                    <div key={stat.label} className="bg-white border border-slate-200 rounded-2xl p-4 text-center shadow-sm">
-                      <div className={`text-2xl font-extrabold text-${stat.color}-700`}>{stat.count}</div>
-                      <div className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mt-1">{stat.label}</div>
+                    <div key={stat.label} className="bg-white border border-slate-200 rounded-xl sm:rounded-2xl p-3 sm:p-4 text-center shadow-sm">
+                      <div className={`text-xl sm:text-2xl font-extrabold text-${stat.color}-700`}>{stat.count}</div>
+                      <div className="text-[9px] sm:text-[10px] font-bold text-slate-500 uppercase tracking-wider mt-0.5 sm:mt-1">{stat.label}</div>
                     </div>
                   ))}
                 </div>
@@ -357,61 +358,61 @@ export default function AdminPage() {
                 ) : (
                   <div className="space-y-3">
                     {filteredRecords.map((record) => (
-                      <div key={record.id} className="bg-white border border-slate-200 rounded-2xl p-5 hover:border-slate-300 transition-all shadow-sm">
-                        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-1">
-                              <span className="text-xs font-mono font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded border border-emerald-200">
+                      <div key={record.id} className="bg-white border border-slate-200 rounded-2xl p-4 sm:p-5 hover:border-slate-300 transition-all shadow-sm">
+                        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 mb-1 flex-wrap">
+                              <span className="text-[11px] font-mono font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded border border-emerald-200">
                                 {record.applicationNo || 'DRAFT'}
                               </span>
-                              <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold border uppercase tracking-wider ${getStatusChip(record.status)}`}>
+                              <span className={`px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-bold border uppercase tracking-wider ${getStatusChip(record.status)}`}>
                                 {record.status}
                               </span>
                             </div>
-                            <h3 className="text-slate-900 font-extrabold text-base">
-                              स्व. (Late) {record.deceasedDetails?.fullName || 'N/A'}
+                            <h3 className="text-slate-900 font-extrabold text-sm sm:text-base">
+                              स्व. {record.deceasedDetails?.fullName || 'N/A'}
                             </h3>
-                            <p className="text-xs text-slate-500 mt-0.5 font-medium">
-                              आवेदक (Applicant): {record.applicantDetails?.fullName} ({record.applicantDetails?.relationWithDeceased}) | मृत्यु तिथि (Date of Death): {record.deceasedDetails?.dateOfDeath}
+                            <p className="text-[11px] sm:text-xs text-slate-500 mt-0.5 font-medium">
+                              आवेदक: {record.applicantDetails?.fullName} ({record.applicantDetails?.relationWithDeceased})
+                              <span className="hidden sm:inline"> | मृत्यु तिथि: {record.deceasedDetails?.dateOfDeath}</span>
                             </p>
+                            <p className="text-[11px] sm:hidden text-slate-500 font-medium">मृत्यु तिथि: {record.deceasedDetails?.dateOfDeath}</p>
                             {record.lastOfficerRemark && (
                               <p className="text-[11px] text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-2 py-1 mt-2 font-medium">
-                                💬 अंतिम टिप्पणी (Last Remark): {record.lastOfficerRemark}
+                                💬 अंतिम टिप्पणी: {record.lastOfficerRemark}
                               </p>
                             )}
                           </div>
 
-                          <div className="flex flex-wrap items-center gap-2">
+                          <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 w-full sm:w-auto">
                             {record.status === 'Submitted' && (
-                              <>
-                                <button
-                                  onClick={() => setRemarkModal({ isOpen: true, record, targetStatus: 'Under Review', remarkText: '', officerName: 'Nagar Palika Officer' })}
-                                  className="btn btn-secondary btn-sm bg-blue-50 border-blue-200 text-blue-700 font-bold"
-                                >
-                                   👁️ समीक्षा शुरू करें (Start Review)
-                                </button>
-                              </>
+                              <button
+                                onClick={() => setRemarkModal({ isOpen: true, record, targetStatus: 'Under Review', remarkText: '', officerName: 'Nagar Palika Officer' })}
+                                className="btn btn-secondary btn-sm bg-blue-50 border-blue-200 text-blue-700 font-bold text-[11px] sm:text-xs"
+                              >
+                                👁️ समीक्षा
+                              </button>
                             )}
 
                             {record.status === 'Under Review' && (
                               <>
                                 <button
                                   onClick={() => setRemarkModal({ isOpen: true, record, targetStatus: 'Approved', remarkText: '', officerName: 'Nagar Palika Officer' })}
-                                  className="btn btn-primary btn-sm bg-gradient-to-r from-emerald-600 to-emerald-700 font-bold"
+                                  className="btn btn-primary btn-sm bg-gradient-to-r from-emerald-600 to-emerald-700 font-bold text-[11px] sm:text-xs"
                                 >
-                                   ✅ स्वीकृत करें (Approve)
+                                  ✅ स्वीकृत
                                 </button>
                                 <button
                                   onClick={() => setRemarkModal({ isOpen: true, record, targetStatus: 'Correction Requested', remarkText: '', officerName: 'Nagar Palika Officer' })}
-                                  className="btn btn-secondary btn-sm bg-amber-50 border-amber-200 text-amber-700 font-bold"
+                                  className="btn btn-secondary btn-sm bg-amber-50 border-amber-200 text-amber-700 font-bold text-[11px] sm:text-xs"
                                 >
-                                   ✏️ सुधार (Correction)
+                                  ✏️ सुधार
                                 </button>
                                 <button
                                   onClick={() => setRemarkModal({ isOpen: true, record, targetStatus: 'Rejected', remarkText: '', officerName: 'Nagar Palika Officer' })}
-                                  className="btn btn-danger btn-sm font-bold"
+                                  className="btn btn-danger btn-sm font-bold text-[11px] sm:text-xs"
                                 >
-                                   ❌ अस्वीकृत करें (Reject)
+                                   ❌ अस्वीकृत
                                 </button>
                               </>
                             )}
@@ -425,17 +426,17 @@ export default function AdminPage() {
                             {(record.status === 'Approved' || record.status === 'Certificate Generated' || record.status === 'Completed') && (
                               <button
                                 onClick={() => setDeathCertPreview(record)}
-                                className="btn btn-primary btn-sm bg-gradient-to-r from-emerald-600 to-emerald-700 font-bold"
+                                className="btn btn-primary btn-sm bg-gradient-to-r from-emerald-600 to-emerald-700 font-bold text-[11px] sm:text-xs"
                               >
-                                 📜 प्रमाण पत्र देखें (View Certificate)
+                                 📜 प्रमाण पत्र
                               </button>
                             )}
 
                             <button
                               onClick={() => setSelectedDeathDetail(record)}
-                              className="btn btn-secondary btn-sm flex items-center gap-1 font-bold text-slate-700"
+                              className="btn btn-secondary btn-sm flex items-center gap-1 font-bold text-slate-700 text-[11px] sm:text-xs"
                             >
-                               <History className="w-3.5 h-3.5 text-slate-500" /> विवरण (Details)
+                               <History className="w-3.5 h-3.5 text-slate-500" /> विवरण
                             </button>
                           </div>
                         </div>
@@ -449,18 +450,18 @@ export default function AdminPage() {
             {/* ── AUDIT LOGS TAB ──────────────────────────────────────────── */}
             {activeTab === 'audit' && (
               <div className="space-y-4">
-                <div className="flex items-center justify-between gap-4 flex-wrap bg-white p-4 border border-slate-200 rounded-2xl shadow-sm">
-                  <div className="flex gap-2 flex-1 max-w-md relative">
+                <div className="flex items-center gap-2 flex-wrap bg-white p-3 sm:p-4 border border-slate-200 rounded-2xl shadow-sm">
+                  <div className="relative flex-1 min-w-0">
                     <input 
                       value={auditSearch} 
                       onChange={e => setAuditSearch(e.target.value)}
-                       placeholder="ऑडिट लॉग खोजें... (Search audit logs...)"
-                      className="flex-1 pl-10 pr-3 py-2.5 rounded-xl bg-white border border-slate-300 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20 transition"
+                      placeholder="ऑडिट लॉग खोजें..."
+                      className="w-full pl-9 pr-3 py-2 rounded-xl bg-white border border-slate-300 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20 transition"
                     />
-                    <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                    <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
                   </div>
-                  <button onClick={loadAuditLogs} className="btn btn-secondary btn-sm flex items-center gap-1">
-                     <RefreshCw className={`w-3.5 h-3.5 ${auditLoading ? 'animate-spin' : ''}`} /> रिफ्रेश (Refresh)
+                  <button onClick={loadAuditLogs} className="btn btn-secondary btn-sm flex items-center gap-1 shrink-0">
+                     <RefreshCw className={`w-3.5 h-3.5 ${auditLoading ? 'animate-spin' : ''}`} /> रिफ्रेश
                   </button>
                 </div>
 
@@ -475,49 +476,84 @@ export default function AdminPage() {
                        कोई ऑडिट लॉग नहीं मिला (No audit logs found)
                     </div>
                   ) : (
-                    <div className="overflow-x-auto">
-                      <table className="w-full text-xs text-left border-collapse">
-                        <thead>
-                          <tr className="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase tracking-wider text-[10px] font-bold">
-                            <th className="p-4">समय (Timestamp)</th>
-                            <th className="p-4">अधिकारी (Officer)</th>
-                            <th className="p-4">कार्यवाही (Action)</th>
-                            <th className="p-4">संस्था प्रकार (Entity Type)</th>
-                            <th className="p-4">अभिलेख आईडी (Record IDs)</th>
-                            <th className="p-4">गणना (Count)</th>
-                          </tr>
-                        </thead>
-                        <tbody className="divide-y divide-slate-200">
-                          {auditLogs
-                            .filter(log => !auditSearch || 
-                              log.adminName?.toLowerCase().includes(auditSearch.toLowerCase()) ||
-                              log.action?.toLowerCase().includes(auditSearch.toLowerCase()) ||
-                              log.entityType?.toLowerCase().includes(auditSearch.toLowerCase())
-                            )
-                            .map((log) => (
-                              <tr key={log.id} className="hover:bg-slate-50/80 transition-colors">
-                                <td className="p-4 font-mono text-slate-600">{formatTimestamp(log.timestamp)}</td>
-                                <td className="p-4 font-bold text-slate-900">{log.adminName || 'N/A'}</td>
-                                <td className="p-4">
-                                  <span className={`px-2.5 py-1 rounded-full text-[11px] font-bold border ${
-                                    log.action?.includes('APPROVED') ? 'bg-emerald-50 text-emerald-700 border-emerald-200' :
-                                    log.action?.includes('REJECTED') ? 'bg-red-50 text-red-700 border-red-200' :
-                                    log.action?.includes('DELETE') ? 'bg-red-50 text-red-700 border-red-200' :
-                                    log.action?.includes('CORRECTION') ? 'bg-amber-50 text-amber-700 border-amber-200' :
-                                    'bg-blue-50 text-blue-700 border-blue-200'
-                                  }`}>
-                                    {log.action || 'N/A'}
-                                  </span>
-                                </td>
-                                <td className="p-4 text-slate-600">{log.entityType || 'N/A'}</td>
-                                <td className="p-4 font-mono text-slate-500 max-w-[200px] truncate">
+                    <div>
+                      {/* Desktop Table */}
+                      <div className="hidden md:block overflow-x-auto">
+                        <table className="w-full text-xs text-left border-collapse">
+                          <thead>
+                            <tr className="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase tracking-wider text-[10px] font-bold">
+                              <th className="p-4">समय (Timestamp)</th>
+                              <th className="p-4">अधिकारी (Officer)</th>
+                              <th className="p-4">कार्यवाही (Action)</th>
+                              <th className="p-4">संस्था प्रकार (Entity Type)</th>
+                              <th className="p-4">अभिलेख आईडी (Record IDs)</th>
+                              <th className="p-4">गणना (Count)</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-slate-200">
+                            {auditLogs
+                              .filter(log => !auditSearch || 
+                                log.adminName?.toLowerCase().includes(auditSearch.toLowerCase()) ||
+                                log.action?.toLowerCase().includes(auditSearch.toLowerCase()) ||
+                                log.entityType?.toLowerCase().includes(auditSearch.toLowerCase())
+                              )
+                              .map((log) => (
+                                <tr key={log.id} className="hover:bg-slate-50/80 transition-colors">
+                                  <td className="p-4 font-mono text-slate-600">{formatTimestamp(log.timestamp)}</td>
+                                  <td className="p-4 font-bold text-slate-900">{log.adminName || 'N/A'}</td>
+                                  <td className="p-4">
+                                    <span className={`px-2.5 py-1 rounded-full text-[11px] font-bold border ${
+                                      log.action?.includes('APPROVED') ? 'bg-emerald-50 text-emerald-700 border-emerald-200' :
+                                      log.action?.includes('REJECTED') ? 'bg-red-50 text-red-700 border-red-200' :
+                                      log.action?.includes('DELETE') ? 'bg-red-50 text-red-700 border-red-200' :
+                                      log.action?.includes('CORRECTION') ? 'bg-amber-50 text-amber-700 border-amber-200' :
+                                      'bg-blue-50 text-blue-700 border-blue-200'
+                                    }`}>
+                                      {log.action || 'N/A'}
+                                    </span>
+                                  </td>
+                                  <td className="p-4 text-slate-600">{log.entityType || 'N/A'}</td>
+                                  <td className="p-4 font-mono text-slate-500 max-w-[200px] truncate">
+                                    {Array.isArray(log.recordIds) ? log.recordIds.join(', ') : log.applicationNo || log.recordIds || '—'}
+                                  </td>
+                                  <td className="p-4 text-center font-bold text-slate-700">{log.count || 1}</td>
+                                </tr>
+                              ))}
+                          </tbody>
+                        </table>
+                      </div>
+                      {/* Mobile Cards */}
+                      <div className="md:hidden divide-y divide-slate-100">
+                        {auditLogs
+                          .filter(log => !auditSearch || 
+                            log.adminName?.toLowerCase().includes(auditSearch.toLowerCase()) ||
+                            log.action?.toLowerCase().includes(auditSearch.toLowerCase()) ||
+                            log.entityType?.toLowerCase().includes(auditSearch.toLowerCase())
+                          )
+                          .map((log) => (
+                            <div key={log.id} className="p-3 hover:bg-slate-50/80 transition-colors">
+                              <div className="flex items-center justify-between gap-2 mb-1.5">
+                                <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold border ${
+                                  log.action?.includes('APPROVED') ? 'bg-emerald-50 text-emerald-700 border-emerald-200' :
+                                  log.action?.includes('REJECTED') ? 'bg-red-50 text-red-700 border-red-200' :
+                                  log.action?.includes('DELETE') ? 'bg-red-50 text-red-700 border-red-200' :
+                                  log.action?.includes('CORRECTION') ? 'bg-amber-50 text-amber-700 border-amber-200' :
+                                  'bg-blue-50 text-blue-700 border-blue-200'
+                                }`}>
+                                  {log.action || 'N/A'}
+                                </span>
+                                <span className="font-mono text-[10px] text-slate-400">{formatTimestamp(log.timestamp)}</span>
+                              </div>
+                              <p className="text-xs font-bold text-slate-900">{log.adminName || 'N/A'}</p>
+                              <p className="text-[11px] text-slate-500 mt-0.5">{log.entityType || 'N/A'}</p>
+                              {log.recordIds && (
+                                <p className="text-[10px] font-mono text-slate-400 mt-1 truncate">
                                   {Array.isArray(log.recordIds) ? log.recordIds.join(', ') : log.applicationNo || log.recordIds || '—'}
-                                </td>
-                                <td className="p-4 text-center font-bold text-slate-700">{log.count || 1}</td>
-                              </tr>
-                            ))}
-                        </tbody>
-                      </table>
+                                </p>
+                              )}
+                            </div>
+                          ))}
+                      </div>
                     </div>
                   )}
                 </div>
