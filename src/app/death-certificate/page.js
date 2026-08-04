@@ -361,6 +361,49 @@ export default function DeathCertificatePage() {
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans antialiased">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            "mainEntity": [
+              {
+                "@type": "Question",
+                "name": "मृत्यु प्रमाण पत्र के लिए ऑनलाइन आवेदन कैसे करें? (How to apply for death certificate online?)",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "नगर पालिका परिषद झाबुआ के ई-नगर पोर्टल पर जाएं। ऑनलाइन फॉर्म भरें, आवश्यक दस्तावेज अपलोड करें और जमा करें। आवेदन संख्या द्वारा स्थिति ट्रैक करें। Visit the e-Nagar portal of Nagar Palika Parishad Jhabua. Fill the online form, upload required documents, and submit. Track status using your application number."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "मृत्यु प्रमाण पत्र हेतु कौन से दस्तावेज आवश्यक हैं? (What documents are required for death certificate?)",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "आवश्यक दस्तावेज: आवेदक का आधार कार्ड, अस्पताल/डॉक्टर द्वारा जारी मृत्यु प्रमाण पत्र, निवास पता प्रमाण, और पासपोर्ट साइज फोटो। Required documents: Aadhaar card, hospital/doctor issued death certificate, address proof, and passport size photo."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "प्रमाण पत्र की स्थिति कैसे ट्रैक करें? (How to track death certificate status?)",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "ई-नगर पोर्टल पर 'ट्रैक करें' टैब में अपनी आवेदन संख्या दर्ज करें। आपको रियल-टाइम स्थिति और टाइमलाइन दिखाई देगी। Go to the Track tab on the e-Nagar portal, enter your application number. You will see real-time status and timeline."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "ई-नगर पोर्टल पर मृत्यु प्रमाण पत्र कितने दिनों में बनता है? (How many days does it take to get death certificate?)",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "सामान्यतः आवेदन जमा करने के 7-15 कार्य दिवसों में प्रमाण पत्र जारी हो जाता है। Generally, the certificate is issued within 7-15 working days after application submission."
+                }
+              }
+            ]
+          })
+        }}
+      />
       <ServiceHeader />
 
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
@@ -1274,6 +1317,45 @@ export default function DeathCertificatePage() {
             </div>
           </div>
         )}
+
+        {/* FAQ Section */}
+        <div className="mt-10 max-w-4xl mx-auto">
+          <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-sm">
+            <h3 className="text-base font-extrabold text-slate-900 mb-6 flex items-center gap-2">
+              <span className="text-lg">❓</span> मृत्यु प्रमाण पत्र संबंधी प्रश्न (Death Certificate FAQ)
+            </h3>
+            <div className="space-y-4">
+              {[
+                {
+                  q: 'मृत्यु प्रमाण पत्र के लिए ऑनलाइन आवेदन कैसे करें? (How to apply for death certificate online?)',
+                  a: 'ऊपर दिए गए "नया ऑनलाइन आवेदन दर्ज करें" टैब में सभी आवश्यक विवरण भरें और "जमा करें" बटन दबाएं। आपको एक आवेदन संख्या (DC-2026-XXXXX) प्राप्त होगी। Fill all required details in the "New Application" tab above and click "Submit". You will receive an application number (DC-2026-XXXXX).'
+                },
+                {
+                  q: 'आवेदन जमा करने के बाद क्या होता है? (What happens after submitting the application?)',
+                  a: 'आवेदन जमा होने के बाद अधिकारी द्वारा समीक्षा की जाती है। स्वीकृति के बाद आप प्रमाण पत्र डाउनलोड कर सकते हैं। हर चरण पर आपको सूचना प्राप्त होती है। After submission, the application is reviewed by an officer. Once approved, you can download the certificate. You receive notifications at every stage.'
+                },
+                {
+                  q: 'क्या मैं अपना आवेदन संपादित कर सकता हूँ? (Can I edit my application?)',
+                  a: 'हाँ, यदि अधिकारी द्वारा सुधार की मांग की जाती है, तो आप विवरण संपादित करके पुनः प्रस्तुत कर सकते हैं। ड्राफ्ट स्थिति में भी संपादन संभव है। Yes, if correction is requested by the officer, you can edit details and resubmit. Editing is also possible in draft status.'
+                },
+                {
+                  q: 'प्रमाण पत्र कितने दिनों में मिलता है? (How many days to get the certificate?)',
+                  a: 'सामान्यतः 7-15 कार्य दिवसों में प्रमाण पत्र जारी हो जाता है। आप "मेरे आवेदन" टैब में स्थिति देख सकते हैं। Generally, the certificate is issued within 7-15 working days. You can check status in the "My Applications" tab.'
+                },
+              ].map((faq, i) => (
+                <details key={i} className="group border border-slate-200 rounded-2xl overflow-hidden">
+                  <summary className="flex items-center justify-between gap-3 px-5 py-4 cursor-pointer bg-slate-50 hover:bg-slate-100 transition-colors text-sm font-bold text-slate-800 select-none">
+                    <span>{faq.q}</span>
+                    <span className="text-emerald-600 group-open:rotate-45 transition-transform text-lg shrink-0">+</span>
+                  </summary>
+                  <div className="px-5 py-4 text-xs text-slate-600 leading-relaxed bg-white border-t border-slate-100">
+                    {faq.a}
+                  </div>
+                </details>
+              ))}
+            </div>
+          </div>
+        </div>
 
       </main>
     </div>

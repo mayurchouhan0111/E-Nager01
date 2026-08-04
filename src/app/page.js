@@ -6,6 +6,57 @@ import { FileText, Baby, ArrowRight, Shield, Clock, CheckCircle2 } from 'lucide-
 export default function HomePage() {
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col antialiased">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            "mainEntity": [
+              {
+                "@type": "Question",
+                "name": "झाबुआ में ऑनलाइन मृत्यु प्रमाण पत्र कैसे बनाएं? (How to apply for death certificate in Jhabua online?)",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "नगर पालिका परिषद झाबुआ के ई-नगर पोर्टल पर जाएं। मृत्यु प्रमाण पत्र सेवा चुनें, ऑनलाइन फॉर्म भरें, आवश्यक दस्तावेज अपलोड करें और जमा करें। Visit the e-Nagar portal of Nagar Palika Parishad Jhabua. Select Death Certificate service, fill the form, upload documents, and submit."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "मृत्यु प्रमाण पत्र हेतु कौन से दस्तावेज आवश्यक हैं? (What documents are required for death certificate?)",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "आवश्यक दस्तावेज: आवेदक का आधार कार्ड, अस्पताल/डॉक्टर द्वारा जारी मृत्यु प्रमाण पत्र, निवास पता प्रमाण, और पासपोर्ट साइज फोटो। Required documents: Aadhaar card, hospital/doctor issued death certificate, address proof, and passport size photo."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "प्रमाण पत्र की स्थिति कैसे ट्रैक करें? (How to track death certificate status?)",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "ई-नगर पोर्टल पर ट्रैक टैब में अपनी आवेदन संख्या दर्ज करें। रियल-टाइम स्थिति और टाइमलाइन दिखाई देगी। Go to the Track tab on the e-Nagar portal, enter your application number to see real-time status."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "ई-नगर पोर्टल पर मृत्यु प्रमाण पत्र कितने दिनों में बनता है? (How many days to get death certificate?)",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "सामान्यतः 7-15 कार्य दिवसों में प्रमाण पत्र जारी हो जाता है। Generally, the certificate is issued within 7-15 working days."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "क्या जन्म प्रमाण पत्र के लिए भी ऑनलाइन आवेदन हो सकता है? (Can birth certificate also be applied online?)",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "हाँ, जन्म प्रमाण पत्र सेवा शीघ्र ही ई-नगर पोर्टल पर उपलब्ध होगी। Yes, birth certificate service will be available soon on the e-Nagar portal."
+                }
+              }
+            ]
+          })
+        }}
+      />
       <ServiceHeader />
 
       {/* Hero Banner */}
@@ -153,6 +204,49 @@ export default function HomePage() {
                   <li>• ई-नगरपालिका पोर्टल (e-Nagar Palika Portal)</li>
                 </ul>
               </div>
+            </div>
+          </div>
+        </div>
+
+        {/* FAQ Section */}
+        <div className="mt-10 sm:mt-14 max-w-4xl mx-auto">
+          <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-sm">
+            <h3 className="text-base font-extrabold text-slate-900 mb-6 flex items-center gap-2">
+              <span className="text-lg">❓</span> अक्सर पूछे जाने वाले प्रश्न (Frequently Asked Questions)
+            </h3>
+            <div className="space-y-4">
+              {[
+                {
+                  q: 'झाबुआ में ऑनलाइन मृत्यु प्रमाण पत्र कैसे बनाएं? (How to apply for death certificate in Jhabua online?)',
+                  a: 'नगर पालिका परिषद झाबुआ के ई-नगर पोर्टल (e-nagar01.netlify.app) पर जाएं। "मृत्यु प्रमाण पत्र" सेवा चुनें, ऑनलाइन फॉर्म भरें, आवश्यक दस्तावेज अपलोड करें और जमा करें। आवेदन संख्या द्वारा स्थिति ट्रैक करें। Visit the e-Nagar portal, select Death Certificate service, fill the online form, upload required documents, and submit. Track status using your application number.'
+                },
+                {
+                  q: 'मृत्यु प्रमाण पत्र हेतु कौन से दस्तावेज आवश्यक हैं? (What documents are required for death certificate?)',
+                  a: 'आवश्यक दस्तावेज: आवेदक का आधार कार्ड, अस्पताल/डॉक्टर द्वारा जारी मृत्यु प्रमाण पत्र, निवास पता प्रमाण, और पासपोर्ट साइज फोटो। Required documents: Aadhaar card, hospital/doctor issued death certificate, address proof, and passport size photo.'
+                },
+                {
+                  q: 'प्रमाण पत्र की स्थिति कैसे ट्रैक करें? (How to track death certificate status?)',
+                  a: 'ई-नगर पोर्टल पर "ट्रैक करें" टैब में अपनी आवेदन संख्या (DC-2026-XXXXX) दर्ज करें। आपको रियल-टाइम स्थिति और टाइमलाइन दिखाई देगी। Go to the "Track" tab on the e-Nagar portal, enter your application number. You will see real-time status and timeline.'
+                },
+                {
+                  q: 'ई-नगर पोर्टल पर मृत्यु प्रमाण पत्र कितने दिनों में बनता है? (How many days does it take to get death certificate on e-Nagar?)',
+                  a: 'सामान्यतः आवेदन जमा करने के 7-15 कार्य दिवसों में प्रमाण पत्र जारी हो जाता है। स्थिति ऑनलाइन ट्रैक की जा सकती है। Generally, the certificate is issued within 7-15 working days after application submission. Status can be tracked online.'
+                },
+                {
+                  q: 'क्या जन्म प्रमाण पत्र के लिए भी ऑनलाइन आवेदन हो सकता है? (Can birth certificate also be applied online?)',
+                  a: 'हाँ, जन्म प्रमाण पत्र सेवा शीघ्र ही ई-नगर पोर्टल पर उपलब्ध होगी। वर्तमान में मृत्यु प्रमाण पत्र के लिए ऑनलाइन आवेदन उपलब्ध है। Yes, birth certificate service will be available soon on the e-Nagar portal. Currently, online application is available for death certificates.'
+                },
+              ].map((faq, i) => (
+                <details key={i} className="group border border-slate-200 rounded-2xl overflow-hidden">
+                  <summary className="flex items-center justify-between gap-3 px-5 py-4 cursor-pointer bg-slate-50 hover:bg-slate-100 transition-colors text-sm font-bold text-slate-800 select-none">
+                    <span>{faq.q}</span>
+                    <span className="text-emerald-600 group-open:rotate-45 transition-transform text-lg shrink-0">+</span>
+                  </summary>
+                  <div className="px-5 py-4 text-xs text-slate-600 leading-relaxed bg-white border-t border-slate-100">
+                    {faq.a}
+                  </div>
+                </details>
+              ))}
             </div>
           </div>
         </div>
