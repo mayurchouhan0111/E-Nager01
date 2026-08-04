@@ -33,20 +33,63 @@ export default function DocumentUploader({
       return;
     }
 
-    const reader = new FileReader();
-    reader.onload = () => {
+    const processAndUpload = (fileName, fileType, fileData, sizeKb) => {
       onUpload({
-        fileName: file.name,
-        fileType: file.type,
-        fileSize: (file.size / 1024).toFixed(1) + ' KB',
-        fileData: reader.result, // base64 string
+        fileName,
+        fileType,
+        fileSize: sizeKb + ' KB',
+        fileData,
         uploadedAt: new Date().toISOString()
       });
     };
-    reader.onerror = () => {
-      setError('फ़ाइल पढ़ने में त्रुटि (Error reading file)');
-    };
-    reader.readAsDataURL(file);
+
+    if (file.type.startsWith('image/')) {
+      const imgReader = new FileReader();
+      imgReader.onload = (event) => {
+        const img = new Image();
+        img.onload = () => {
+          const maxDim = 1200;
+          let width = img.width;
+          let height = img.height;
+
+          if (width > maxDim || height > maxDim) {
+            if (width > height) {
+              height = Math.round((height * maxDim) / width);
+              width = maxDim;
+            } else {
+              width = Math.round((width * maxDim) / height);
+              height = maxDim;
+            }
+          }
+
+          const canvas = document.createElement('canvas');
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+
+          const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
+          const approxKb = (Math.round((compressedBase64.length * 3) / 4) / 1024).toFixed(1);
+          processAndUpload(file.name, 'image/jpeg', compressedBase64, approxKb);
+        };
+        img.onerror = () => {
+          setError('फ़ाइल पढ़ने में त्रुटि (Error processing image)');
+        };
+        img.src = event.target.result;
+      };
+      imgReader.readAsDataURL(file);
+    } else {
+      // PDF or non-image files
+      const reader = new FileReader();
+      reader.onload = () => {
+        const sizeKb = (file.size / 1024).toFixed(1);
+        processAndUpload(file.name, file.type, reader.result, sizeKb);
+      };
+      reader.onerror = () => {
+        setError('फ़ाइल पढ़ने में त्रुटि (Error reading file)');
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   const isUploaded = Boolean(documentData && documentData.fileData);
