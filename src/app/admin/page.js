@@ -132,7 +132,7 @@ export default function AdminPage() {
       return
     }
 
-    const toastId = toast.loading(`Updating status to ${remarkModal.targetStatus}...`)
+    const toastId = toast.loading(`स्थिति अपडेट हो रही है: ${remarkModal.targetStatus}... (Updating status...)`)
     const res = await updateDeathCertificateStatus({
       id: remarkModal.record.id,
       newStatus: remarkModal.targetStatus,
@@ -141,11 +141,11 @@ export default function AdminPage() {
     })
 
     if (res.success) {
-      toast.success(`Status updated to ${remarkModal.targetStatus}!`, { id: toastId })
+      toast.success(`स्थिति अपडेट हो गई: ${remarkModal.targetStatus}! (Status updated!)`, { id: toastId })
       setRemarkModal({ isOpen: false, record: null, targetStatus: '', remarkText: '', officerName: 'Nagar Palika Officer' })
       loadDeathRecords()
     } else {
-      toast.error(`Update failed: ${res.error}`, { id: toastId })
+      toast.error(`अपडेट विफल: ${res.error} (Update failed)`, { id: toastId })
     }
   }
 
@@ -190,8 +190,8 @@ export default function AdminPage() {
             </a>
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="font-extrabold text-slate-900 text-sm tracking-tight">e-Nagar Officer Panel</h1>
-                <span className="text-[10px] font-bold text-emerald-800 tracking-wider bg-emerald-100 px-2 py-0.5 rounded border border-emerald-300 uppercase">Console</span>
+                <h1 className="font-extrabold text-slate-900 text-sm tracking-tight">ई-नगर अधिकारी पैनल (e-Nagar Officer Panel)</h1>
+                <span className="text-[10px] font-bold text-emerald-800 tracking-wider bg-emerald-100 px-2 py-0.5 rounded border border-emerald-300 uppercase">कंसोल (Console)</span>
               </div>
             </div>
           </div>
@@ -215,7 +215,7 @@ export default function AdminPage() {
                 onClick={handleLogout} 
                 className="btn btn-secondary btn-sm flex items-center gap-1"
               >
-                <LogOut className="w-3.5 h-3.5" /> Logout
+                <LogOut className="w-3.5 h-3.5" /> लॉगआउट (Logout)
               </button>
             </div>
           )}
@@ -233,8 +233,8 @@ export default function AdminPage() {
                 <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-700 to-emerald-800 flex items-center justify-center shadow-lg shadow-emerald-700/20 mx-auto text-white">
                   <ShieldAlert className="w-8 h-8" />
                 </div>
-                <h2 className="text-xl font-extrabold text-slate-900">Municipal Officer Login</h2>
-                <p className="text-xs text-slate-500 max-w-xs mx-auto">e-Nagar Palika Parishad Jhabua Officer Administration Portal</p>
+                <h2 className="text-xl font-extrabold text-slate-900">नगरपालिका अधिकारी लॉगिन (Municipal Officer Login)</h2>
+                <p className="text-xs text-slate-500 max-w-xs mx-auto">नगर पालिका परिषद झाबुआ अधिकारी प्रशासन पोर्टल (e-Nagar Palika Parishad Jhabua Officer Administration Portal)</p>
               </div>
 
               {loginError && (
@@ -245,7 +245,7 @@ export default function AdminPage() {
 
               <form onSubmit={handleLogin} className="space-y-4 mt-6">
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Username</label>
+                  <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">उपयोगकर्ता नाम (Username)</label>
                   <input
                     value={username} 
                     onChange={e => setUsername(e.target.value)}
@@ -255,7 +255,7 @@ export default function AdminPage() {
                 </div>
                 
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Password</label>
+                  <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">पासवर्ड (Password)</label>
                   <input
                     type="password" 
                     value={password} 
@@ -266,7 +266,7 @@ export default function AdminPage() {
                 </div>
                 
                 <button type="submit" className="w-full btn btn-primary py-3 text-xs uppercase tracking-wider font-bold mt-2">
-                  Verify Credentials
+                  प्रमाण सत्यापित करें (Verify Credentials)
                 </button>
               </form>
             </div>
@@ -280,8 +280,8 @@ export default function AdminPage() {
             {/* Tab Navigation Menu */}
             <div className="flex gap-1.5 bg-white border border-slate-200 rounded-2xl p-1.5 w-fit shadow-sm">
               {[
-                { key: 'death-certificates', label: 'Death Certificates', icon: FileText },
-                { key: 'audit', label: 'Audit Logs', icon: History },
+                { key: 'death-certificates', label: 'मृत्यु प्रमाण पत्र (Death Certificates)', icon: FileText },
+                { key: 'audit', label: 'ऑडिट लॉग (Audit Logs)', icon: History },
               ].map(tab => {
                 const Icon = tab.icon
                 return (
@@ -307,15 +307,15 @@ export default function AdminPage() {
                 {/* Search & Stats */}
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                   <div>
-                    <h2 className="text-lg font-extrabold text-slate-900">Death Certificate Applications</h2>
-                    <p className="text-xs text-slate-500 mt-0.5">Manage and review all death certificate applications</p>
+                    <h2 className="text-lg font-extrabold text-slate-900">मृत्यु प्रमाण पत्र आवेदन (Death Certificate Applications)</h2>
+                    <p className="text-xs text-slate-500 mt-0.5">सभी मृत्यु प्रमाण पत्र आवेदनों का प्रबंधन एवं समीक्षा (Manage and review all death certificate applications)</p>
                   </div>
                   <div className="flex items-center gap-2">
                     <div className="relative">
                       <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                       <input
                         type="text"
-                        placeholder="Search by name, app no..."
+                        placeholder="नाम, आवेदन क्र. से खोजें... (Search by name, app no...)"
                         value={deathSearch}
                         onChange={(e) => setDeathSearch(e.target.value)}
                         className="input pl-9 w-64"
@@ -330,11 +330,11 @@ export default function AdminPage() {
                 {/* Stats Cards */}
                 <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
                   {[
-                    { label: 'Total', count: deathRecords.length, color: 'slate' },
-                    { label: 'Submitted', count: deathRecords.filter(r => r.status === 'Submitted').length, color: 'blue' },
-                    { label: 'Under Review', count: deathRecords.filter(r => r.status === 'Under Review').length, color: 'amber' },
-                    { label: 'Approved', count: deathRecords.filter(r => r.status === 'Approved' || r.status === 'Certificate Generated').length, color: 'emerald' },
-                    { label: 'Rejected', count: deathRecords.filter(r => r.status === 'Rejected').length, color: 'red' },
+                    { label: 'कुल (Total)', count: deathRecords.length, color: 'slate' },
+                    { label: 'जमा (Submitted)', count: deathRecords.filter(r => r.status === 'Submitted').length, color: 'blue' },
+                    { label: 'समीक्षाधीन (Under Review)', count: deathRecords.filter(r => r.status === 'Under Review').length, color: 'amber' },
+                    { label: 'स्वीकृत (Approved)', count: deathRecords.filter(r => r.status === 'Approved' || r.status === 'Certificate Generated').length, color: 'emerald' },
+                    { label: 'अस्वीकृत (Rejected)', count: deathRecords.filter(r => r.status === 'Rejected').length, color: 'red' },
                   ].map((stat) => (
                     <div key={stat.label} className="bg-white border border-slate-200 rounded-2xl p-4 text-center shadow-sm">
                       <div className={`text-2xl font-extrabold text-${stat.color}-700`}>{stat.count}</div>
@@ -347,12 +347,12 @@ export default function AdminPage() {
                 {deathLoading ? (
                   <div className="text-center py-16 bg-white border border-slate-200 rounded-2xl shadow-sm">
                     <RefreshCw className="animate-spin w-8 h-8 text-emerald-600 mx-auto mb-2" />
-                    <p className="text-slate-500 text-xs">Loading applications...</p>
+                    <p className="text-slate-500 text-xs">आवेदन लोड हो रहे हैं... (Loading applications...)</p>
                   </div>
                 ) : filteredRecords.length === 0 ? (
                   <div className="text-center py-16 bg-white border border-dashed border-slate-200 rounded-2xl">
                     <FileText className="w-10 h-10 text-slate-400 mx-auto mb-2" />
-                    <p className="text-slate-500 text-sm font-semibold">No applications found</p>
+                    <p className="text-slate-500 text-sm font-semibold">कोई आवेदन नहीं मिला (No applications found)</p>
                   </div>
                 ) : (
                   <div className="space-y-3">
@@ -369,14 +369,14 @@ export default function AdminPage() {
                               </span>
                             </div>
                             <h3 className="text-slate-900 font-extrabold text-base">
-                              स्व. {record.deceasedDetails?.fullName || 'N/A'}
+                              स्व. (Late) {record.deceasedDetails?.fullName || 'N/A'}
                             </h3>
                             <p className="text-xs text-slate-500 mt-0.5 font-medium">
-                              आवेदक: {record.applicantDetails?.fullName} ({record.applicantDetails?.relationWithDeceased}) | मृत्यु तिथि: {record.deceasedDetails?.dateOfDeath}
+                              आवेदक (Applicant): {record.applicantDetails?.fullName} ({record.applicantDetails?.relationWithDeceased}) | मृत्यु तिथि (Date of Death): {record.deceasedDetails?.dateOfDeath}
                             </p>
                             {record.lastOfficerRemark && (
                               <p className="text-[11px] text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-2 py-1 mt-2 font-medium">
-                                💬 Last Remark: {record.lastOfficerRemark}
+                                💬 अंतिम टिप्पणी (Last Remark): {record.lastOfficerRemark}
                               </p>
                             )}
                           </div>
@@ -388,7 +388,7 @@ export default function AdminPage() {
                                   onClick={() => setRemarkModal({ isOpen: true, record, targetStatus: 'Under Review', remarkText: '', officerName: 'Nagar Palika Officer' })}
                                   className="btn btn-secondary btn-sm bg-blue-50 border-blue-200 text-blue-700 font-bold"
                                 >
-                                  👁️ Start Review
+                                   👁️ समीक्षा शुरू करें (Start Review)
                                 </button>
                               </>
                             )}
@@ -399,26 +399,26 @@ export default function AdminPage() {
                                   onClick={() => setRemarkModal({ isOpen: true, record, targetStatus: 'Approved', remarkText: '', officerName: 'Nagar Palika Officer' })}
                                   className="btn btn-primary btn-sm bg-gradient-to-r from-emerald-600 to-emerald-700 font-bold"
                                 >
-                                  ✅ Approve
+                                   ✅ स्वीकृत करें (Approve)
                                 </button>
                                 <button
                                   onClick={() => setRemarkModal({ isOpen: true, record, targetStatus: 'Correction Requested', remarkText: '', officerName: 'Nagar Palika Officer' })}
                                   className="btn btn-secondary btn-sm bg-amber-50 border-amber-200 text-amber-700 font-bold"
                                 >
-                                  ✏️ Correction
+                                   ✏️ सुधार (Correction)
                                 </button>
                                 <button
                                   onClick={() => setRemarkModal({ isOpen: true, record, targetStatus: 'Rejected', remarkText: '', officerName: 'Nagar Palika Officer' })}
                                   className="btn btn-danger btn-sm font-bold"
                                 >
-                                  ❌ Reject
+                                   ❌ अस्वीकृत करें (Reject)
                                 </button>
                               </>
                             )}
 
                             {record.status === 'Correction Requested' && (
                               <span className="text-[10px] text-amber-700 font-bold bg-amber-50 border border-amber-200 px-2 py-1 rounded">
-                                Waiting for citizen resubmission
+                                 नागरिक पुन: प्रस्तुति की प्रतीक्षा (Waiting for resubmission)
                               </span>
                             )}
 
@@ -427,7 +427,7 @@ export default function AdminPage() {
                                 onClick={() => setDeathCertPreview(record)}
                                 className="btn btn-primary btn-sm bg-gradient-to-r from-emerald-600 to-emerald-700 font-bold"
                               >
-                                📜 View Certificate
+                                 📜 प्रमाण पत्र देखें (View Certificate)
                               </button>
                             )}
 
@@ -435,7 +435,7 @@ export default function AdminPage() {
                               onClick={() => setSelectedDeathDetail(record)}
                               className="btn btn-secondary btn-sm flex items-center gap-1 font-bold text-slate-700"
                             >
-                              <History className="w-3.5 h-3.5 text-slate-500" /> Details
+                               <History className="w-3.5 h-3.5 text-slate-500" /> विवरण (Details)
                             </button>
                           </div>
                         </div>
@@ -454,13 +454,13 @@ export default function AdminPage() {
                     <input 
                       value={auditSearch} 
                       onChange={e => setAuditSearch(e.target.value)}
-                      placeholder="Search audit logs..."
+                       placeholder="ऑडिट लॉग खोजें... (Search audit logs...)"
                       className="flex-1 pl-10 pr-3 py-2.5 rounded-xl bg-white border border-slate-300 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20 transition"
                     />
                     <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
                   </div>
                   <button onClick={loadAuditLogs} className="btn btn-secondary btn-sm flex items-center gap-1">
-                    <RefreshCw className={`w-3.5 h-3.5 ${auditLoading ? 'animate-spin' : ''}`} /> Refresh
+                     <RefreshCw className={`w-3.5 h-3.5 ${auditLoading ? 'animate-spin' : ''}`} /> रिफ्रेश (Refresh)
                   </button>
                 </div>
 
@@ -468,23 +468,23 @@ export default function AdminPage() {
                   {auditLoading ? (
                     <div className="p-12 text-center text-slate-500">
                       <RefreshCw className="animate-spin w-6 h-6 text-emerald-600 mx-auto mb-2" />
-                      Loading audit logs...
+                       ऑडिट लॉग लोड हो रहे हैं... (Loading audit logs...)
                     </div>
                   ) : auditLogs.length === 0 ? (
                     <div className="p-12 text-center text-slate-400 text-xs">
-                      No audit logs found
+                       कोई ऑडिट लॉग नहीं मिला (No audit logs found)
                     </div>
                   ) : (
                     <div className="overflow-x-auto">
                       <table className="w-full text-xs text-left border-collapse">
                         <thead>
                           <tr className="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase tracking-wider text-[10px] font-bold">
-                            <th className="p-4">Timestamp</th>
-                            <th className="p-4">Officer</th>
-                            <th className="p-4">Action</th>
-                            <th className="p-4">Entity Type</th>
-                            <th className="p-4">Record IDs</th>
-                            <th className="p-4">Count</th>
+                            <th className="p-4">समय (Timestamp)</th>
+                            <th className="p-4">अधिकारी (Officer)</th>
+                            <th className="p-4">कार्यवाही (Action)</th>
+                            <th className="p-4">संस्था प्रकार (Entity Type)</th>
+                            <th className="p-4">अभिलेख आईडी (Record IDs)</th>
+                            <th className="p-4">गणना (Count)</th>
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-200">
@@ -532,7 +532,7 @@ export default function AdminPage() {
             <div className="bg-white border border-slate-200 rounded-3xl max-w-lg w-full p-6 shadow-2xl space-y-4">
               <div className="flex items-center justify-between border-b border-slate-100 pb-3">
                 <h3 className="text-slate-900 font-extrabold text-base">
-                  Update Status to: <span className="text-emerald-700">{remarkModal.targetStatus}</span>
+                   स्थिति अपडेट करें: (Update Status to:) <span className="text-emerald-700">{remarkModal.targetStatus}</span>
                 </h3>
                 <button onClick={() => setRemarkModal({ isOpen: false, record: null, targetStatus: '', remarkText: '', officerName: 'Nagar Palika Officer' })} className="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100">
                   <X className="w-5 h-5" />
@@ -540,8 +540,8 @@ export default function AdminPage() {
               </div>
 
               <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 text-xs text-amber-900">
-                <span className="font-bold block mb-1">⚠️ Application: {remarkModal.record?.applicationNo}</span>
-                <p>Deceased: {remarkModal.record?.deceasedDetails?.fullName}</p>
+                 <span className="font-bold block mb-1">⚠️ आवेदन: (Application:) {remarkModal.record?.applicationNo}</span>
+                 <p>मृतक: (Deceased:) {remarkModal.record?.deceasedDetails?.fullName}</p>
               </div>
 
               <form onSubmit={handleConfirmStatusUpdate} className="space-y-4">
@@ -553,17 +553,17 @@ export default function AdminPage() {
                     value={remarkModal.remarkText}
                     onChange={(e) => setRemarkModal(prev => ({ ...prev, remarkText: e.target.value }))}
                     className="input min-h-[80px]"
-                    placeholder="Enter your remark here..."
+                     placeholder="यहाँ अपनी टिप्पणी दर्ज करें... (Enter your remark here...)"
                     required
                   />
                 </div>
 
                 <div className="flex justify-end gap-2">
                   <button type="button" onClick={() => setRemarkModal({ isOpen: false, record: null, targetStatus: '', remarkText: '', officerName: 'Nagar Palika Officer' })} className="btn btn-secondary">
-                    Cancel
+                    रद्द करें (Cancel)
                   </button>
                   <button type="submit" className="btn btn-primary">
-                    Confirm & Update Status
+                     पुष्टि करें और स्थिति अपडेट करें (Confirm & Update Status)
                   </button>
                 </div>
               </form>
@@ -578,7 +578,7 @@ export default function AdminPage() {
               <div className="flex items-center justify-between border-b border-slate-100 pb-3">
                 <div>
                   <span className="text-xs font-mono font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded border border-emerald-200">{selectedDeathDetail.applicationNo}</span>
-                  <h3 className="text-slate-900 font-extrabold text-lg mt-1">मृतक: स्व. {selectedDeathDetail.deceasedDetails?.fullName}</h3>
+                   <h3 className="text-slate-900 font-extrabold text-lg mt-1">मृतक: स्व. (Deceased: Late) {selectedDeathDetail.deceasedDetails?.fullName}</h3>
                 </div>
                 <button onClick={() => setSelectedDeathDetail(null)} className="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100">
                   <X className="w-5 h-5" />
@@ -593,18 +593,18 @@ export default function AdminPage() {
               )}
 
               <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 text-xs space-y-3">
-                <h4 className="font-bold text-slate-800 border-b border-slate-200 pb-1.5 uppercase tracking-wider text-[11px]">Application Details</h4>
+                 <h4 className="font-bold text-slate-800 border-b border-slate-200 pb-1.5 uppercase tracking-wider text-[11px]">आवेदन विवरण (Application Details)</h4>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-[11px]">
-                  <div><span className="text-slate-500 block">Gender / Age:</span><span className="font-bold">{selectedDeathDetail.deceasedDetails?.gender} / {selectedDeathDetail.deceasedDetails?.age || 'N/A'} yrs</span></div>
-                  <div><span className="text-slate-500 block">Date of Death:</span><span className="font-bold">{selectedDeathDetail.deceasedDetails?.dateOfDeath}</span></div>
-                  <div><span className="text-slate-500 block">Place of Death:</span><span className="font-bold">{selectedDeathDetail.deceasedDetails?.placeType} ({selectedDeathDetail.deceasedDetails?.placeOfDeath || 'N/A'})</span></div>
-                  <div><span className="text-slate-500 block">Address:</span><span className="font-bold">{selectedDeathDetail.deceasedDetails?.presentAddress?.villageCity || 'N/A'}, {selectedDeathDetail.deceasedDetails?.presentAddress?.district || 'N/A'}</span></div>
-                  <div><span className="text-slate-500 block">Religion / Occupation:</span><span className="font-bold">{selectedDeathDetail.statisticalDetails?.religion || 'N/A'} / {selectedDeathDetail.statisticalDetails?.occupation || 'N/A'}</span></div>
-                  <div><span className="text-slate-500 block">Medical Cert:</span><span className="font-bold">{selectedDeathDetail.statisticalDetails?.isMedicallyCertified || 'N/A'}</span></div>
+                   <div><span className="text-slate-500 block">लिंग / आयु (Gender / Age):</span><span className="font-bold">{selectedDeathDetail.deceasedDetails?.gender} / {selectedDeathDetail.deceasedDetails?.age || 'N/A'} yrs</span></div>
+                   <div><span className="text-slate-500 block">मृत्यु तिथि (Date of Death):</span><span className="font-bold">{selectedDeathDetail.deceasedDetails?.dateOfDeath}</span></div>
+                   <div><span className="text-slate-500 block">मृत्यु स्थान (Place of Death):</span><span className="font-bold">{selectedDeathDetail.deceasedDetails?.placeType} ({selectedDeathDetail.deceasedDetails?.placeOfDeath || 'N/A'})</span></div>
+                   <div><span className="text-slate-500 block">पता (Address):</span><span className="font-bold">{selectedDeathDetail.deceasedDetails?.presentAddress?.villageCity || 'N/A'}, {selectedDeathDetail.deceasedDetails?.presentAddress?.district || 'N/A'}</span></div>
+                   <div><span className="text-slate-500 block">धर्म / व्यवसाय (Religion / Occupation):</span><span className="font-bold">{selectedDeathDetail.statisticalDetails?.religion || 'N/A'} / {selectedDeathDetail.statisticalDetails?.occupation || 'N/A'}</span></div>
+                   <div><span className="text-slate-500 block">चिकित्सा प्रमाणन (Medical Cert):</span><span className="font-bold">{selectedDeathDetail.statisticalDetails?.isMedicallyCertified || 'N/A'}</span></div>
                 </div>
               </div>
 
-              <h4 className="text-xs uppercase font-extrabold text-slate-500 tracking-wider">Activity Timeline</h4>
+               <h4 className="text-xs uppercase font-extrabold text-slate-500 tracking-wider">गतिविधि टाइमलाइन (Activity Timeline)</h4>
               <ApplicationTimeline timeline={selectedDeathDetail.timeline || []} />
             </div>
           </div>
@@ -616,14 +616,14 @@ export default function AdminPage() {
             <div className="bg-white border border-slate-200 rounded-3xl max-w-4xl w-full p-6 my-8 shadow-2xl space-y-4">
               <div className="flex items-center justify-between border-b border-slate-100 pb-3">
                 <h3 className="text-slate-900 font-extrabold text-base flex items-center gap-2">
-                  📜 Official Death Certificate Preview
+                   📜 आधिकारिक मृत्यु प्रमाण पत्र पूर्वावलोकन (Official Death Certificate Preview)
                 </h3>
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => window.print()}
                     className="btn btn-primary btn-sm flex items-center gap-1 font-bold"
                   >
-                    <Printer className="w-3.5 h-3.5" /> Print / Download PDF
+                     <Printer className="w-3.5 h-3.5" /> प्रिंट / PDF डाउनलोड करें (Print / Download PDF)
                   </button>
                   <button onClick={() => setDeathCertPreview(null)} className="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100">
                     <X className="w-5 h-5" />

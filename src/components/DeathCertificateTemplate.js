@@ -51,10 +51,10 @@ export default function DeathCertificateTemplate({ record }) {
             नगर
           </div>
           <h2 className="text-sm uppercase tracking-widest text-slate-600 font-semibold mb-1">
-            मध्य प्रदेश शासन - लोक स्वास्थ्य एवं परिवार कल्याण विभाग
+            मध्य प्रदेश शासन - लोक स्वास्थ्य एवं परिवार कल्याण विभाग (Govt. of MP - Dept. of Public Health & Family Welfare)
           </h2>
           <h1 className="text-2xl font-bold text-amber-950 uppercase tracking-wider">
-            कार्यालय नगर पालिका परिषद झाबुआ (म.प्र.)
+            कार्यालय नगर पालिका परिषद झाबुआ (म.प्र.) (Office of Nagar Palika Parishad Jhabua, MP)
           </h1>
           <h3 className="text-xl font-extrabold text-blue-950 underline decoration-amber-700 decoration-2 underline-offset-4 mt-2">
             मृत्यु प्रमाण पत्र (DEATH CERTIFICATE)
@@ -88,7 +88,7 @@ export default function DeathCertificateTemplate({ record }) {
             </tr>
             <tr className="border-b border-slate-300">
               <td className="p-2.5 font-bold text-slate-700 border-r border-slate-300">लिंग (Gender) / आयु (Age):</td>
-              <td className="p-2.5 text-slate-900">{deceased.gender || 'N/A'} / {deceased.age ? `${deceased.age} वर्ष` : 'N/A'}</td>
+              <td className="p-2.5 text-slate-900">{deceased.gender || 'N/A'} / {deceased.age ? `${deceased.age} वर्ष (yrs)` : 'N/A'}</td>
             </tr>
             <tr className="border-b border-slate-300 bg-slate-50">
               <td className="p-2.5 font-bold text-slate-700 border-r border-slate-300">मृत्यु की तिथि (Date of Death):</td>
@@ -119,7 +119,7 @@ export default function DeathCertificateTemplate({ record }) {
             <tr className="border-b border-slate-300 bg-slate-50">
               <td className="p-2.5 font-bold text-slate-700 border-r border-slate-300">चिकित्सीय प्रमाणन (Medical Certification):</td>
               <td className="p-2.5 text-slate-900">
-                {statistical.isMedicallyCertified || 'हाँ (Yes)'} {deceased.causeOfDeath ? `| कारण: ${deceased.causeOfDeath}` : ''}
+                {statistical.isMedicallyCertified || 'हाँ (Yes)'} {deceased.causeOfDeath ? `| कारण (Cause): ${deceased.causeOfDeath}` : ''}
               </td>
             </tr>
             <tr className="border-b border-slate-300">
@@ -144,16 +144,16 @@ export default function DeathCertificateTemplate({ record }) {
                 <div className="bg-white"></div>
               </div>
             </div>
-            <span className="text-[10px] font-mono text-slate-500 block">QR VERIFIED OFFICIAL</span>
+            <span className="text-[10px] font-mono text-slate-500 block">QR सत्यापित आधिकारिक (QR VERIFIED OFFICIAL)</span>
           </div>
 
           <div className="text-center pr-4">
             <div className="w-20 h-20 rounded-full border-2 border-dashed border-blue-900/40 mx-auto mb-2 flex items-center justify-center text-[10px] text-blue-900 font-bold tracking-tighter">
-              सील नगर पालिका
+              सील नगर पालिका (Seal: Nagar Palika)
             </div>
-            <div className="font-bold text-xs text-slate-900">रजिस्ट्रार (जन्म एवं मृत्यु)</div>
+            <div className="font-bold text-xs text-slate-900">रजिस्ट्रार (जन्म एवं मृत्यु) (Registrar (Birth & Death))</div>
             <div className="text-xs text-slate-700 font-semibold">नगर पालिका परिषद झाबुआ</div>
-            <div className="text-[10px] text-slate-500 mt-1">जारी करने की तिथि: {formattedDate(new Date())}</div>
+            <div className="text-[10px] text-slate-500 mt-1">जारी करने की तिथि: (Date of Issue:) {formattedDate(new Date())}</div>
           </div>
 
         </div>

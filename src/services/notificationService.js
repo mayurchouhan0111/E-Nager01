@@ -51,7 +51,7 @@ export async function sendNotification({
     recipientId,
     event,
     status,
-    message: message || `Status changed to ${status}`,
+    message: message || `Status changed to ${status} (स्थिति बदली: ${status})`,
     officerRemark: officerRemark || '',
     officerName: officerName || 'Nagar Palika Officer',
     isRead: false,

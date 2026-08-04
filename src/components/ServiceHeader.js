@@ -46,12 +46,12 @@ export default function ServiceHeader() {
             </Link>
             <div>
               <div className="text-slate-900 font-extrabold text-sm sm:text-base leading-tight flex items-center gap-2">
-                नगर पालिका ई-सेवा पोर्टल
+                नगर पालिका ई-सेवा पोर्टल (Nagar Palika e-Service Portal)
                 <span className="text-[10px] bg-emerald-100 text-emerald-800 border border-emerald-300 px-2 py-0.5 rounded-md uppercase tracking-wider font-bold">
                   MP e-Nagar
                 </span>
               </div>
-              <p className="text-xs text-slate-500 font-medium">झाबुआ नगर पालिका प्रमाण पत्र सेवा पोर्टल</p>
+              <p className="text-xs text-slate-500 font-medium">झाबुआ नगर पालिका प्रमाण पत्र सेवा पोर्टल (Jhabua Nagar Palika Certificate Service Portal)</p>
             </div>
           </div>
 
@@ -134,7 +134,7 @@ export default function ServiceHeader() {
                           <p className="text-xs font-semibold text-slate-800 mb-1">{n.message}</p>
                           {n.officerRemark && (
                             <p className="text-[11px] text-amber-800 bg-amber-50 p-2 rounded-lg border border-amber-200 mt-1 font-medium">
-                              💬 अधिकारी टिप्पणी: {n.officerRemark}
+                              💬 अधिकारी टिप्पणी: (Officer Remark:) {n.officerRemark}
                             </p>
                           )}
                         </div>

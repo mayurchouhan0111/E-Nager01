@@ -55,7 +55,7 @@ export default function ApplicationTimeline({ timeline = [] }) {
             </div>
 
             <div className="text-xs font-semibold text-slate-700 mb-1">
-              द्वारा निष्पादित (Performed by): <span className="text-slate-900 font-bold">{item.performedBy || 'System'}</span> {item.role ? `(${item.role})` : ''}
+              द्वारा निष्पादित (Performed by): <span className="text-slate-900 font-bold">{item.performedBy || 'सिस्टम (System)'}</span> {item.role ? `(${item.role})` : ''}
             </div>
 
             {item.remarks && (

@@ -186,7 +186,7 @@ export async function submitDeathCertificate(data, existingId = null) {
     recipientId: 'all',
     event: isResubmission ? 'APPLICATION_RESUBMITTED' : 'APPLICATION_SUBMITTED',
     status: 'Submitted',
-    message: `मृतक प्रमाण पत्र आवेदन (${applicationNo}) सफलतापूर्वक जमा किया गया।`,
+    message: `मृतक प्रमाण पत्र आवेदन (${applicationNo}) सफलतापूर्वक जमा किया गया। (Death certificate application submitted successfully.)`,
     officerRemark: '',
     officerName: 'Citizen System'
   });
@@ -286,13 +286,13 @@ export async function updateDeathCertificateStatus({
     });
   } catch (e) {}
 
-  let notificationMsg = `आपका मृतक प्रमाण पत्र आवेदन (${existing.applicationNo || id}) की स्थिति बदलकर ${newStatus} कर दी गई है।`;
+  let notificationMsg = `आपका मृतक प्रमाण पत्र आवेदन (${existing.applicationNo || id}) की स्थिति बदलकर ${newStatus} कर दी गई है। (Your death certificate application status has been changed to ${newStatus}.)`;
   if (newStatus === 'Correction Requested') {
-    notificationMsg = `⚠ आपके आवेदन (${existing.applicationNo || id}) में सुधार की आवश्यकता है। कारण: ${remarks.trim()}`;
+    notificationMsg = `⚠ आपके आवेदन (${existing.applicationNo || id}) में सुधार की आवश्यकता है। कारण: ${remarks.trim()} (Correction required in your application. Reason: ${remarks.trim()})`;
   } else if (newStatus === 'Rejected') {
-    notificationMsg = `❌ आपका आवेदन (${existing.applicationNo || id}) निरस्त कर दिया गया है। कारण: ${remarks.trim()}`;
+    notificationMsg = `❌ आपका आवेदन (${existing.applicationNo || id}) निरस्त कर दिया गया है। कारण: ${remarks.trim()} (Your application has been rejected. Reason: ${remarks.trim()})`;
   } else if (newStatus === 'Approved' || newStatus === 'Certificate Generated') {
-    notificationMsg = `✅ आपका मृतक प्रमाण पत्र (${existing.applicationNo || id}) स्वीकृत एवं जनरेट कर दिया गया है!`;
+    notificationMsg = `✅ आपका मृतक प्रमाण पत्र (${existing.applicationNo || id}) स्वीकृत एवं जनरेट कर दिया गया है! (Your death certificate has been approved and generated!)`;
   }
 
   await sendNotification({

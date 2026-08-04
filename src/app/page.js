@@ -13,16 +13,20 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
           <div className="space-y-4 max-w-3xl">
             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-white/10 text-emerald-200 border border-white/20 backdrop-blur-md">
-              🏛️ मध्य प्रदेश शासन - नगर पालिका परिषद झाबुआ
+              🏛️ मध्य प्रदेश शासन - नगर पालिका परिषद झाबुआ (Govt. of MP - Nagar Palika Parishad Jhabua)
             </span>
             <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight leading-tight">
-              जन्म एवं मृत्यु प्रमाण पत्र<br />
-              <span className="text-emerald-300">ऑनलाइन सेवा पोर्टल</span>
+              जन्म एवं मृत्यु प्रमाण पत्र (Birth & Death Certificate)<br />
+              <span className="text-emerald-300">ऑनलाइन सेवा पोर्टल (Online Service Portal)</span>
             </h1>
             <p className="text-slate-200 text-sm sm:text-base max-w-2xl leading-relaxed">
               नगर पालिका परिषद झाबुआ (म.प्र.) द्वारा संचालित डिजिटल सेवा पोर्टल। 
               अब घर बैठे अपने मृत्यु एवं जन्म प्रमाण पत्र के लिए ऑनलाइन आवेदन करें, 
               स्थिति ट्रैक करें एवं स्वीकृत प्रमाण पत्र डाउनलोड करें।
+              <br />
+              <span className="text-emerald-300/80 text-xs">
+                Digital service portal operated by Nagar Palika Parishad Jhabua (MP). Apply online for death and birth certificates, track status, and download approved certificates.
+              </span>
             </p>
           </div>
         </div>
@@ -32,7 +36,7 @@ export default function HomePage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 flex-1 w-full">
         <div className="text-center mb-10">
           <h2 className="text-xl sm:text-2xl font-extrabold text-slate-900">हमारी सेवाएँ (Our Services)</h2>
-          <p className="text-sm text-slate-500 mt-2">अपनी आवश्यकता अनुसार सेवा चुनें</p>
+          <p className="text-sm text-slate-500 mt-2">अपनी आवश्यकता अनुसार सेवा चुनें (Choose a service as per your requirement)</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 max-w-4xl mx-auto">
@@ -44,32 +48,34 @@ export default function HomePage() {
                 <FileText className="w-8 h-8 text-white" />
               </div>
               <h3 className="text-lg font-extrabold text-slate-900 mb-2">
-                मृत्यु प्रमाण पत्र
+                मृत्यु प्रमाण पत्र (Death Certificate)
               </h3>
               <p className="text-xs text-emerald-700 font-bold uppercase tracking-wider mb-3">
                 Death Certificate Application
               </p>
               <p className="text-sm text-slate-600 leading-relaxed mb-6">
                 मृत्यु प्रमाण पत्र के लिए ऑनलाइन आवेदन करें। आवेदन की स्थिति ट्रैक करें एवं स्वीकृत प्रमाण पत्र डाउनलोड करें।
+                <br />
+                <span className="text-xs text-slate-400">Apply online for Death Certificate. Track application status and download approved certificate.</span>
               </p>
               
               <div className="space-y-2 mb-6">
                 <div className="flex items-center gap-2 text-xs text-slate-600">
                   <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                  <span>ऑनलाइन आवेदन एवं ड्राफ्ट सेव</span>
+                  <span>ऑनलाइन आवेदन एवं ड्राफ्ट सेव (Online Application & Draft Save)</span>
                 </div>
                 <div className="flex items-center gap-2 text-xs text-slate-600">
                   <Clock className="w-4 h-4 text-emerald-600" />
-                  <span>रियल-टाइम स्थिति ट्रैकिंग</span>
+                  <span>रियल-टाइम स्थिति ट्रैकिंग (Real-time Status Tracking)</span>
                 </div>
                 <div className="flex items-center gap-2 text-xs text-slate-600">
                   <Shield className="w-4 h-4 text-emerald-600" />
-                  <span>सुरक्षित एवं गोपनीय</span>
+                  <span>सुरक्षित एवं गोपनीय (Secure & Confidential)</span>
                 </div>
               </div>
 
               <div className="flex items-center text-emerald-700 font-bold text-sm group-hover:gap-3 gap-2 transition-all">
-                आवेदन शुरू करें
+                आवेदन शुरू करें (Start Application)
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </div>
             </div>
@@ -80,39 +86,41 @@ export default function HomePage() {
             <div className="bg-white border border-slate-200 rounded-3xl p-8 shadow-sm hover:shadow-xl hover:border-blue-300 transition-all duration-300 h-full relative overflow-hidden">
               <div className="absolute top-4 right-4">
                 <span className="text-[10px] font-bold bg-blue-100 text-blue-700 px-2.5 py-1 rounded-full border border-blue-200 uppercase tracking-wider">
-                  Coming Soon
+                  जल्द आ रहा है (Coming Soon)
                 </span>
               </div>
               <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-600 to-blue-700 flex items-center justify-center shadow-lg shadow-blue-200 mb-6 group-hover:scale-105 transition-transform">
                 <Baby className="w-8 h-8 text-white" />
               </div>
               <h3 className="text-lg font-extrabold text-slate-900 mb-2">
-                जन्म प्रमाण पत्र
+                जन्म प्रमाण पत्र (Birth Certificate)
               </h3>
               <p className="text-xs text-blue-700 font-bold uppercase tracking-wider mb-3">
                 Birth Certificate Application
               </p>
               <p className="text-sm text-slate-600 leading-relaxed mb-6">
                 जन्म प्रमाण पत्र के लिए ऑनलाइन आवेदन करें। शीघ्र ही यह सेवा उपलब्ध होगी।
+                <br />
+                <span className="text-xs text-slate-400">Apply online for Birth Certificate. This service will be available soon.</span>
               </p>
               
               <div className="space-y-2 mb-6">
                 <div className="flex items-center gap-2 text-xs text-slate-600">
                   <CheckCircle2 className="w-4 h-4 text-blue-600" />
-                  <span>ऑनलाइन आवेदन (शीघ्र)</span>
+                  <span>ऑनलाइन आवेदन (शीघ्र) (Online Application - Soon)</span>
                 </div>
                 <div className="flex items-center gap-2 text-xs text-slate-600">
                   <Clock className="w-4 h-4 text-blue-600" />
-                  <span>त्वरित प्रमाणीकरण</span>
+                  <span>त्वरित प्रमाणीकरण (Instant Verification)</span>
                 </div>
                 <div className="flex items-center gap-2 text-xs text-slate-600">
                   <Shield className="w-4 h-4 text-blue-600" />
-                  <span>डिजिटल रूप से सत्यापित</span>
+                  <span>डिजिटल रूप से सत्यापित (Digitally Verified)</span>
                 </div>
               </div>
 
               <div className="flex items-center text-blue-700 font-bold text-sm group-hover:gap-3 gap-2 transition-all">
-                जल्द आ रहा है
+                जल्द आ रहा है (Coming Soon)
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </div>
             </div>
@@ -128,21 +136,21 @@ export default function HomePage() {
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm text-slate-600">
               <div className="space-y-2">
-                <p className="font-semibold text-slate-800">आवेदन हेतु आवश्यक दस्तावेज:</p>
+                <p className="font-semibold text-slate-800">आवेदन हेतु आवश्यक दस्तावेज़ (Required Documents):</p>
                 <ul className="space-y-1 text-xs">
-                  <li>• आवेदक का आधार कार्ड</li>
-                  <li>• मृतक/शिशु का अस्पताल प्रमाण पत्र</li>
-                  <li>• निवास पता प्रमाण</li>
-                  <li>• पासपोर्ट साइज फोटो</li>
+                  <li>• आवेदक का आधार कार्ड (Applicant's Aadhaar Card)</li>
+                  <li>• मृतक/शिशु का अस्पताल प्रमाण पत्र (Hospital Certificate)</li>
+                  <li>• निवास पता प्रमाण (Address Proof)</li>
+                  <li>• पासपोर्ट साइज फोटो (Passport Size Photo)</li>
                 </ul>
               </div>
               <div className="space-y-2">
-                <p className="font-semibold text-slate-800">सहायता हेतु संपर्क करें:</p>
+                <p className="font-semibold text-slate-800">सहायता हेतु संपर्क करें (Contact for Help):</p>
                 <ul className="space-y-1 text-xs">
-                  <li>• नगर पालिका परिषद, झाबुआ</li>
-                  <li>• जिला - झाबुआ, मध्य प्रदेश</li>
-                  <li>• कार्यालय समय: सोमवार - शनिवार (10:30 - 17:30)</li>
-                  <li>• ई-नगरपालिका पोर्टल</li>
+                  <li>• नगर पालिका परिषद, झाबुआ (Nagar Palika Parishad, Jhabua)</li>
+                  <li>• जिला - झाबुआ, मध्य प्रदेश (District - Jhabua, MP)</li>
+                  <li>• कार्यालय समय: सोमवार - शनिवार (Office: Mon - Sat, 10:30 - 17:30)</li>
+                  <li>• ई-नगरपालिका पोर्टल (e-Nagar Palika Portal)</li>
                 </ul>
               </div>
             </div>
@@ -155,6 +163,8 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <p className="text-xs text-slate-500">
             © {new Date().getFullYear()} नगर पालिका परिषद झाबुआ (म.प्र.) | डिजिटल नागरिक सेवा पोर्टल
+            <br />
+            <span className="text-slate-400">Nagar Palika Parishad Jhabua (MP) | Digital Citizen Service Portal</span>
           </p>
         </div>
       </footer>

@@ -34,7 +34,7 @@ export default function BirthCertificatePage() {
             </div>
             
             <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
-              जन्म प्रमाण पत्र ऑनलाइन आवेदन
+              जन्म प्रमाण पत्र ऑनलाइन आवेदन (Birth Certificate Online Application)
             </h1>
             <p className="text-blue-100 text-xs sm:text-sm max-w-2xl leading-relaxed">
               Birth Certificate Online Application — Coming Soon
@@ -42,6 +42,7 @@ export default function BirthCertificatePage() {
             <p className="text-blue-200 text-xs max-w-2xl leading-relaxed">
               जन्म प्रमाण पत्र के लिए ऑनलाइन आवेदन प्रणाली शीघ्र ही उपलब्ध होगी। 
               कृपया अपडेट के लिए इस पेज को देखते रहें।
+              Online application system for birth certificate will be available soon. Please keep checking this page for updates.
             </p>
           </div>
         </div>
@@ -57,9 +58,10 @@ export default function BirthCertificatePage() {
               <div className="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center">
                 <CheckCircle2 className="w-5 h-5 text-blue-700" />
               </div>
-              <h3 className="text-sm font-bold text-slate-900">ऑनलाइन आवेदन</h3>
+              <h3 className="text-sm font-bold text-slate-900">ऑनलाइन आवेदन (Online Application)</h3>
               <p className="text-xs text-slate-600 leading-relaxed">
                 घर बैठे जन्म प्रमाण पत्र के लिए ऑनलाइन आवेदन करें। कोई कतार नहीं, कोई परेशानी नहीं।
+                Apply for birth certificate online from home. No queues, no hassle.
               </p>
             </div>
 
@@ -67,9 +69,10 @@ export default function BirthCertificatePage() {
               <div className="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center">
                 <Clock className="w-5 h-5 text-blue-700" />
               </div>
-              <h3 className="text-sm font-bold text-slate-900">त्वरित प्रक्रिया</h3>
+              <h3 className="text-sm font-bold text-slate-900">त्वरित प्रक्रिया (Quick Process)</h3>
               <p className="text-xs text-slate-600 leading-relaxed">
                 आवेदन की त्वरित प्रोसेसिंग और रियल-टाइम स्थिति ट्रैकिंग।
+                Quick processing of applications and real-time status tracking.
               </p>
             </div>
 
@@ -77,9 +80,10 @@ export default function BirthCertificatePage() {
               <div className="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center">
                 <Shield className="w-5 h-5 text-blue-700" />
               </div>
-              <h3 className="text-sm font-bold text-slate-900">सुरक्षित डेटा</h3>
+              <h3 className="text-sm font-bold text-slate-900">सुरक्षित डेटा (Secure Data)</h3>
               <p className="text-xs text-slate-600 leading-relaxed">
                 आपका डेटा पूर्णतः सुरक्षित और गोपनीय रहेगा। सरकारी मानकों के अनुसार।
+                Your data will be completely secure and confidential. As per government standards.
               </p>
             </div>
 
@@ -87,9 +91,10 @@ export default function BirthCertificatePage() {
               <div className="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center">
                 <span className="text-blue-700 font-bold text-sm">📄</span>
               </div>
-              <h3 className="text-sm font-bold text-slate-900">डिजिटल प्रमाण पत्र</h3>
+              <h3 className="text-sm font-bold text-slate-900">डिजिटल प्रमाण पत्र (Digital Certificate)</h3>
               <p className="text-xs text-slate-600 leading-relaxed">
                 स्वीकृत प्रमाण पत्र को डिजिटल रूप में डाउनलोड करें।
+                Download the approved certificate in digital format.
               </p>
             </div>
 
@@ -97,9 +102,10 @@ export default function BirthCertificatePage() {
               <div className="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center">
                 <span className="text-blue-700 font-bold text-sm">🔔</span>
               </div>
-              <h3 className="text-sm font-bold text-slate-900">सूचना सेवा</h3>
+              <h3 className="text-sm font-bold text-slate-900">सूचना सेवा (Notification Service)</h3>
               <p className="text-xs text-slate-600 leading-relaxed">
                 SMS/ईमेल के माध्यम से आवेदन की स्थिति की जानकारी।
+                Get application status updates via SMS/Email.
               </p>
             </div>
 
@@ -107,9 +113,10 @@ export default function BirthCertificatePage() {
               <div className="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center">
                 <span className="text-blue-700 font-bold text-sm">📱</span>
               </div>
-              <h3 className="text-sm font-bold text-slate-900">मोबाइल फ्रेंडली</h3>
+              <h3 className="text-sm font-bold text-slate-900">मोबाइल फ्रेंडली (Mobile Friendly)</h3>
               <p className="text-xs text-slate-600 leading-relaxed">
                 मोबाइल फोन से भी आसानी से आवेदन करें।
+                Easily apply even from your mobile phone.
               </p>
             </div>
           </div>
@@ -128,10 +135,10 @@ export default function BirthCertificatePage() {
                   <Building2 className="w-5 h-5 text-emerald-700" />
                 </div>
                 <div>
-                  <h3 className="text-sm font-bold text-slate-900">नगर पालिका परिषद झाबुआ</h3>
+                  <h3 className="text-sm font-bold text-slate-900">नगर पालिका परिषद झाबुआ (Nagar Palika Parishad Jhabua)</h3>
                   <p className="text-xs text-slate-600 leading-relaxed">
-                    जिला - झाबुआ, मध्य प्रदेश<br />
-                    पिन कोड - 457661
+                    जिला - झाबुआ, मध्य प्रदेश (District - Jhabua, MP)<br />
+                    पिन कोड - 457661 (Pin Code - 457661)
                   </p>
                 </div>
               </div>
@@ -141,9 +148,9 @@ export default function BirthCertificatePage() {
                   <Clock className="w-5 h-5 text-emerald-700" />
                 </div>
                 <div>
-                  <h3 className="text-sm font-bold text-slate-900">कार्यालय समय</h3>
+                  <h3 className="text-sm font-bold text-slate-900">कार्यालय समय (Office Hours)</h3>
                   <p className="text-xs text-slate-600 leading-relaxed">
-                    सोमवार से शनिवार<br />
+                    सोमवार से शनिवार (Monday to Saturday)<br />
                     10:30 AM - 5:30 PM
                   </p>
                 </div>
@@ -156,7 +163,7 @@ export default function BirthCertificatePage() {
                   <Phone className="w-5 h-5 text-emerald-700" />
                 </div>
                 <div>
-                  <h3 className="text-sm font-bold text-slate-900">फोन संपर्क</h3>
+                  <h3 className="text-sm font-bold text-slate-900">फोन संपर्क (Phone Contact)</h3>
                   <p className="text-xs text-slate-600 leading-relaxed">
                     कार्यालय: 07392-XXXXXX<br />
                     हेल्पलाइन: 1800-XXX-XXXX (Toll Free)
@@ -169,7 +176,7 @@ export default function BirthCertificatePage() {
                   <Mail className="w-5 h-5 text-emerald-700" />
                 </div>
                 <div>
-                  <h3 className="text-sm font-bold text-slate-900">ईमेल संपर्क</h3>
+                  <h3 className="text-sm font-bold text-slate-900">ईमेल संपर्क (Email Contact)</h3>
                   <p className="text-xs text-slate-600 leading-relaxed">
                     support@nagarpalikajhabua.gov.in<br />
                     info@nagarpalikajhabua.gov.in
@@ -187,6 +194,8 @@ export default function BirthCertificatePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <p className="text-xs text-slate-500">
             © {new Date().getFullYear()} नगर पालिका परिषद झाबुआ (म.प्र.) | डिजिटल नागरिक सेवा पोर्टल
+            <br />
+            Digital Citizen Service Portal
           </p>
         </div>
       </footer>
