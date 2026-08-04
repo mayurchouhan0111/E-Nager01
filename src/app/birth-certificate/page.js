@@ -17,33 +17,32 @@ export default function BirthCertificatePage() {
         </Link>
 
         {/* Coming Soon Banner */}
-        <div className="bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-800 text-white rounded-3xl p-8 sm:p-12 shadow-xl relative overflow-hidden mb-8">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2" />
-          <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/2" />
+        <div className="relative bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 text-white rounded-3xl p-8 sm:p-12 shadow-xl overflow-hidden mb-8">
+          <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wMyI+PHBhdGggZD0iTTM2IDM0djItSDI0di0yaDEyek0zNiAyNHYySDI0di0yaDEyeiIvPjwvZz48L2c+PC9zdmc+')] opacity-30" />
+          <div className="absolute top-0 right-0 w-72 h-72 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/3 blur-2xl" />
+          <div className="absolute bottom-0 left-0 w-56 h-56 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/3 blur-2xl" />
           
           <div className="relative z-10 space-y-4">
-            <div className="flex items-center gap-3">
-              <div className="w-16 h-16 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/20">
+            <div className="flex items-center gap-4">
+              <div className="w-16 h-16 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/20 shadow-lg">
                 <Baby className="w-8 h-8 text-white" />
               </div>
-              <div>
-                <span className="inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold bg-white/10 text-blue-200 border border-white/20 uppercase tracking-wider">
-                  प्रारंभिक चरण / Under Development
-                </span>
-              </div>
+              <span className="inline-flex items-center px-4 py-1.5 rounded-full text-xs font-bold bg-white/15 text-blue-200 border border-white/20 uppercase tracking-wider backdrop-blur-sm">
+                प्रारंभिक चरण
+              </span>
             </div>
             
-            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
-              जन्म प्रमाण पत्र ऑनलाइन आवेदन (Birth Certificate Online Application)
+            <h1 className="text-2xl sm:text-4xl font-extrabold tracking-tight">
+              जन्म प्रमाण पत्र ऑनलाइन आवेदन
             </h1>
             <p className="text-blue-100 text-xs sm:text-sm max-w-2xl leading-relaxed">
-              Birth Certificate Online Application — Coming Soon
-            </p>
-            <p className="text-blue-200 text-xs max-w-2xl leading-relaxed">
               जन्म प्रमाण पत्र के लिए ऑनलाइन आवेदन प्रणाली शीघ्र ही उपलब्ध होगी। 
               कृपया अपडेट के लिए इस पेज को देखते रहें।
-              Online application system for birth certificate will be available soon. Please keep checking this page for updates.
             </p>
+            <div className="flex items-center gap-2 text-blue-200 text-xs">
+              <span className="w-2 h-2 rounded-full bg-blue-400 animate-pulse" />
+              Coming Soon — Under Development
+            </div>
           </div>
         </div>
 

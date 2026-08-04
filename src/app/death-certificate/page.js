@@ -409,13 +409,16 @@ export default function DeathCertificatePage() {
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
         
         {/* Banner */}
-        <div className="bg-gradient-to-r from-emerald-900 via-emerald-800 to-slate-900 text-white rounded-3xl p-6 sm:p-8 shadow-xl relative overflow-hidden">
+        <div className="relative bg-gradient-to-br from-emerald-900 via-emerald-800 to-teal-900 text-white rounded-3xl p-6 sm:p-8 shadow-xl overflow-hidden">
+          <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wMyI+PHBhdGggZD0iTTM2IDM0djItSDI0di0yaDEyek0zNiAyNHYySDI0di0yaDEyeiIvPjwvZz48L2c+PC9zdmc+')] opacity-30" />
+          <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-400/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3" />
           <div className="relative z-10 space-y-2">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-white/10 text-emerald-200 border border-white/20 backdrop-blur-md">
-              📜 मध्य प्रदेश शासन - लोक स्वास्थ्य एवं परिवार कल्याण विभाग
+            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold bg-white/10 text-emerald-200 border border-white/15 backdrop-blur-md">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+              मध्य प्रदेश शासन - लोक स्वास्थ्य एवं परिवार कल्याण विभाग
             </span>
             <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
-              मृतक प्रमाण पत्र ऑनलाइन आवेदन (Official Government Death Certificate Portal)
+              मृतक प्रमाण पत्र ऑनलाइन आवेदन
             </h1>
             <p className="text-slate-200 text-xs sm:text-sm max-w-3xl leading-relaxed">
               नगर पालिका परिषद झाबुआ (म.प्र.) | जन्म और मृत्यु पंजीकरण अधिनियम, 1969 के अंतर्गत पूर्ण शासकीय मृत्यु पंजीकरण फॉर्म। ऑनलाइन आवेदन करें, स्थिति ट्रैक करें एवं स्वीकृत प्रमाण पत्र डाउनलोड करें।
