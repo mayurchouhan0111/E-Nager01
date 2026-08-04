@@ -1,0 +1,125 @@
+import { db } from '../lib/firebase';
+import { 
+  collection, 
+  addDoc, 
+  getDocs, 
+  doc, 
+  updateDoc, 
+  serverTimestamp 
+} from 'firebase/firestore';
+
+const NOTIFICATIONS_COLLECTION = 'notifications';
+
+function getLocalNotifications() {
+  if (typeof window === 'undefined') return [];
+  try {
+    const data = localStorage.getItem('dc_notifications');
+    return data ? JSON.parse(data) : [];
+  } catch (e) {
+    return [];
+  }
+}
+
+function saveLocalNotifications(list) {
+  if (typeof window === 'undefined') return;
+  try {
+    localStorage.setItem('dc_notifications', JSON.stringify(list));
+  } catch (e) {}
+}
+
+function addLocalNotification(notif) {
+  const list = getLocalNotifications();
+  list.unshift(notif);
+  saveLocalNotifications(list);
+}
+
+export async function sendNotification({
+  serviceType = 'general',
+  applicationId = '',
+  applicationNo = '',
+  recipientId = 'citizen',
+  event = 'STATUS_UPDATE',
+  status = '',
+  message = '',
+  officerRemark = '',
+  officerName = 'Nagar Palika Officer'
+}) {
+  const payload = {
+    serviceType,
+    applicationId,
+    applicationNo,
+    recipientId,
+    event,
+    status,
+    message: message || `Status changed to ${status}`,
+    officerRemark: officerRemark || '',
+    officerName: officerName || 'Nagar Palika Officer',
+    isRead: false,
+    timestamp: new Date().toISOString()
+  };
+
+  try {
+    const docRef = await addDoc(collection(db, NOTIFICATIONS_COLLECTION), {
+      ...payload,
+      createdAt: serverTimestamp()
+    });
+    addLocalNotification({ id: docRef.id, ...payload });
+    return { success: true, id: docRef.id };
+  } catch (error) {
+    console.warn('[Notification] Firestore send fallback to local storage:', error.message);
+    const localId = `local-notif-${Date.now()}`;
+    addLocalNotification({ id: localId, ...payload });
+    return { success: true, id: localId };
+  }
+}
+
+export async function getNotifications(serviceType = null, recipientId = null, maxResults = 50) {
+  try {
+    const notifRef = collection(db, NOTIFICATIONS_COLLECTION);
+    const snap = await getDocs(notifRef);
+
+    let notifications = snap.docs.map(d => ({
+      id: d.id,
+      ...d.data()
+    }));
+
+    if (serviceType) {
+      notifications = notifications.filter(n => n.serviceType === serviceType);
+    }
+    if (recipientId) {
+      notifications = notifications.filter(n => n.recipientId === recipientId || n.recipientId === 'all');
+    }
+
+    notifications.sort((a, b) => new Date(b.timestamp || 0) - new Date(a.timestamp || 0));
+    saveLocalNotifications(notifications);
+    return notifications.slice(0, maxResults);
+  } catch (error) {
+    console.warn('[Notification] Firestore read fallback to local storage:', error.message);
+    let notifications = getLocalNotifications();
+    if (serviceType) {
+      notifications = notifications.filter(n => n.serviceType === serviceType);
+    }
+    if (recipientId) {
+      notifications = notifications.filter(n => n.recipientId === recipientId || n.recipientId === 'all');
+    }
+    notifications.sort((a, b) => new Date(b.timestamp || 0) - new Date(a.timestamp || 0));
+    return notifications.slice(0, maxResults);
+  }
+}
+
+export async function markNotificationAsRead(notificationId) {
+  try {
+    const docRef = doc(db, NOTIFICATIONS_COLLECTION, notificationId);
+    await updateDoc(docRef, { isRead: true });
+  } catch (error) {
+    console.warn('[Notification] Error marking notification as read (updating local storage):', error.message);
+  }
+
+  const list = getLocalNotifications();
+  const idx = list.findIndex(n => n.id === notificationId);
+  if (idx >= 0) {
+    list[idx].isRead = true;
+    saveLocalNotifications(list);
+  }
+  return true;
+}
