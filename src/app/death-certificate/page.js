@@ -13,7 +13,7 @@ import {
 } from '../../services/deathCertificateService';
 import { 
   FileText, Activity, CheckCircle2, AlertCircle, RefreshCw, Printer, X, History, Plus, 
-  Building2, User, Home, HeartPulse, CheckSquare, Download 
+  Building2, User, Home, HeartPulse, CheckSquare, Download, ShieldAlert 
 } from 'lucide-react';
 
 const defaultDeceasedDetails = {

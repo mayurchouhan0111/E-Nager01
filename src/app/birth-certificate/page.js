@@ -13,7 +13,7 @@ import {
 } from '@/services/birthCertificateService';
 import { 
   Baby, Activity, CheckCircle2, AlertCircle, RefreshCw, Printer, X, History, Plus, 
-  Building2, User, Home, HeartPulse, CheckSquare, FileText, Download 
+  Building2, User, Home, HeartPulse, CheckSquare, FileText, Download, ShieldAlert 
 } from 'lucide-react';
 import Link from 'next/link';
 
