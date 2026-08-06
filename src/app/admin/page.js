@@ -392,27 +392,6 @@ export default function AdminPage() {
                 </div>
               )}
 
-              {/* Department Credentials Info Box */}
-              <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 text-xs text-slate-700 space-y-2">
-                <p className="font-bold text-slate-900 flex items-center gap-1.5">
-                  <span>🔑</span> विभाग अनुसार अधिकृत लॉगिन क्रेडेंशियल्स:
-                </p>
-                <div className="space-y-1 font-mono text-[11px]">
-                  <div className="bg-white p-2 rounded border border-slate-200">
-                    <span className="font-bold text-emerald-800">1. जन्म व मृत्यु रजिस्ट्रार:</span><br />
-                    यूजर: <code className="font-bold text-slate-900 bg-slate-100 px-1 py-0.5 rounded">admin</code> | पास: <code className="font-bold text-slate-900 bg-slate-100 px-1 py-0.5 rounded">jhabua@2024</code>
-                  </div>
-                  <div className="bg-white p-2 rounded border border-slate-200">
-                    <span className="font-bold text-teal-800">2. जल प्रदाय विभाग:</span><br />
-                    यूजर: <code className="font-bold text-slate-900 bg-slate-100 px-1 py-0.5 rounded">water_admin</code> | पास: <code className="font-bold text-slate-900 bg-slate-100 px-1 py-0.5 rounded">water@jhabua2024</code>
-                  </div>
-                  <div className="bg-white p-2 rounded border border-slate-200">
-                    <span className="font-bold text-indigo-800">3. मुख्य अधिकारी (Super Admin):</span><br />
-                    यूजर: <code className="font-bold text-slate-900 bg-slate-100 px-1 py-0.5 rounded">super_admin</code> | पास: <code className="font-bold text-slate-900 bg-slate-100 px-1 py-0.5 rounded">jhabua@super2024</code>
-                  </div>
-                </div>
-              </div>
-
               <form onSubmit={handleLogin} className="space-y-4">
                 <div>
                   <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">उपयोगकर्ता नाम (Username)</label>
@@ -420,7 +399,7 @@ export default function AdminPage() {
                     value={username} 
                     onChange={e => setUsername(e.target.value)}
                     className="w-full border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs font-medium focus:outline-none focus:border-emerald-600"
-                    placeholder="admin या water_admin"
+                    placeholder="User ID / Username"
                   />
                 </div>
                 
