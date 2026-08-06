@@ -390,18 +390,18 @@ export default function BirthCertificatePage() {
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
         
         {/* Banner */}
-        <div className="relative bg-gradient-to-br from-blue-700 via-blue-800 to-indigo-900 text-white rounded-3xl p-6 sm:p-8 shadow-xl overflow-hidden">
+        <div className="relative bg-gradient-to-br from-emerald-900 via-emerald-800 to-teal-900 text-white rounded-3xl p-6 sm:p-8 shadow-xl overflow-hidden">
           <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wMyI+PHBhdGggZD0iTTM2IDM0djItSDI0di0yaDEyek0zNiAyNHYySDI0di0yaDEyeiIvPjwvZz48L2c+PC9zdmc+')] opacity-30" />
-          <div className="absolute top-0 right-0 w-64 h-64 bg-blue-400/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3" />
+          <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-400/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3" />
           <div className="relative z-10 space-y-2">
-            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold bg-white/10 text-blue-200 border border-white/15 backdrop-blur-md">
-              <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />
+            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold bg-white/10 text-emerald-200 border border-white/15 backdrop-blur-md">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
               मध्य प्रदेश शासन - लोक स्वास्थ्य एवं परिवार कल्याण विभाग
             </span>
             <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
               जन्म प्रमाण पत्र ऑनलाइन आवेदन
             </h1>
-            <p className="text-blue-100 text-xs sm:text-sm max-w-3xl leading-relaxed">
+            <p className="text-slate-200 text-xs sm:text-sm max-w-3xl leading-relaxed">
               नगर पालिका परिषद झाबुआ (म.प्र.) | जन्म और मृत्यु पंजीकरण अधिनियम, 1969 के अंतर्गत डिजिटल जन्म पंजीकरण सेवा। ऑनलाइन फॉर्म भरें, भौतिक सत्यापन पावती पत्र डाउनलोड करें एवं स्वीकृत प्रमाण पत्र प्राप्त करें।
             </p>
           </div>
@@ -432,7 +432,7 @@ export default function BirthCertificatePage() {
               onClick={() => setActiveTab('apply')}
               className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all ${
                 activeTab === 'apply'
-                  ? 'bg-blue-700 text-white shadow-md'
+                  ? 'bg-emerald-700 text-white shadow-md'
                   : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
               }`}
             >
@@ -443,7 +443,7 @@ export default function BirthCertificatePage() {
               onClick={() => setActiveTab('track')}
               className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all ${
                 activeTab === 'track'
-                  ? 'bg-blue-700 text-white shadow-md'
+                  ? 'bg-emerald-700 text-white shadow-md'
                   : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
               }`}
             >
@@ -513,7 +513,7 @@ export default function BirthCertificatePage() {
             {/* SECTION 1: CHILD DETAILS */}
             <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-sm space-y-5">
               <h2 className="text-sm sm:text-base font-bold text-slate-900 flex items-center gap-2 border-b border-slate-100 pb-3">
-                <span className="p-1.5 rounded-lg bg-blue-100 text-blue-800 text-xs">👶</span> 1. नवजात शिशु का विवरण (Child Details)
+                <span className="p-1.5 rounded-lg bg-emerald-100 text-emerald-800 text-xs">👶</span> 1. नवजात शिशु का विवरण (Child Details)
               </h2>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -608,7 +608,7 @@ export default function BirthCertificatePage() {
             {/* SECTION 2: PLACE OF BIRTH & ADDRESS DETAILS */}
             <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-sm space-y-6">
               <h2 className="text-sm sm:text-base font-bold text-slate-900 flex items-center gap-2 border-b border-slate-100 pb-3">
-                <span className="p-1.5 rounded-lg bg-blue-100 text-blue-800 text-xs">🏥</span> 2. जन्म का स्थान एवं पता विवरण (Place of Birth & Address Details)
+                <span className="p-1.5 rounded-lg bg-emerald-100 text-emerald-800 text-xs">🏥</span> 2. जन्म का स्थान एवं पता विवरण (Place of Birth & Address Details)
               </h2>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -754,12 +754,12 @@ export default function BirthCertificatePage() {
                   <h3 className="text-xs font-extrabold text-slate-700 uppercase tracking-wider">
                     🏠 माता-पिता का स्थायी पता (Permanent Address of Parents)
                   </h3>
-                  <label className="flex items-center gap-2 text-xs text-blue-800 font-bold cursor-pointer">
+                  <label className="flex items-center gap-2 text-xs text-emerald-800 font-bold cursor-pointer">
                     <input
                       type="checkbox"
                       checked={formData.childDetails.permanentAddress.isSameAsPresent}
                       onChange={(e) => toggleSameAsPresentAddress(e.target.checked)}
-                      className="rounded text-blue-700 focus:ring-blue-600 h-4 w-4"
+                      className="rounded text-emerald-700 focus:ring-emerald-600 h-4 w-4"
                     />
                     <span>वर्तमान पते के समान (Same as Present Address)</span>
                   </label>
@@ -841,7 +841,7 @@ export default function BirthCertificatePage() {
             {/* SECTION 3: MOTHER'S DETAILS */}
             <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-sm space-y-5">
               <h2 className="text-sm sm:text-base font-bold text-slate-900 flex items-center gap-2 border-b border-slate-100 pb-3">
-                <span className="p-1.5 rounded-lg bg-blue-100 text-blue-800 text-xs">👩</span> 3. माता का विवरण (Mother's Details)
+                <span className="p-1.5 rounded-lg bg-emerald-100 text-emerald-800 text-xs">👩</span> 3. माता का विवरण (Mother's Details)
               </h2>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -934,7 +934,7 @@ export default function BirthCertificatePage() {
             {/* SECTION 4: FATHER'S DETAILS */}
             <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-sm space-y-5">
               <h2 className="text-sm sm:text-base font-bold text-slate-900 flex items-center gap-2 border-b border-slate-100 pb-3">
-                <span className="p-1.5 rounded-lg bg-blue-100 text-blue-800 text-xs">👨</span> 4. पिता का विवरण (Father's Details)
+                <span className="p-1.5 rounded-lg bg-emerald-100 text-emerald-800 text-xs">👨</span> 4. पिता का विवरण (Father's Details)
               </h2>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -1001,7 +1001,7 @@ export default function BirthCertificatePage() {
             {/* SECTION 5: APPLICANT / INFORMANT DETAILS */}
             <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-sm space-y-5">
               <h2 className="text-sm sm:text-base font-bold text-slate-900 flex items-center gap-2 border-b border-slate-100 pb-3">
-                <span className="p-1.5 rounded-lg bg-blue-100 text-blue-800 text-xs">📝</span> 5. आवेदक / सूचनाकर्ता का विवरण (Applicant / Informant Details)
+                <span className="p-1.5 rounded-lg bg-emerald-100 text-emerald-800 text-xs">📝</span> 5. आवेदक / सूचनाकर्ता का विवरण (Applicant / Informant Details)
               </h2>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -1095,7 +1095,7 @@ export default function BirthCertificatePage() {
             {/* SECTION 6: SUPPORTING DOCUMENT PHOTO UPLOADS */}
             <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-sm space-y-5">
               <h2 className="text-sm sm:text-base font-bold text-slate-900 flex items-center gap-2 border-b border-slate-100 pb-3">
-                <span className="p-1.5 rounded-lg bg-blue-100 text-blue-800 text-xs">📎</span> 6. आवश्यक दस्तावेज फोटो अपलोड (Supporting Document Uploads)
+                <span className="p-1.5 rounded-lg bg-emerald-100 text-emerald-800 text-xs">📎</span> 6. आवश्यक दस्तावेज फोटो अपलोड (Supporting Document Uploads)
               </h2>
               <p className="text-xs text-slate-500 leading-relaxed">
                 कृपया प्रमाण पत्र सत्यापन हेतु आवश्यक मूल दस्तावेजों की स्पष्ट फोटो या PDF फ़ाइल संलग्न करें।
@@ -1154,7 +1154,7 @@ export default function BirthCertificatePage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="btn btn-primary bg-blue-700 hover:bg-blue-800 flex items-center gap-2 shadow-lg shadow-blue-700/20 font-bold"
+                className="btn btn-primary bg-emerald-700 hover:bg-emerald-800 flex items-center gap-2 shadow-lg shadow-emerald-700/20 font-bold"
               >
                 {loading ? (
                   <RefreshCw className="animate-spin w-4 h-4 text-white" />
@@ -1180,7 +1180,7 @@ export default function BirthCertificatePage() {
                 <p className="text-slate-500 text-xs mb-4">आपने अभी तक कोई जन्म प्रमाण पत्र आवेदन जमा नहीं किया है।</p>
                 <button
                   onClick={() => setActiveTab('apply')}
-                  className="btn btn-primary text-xs font-bold bg-blue-700 hover:bg-blue-800"
+                  className="btn btn-primary text-xs font-bold bg-emerald-700 hover:bg-emerald-800"
                 >
                   + पहला आवेदन दर्ज करें
                 </button>
@@ -1191,7 +1191,7 @@ export default function BirthCertificatePage() {
                   <div key={app.id} className="bg-white border border-slate-200 rounded-2xl p-5 hover:border-slate-300 transition-all flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-sm">
                     <div>
                       <div className="flex items-center gap-2 mb-1">
-                        <span className="text-xs font-mono font-bold text-blue-800 bg-blue-100 px-2 py-0.5 rounded border border-blue-200">{app.applicationNo || 'DRAFT'}</span>
+                        <span className="text-xs font-mono font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded border border-emerald-200">{app.applicationNo || 'DRAFT'}</span>
                         <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold border uppercase tracking-wider ${getStatusChip(app.status)}`}>
                           {app.status}
                         </span>
