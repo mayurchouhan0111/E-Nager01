@@ -32,6 +32,7 @@ export default function ServiceHeader() {
     if (path === '/' && pathname === '/') return true;
     if (path === '/death-certificate' && pathname?.startsWith('/death-certificate')) return true;
     if (path === '/birth-certificate' && pathname?.startsWith('/birth-certificate')) return true;
+    if (path === '/water-connection' && pathname?.startsWith('/water-connection')) return true;
     if (path === '/admin' && pathname?.startsWith('/admin')) return true;
     return false;
   };
@@ -53,7 +54,7 @@ export default function ServiceHeader() {
                   MP e-Nagar
                 </span>
               </div>
-              <p className="text-[11px] text-slate-400 font-medium">झाबुआ — प्रमाण पत्र सेवा पोर्टल</p>
+              <p className="text-[11px] text-slate-400 font-medium">झाबुआ — नागरिक सेवा पोर्टल</p>
             </div>
           </Link>
 
@@ -61,7 +62,7 @@ export default function ServiceHeader() {
           <nav className="hidden md:flex items-center gap-1 bg-slate-100/80 p-1 rounded-2xl border border-slate-200/60">
             <Link
               href="/death-certificate"
-              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all duration-200 flex items-center gap-2 ${
+              className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all duration-200 flex items-center gap-1.5 ${
                 isCurrentTab('/death-certificate')
                   ? 'bg-emerald-700 text-white shadow-md shadow-emerald-200'
                   : 'text-slate-600 hover:text-slate-900 hover:bg-white/80'
@@ -73,7 +74,7 @@ export default function ServiceHeader() {
 
             <Link
               href="/birth-certificate"
-              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all duration-200 flex items-center gap-2 ${
+              className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all duration-200 flex items-center gap-1.5 ${
                 isCurrentTab('/birth-certificate')
                   ? 'bg-emerald-700 text-white shadow-md shadow-emerald-200'
                   : 'text-slate-600 hover:text-slate-900 hover:bg-white/80'
@@ -81,6 +82,18 @@ export default function ServiceHeader() {
             >
               <span className="text-sm">👶</span>
               <span>जन्म प्रमाण पत्र</span>
+            </Link>
+
+            <Link
+              href="/water-connection"
+              className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all duration-200 flex items-center gap-1.5 ${
+                isCurrentTab('/water-connection')
+                  ? 'bg-teal-700 text-white shadow-md shadow-teal-200'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-white/80'
+              }`}
+            >
+              <span className="text-sm">💧</span>
+              <span>जल कनेक्शन सेवा</span>
             </Link>
           </nav>
 

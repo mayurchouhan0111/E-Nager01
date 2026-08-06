@@ -423,6 +423,24 @@ export default function DeathCertificatePage() {
           </div>
         </div>
 
+        {/* Platform Legal Disclaimer & Mandatory Submission Warning */}
+        <div className="bg-amber-50 border-2 border-amber-300 rounded-3xl p-5 shadow-sm space-y-2 text-amber-950">
+          <div className="flex items-center gap-2 text-amber-900 font-extrabold text-xs sm:text-sm">
+            <ShieldAlert className="w-5 h-5 text-amber-600 shrink-0" />
+            <span>⚠️ वैधानिक चेतावनी एवं आवश्यक निर्देश (Official Legal Responsibility & Instructions)</span>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs leading-relaxed font-medium">
+            <div className="bg-white/80 p-3 rounded-2xl border border-amber-200">
+              <strong className="text-amber-900 block mb-1">1. आवेदक का वैधानिक उत्तरदायित्व:</strong>
+              इस संपूर्ण प्लेटफॉर्म पर दर्ज समस्त विवरण शासकीय अभिलेख हेतु आधिकारिक है। यदि आवेदक द्वारा कोई असत्य या भ्रामक जानकारी दर्ज की जाती है, तो उसके लिए <strong>केवल आवेदक स्वयं व्यक्तिगत एवं कानूनी रूप से उत्तरदायी</strong> होगा।
+            </div>
+            <div className="bg-white/80 p-3 rounded-2xl border border-amber-200">
+              <strong className="text-amber-900 block mb-1">2. अनिवार्य भौतिक पावती पत्र जमा:</strong>
+              ऑनलाइन आवेदन फॉर्म भरने के पश्चात, जनरेट किए गए <strong>पावती पत्र (Hard Copy Application Letter)</strong> का प्रिंटआउट निकालें और अपने <strong>संलग्न मूल दस्तावेजों सहित नगर पालिका कार्यालय झाबुआ</strong> में अनिवार्य रूप से जमा करें।
+            </div>
+          </div>
+        </div>
+
         {/* Navigation Tabs */}
         <div className="flex items-center justify-between flex-wrap gap-4">
           <div className="flex gap-1.5 bg-white border border-slate-200 rounded-2xl p-1.5 shadow-sm">

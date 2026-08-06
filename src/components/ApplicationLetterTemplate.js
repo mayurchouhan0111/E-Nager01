@@ -5,7 +5,8 @@ import React from 'react';
 export default function ApplicationLetterTemplate({ record, serviceType = 'death' }) {
   if (!record) return null;
 
-  const isBirth = serviceType === 'birth' || record.applicationNo?.startsWith('BC');
+  const isWater = serviceType === 'water_connection' || serviceType === 'water' || record.applicationNo?.startsWith('WC');
+  const isBirth = !isWater && (serviceType === 'birth' || record.applicationNo?.startsWith('BC'));
 
   const child = record.childDetails || {};
   const deceased = record.deceasedDetails || {};
@@ -13,6 +14,9 @@ export default function ApplicationLetterTemplate({ record, serviceType = 'death
   const father = record.fatherDetails || {};
   const applicant = record.applicantDetails || {};
   const parentSpouse = record.parentSpouseDetails || {};
+  const property = record.propertyDetails || {};
+  const existingConn = record.existingConnectionDetails || {};
+  const plumber = record.plumberDetails || {};
 
   const formattedDate = (dateStr) => {
     if (!dateStr) return 'N/A';
@@ -29,6 +33,7 @@ export default function ApplicationLetterTemplate({ record, serviceType = 'death
 
   const formatAddress = (addrObj) => {
     if (!addrObj) return 'N/A';
+    if (typeof addrObj === 'string') return addrObj;
     if (addrObj.isSameAsPresent) return 'वर्तमान पते के समान (Same as Present Address)';
     const parts = [
       addrObj.houseNo && `मकान क्र. ${addrObj.houseNo}`,
@@ -55,7 +60,7 @@ export default function ApplicationLetterTemplate({ record, serviceType = 'death
           </div>
           <div>
             <h2 className="text-[11px] uppercase tracking-widest text-slate-700 font-bold">
-              मध्य प्रदेश शासन - लोक स्वास्थ्य एवं परिवार कल्याण विभाग
+              मध्य प्रदेश शासन — नगरीय विकास एवं आवास विभाग
             </h2>
             <h1 className="text-lg font-extrabold text-slate-950 uppercase tracking-wide">
               कार्यालय नगर पालिका परिषद झाबुआ (म.प्र.)
@@ -67,7 +72,7 @@ export default function ApplicationLetterTemplate({ record, serviceType = 'death
         </div>
 
         <div className="mt-2 bg-slate-900 text-white py-1.5 px-4 rounded font-bold text-sm tracking-wider uppercase inline-block">
-          {isBirth ? 'जन्म प्रमाण पत्र आवेदन पत्र सह पावती' : 'मृत्यु प्रमाण पत्र आवेदन पत्र सह पावती'}
+          {isWater ? 'नल कनेक्शन हेतु आवेदन पत्र सह पावती' : isBirth ? 'जन्म प्रमाण पत्र आवेदन पत्र सह पावती' : 'मृत्यु प्रमाण पत्र आवेदन पत्र सह पावती'}
         </div>
         <p className="text-[10px] text-slate-600 mt-1 italic">
           (भौतिक सत्यापन एवं कार्यालयीन रिकॉर्ड हेतु मूल पावती पत्र)
@@ -88,13 +93,81 @@ export default function ApplicationLetterTemplate({ record, serviceType = 'death
       </div>
 
       {/* Notice Alert Box */}
-      <div className="bg-amber-50 border-2 border-amber-400 p-3 rounded-lg text-amber-950 font-medium mb-5 leading-relaxed">
-        <span className="font-bold text-amber-900 underline block mb-1">📌 महत्वपूर्ण निर्देश (IMPORTANT INSTRUCTIONS):</span>
-        कृपया इस ऑनलाइन आवेदन पत्र का <strong>प्रिंट आउट (Hard Copy)</strong> निकालें और अपने <strong>संलग्न मूल दस्तावेजों एवं छायाप्रतियों</strong> के साथ <strong>नगर पालिका कार्यालय झाबुआ (जन्म-मृत्यु पंजीकरण शाखा)</strong> में भौतिक सत्यापन (Cross Verification) हेतु जमा करें।
+      <div className="bg-amber-50 border-2 border-amber-400 p-3 rounded-lg text-amber-950 font-medium mb-5 leading-relaxed space-y-1.5">
+        <div>
+          <span className="font-bold text-amber-900 underline">📌 अनिवार्य निर्देश (MANDATORY INSTRUCTIONS):</span>
+          कृपया इस ऑनलाइन आवेदन पत्र का <strong>प्रिंट आउट (Hard Copy)</strong> निकालें और अपने <strong>संलग्न मूल दस्तावेजों एवं छायाप्रतियों</strong> के साथ <strong>नगर पालिका कार्यालय झाबुआ ({isWater ? 'जल प्रदाय शाखा' : 'जन्म-मृत्यु पंजीकरण शाखा'})</strong> में भौतिक सत्यापन (Physical Verification) हेतु अनिवार्यतः जमा करें।
+        </div>
+        <div className="text-[11px] text-rose-900 font-bold bg-rose-100/80 p-2 rounded border border-rose-300 mt-1">
+          ⚠️ वैधानिक उत्तरदायित्व चेतावनी (Official Legal Disclaimer): इस पोर्टल पर दर्ज समस्त जानकारी शासकीय अभिलेख हेतु आधिकारिक है। यदि आवेदक द्वारा कोई असत्य या भ्रामक जानकारी दर्ज की जाती है, तो उसके लिए आवेदक स्वयं व्यक्तिगत एवं कानूनी रूप से पूर्णतः जिम्मेदार रहेगा।
+        </div>
       </div>
 
       {/* Details Section */}
-      {isBirth ? (
+      {isWater ? (
+        /* WATER CONNECTION DETAILS TABLE (Matching image.png) */
+        <div className="space-y-4 mb-4">
+          <div>
+            <h3 className="font-bold text-slate-900 border-b border-slate-400 pb-1 mb-2 uppercase text-xs">
+              1. आवेदक एवं भवन का विवरण (Applicant & Property Details)
+            </h3>
+            <table className="w-full border-collapse border border-slate-400 text-xs">
+              <tbody>
+                <tr className="border-b border-slate-300 bg-slate-50">
+                  <td className="p-2 font-bold w-1/3 border-r border-slate-300">आवेदक का नाम:</td>
+                  <td className="p-2 font-bold text-slate-900">{applicant.fullName || 'N/A'}</td>
+                </tr>
+                <tr className="border-b border-slate-300">
+                  <td className="p-2 font-bold border-r border-slate-300">पिता / पति का नाम / जाति:</td>
+                  <td className="p-2">{applicant.fatherHusbandName || 'N/A'} {applicant.caste ? `(जाति: ${applicant.caste})` : ''}</td>
+                </tr>
+                <tr className="border-b border-slate-300 bg-slate-50">
+                  <td className="p-2 font-bold border-r border-slate-300">भवन क्रमांक / स्वामी का नाम:</td>
+                  <td className="p-2">भवन क्र. {property.houseNo || 'N/A'} | भवन स्वामी: {property.houseOwnerName || applicant.fullName}</td>
+                </tr>
+                <tr className="border-b border-slate-300">
+                  <td className="p-2 font-bold border-r border-slate-300">वार्ड क्र. / किरायदार स्थिति:</td>
+                  <td className="p-2">वार्ड क्र. {applicant.wardNo || 'N/A'} | किरायदार है? <span className="font-bold">{applicant.isTenant ? 'हाँ (Yes)' : 'नहीं (No)'}</span></td>
+                </tr>
+                <tr className="border-b border-slate-300 bg-slate-50">
+                  <td className="p-2 font-bold border-r border-slate-300">कनेक्शन साइज / फेरूल साइज:</td>
+                  <td className="p-2">कनेक्शन: {property.connectionSize || '1/2 इंच'} | फेरूल साइज: {property.ferruleSize || '1/2 इंच'}</td>
+                </tr>
+                <tr className="border-b border-slate-300">
+                  <td className="p-2 font-bold border-r border-slate-300">टोटी की संख्या / उपयोग प्रयोजन:</td>
+                  <td className="p-2">टोंटी: {property.tapCount || '1'} | प्रयोजन: {property.usagePurpose || 'घरेलू (Domestic)'}</td>
+                </tr>
+                <tr className="border-b border-slate-300 bg-slate-50">
+                  <td className="p-2 font-bold border-r border-slate-300">दैनिक जल खपत / दूरी:</td>
+                  <td className="p-2">{property.dailyWaterLiters || 'N/A'} लीटर/दिन | मुख्य पाइप लाइन से भवन दूरी: {property.distanceMainPipe || 'N/A'} फीट</td>
+                </tr>
+                <tr>
+                  <td className="p-2 font-bold border-r border-slate-300">पाइप साइज एवं कुल लम्बाई:</td>
+                  <td className="p-2">पाइप साइज: {property.pipeSize || '1/2 इंच'} | कुल लम्बाई: {property.totalPipeLength || 'N/A'} फीट</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div>
+            <h3 className="font-bold text-slate-900 border-b border-slate-400 pb-1 mb-2 uppercase text-xs">
+              2. संदर्भ एवं अधिकृत प्लम्बर का विवरण (Reference & Licensed Plumber)
+            </h3>
+            <table className="w-full border-collapse border border-slate-400 text-xs">
+              <tbody>
+                <tr className="border-b border-slate-300 bg-slate-50">
+                  <td className="p-2 font-bold w-1/3 border-r border-slate-300">अन्य कनेक्शन विवरण:</td>
+                  <td className="p-2">{existingConn.existingConnNo ? `कनेक्शन क्र. ${existingConn.existingConnNo} (${existingConn.existingConnName || ''})` : 'कोई पूर्व कनेक्शन नहीं'}</td>
+                </tr>
+                <tr>
+                  <td className="p-2 font-bold border-r border-slate-300">अधिकृत प्लम्बर नाम एवं लाइसेंस क्र.:</td>
+                  <td className="p-2 font-semibold text-emerald-950">{plumber.plumberName || 'नगर निगम / पालिका अधिकृत प्लम्बर'} (लाइसेंस क्र. {plumber.plumberLicenseNo || 'N/A'})</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      ) : isBirth ? (
         /* BIRTH DETAILS TABLE */
         <div className="mb-4">
           <h3 className="font-bold text-slate-900 border-b border-slate-400 pb-1 mb-2 uppercase text-xs">
@@ -224,7 +297,42 @@ export default function ApplicationLetterTemplate({ record, serviceType = 'death
             </tr>
           </thead>
           <tbody>
-            {isBirth ? (
+            {isWater ? (
+              <>
+                <tr className="border-b border-slate-300">
+                  <td className="p-1.5 font-bold border-r border-slate-300 text-center">1</td>
+                  <td className="p-1.5 border-r border-slate-300">आवेदक का आधार कार्ड फोटो (Applicant Aadhaar Photo)</td>
+                  <td className="p-1.5 border-r border-slate-300 text-center font-bold text-emerald-800">
+                    {record.documents?.aadhaarCard?.fileName ? 'संलग्न' : 'संलग्न'}
+                  </td>
+                  <td className="p-1.5 text-center font-mono text-slate-400">[  ] सत्यापित</td>
+                </tr>
+                <tr className="border-b border-slate-300 bg-slate-50">
+                  <td className="p-1.5 font-bold border-r border-slate-300 text-center">2</td>
+                  <td className="p-1.5 border-r border-slate-300">भवन स्वामित्व / संपत्ति कर रसीद (Property Tax / Registry Document)</td>
+                  <td className="p-1.5 border-r border-slate-300 text-center font-bold text-emerald-800">
+                    {record.documents?.propertyReceipt?.fileName ? 'संलग्न' : 'संलग्न'}
+                  </td>
+                  <td className="p-1.5 text-center font-mono text-slate-400">[  ] सत्यापित</td>
+                </tr>
+                <tr className="border-b border-slate-300">
+                  <td className="p-1.5 font-bold border-r border-slate-300 text-center">3</td>
+                  <td className="p-1.5 border-r border-slate-300">नोटरी शपथ पत्र (Notarized Affidavit on Stamp Paper)</td>
+                  <td className="p-1.5 border-r border-slate-300 text-center font-bold text-emerald-800">
+                    {record.documents?.affidavitDoc?.fileName ? 'संलग्न' : 'संलग्न'}
+                  </td>
+                  <td className="p-1.5 text-center font-mono text-slate-400">[  ] सत्यापित</td>
+                </tr>
+                <tr className="border-b border-slate-300 bg-slate-50">
+                  <td className="p-1.5 font-bold border-r border-slate-300 text-center">4</td>
+                  <td className="p-1.5 border-r border-slate-300">आवेदक का पासपोर्ट साइज फोटो (Applicant Photo)</td>
+                  <td className="p-1.5 border-r border-slate-300 text-center font-bold text-emerald-800">
+                    {record.documents?.applicantPhoto?.fileName ? 'संलग्न' : 'संलग्न'}
+                  </td>
+                  <td className="p-1.5 text-center font-mono text-slate-400">[  ] सत्यापित</td>
+                </tr>
+              </>
+            ) : isBirth ? (
               <>
                 <tr className="border-b border-slate-300">
                   <td className="p-1.5 font-bold border-r border-slate-300 text-center">1</td>
