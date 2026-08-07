@@ -395,10 +395,17 @@ export default function BirthCertificatePage() {
           <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wMyI+PHBhdGggZD0iTTM2IDM0djItSDI0di0yaDEyek0zNiAyNHYySDI0di0yaDEyeiIvPjwvZz48L2c+PC9zdmc+')] opacity-30" />
           <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-400/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3" />
           <div className="relative z-10 space-y-2">
-            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold bg-white/10 text-emerald-200 border border-white/15 backdrop-blur-md">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-              मध्य प्रदेश शासन - लोक स्वास्थ्य एवं परिवार कल्याण विभाग
-            </span>
+            <div className="flex items-center gap-3">
+              <img 
+                src="/mp-logo.png" 
+                alt="मध्य प्रदेश शासन" 
+                className="w-14 h-14 object-contain drop-shadow shrink-0" 
+              />
+              <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold bg-white/10 text-emerald-200 border border-white/15 backdrop-blur-md">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                मध्य प्रदेश शासन - लोक स्वास्थ्य एवं परिवार कल्याण विभाग
+              </span>
+            </div>
             <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
               जन्म प्रमाण पत्र ऑनलाइन आवेदन
             </h1>

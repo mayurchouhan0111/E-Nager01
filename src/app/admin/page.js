@@ -328,8 +328,8 @@ export default function AdminPage() {
       <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 sm:h-16 flex items-center justify-between gap-3">
           <div className="flex items-center gap-2.5 min-w-0">
-            <a href="/" className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-700 to-emerald-800 flex items-center justify-center shadow-lg hover:opacity-90 transition shrink-0" title="Home">
-              <ShieldAlert className="w-5 h-5 text-white" />
+            <a href="/" className="w-9 h-9 flex items-center justify-center hover:opacity-90 transition shrink-0" title="Home">
+              <img src="/mp-logo.png" alt="मध्य प्रदेश शासन" className="w-9 h-9 object-contain drop-shadow-sm" />
             </a>
             <div className="min-w-0">
               <h1 className="font-extrabold text-slate-900 text-sm tracking-tight truncate">
@@ -379,9 +379,7 @@ export default function AdminPage() {
           <div className="max-w-md mx-auto my-12 w-full animate-fade-in">
             <div className="bg-white border border-slate-200 rounded-3xl p-8 shadow-xl space-y-6">
               <div className="text-center space-y-3">
-                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-700 to-emerald-800 flex items-center justify-center shadow-lg shadow-emerald-700/20 mx-auto text-white">
-                  <ShieldAlert className="w-8 h-8" />
-                </div>
+                <img src="/mp-logo.png" alt="मध्य प्रदेश शासन" className="w-16 h-16 object-contain drop-shadow-md mx-auto" />
                 <h2 className="text-xl font-extrabold text-slate-900">नगरपालिका अधिकारी लॉगिन (Officer Login)</h2>
                 <p className="text-xs text-slate-500 max-w-xs mx-auto">नगर पालिका परिषद झाबुआ अधिकारी प्रशासन पोर्टल (e-Nagar Palika Parishad Jhabua Officer Administration Portal)</p>
               </div>
