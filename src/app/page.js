@@ -16,10 +16,17 @@ export default function HomePage() {
         <div className="absolute bottom-0 left-0 w-72 h-72 bg-emerald-400/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/3" />
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 sm:py-20">
           <div className="space-y-5 max-w-3xl">
-            <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold bg-white/10 text-teal-200 border border-white/15 backdrop-blur-md">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              मध्य प्रदेश शासन - नगर पालिका परिषद झाबुआ
-            </span>
+            <div className="flex items-center gap-3">
+              <img 
+                src="/mp-logo.png" 
+                alt="मध्य प्रदेश शासन" 
+                className="w-16 h-16 object-contain drop-shadow-md shrink-0" 
+              />
+              <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold bg-white/10 text-teal-200 border border-white/15 backdrop-blur-md">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                मध्य प्रदेश शासन - नगर पालिका परिषद झाबुआ
+              </span>
+            </div>
             <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight leading-tight">
               नगर पालिका नागरिक ई-सेवाएँ<br />
               <span className="bg-gradient-to-r from-emerald-300 via-teal-200 to-cyan-200 bg-clip-text text-transparent">जन्म, मृत्यु एवं जल कनेक्शन पोर्टल</span>
