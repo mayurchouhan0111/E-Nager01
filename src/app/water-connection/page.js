@@ -6,6 +6,7 @@ import ApplicationTimeline from '@/components/ApplicationTimeline';
 import WaterConnectionTemplate from '@/components/WaterConnectionTemplate';
 import ApplicationLetterTemplate from '@/components/ApplicationLetterTemplate';
 import DocumentUploader from '@/components/DocumentUploader';
+import DocumentChecklist from '@/components/DocumentChecklist';
 import { 
   saveWaterConnectionDraft, 
   submitWaterConnection, 
@@ -13,7 +14,7 @@ import {
 } from '@/services/waterConnectionService';
 import { 
   Droplet, Activity, CheckCircle2, AlertCircle, RefreshCw, Printer, X, History, Plus, 
-  Building2, User, Home, FileText, Download, ShieldAlert, CheckSquare, Wrench
+  Building2, User, Home, FileText, Download, ShieldAlert, CheckSquare, Wrench, ListChecks
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -332,6 +333,17 @@ export default function WaterConnectionPage() {
             >
               <Activity className="w-4 h-4" />
               <span>मेरे आवेदन एवं स्थिति ({applications.length})</span>
+            </button>
+            <button
+              onClick={() => setActiveTab('checklist')}
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all ${
+                activeTab === 'checklist'
+                  ? 'bg-teal-700 text-white shadow-md'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+              }`}
+            >
+              <ListChecks className="w-4 h-4" />
+              <span>आवश्यक दस्तावेज चैकलिस्ट</span>
             </button>
           </div>
 
@@ -864,6 +876,11 @@ export default function WaterConnectionPage() {
               </div>
             )}
           </div>
+        )}
+
+        {/* TAB 3: DOCUMENT CHECKLIST */}
+        {activeTab === 'checklist' && (
+          <DocumentChecklist defaultCategory="water" />
         )}
 
       </main>

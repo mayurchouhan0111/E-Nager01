@@ -192,11 +192,47 @@ export const CHECKLIST_DATA = {
         required: true
       }
     ]
+  },
+  waterConnection: {
+    id: 'waterConnection',
+    title: 'जल (नल) कनेक्शन हेतु आवश्यक दस्तावेज',
+    subtitle: 'Required Documents for New Water Connection',
+    category: 'water',
+    icon: '🚰',
+    badge: 'नल कनेक्शन',
+    badgeColor: 'bg-teal-100 text-teal-800 border-teal-300',
+    description: 'नगर पालिका परिषद झाबुआ में नए नल कनेक्शन हेतु आवेदन के साथ निम्नलिखित 4 आवश्यक दस्तावेज संलग्न करें:',
+    items: [
+      {
+        id: 'wc_1',
+        title: '1. आवेदक का आधार कार्ड की फोटोकॉपी',
+        detail: 'भवन स्वामी / आवेदक का 12 अंकों का आधार कार्ड स्पष्ट होना अनिवार्य है।',
+        required: true
+      },
+      {
+        id: 'wc_2',
+        title: '2. भवन स्वामित्व / संपत्ति कर भुगतान रसीद',
+        detail: 'मकान की रजिस्ट्री, पट्टा अथवा नगर पालिका की अद्यतन संपत्ति कर (Property Tax) रसीद की फोटोकॉपी।',
+        required: true
+      },
+      {
+        id: 'wc_3',
+        title: '3. नोटरी द्वारा सत्यापित शपथ पत्र (Affidavit)',
+        detail: 'स्टाम्प पेपर पर नोटरी द्वारा सत्यापित शपथ पत्र (नल कनेक्शन उपयोग नियम एवं शर्तों हेतु)।',
+        required: true
+      },
+      {
+        id: 'wc_4',
+        title: '4. आवेदक का पासपोर्ट साइज फोटो एवं आवेदन पत्र',
+        detail: 'नवीनतम रंगीन पासपोर्ट साइज फोटो एवं ई-पोर्टल द्वारा जनरेटेड हस्ताक्षरित आवेदन पत्र (Hard Copy)।',
+        required: true
+      }
+    ]
   }
 };
 
 export default function DocumentChecklist({ defaultCategory = 'all', compact = false }) {
-  const [activeCategory, setActiveCategory] = useState(defaultCategory); // 'all' | 'birth' | 'death'
+  const [activeCategory, setActiveCategory] = useState(defaultCategory); // 'all' | 'birth' | 'death' | 'water'
   const [checkedItems, setCheckedItems] = useState({});
 
   const toggleCheck = (itemId) => {
@@ -235,7 +271,7 @@ export default function DocumentChecklist({ defaultCategory = 'all', compact = f
 
         <div className="flex items-center gap-2">
           {!compact && (
-            <div className="flex gap-1 bg-slate-100 p-1 rounded-xl border border-slate-200">
+            <div className="flex gap-1 bg-slate-100 p-1 rounded-xl border border-slate-200 flex-wrap">
               <button
                 type="button"
                 onClick={() => setActiveCategory('all')}
@@ -262,6 +298,15 @@ export default function DocumentChecklist({ defaultCategory = 'all', compact = f
                 }`}
               >
                 🕯️ मृत्यु प्रमाण पत्र
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveCategory('water')}
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                  activeCategory === 'water' ? 'bg-teal-700 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                🚰 जल कनेक्शन
               </button>
             </div>
           )}
