@@ -46,9 +46,11 @@ export default function BirthCertificateTemplate({ record }) {
         
         {/* Official Header */}
         <div className="text-center border-b-2 border-blue-900/30 pb-4 mb-6">
-          <div className="w-16 h-16 mx-auto mb-2 bg-blue-700/10 rounded-full border border-blue-700/40 flex items-center justify-center font-bold text-blue-950 text-2xl">
-            नगर
-          </div>
+          <img 
+            src="/mp-logo.png" 
+            alt="मध्य प्रदेश शासन" 
+            className="w-20 h-20 mx-auto mb-2 object-contain" 
+          />
           <h2 className="text-sm uppercase tracking-widest text-slate-600 font-semibold mb-1">
             मध्य प्रदेश शासन - लोक स्वास्थ्य एवं परिवार कल्याण विभाग (Govt. of MP - Dept. of Public Health & Family Welfare)
           </h2>

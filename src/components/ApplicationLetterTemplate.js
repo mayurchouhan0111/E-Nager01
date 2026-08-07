@@ -55,9 +55,11 @@ export default function ApplicationLetterTemplate({ record, serviceType = 'death
       {/* Official Header */}
       <div className="text-center border-b-2 border-slate-800 pb-4 mb-4">
         <div className="flex items-center justify-center gap-3 mb-2">
-          <div className="w-14 h-14 bg-emerald-900/10 rounded-full border-2 border-emerald-800 flex items-center justify-center font-bold text-emerald-900 text-xl shrink-0">
-            झाबुआ
-          </div>
+          <img 
+            src="/mp-logo.png" 
+            alt="मध्य प्रदेश शासन" 
+            className="w-14 h-14 object-contain shrink-0" 
+          />
           <div>
             <h2 className="text-[11px] uppercase tracking-widest text-slate-700 font-bold">
               मध्य प्रदेश शासन — नगरीय विकास एवं आवास विभाग

@@ -115,15 +115,17 @@ export default function ServiceHeader() {
         <div className="flex items-center justify-between h-16">
           
           <Link href="/" className="flex items-center gap-3 group">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-600 to-emerald-700 flex items-center justify-center shadow-md shadow-emerald-100 text-white group-hover:shadow-lg group-hover:shadow-emerald-200 transition-all duration-300">
-              <Layers className="w-5 h-5" />
-            </div>
+            <img 
+              src="/mp-logo.png" 
+              alt="मध्य प्रदेश शासन" 
+              className="w-11 h-11 object-contain drop-shadow-sm group-hover:scale-105 transition-transform duration-300" 
+            />
             <div className="hidden sm:block">
               <div className="text-slate-900 font-extrabold text-sm leading-tight flex items-center gap-2">
                 नगर पालिका ई-सेवा पोर्टल
                 <span className="text-[9px] bg-emerald-100 text-emerald-800 border border-emerald-200 px-2 py-0.5 rounded-full uppercase tracking-wider font-bold">MP e-Nagar</span>
               </div>
-              <p className="text-[11px] text-slate-400 font-medium">झाबुआ — नागरिक सेवा पोर्टल</p>
+              <p className="text-[11px] text-slate-400 font-medium">झाबुआ — मध्य प्रदेश शासन</p>
             </div>
           </Link>
 

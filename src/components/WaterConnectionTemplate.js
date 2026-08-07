@@ -29,9 +29,11 @@ export default function WaterConnectionTemplate({ record }) {
         
         {/* Official Header */}
         <div className="text-center border-b-2 border-teal-900/30 pb-4 mb-6">
-          <div className="w-16 h-16 mx-auto mb-2 bg-teal-700/10 rounded-full border border-teal-700/40 flex items-center justify-center font-bold text-teal-950 text-2xl">
-            झाबुआ
-          </div>
+          <img 
+            src="/mp-logo.png" 
+            alt="मध्य प्रदेश शासन" 
+            className="w-20 h-20 mx-auto mb-2 object-contain" 
+          />
           <h2 className="text-sm uppercase tracking-widest text-slate-600 font-semibold mb-1">
             मध्य प्रदेश शासन — नगरीय विकास एवं आवास विभाग (Govt. of MP — Urban Development & Housing)
           </h2>
