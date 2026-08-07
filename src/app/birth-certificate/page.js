@@ -6,6 +6,7 @@ import ApplicationTimeline from '@/components/ApplicationTimeline';
 import BirthCertificateTemplate from '@/components/BirthCertificateTemplate';
 import ApplicationLetterTemplate from '@/components/ApplicationLetterTemplate';
 import DocumentUploader from '@/components/DocumentUploader';
+import DocumentChecklist from '@/components/DocumentChecklist';
 import { 
   saveBirthCertificateDraft, 
   submitBirthCertificate, 
@@ -13,7 +14,7 @@ import {
 } from '@/services/birthCertificateService';
 import { 
   Baby, Activity, CheckCircle2, AlertCircle, RefreshCw, Printer, X, History, Plus, 
-  Building2, User, Home, HeartPulse, CheckSquare, FileText, Download, ShieldAlert 
+  Building2, User, Home, HeartPulse, CheckSquare, FileText, Download, ShieldAlert, ListChecks
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -449,6 +450,17 @@ export default function BirthCertificatePage() {
             >
               <Activity className="w-4 h-4" />
               <span>मेरे आवेदन एवं स्थिति ({applications.length})</span>
+            </button>
+            <button
+              onClick={() => setActiveTab('checklist')}
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all ${
+                activeTab === 'checklist'
+                  ? 'bg-emerald-700 text-white shadow-md'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+              }`}
+            >
+              <ListChecks className="w-4 h-4" />
+              <span>आवश्यक दस्तावेज चैकलिस्ट</span>
             </button>
           </div>
 
@@ -1094,46 +1106,87 @@ export default function BirthCertificatePage() {
 
             {/* SECTION 6: SUPPORTING DOCUMENT PHOTO UPLOADS */}
             <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-sm space-y-5">
-              <h2 className="text-sm sm:text-base font-bold text-slate-900 flex items-center gap-2 border-b border-slate-100 pb-3">
-                <span className="p-1.5 rounded-lg bg-emerald-100 text-emerald-800 text-xs">📎</span> 6. आवश्यक दस्तावेज फोटो अपलोड (Supporting Document Uploads)
-              </h2>
+              <div className="flex items-center justify-between flex-wrap gap-2 border-b border-slate-100 pb-3">
+                <h2 className="text-sm sm:text-base font-bold text-slate-900 flex items-center gap-2">
+                  <span className="p-1.5 rounded-lg bg-emerald-100 text-emerald-800 text-xs">📎</span> 6. आवश्यक दस्तावेज फोटो अपलोड (Supporting Document Uploads)
+                </h2>
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('checklist')}
+                  className="text-xs text-emerald-800 font-bold hover:underline flex items-center gap-1 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200"
+                >
+                  📋 शासकीय दस्तावेज सूची देखें (View Official Checklist)
+                </button>
+              </div>
+              
               <p className="text-xs text-slate-500 leading-relaxed">
-                कृपया प्रमाण पत्र सत्यापन हेतु आवश्यक मूल दस्तावेजों की स्पष्ट फोटो या PDF फ़ाइल संलग्न करें।
+                नगर पालिका परिषद झाबुआ के निर्देशानुसार, <strong>{formData.childDetails.placeType}</strong> हेतु आवश्यक मूल दस्तावेजों की स्पष्ट फोटो या PDF फ़ाइल संलग्न करें।
               </p>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <DocumentUploader
-                  title="अस्पताल जन्म डिस्चार्ज कार्ड / पर्ची"
-                  description="अस्पताल द्वारा जारी जन्म पर्ची या डिस्चार्ज कार्ड"
-                  required={true}
-                  documentData={formData.documents.hospitalSlip}
-                  onUpload={(doc) => handleDocumentUpload('hospitalSlip', doc)}
-                  onRemove={() => handleDocumentRemove('hospitalSlip')}
-                />
-
-                <DocumentUploader
-                  title="माता का आधार कार्ड फोटो"
+                  title="1. माता का आधार कार्ड फोटो"
                   description="शिशु की माता का आधार कार्ड (स्पष्ट फोटो)"
                   required={true}
-                  documentData={formData.documents.motherAadhaar}
+                  documentData={formData.documents?.motherAadhaar}
                   onUpload={(doc) => handleDocumentUpload('motherAadhaar', doc)}
                   onRemove={() => handleDocumentRemove('motherAadhaar')}
                 />
 
                 <DocumentUploader
-                  title="पिता का आधार कार्ड फोटो"
+                  title="2. पिता का आधार कार्ड फोटो"
                   description="शिशु के पिता का आधार कार्ड (स्पष्ट फोटो)"
                   required={true}
-                  documentData={formData.documents.fatherAadhaar}
+                  documentData={formData.documents?.fatherAadhaar}
                   onUpload={(doc) => handleDocumentUpload('fatherAadhaar', doc)}
                   onRemove={() => handleDocumentRemove('fatherAadhaar')}
                 />
 
                 <DocumentUploader
-                  title="निवास प्रमाण पत्र फोटो"
+                  title="3. समग्र परिवार आई.डी. (Samagra Family ID)"
+                  description="जिसमें माता-पिता दोनों का नाम होना अनिवार्य है"
+                  required={true}
+                  documentData={formData.documents?.samagraId}
+                  onUpload={(doc) => handleDocumentUpload('samagraId', doc)}
+                  onRemove={() => handleDocumentRemove('samagraId')}
+                />
+
+                {formData.childDetails.placeType.includes('घर') ? (
+                  <>
+                    <DocumentUploader
+                      title="4. आँगनवाड़ी कार्यकर्ता प्रमाणित पत्र"
+                      description="आँगनवाड़ी कार्यकर्ता द्वारा प्रमाणित सील-हस्ताक्षर युक्त पत्र (बच्चा घर पर होने पर)"
+                      required={true}
+                      documentData={formData.documents?.anganwadiLetter}
+                      onUpload={(doc) => handleDocumentUpload('anganwadiLetter', doc)}
+                      onRemove={() => handleDocumentRemove('anganwadiLetter')}
+                    />
+
+                    <DocumentUploader
+                      title="5. जच्चा-बच्चा (MCP) कार्ड फोटो"
+                      description="स्वास्थ्य विभाग द्वारा जारी जच्चा बच्चा कार्ड फोटोकॉपी"
+                      required={true}
+                      documentData={formData.documents?.mcpCard}
+                      onUpload={(doc) => handleDocumentUpload('mcpCard', doc)}
+                      onRemove={() => handleDocumentRemove('mcpCard')}
+                    />
+                  </>
+                ) : (
+                  <DocumentUploader
+                    title={formData.childDetails.hospitalName?.includes('वरदान') ? "4. वरदान हॉस्पिटल रजिस्ट्रेशन व डिस्चार्ज कार्ड" : "4. अस्पताल प्रसव सूचना / डिस्चार्ज कार्ड"}
+                    description="अस्पताल द्वारा जारी मूल रजिस्ट्रेशन पर्ची एवं डिस्चार्ज कार्ड"
+                    required={true}
+                    documentData={formData.documents?.hospitalSlip}
+                    onUpload={(doc) => handleDocumentUpload('hospitalSlip', doc)}
+                    onRemove={() => handleDocumentRemove('hospitalSlip')}
+                  />
+                )}
+
+                <DocumentUploader
+                  title="निवास प्रमाण पत्र / अन्य"
                   description="राशन कार्ड / वोटर ID / बिजली बिल / अन्य"
                   required={false}
-                  documentData={formData.documents.addressProof}
+                  documentData={formData.documents?.addressProof}
                   onUpload={(doc) => handleDocumentUpload('addressProof', doc)}
                   onRemove={() => handleDocumentRemove('addressProof')}
                 />
@@ -1250,6 +1303,11 @@ export default function BirthCertificatePage() {
             )}
 
           </div>
+        )}
+
+        {/* TAB 3: CHECKLIST */}
+        {activeTab === 'checklist' && (
+          <DocumentChecklist defaultCategory="birth" />
         )}
 
         {/* TIMELINE & APPLICATION DETAILS MODAL */}

@@ -6,6 +6,7 @@ import ApplicationTimeline from '../../components/ApplicationTimeline';
 import DeathCertificateTemplate from '../../components/DeathCertificateTemplate';
 import ApplicationLetterTemplate from '../../components/ApplicationLetterTemplate';
 import DocumentUploader from '../../components/DocumentUploader';
+import DocumentChecklist from '../../components/DocumentChecklist';
 import { 
   saveDeathCertificateDraft, 
   submitDeathCertificate, 
@@ -13,7 +14,7 @@ import {
 } from '../../services/deathCertificateService';
 import { 
   FileText, Activity, CheckCircle2, AlertCircle, RefreshCw, Printer, X, History, Plus, 
-  Building2, User, Home, HeartPulse, CheckSquare, Download, ShieldAlert 
+  Building2, User, Home, HeartPulse, CheckSquare, Download, ShieldAlert, ListChecks 
 } from 'lucide-react';
 
 const defaultDeceasedDetails = {
@@ -465,6 +466,17 @@ export default function DeathCertificatePage() {
             >
               <Activity className="w-4 h-4" />
               <span>मेरे आवेदन एवं स्थिति ({applications.length})</span>
+            </button>
+            <button
+              onClick={() => setActiveTab('checklist')}
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all ${
+                activeTab === 'checklist'
+                  ? 'bg-emerald-700 text-white shadow-md'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+              }`}
+            >
+              <ListChecks className="w-4 h-4" />
+              <span>आवश्यक दस्तावेज चैकलिस्ट</span>
             </button>
           </div>
 
@@ -1017,31 +1029,81 @@ export default function DeathCertificatePage() {
 
             {/* SECTION 6: SUPPORTING DOCUMENT PHOTO UPLOADS */}
             <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-sm space-y-5">
-              <h2 className="text-sm sm:text-base font-bold text-slate-900 flex items-center gap-2 border-b border-slate-100 pb-3">
-                <span className="p-1.5 rounded-lg bg-emerald-100 text-emerald-800 text-xs">📎</span> 6. आवश्यक दस्तावेज फोटो अपलोड (Supporting Document Uploads)
-              </h2>
+              <div className="flex items-center justify-between flex-wrap gap-2 border-b border-slate-100 pb-3">
+                <h2 className="text-sm sm:text-base font-bold text-slate-900 flex items-center gap-2">
+                  <span className="p-1.5 rounded-lg bg-emerald-100 text-emerald-800 text-xs">📎</span> 6. आवश्यक दस्तावेज फोटो अपलोड (Supporting Document Uploads)
+                </h2>
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('checklist')}
+                  className="text-xs text-emerald-800 font-bold hover:underline flex items-center gap-1 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200"
+                >
+                  📋 शासकीय दस्तावेज सूची देखें (View Official Checklist)
+                </button>
+              </div>
+
               <p className="text-xs text-slate-500 leading-relaxed">
-                कृपया मृत्यु प्रमाण पत्र सत्यापन हेतु आवश्यक मूल दस्तावेजों की स्पष्ट फोटो या PDF फ़ाइल संलग्न करें।
+                नगर पालिका परिषद झाबुआ के निर्देशानुसार, <strong>{formData.deceasedDetails.placeType}</strong> हेतु आवश्यक मूल दस्तावेजों की स्पष्ट फोटो या PDF फ़ाइल संलग्न करें।
               </p>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <DocumentUploader
-                  title="अस्पताल मृत्यु प्रमाण पत्र / दाह संस्कार रसीद"
-                  description="अस्पताल मृत्यु पर्ची या श्मशान/कब्रिस्तान की रसीद"
+                  title="1. मृतक का आधार कार्ड फोटो"
+                  description="मृतक व्यक्ति का आधार कार्ड (स्पष्ट फोटो)"
                   required={true}
-                  documentData={getDoc('deathSlip')}
-                  onUpload={(doc) => handleDocumentUpload('deathSlip', doc)}
-                  onRemove={() => handleDocumentRemove('deathSlip')}
+                  documentData={getDoc('deceasedAadhaar') || getDoc('deathSlip')}
+                  onUpload={(doc) => handleDocumentUpload('deceasedAadhaar', doc)}
+                  onRemove={() => handleDocumentRemove('deceasedAadhaar')}
                 />
 
                 <DocumentUploader
-                  title="आवेदक आधार कार्ड फोटो"
-                  description="आवेदक का आधार कार्ड (स्पष्ट फोटो)"
+                  title="2. सूचनादाता / आवेदक का आधार कार्ड फोटो"
+                  description="आवेदन करने वाले रिश्तेदार/सूचनादाता का आधार कार्ड"
                   required={true}
                   documentData={getDoc('applicantAadhaar')}
                   onUpload={(doc) => handleDocumentUpload('applicantAadhaar', doc)}
                   onRemove={() => handleDocumentRemove('applicantAadhaar')}
                 />
+
+                <DocumentUploader
+                  title="3. मृतक की समग्र आई.डी. फोटोकॉपी"
+                  description="मृतक सदस्य का नाम दर्ज समग्र परिवार आईडी"
+                  required={true}
+                  documentData={getDoc('samagraId')}
+                  onUpload={(doc) => handleDocumentUpload('samagraId', doc)}
+                  onRemove={() => handleDocumentRemove('samagraId')}
+                />
+
+                {formData.deceasedDetails.placeType.includes('घर') ? (
+                  <>
+                    <DocumentUploader
+                      title="4. मुक्तिधाम / मुस्लिम पंचायत / चर्च रसीद"
+                      description="अंतिम संस्कार/दाह संस्कार/दफन की जारी रसीद फोटोकॉपी"
+                      required={true}
+                      documentData={getDoc('cremationReceipt')}
+                      onUpload={(doc) => handleDocumentUpload('cremationReceipt', doc)}
+                      onRemove={() => handleDocumentRemove('cremationReceipt')}
+                    />
+
+                    <DocumentUploader
+                      title="5. पंचनामा या वार्ड पार्षद प्रमाणित पत्र"
+                      description="मृत्यु स्थल एवं दिनांक प्रमाणीकरण पत्र (पार्षद द्वारा प्रमाणित)"
+                      required={true}
+                      documentData={getDoc('panchnamaLetter')}
+                      onUpload={(doc) => handleDocumentUpload('panchnamaLetter', doc)}
+                      onRemove={() => handleDocumentRemove('panchnamaLetter')}
+                    />
+                  </>
+                ) : (
+                  <DocumentUploader
+                    title="4. अस्पताल मृत्यु प्रमाण पत्र (Form 4/4A)"
+                    description="अस्पताल द्वारा जारी मेडिकल डेथ सर्टिफिकेट / डिस्चार्ज पर्ची"
+                    required={true}
+                    documentData={getDoc('hospitalDeathSlip') || getDoc('deathSlip')}
+                    onUpload={(doc) => handleDocumentUpload('hospitalDeathSlip', doc)}
+                    onRemove={() => handleDocumentRemove('hospitalDeathSlip')}
+                  />
+                )}
 
                 <DocumentUploader
                   title="मृतक का निवास पता प्रमाण फोटो"
@@ -1160,6 +1222,11 @@ export default function DeathCertificatePage() {
             )}
 
           </div>
+        )}
+
+        {/* TAB 3: CHECKLIST */}
+        {activeTab === 'checklist' && (
+          <DocumentChecklist defaultCategory="death" />
         )}
 
         {/* TIMELINE & APPLICATION DETAILS MODAL */}

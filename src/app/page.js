@@ -1,7 +1,8 @@
 'use client'
 import Link from 'next/link'
 import ServiceHeader from '@/components/ServiceHeader'
-import { FileText, Baby, Droplet, ArrowRight, Shield, Clock, CheckCircle2, AlertTriangle, ShieldAlert } from 'lucide-react'
+import DocumentChecklist from '@/components/DocumentChecklist'
+import { FileText, Baby, Droplet, ArrowRight, Shield, Clock, CheckCircle2, AlertTriangle, ShieldAlert, ListChecks } from 'lucide-react'
 
 export default function HomePage() {
   return (
@@ -208,8 +209,13 @@ export default function HomePage() {
 
         </div>
 
+        {/* Official Document Checklist Section */}
+        <div className="mt-12 sm:mt-16 max-w-6xl mx-auto">
+          <DocumentChecklist defaultCategory="all" />
+        </div>
+
         {/* Info Section */}
-        <div className="mt-12 sm:mt-16 max-w-4xl mx-auto">
+        <div className="mt-8 sm:mt-12 max-w-6xl mx-auto">
           <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-sm">
             <h3 className="text-base font-extrabold text-slate-900 mb-4 flex items-center gap-2">
               <span className="text-lg">ℹ️</span> महत्वपूर्ण सूचना (Important Information)
