@@ -87,6 +87,7 @@ export default function BirthCertificatePage() {
   const [selectedApp, setSelectedApp] = useState(null);
   const [showCertModal, setShowCertModal] = useState(false);
   const [showLetterModal, setShowLetterModal] = useState(false);
+  const [dpdpConsent, setDpdpConsent] = useState(false);
 
   // Form State
   const [formData, setFormData] = useState({
@@ -257,6 +258,11 @@ export default function BirthCertificatePage() {
 
     if (!child.permanentAddress?.isSameAsPresent && child.permanentAddress?.pincode && !/^\d{6}$/.test(child.permanentAddress.pincode)) {
       errors.push('स्थायी पते का पिनकोड 6 अंकों का होना चाहिए (Permanent address pincode must be 6 digits)');
+    }
+
+    // 8. DPDP Act 2023 Mandatory Consent Validation
+    if (!dpdpConsent) {
+      errors.push('आपको DPDP Act 2023 के तहत डेटा प्राइवेसी सहमति देना अनिवार्य है (Mandatory DPDP consent required)');
     }
 
     return errors;
@@ -1198,6 +1204,22 @@ export default function BirthCertificatePage() {
                   onRemove={() => handleDocumentRemove('addressProof')}
                 />
               </div>
+            </div>
+
+            {/* DPDP ACT 2023 CONSENT CHECKBOX */}
+            <div className="bg-emerald-50/90 border border-emerald-200 rounded-2xl p-4 space-y-2 shadow-sm">
+              <label className="flex items-start gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  required
+                  checked={dpdpConsent}
+                  onChange={(e) => setDpdpConsent(e.target.checked)}
+                  className="mt-0.5 h-4 w-4 rounded border-emerald-300 text-emerald-700 focus:ring-emerald-600 shrink-0"
+                />
+                <span className="text-xs text-slate-800 font-medium leading-relaxed">
+                  मैं एतद्द्वारा घोषित करता/करती हूँ कि ऊपर दी गई समस्त जानकारी सत्य व सही है। मैं भारत के <strong>डिजिटल व्यक्तिगत डेटा संरक्षण अधिनियम (DPDP Act, 2023)</strong> के तहत मेरे द्वारा प्रदान किए गए डेटा के प्रक्रमण (Processing) हेतु नगर पालिका परिषद झाबुआ को सहमति प्रदान करता/करती हूँ। (<Link href="/privacy-policy" className="text-emerald-700 underline font-bold" target="_blank">प्राइवेसी नीति एवं नियम पढ़ें</Link>)
+                </span>
+              </label>
             </div>
 
             {/* ACTION BUTTONS */}

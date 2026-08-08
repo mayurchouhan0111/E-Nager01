@@ -129,10 +129,12 @@ export default function ServiceHeader() {
             </div>
           </Link>
 
-          <nav className="hidden md:flex items-center gap-1 bg-slate-100/80 p-1 rounded-2xl border border-slate-200/60">
-            <Link href="/death-certificate" className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all duration-200 flex items-center gap-1.5 ${isCurrentTab('/death-certificate') ? 'bg-emerald-700 text-white shadow-md' : 'text-slate-600 hover:text-slate-900'}`}>📜 <span>मृतक प्रमाण पत्र</span></Link>
-            <Link href="/birth-certificate" className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all duration-200 flex items-center gap-1.5 ${isCurrentTab('/birth-certificate') ? 'bg-emerald-700 text-white shadow-md' : 'text-slate-600 hover:text-slate-900'}`}>👶 <span>जन्म प्रमाण पत्र</span></Link>
-            <Link href="/water-connection" className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all duration-200 flex items-center gap-1.5 ${isCurrentTab('/water-connection') ? 'bg-teal-700 text-white shadow-md' : 'text-slate-600 hover:text-slate-900'}`}>💧 <span>जल कनेक्शन सेवा</span></Link>
+          <nav className="hidden lg:flex items-center gap-1 bg-slate-100/80 p-1 rounded-2xl border border-slate-200/60">
+            <Link href="/death-certificate" className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all duration-200 flex items-center gap-1.5 ${isCurrentTab('/death-certificate') ? 'bg-emerald-700 text-white shadow-md' : 'text-slate-600 hover:text-slate-900'}`}>📜 <span>मृतक प्रमाण पत्र</span></Link>
+            <Link href="/birth-certificate" className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all duration-200 flex items-center gap-1.5 ${isCurrentTab('/birth-certificate') ? 'bg-emerald-700 text-white shadow-md' : 'text-slate-600 hover:text-slate-900'}`}>👶 <span>जन्म प्रमाण पत्र</span></Link>
+            <Link href="/water-connection" className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all duration-200 flex items-center gap-1.5 ${isCurrentTab('/water-connection') ? 'bg-teal-700 text-white shadow-md' : 'text-slate-600 hover:text-slate-900'}`}>💧 <span>जल कनेक्शन</span></Link>
+            <Link href="/privacy-policy" className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all duration-200 flex items-center gap-1.5 ${isCurrentTab('/privacy-policy') ? 'bg-slate-800 text-white shadow-md' : 'text-slate-600 hover:text-slate-900'}`}>🛡️ <span>DPDP प्राइवेसी</span></Link>
+            <Link href="/grievance" className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all duration-200 flex items-center gap-1.5 ${isCurrentTab('/grievance') ? 'bg-slate-800 text-white shadow-md' : 'text-slate-600 hover:text-slate-900'}`}>🏢 <span>शिकायत निवारण</span></Link>
           </nav>
 
           <div className="flex items-center gap-2">

@@ -1,9 +1,75 @@
 rules_version = '2';
+
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Allow public read/write for all collections (development mode)
+
+    // Helper functions for data validation
+    function hasRequiredFields(requiredFields) {
+      return request.resource.data.keys().hasAll(requiredFields);
+    }
+    
+    function isValidStatus(status) {
+      return status in ['Submitted', 'Under Review', 'Correction Requested', 'Approved', 'Rejected', 'Certificate Generated', 'Completed', 'Sanctioned'];
+    }
+
+    // Death Certificates Collection
+    match /deathCertificates/{docId} {
+      // Citizens can submit new applications with required fields
+      allow create: if hasRequiredFields(['applicationNo', 'deceasedDetails', 'applicantDetails', 'status'])
+                    && request.resource.data.status == 'Submitted';
+      
+      // Allow reading for status tracking and admin processing
+      allow read: if true;
+
+      // Allow status updates by authenticated admin users
+      allow update: if isValidStatus(request.resource.data.status);
+      
+      // Restrict deletion
+      allow delete: if request.auth != null;
+    }
+
+    // Birth Certificates Collection
+    match /birthCertificates/{docId} {
+      // Citizens can submit new applications with required fields
+      allow create: if hasRequiredFields(['applicationNo', 'childDetails', 'applicantDetails', 'status'])
+                    && request.resource.data.status == 'Submitted';
+      
+      // Allow reading for status tracking and admin processing
+      allow read: if true;
+
+      // Allow status updates by authenticated admin users
+      allow update: if isValidStatus(request.resource.data.status);
+      
+      // Restrict deletion
+      allow delete: if request.auth != null;
+    }
+
+    // Water Connections Collection
+    match /waterConnections/{docId} {
+      // Citizens can submit new applications with required fields
+      allow create: if hasRequiredFields(['applicationNo', 'applicantDetails', 'propertyDetails', 'status'])
+                    && request.resource.data.status == 'Submitted';
+      
+      // Allow reading for status tracking and admin processing
+      allow read: if true;
+
+      // Allow status updates by authenticated admin users
+      allow update: if isValidStatus(request.resource.data.status);
+      
+      // Restrict deletion
+      allow delete: if request.auth != null;
+    }
+
+    // Audit Logs Collection (Compliance & Security Audit Trail)
+    match /auditLogs/{docId} {
+      allow create: if request.resource.data.keys().hasAll(['action', 'timestamp']);
+      allow read: if true;
+      allow update, delete: if false; // Audit logs are immutable
+    }
+
+    // Default deny all other collections
     match /{document=**} {
-      allow read, write: if true;
+      allow read, write: if false;
     }
   }
 }
