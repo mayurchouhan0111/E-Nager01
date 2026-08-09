@@ -943,9 +943,9 @@ export default function WaterConnectionPage() {
 
       {/* Pawati Application Letter Modal */}
       {showLetterModal && selectedApp && (
-        <div className="fixed inset-0 bg-slate-900/70 backdrop-blur-md z-50 flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-white border border-slate-200 rounded-3xl max-w-4xl w-full p-6 my-8 shadow-2xl space-y-4">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+        <div className="fixed inset-0 bg-slate-900/75 backdrop-blur-md z-50 flex items-center justify-center p-4 sm:p-6 overflow-hidden">
+          <div className="bg-white border border-slate-200 rounded-3xl max-w-4xl w-full p-6 sm:p-8 shadow-2xl flex flex-col max-h-[90vh]">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3 shrink-0">
               <h3 className="text-slate-900 font-extrabold text-base flex items-center gap-2">
                 📄 भौतिक पावती पत्र (Official Physical Submission Letter)
               </h3>
@@ -956,22 +956,24 @@ export default function WaterConnectionPage() {
                 >
                   <Printer className="w-3.5 h-3.5" /> प्रिंट / PDF डाउनलोड
                 </button>
-                <button onClick={() => setShowLetterModal(false)} className="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100">
+                <button onClick={() => setShowLetterModal(false)} className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors">
                   <X className="w-5 h-5" />
                 </button>
               </div>
             </div>
 
-            <ApplicationLetterTemplate record={selectedApp} serviceType="water_connection" />
+            <div className="overflow-y-auto flex-1 pr-1 pt-4">
+              <ApplicationLetterTemplate record={selectedApp} serviceType="water_connection" />
+            </div>
           </div>
         </div>
       )}
 
       {/* Approved Permit Certificate Modal */}
       {showCertModal && selectedApp && (
-        <div className="fixed inset-0 bg-slate-900/70 backdrop-blur-md z-50 flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-white border border-slate-200 rounded-3xl max-w-4xl w-full p-6 my-8 shadow-2xl space-y-4">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+        <div className="fixed inset-0 bg-slate-900/75 backdrop-blur-md z-50 flex items-center justify-center p-4 sm:p-6 overflow-hidden">
+          <div className="bg-white border border-slate-200 rounded-3xl max-w-4xl w-full p-6 sm:p-8 shadow-2xl flex flex-col max-h-[90vh]">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3 shrink-0">
               <h3 className="text-slate-900 font-extrabold text-base flex items-center gap-2">
                 📜 नल कनेक्शन स्वीकृत आदेश (Sanction Permit Certificate)
               </h3>
@@ -982,13 +984,15 @@ export default function WaterConnectionPage() {
                 >
                   <Printer className="w-3.5 h-3.5" /> प्रिंट / PDF डाउनलोड
                 </button>
-                <button onClick={() => setShowCertModal(false)} className="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100">
+                <button onClick={() => setShowCertModal(false)} className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors">
                   <X className="w-5 h-5" />
                 </button>
               </div>
             </div>
 
-            <WaterConnectionTemplate record={selectedApp} />
+            <div className="overflow-y-auto flex-1 pr-1 pt-4">
+              <WaterConnectionTemplate record={selectedApp} />
+            </div>
           </div>
         </div>
       )}

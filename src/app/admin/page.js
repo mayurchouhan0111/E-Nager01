@@ -43,7 +43,7 @@ const ADMIN_ACCOUNTS = {
   super_admin: {
     password: 'jhabua@super2024',
     role: 'super_admin',
-    name: 'मुख्य नगर पालिका अधिकारी (Chief Executive Officer)',
+    name: 'मुख्य नगर पालिका अधिकारी (Chief Municipal Officer - CMO)',
     defaultTab: 'death-certificates',
     allowedTabs: ['death-certificates', 'birth-certificates', 'water-connections', 'audit']
   }

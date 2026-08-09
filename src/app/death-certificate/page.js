@@ -1336,9 +1336,9 @@ export default function DeathCertificatePage() {
 
         {/* APPLICATION SUBMISSION LETTER MODAL */}
         {selectedApp && showLetterModal && (
-          <div className="fixed inset-0 bg-slate-900/70 backdrop-blur-md z-50 flex items-center justify-center p-4 overflow-y-auto">
-            <div className="bg-white border border-slate-200 rounded-3xl max-w-4xl w-full p-6 my-8 shadow-2xl space-y-4">
-              <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+          <div className="fixed inset-0 bg-slate-900/75 backdrop-blur-md z-50 flex items-center justify-center p-4 sm:p-6 overflow-hidden">
+            <div className="bg-white border border-slate-200 rounded-3xl max-w-4xl w-full p-6 sm:p-8 shadow-2xl flex flex-col max-h-[90vh]">
+              <div className="flex items-center justify-between border-b border-slate-100 pb-3 shrink-0">
                 <h3 className="text-slate-900 font-extrabold text-base flex items-center gap-2">
                   📄 भौतिक सत्यापन आवेदन पत्र (Application Submission Letter)
                 </h3>
@@ -1349,22 +1349,24 @@ export default function DeathCertificatePage() {
                   >
                     <Printer className="w-3.5 h-3.5" /> प्रिंट / PDF डाउनलोड करें
                   </button>
-                  <button onClick={() => { setShowLetterModal(false); setSelectedApp(null); }} className="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100">
+                  <button onClick={() => { setShowLetterModal(false); setSelectedApp(null); }} className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors">
                     <X className="w-5 h-5" />
                   </button>
                 </div>
               </div>
 
-              <ApplicationLetterTemplate record={selectedApp} serviceType="death" />
+              <div className="overflow-y-auto flex-1 pr-1 pt-4">
+                <ApplicationLetterTemplate record={selectedApp} serviceType="death" />
+              </div>
             </div>
           </div>
         )}
 
         {/* CERTIFICATE PREVIEW MODAL */}
         {selectedApp && showCertModal && (
-          <div className="fixed inset-0 bg-slate-900/70 backdrop-blur-md z-50 flex items-center justify-center p-4 overflow-y-auto">
-            <div className="bg-white border border-slate-200 rounded-3xl max-w-4xl w-full p-6 my-8 shadow-2xl space-y-4">
-              <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+          <div className="fixed inset-0 bg-slate-900/75 backdrop-blur-md z-50 flex items-center justify-center p-4 sm:p-6 overflow-hidden">
+            <div className="bg-white border border-slate-200 rounded-3xl max-w-4xl w-full p-6 sm:p-8 shadow-2xl flex flex-col max-h-[90vh]">
+              <div className="flex items-center justify-between border-b border-slate-100 pb-3 shrink-0">
                 <h3 className="text-slate-900 font-extrabold text-base flex items-center gap-2">
                   📜 आधिकारिक मृत्यु प्रमाण पत्र पूर्वावलोकन (Official Death Certificate Preview)
                 </h3>
@@ -1375,13 +1377,15 @@ export default function DeathCertificatePage() {
                   >
                     <Printer className="w-3.5 h-3.5" /> प्रिंट / PDF डाउनलोड करें
                   </button>
-                  <button onClick={() => { setShowCertModal(false); setSelectedApp(null); }} className="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100">
+                  <button onClick={() => { setShowCertModal(false); setSelectedApp(null); }} className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors">
                     <X className="w-5 h-5" />
                   </button>
                 </div>
               </div>
 
-              <DeathCertificateTemplate record={selectedApp} />
+              <div className="overflow-y-auto flex-1 pr-1 pt-4">
+                <DeathCertificateTemplate record={selectedApp} />
+              </div>
             </div>
           </div>
         )}

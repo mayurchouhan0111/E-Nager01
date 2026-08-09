@@ -149,7 +149,7 @@ export default function PrivacyPolicyPage() {
             </p>
 
             <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 space-y-3">
-              <p className="font-extrabold text-slate-900">मुख्य नगर पालिका अधिकारी एवं नोडल डेटा संरक्षण अधिकारी (Chief Executive Officer & DPO)</p>
+              <p className="font-extrabold text-slate-900">मुख्य नगर पालिका अधिकारी एवं नोडल डेटा संरक्षण अधिकारी (Chief Municipal Officer - CMO & DPO)</p>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs text-slate-700 font-medium">
                 <div className="flex items-center gap-2">
                   <MapPin className="w-4 h-4 text-emerald-600 shrink-0" />

@@ -205,21 +205,31 @@ export default function ServiceHeader() {
       )}
 
       {selectedRecord && modalType === 'letter' && (
-        <div className="fixed inset-0 bg-slate-900/70 z-[60] flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-white rounded-3xl max-w-4xl w-full p-6 my-8">
-            <button onClick={() => { setSelectedRecord(null); setModalType(null); }} className="mb-4"><X /></button>
-            <ApplicationLetterTemplate record={selectedRecord} serviceType={selectedRecord.serviceType} />
+        <div className="fixed inset-0 bg-slate-900/75 z-[60] flex items-center justify-center p-4 sm:p-6 overflow-hidden">
+          <div className="bg-white rounded-3xl max-w-4xl w-full p-6 sm:p-8 shadow-2xl flex flex-col max-h-[90vh]">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3 shrink-0 mb-2">
+              <span className="font-extrabold text-slate-900 text-sm">📄 पावती पत्र (Submission Letter)</span>
+              <button onClick={() => { setSelectedRecord(null); setModalType(null); }} className="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100"><X className="w-5 h-5" /></button>
+            </div>
+            <div className="overflow-y-auto flex-1 pr-1">
+              <ApplicationLetterTemplate record={selectedRecord} serviceType={selectedRecord.serviceType} />
+            </div>
           </div>
         </div>
       )}
 
       {selectedRecord && modalType === 'certificate' && (
-        <div className="fixed inset-0 bg-slate-900/70 z-[60] flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-white rounded-3xl max-w-4xl w-full p-6 my-8">
-            <button onClick={() => { setSelectedRecord(null); setModalType(null); }} className="mb-4"><X /></button>
-            {selectedRecord.serviceType === 'birth' && <BirthCertificateTemplate record={selectedRecord} />}
-            {selectedRecord.serviceType === 'death' && <DeathCertificateTemplate record={selectedRecord} />}
-            {selectedRecord.serviceType === 'water_connection' && <WaterConnectionTemplate record={selectedRecord} />}
+        <div className="fixed inset-0 bg-slate-900/75 z-[60] flex items-center justify-center p-4 sm:p-6 overflow-hidden">
+          <div className="bg-white rounded-3xl max-w-4xl w-full p-6 sm:p-8 shadow-2xl flex flex-col max-h-[90vh]">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3 shrink-0 mb-2">
+              <span className="font-extrabold text-slate-900 text-sm">📜 प्रमाण पत्र (Certificate Preview)</span>
+              <button onClick={() => { setSelectedRecord(null); setModalType(null); }} className="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100"><X className="w-5 h-5" /></button>
+            </div>
+            <div className="overflow-y-auto flex-1 pr-1">
+              {selectedRecord.serviceType === 'birth' && <BirthCertificateTemplate record={selectedRecord} />}
+              {selectedRecord.serviceType === 'death' && <DeathCertificateTemplate record={selectedRecord} />}
+              {selectedRecord.serviceType === 'water_connection' && <WaterConnectionTemplate record={selectedRecord} />}
+            </div>
           </div>
         </div>
       )}
