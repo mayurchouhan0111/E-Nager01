@@ -247,6 +247,12 @@ export async function getBirthCertificates() {
         mergedMap.set(item.id, { ...item, ...existingRemote });
       } else {
         mergedMap.set(item.id, item);
+        if (item.id && item.status && item.status !== 'Draft') {
+          try {
+            const docRef = doc(db, COLLECTION_NAME, item.id);
+            setDoc(docRef, item, { merge: true }).catch(() => {});
+          } catch (e) {}
+        }
       }
     });
 
