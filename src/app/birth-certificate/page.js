@@ -415,7 +415,7 @@ export default function BirthCertificatePage() {
               />
               <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold bg-white/10 text-emerald-200 border border-white/15 backdrop-blur-md">
                 <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                मध्य प्रदेश शासन — नगर पालिका परिषद झाबुआ (जन्म पंजीयन शाखा)
+                मध्य प्रदेश शासन — नगर पालिका परिषद झाबुआ
               </span>
             </div>
             <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
