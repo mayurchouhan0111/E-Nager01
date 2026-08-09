@@ -61,6 +61,28 @@ export function getCurrentCitizen() {
   return null;
 }
 
+export function createOrUpdateLocalCitizenProfile(details = {}) {
+  if (typeof window === 'undefined') return null;
+  const existing = getCurrentCitizen();
+  const name = details.fullName || details.name || existing?.displayName || 'नागरिक (Citizen)';
+  const mobile = details.mobile || details.phone || existing?.mobile || '';
+  const email = details.email || existing?.email || (mobile ? `${mobile}@jhabuanagarpalika.local` : null);
+  
+  const citizenData = {
+    uid: existing?.uid || `citizen-local-${mobile || Date.now()}`,
+    email: email,
+    mobile: mobile,
+    displayName: name,
+    photoURL: existing?.photoURL || null,
+    loggedInAt: existing?.loggedInAt || new Date().toISOString()
+  };
+
+  try {
+    localStorage.setItem('enagar_citizen_user', JSON.stringify(citizenData));
+  } catch (e) {}
+  return citizenData;
+}
+
 export function subscribeToCitizenAuth(callback) {
   if (typeof window === 'undefined') return () => {};
   
@@ -80,3 +102,4 @@ export function subscribeToCitizenAuth(callback) {
     }
   });
 }
+

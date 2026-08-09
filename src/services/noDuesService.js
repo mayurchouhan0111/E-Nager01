@@ -11,7 +11,7 @@ import {
   serverTimestamp 
 } from 'firebase/firestore';
 import { sendNotification } from './notificationService';
-import { getCurrentCitizen } from './citizenAuthService';
+import { getCurrentCitizen, createOrUpdateLocalCitizenProfile } from './citizenAuthService';
 
 const COLLECTION_NAME = 'noDuesCertificates';
 const AUDIT_LOGS_COLLECTION = 'auditLogs';
@@ -51,12 +51,17 @@ function syncLocalRecord(record) {
 }
 
 export async function saveNoDuesDraft(data, existingId = null) {
-  const citizen = getCurrentCitizen();
+  let citizen = getCurrentCitizen();
+  if (!citizen && data.applicantDetails) {
+    citizen = createOrUpdateLocalCitizenProfile(data.applicantDetails);
+  }
+
   const payload = {
     ...data,
     userEmail: citizen?.email || data.userEmail || data.applicantDetails?.email || null,
     userUid: citizen?.uid || data.userUid || null,
-    userDisplayName: citizen?.displayName || data.userDisplayName || null,
+    userMobile: citizen?.mobile || data.applicantDetails?.mobile || null,
+    userDisplayName: citizen?.displayName || data.userDisplayName || data.applicantDetails?.fullName || null,
     status: 'Draft',
     updatedAt: new Date().toISOString()
   };
@@ -141,7 +146,10 @@ export async function saveNoDuesDraft(data, existingId = null) {
 
 export async function submitNoDuesCertificate(data, existingId = null) {
   const now = new Date().toISOString();
-  const citizen = getCurrentCitizen();
+  let citizen = getCurrentCitizen();
+  if (!citizen && data.applicantDetails) {
+    citizen = createOrUpdateLocalCitizenProfile(data.applicantDetails);
+  }
 
   const timelineEntry = {
     id: `t-${Date.now()}`,
@@ -160,6 +168,7 @@ export async function submitNoDuesCertificate(data, existingId = null) {
   const appNo = data.applicationNo || generateAppNumber();
   const userEmail = citizen?.email || data.applicantDetails?.email || '';
   const userUid = citizen?.uid || '';
+  const userMobile = citizen?.mobile || data.applicantDetails?.mobile || '';
   const userDisplayName = citizen?.displayName || data.applicantDetails?.fullName || '';
 
   const finalPayload = {
@@ -167,6 +176,7 @@ export async function submitNoDuesCertificate(data, existingId = null) {
     applicationNo: appNo,
     userEmail,
     userUid,
+    userMobile,
     userDisplayName,
     status: 'Submitted',
     appliedAt: data.appliedAt || now,
@@ -255,15 +265,26 @@ export async function getNoDuesCertificates(param1 = null, param2 = false) {
     if (!isOfficer) {
       const activeEmail = filterEmail || citizen?.email;
       const activeUid = citizen?.uid;
+      const activeMobile = citizen?.mobile;
 
-      if (!activeEmail && !activeUid) {
-        return [];
+      if (!activeEmail && !activeUid && !activeMobile) {
+        return localItems;
       }
 
-      items = items.filter(item => 
-        (activeEmail && (item.userEmail === activeEmail || item.applicantDetails?.email === activeEmail)) || 
-        (activeUid && item.userUid === activeUid)
-      );
+      items = items.filter(item => {
+        const isLocal = localItems.some(loc => loc.id === item.id || (item.applicationNo && loc.applicationNo === item.applicationNo));
+        if (isLocal) return true;
+
+        const itemEmail = item.userEmail || item.applicantDetails?.email;
+        const itemUid = item.userUid;
+        const itemMobile = item.userMobile || item.applicantDetails?.mobile;
+
+        return (
+          (activeEmail && itemEmail === activeEmail) ||
+          (activeUid && itemUid === activeUid) ||
+          (activeMobile && itemMobile === activeMobile)
+        );
+      });
     }
 
     items.sort((a, b) => new Date(b.updatedAt || b.appliedAt || 0) - new Date(a.updatedAt || a.appliedAt || 0));
@@ -272,17 +293,28 @@ export async function getNoDuesCertificates(param1 = null, param2 = false) {
   } catch (error) {
     let items = localItems;
     if (!isOfficer) {
-      const activeEmail = targetEmail || citizen?.email;
+      const activeEmail = filterEmail || citizen?.email;
       const activeUid = citizen?.uid;
+      const activeMobile = citizen?.mobile;
 
-      if (!activeEmail && !activeUid) {
-        return [];
+      if (!activeEmail && !activeUid && !activeMobile) {
+        return localItems;
       }
 
-      items = items.filter(item => 
-        (activeEmail && (item.userEmail === activeEmail || item.applicantDetails?.email === activeEmail)) || 
-        (activeUid && item.userUid === activeUid)
-      );
+      items = items.filter(item => {
+        const isLocal = localItems.some(loc => loc.id === item.id || (item.applicationNo && loc.applicationNo === item.applicationNo));
+        if (isLocal) return true;
+
+        const itemEmail = item.userEmail || item.applicantDetails?.email;
+        const itemUid = item.userUid;
+        const itemMobile = item.userMobile || item.applicantDetails?.mobile;
+
+        return (
+          (activeEmail && itemEmail === activeEmail) ||
+          (activeUid && itemUid === activeUid) ||
+          (activeMobile && itemMobile === activeMobile)
+        );
+      });
     }
     items.sort((a, b) => new Date(b.updatedAt || b.appliedAt || 0) - new Date(a.updatedAt || a.appliedAt || 0));
     return items;

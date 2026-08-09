@@ -12,7 +12,7 @@ import {
   submitBirthCertificate, 
   getBirthCertificates 
 } from '@/services/birthCertificateService';
-import { getCurrentCitizen, loginWithGoogle, loginWithMobileOrEmail } from '@/services/citizenAuthService';
+import { getCurrentCitizen, loginWithGoogle, createOrUpdateLocalCitizenProfile } from '@/services/citizenAuthService';
 import toast from 'react-hot-toast';
 import { validateBirthCertificateForm, navigateToFirstErrorField } from '../../utils/formValidationHelper';
 import { 
@@ -331,22 +331,19 @@ export default function BirthCertificatePage() {
       return;
     }
 
-    // Strict 100% Fast Google Authentication
+    // Citizen Profile Identification (Google Auth with fallback to Local Profile)
     let citizen = getCurrentCitizen();
     if (!citizen) {
-      toast.loading('🔐 नागरिक डेटा ट्रैकिंग हेतु गूगल साइन-इन आवश्यक है...', { id: 'g-auth' });
+      toast.loading('🔐 नागरिक डेटा ट्रैकिंग हेतु गूगल साइन-इन प्रारम्भ किया जा रहा है...', { id: 'g-auth' });
       const authRes = await loginWithGoogle();
       toast.dismiss('g-auth');
-      if (!authRes.success) {
-        if (authRes.isUnauthorizedDomain) {
-          setMessage({ type: 'error', text: '⚠️ Firebase Domain Error: Please add jhabua-nagarpalika-aapke-dwar.netlify.app in Firebase Console -> Authentication -> Settings -> Authorized Domains.' });
-        } else {
-          setMessage({ type: 'error', text: '⚠️ व्यक्तिगत डेटा सुरक्षा एवं आवेदन ट्रैकिंग हेतु गूगल साइन-इन अनिवार्य है।' });
-        }
-        return;
+      if (authRes.success) {
+        citizen = authRes.user;
+        toast.success(`नमस्ते ${citizen.displayName}! गूगल अकाउंट सफलतापूर्वक जुड़ गया।`);
+      } else {
+        citizen = createOrUpdateLocalCitizenProfile(formData.applicantDetails || {});
+        toast.success('स्थानीय नागरिक प्रोफ़ाइल के साथ आवेदन जमा किया जा रहा है...');
       }
-      citizen = authRes.user;
-      toast.success(`नमस्ते ${citizen.displayName}! गूगल अकाउंट सफलतापूर्वक जुड़ गया।`);
     }
 
     setFieldErrors({});

@@ -11,7 +11,7 @@ import {
   serverTimestamp 
 } from 'firebase/firestore';
 import { sendNotification } from './notificationService';
-import { getCurrentCitizen } from './citizenAuthService';
+import { getCurrentCitizen, createOrUpdateLocalCitizenProfile } from './citizenAuthService';
 
 const COLLECTION_NAME = 'waterConnections';
 const AUDIT_LOGS_COLLECTION = 'auditLogs';
@@ -51,12 +51,17 @@ function syncLocalRecord(record) {
 }
 
 export async function saveWaterConnectionDraft(data, existingId = null) {
-  const citizen = getCurrentCitizen();
+  let citizen = getCurrentCitizen();
+  if (!citizen && data.applicantDetails) {
+    citizen = createOrUpdateLocalCitizenProfile(data.applicantDetails);
+  }
+
   const payload = {
     ...data,
     userEmail: citizen?.email || data.userEmail || data.applicantDetails?.email || null,
     userUid: citizen?.uid || data.userUid || null,
-    userDisplayName: citizen?.displayName || data.userDisplayName || null,
+    userMobile: citizen?.mobile || data.applicantDetails?.mobile || null,
+    userDisplayName: citizen?.displayName || data.userDisplayName || data.applicantDetails?.fullName || null,
     status: 'Draft',
     updatedAt: new Date().toISOString()
   };
@@ -150,14 +155,18 @@ export async function submitWaterConnection(data, existingId = null) {
   const applicationNo = data.applicationNo || generateAppNumber();
   const isResubmission = Boolean(existingId || data.applicationNo || data.status === 'Correction Requested');
   const now = new Date().toISOString();
-  const citizen = getCurrentCitizen();
+  let citizen = getCurrentCitizen();
+  if (!citizen && data.applicantDetails) {
+    citizen = createOrUpdateLocalCitizenProfile(data.applicantDetails);
+  }
 
   const formattedDocuments = formatOfficialDocumentVault(data.documents, applicationNo, 'water_connection');
   const processedData = {
     ...data,
-    userEmail: citizen?.email || data.userEmail || null,
+    userEmail: citizen?.email || data.userEmail || data.applicantDetails?.email || null,
     userUid: citizen?.uid || data.userUid || null,
-    userDisplayName: citizen?.displayName || data.userDisplayName || null,
+    userMobile: citizen?.mobile || data.applicantDetails?.mobile || null,
+    userDisplayName: citizen?.displayName || data.userDisplayName || data.applicantDetails?.fullName || null,
     documents: formattedDocuments,
     documentVaultPath: `applications/water_connection/${new Date().getFullYear()}/${applicationNo}/documents/`
   };
@@ -326,19 +335,30 @@ export async function getWaterConnections(filterEmail = null, isOfficer = false)
 
     let items = Array.from(mergedMap.values());
 
-    // Strict Citizen Isolation: If not officer, filter by current citizen email/uid. If not logged in, return []
+    // Strict Citizen Isolation: If not officer, filter by current citizen email/uid/mobile or local items.
     if (!isOfficer) {
       const activeEmail = filterEmail || citizen?.email;
       const activeUid = citizen?.uid;
+      const activeMobile = citizen?.mobile;
 
-      if (!activeEmail && !activeUid) {
-        return [];
+      if (!activeEmail && !activeUid && !activeMobile) {
+        return localItems;
       }
 
-      items = items.filter(item => 
-        (activeEmail && (item.userEmail === activeEmail || item.applicantDetails?.email === activeEmail)) ||
-        (activeUid && item.userUid === activeUid)
-      );
+      items = items.filter(item => {
+        const isLocal = localItems.some(loc => loc.id === item.id || (item.applicationNo && loc.applicationNo === item.applicationNo));
+        if (isLocal) return true;
+
+        const itemEmail = item.userEmail || item.applicantDetails?.email;
+        const itemUid = item.userUid;
+        const itemMobile = item.userMobile || item.applicantDetails?.mobile;
+
+        return (
+          (activeEmail && itemEmail === activeEmail) ||
+          (activeUid && itemUid === activeUid) ||
+          (activeMobile && itemMobile === activeMobile)
+        );
+      });
     }
 
     items.sort((a, b) => new Date(b.updatedAt || b.appliedAt || 0) - new Date(a.updatedAt || a.appliedAt || 0));
@@ -350,15 +370,26 @@ export async function getWaterConnections(filterEmail = null, isOfficer = false)
     if (!isOfficer) {
       const activeEmail = filterEmail || citizen?.email;
       const activeUid = citizen?.uid;
+      const activeMobile = citizen?.mobile;
 
-      if (!activeEmail && !activeUid) {
-        return [];
+      if (!activeEmail && !activeUid && !activeMobile) {
+        return localItems;
       }
 
-      items = items.filter(item => 
-        (activeEmail && (item.userEmail === activeEmail || item.applicantDetails?.email === activeEmail)) ||
-        (activeUid && item.userUid === activeUid)
-      );
+      items = items.filter(item => {
+        const isLocal = localItems.some(loc => loc.id === item.id || (item.applicationNo && loc.applicationNo === item.applicationNo));
+        if (isLocal) return true;
+
+        const itemEmail = item.userEmail || item.applicantDetails?.email;
+        const itemUid = item.userUid;
+        const itemMobile = item.userMobile || item.applicantDetails?.mobile;
+
+        return (
+          (activeEmail && itemEmail === activeEmail) ||
+          (activeUid && itemUid === activeUid) ||
+          (activeMobile && itemMobile === activeMobile)
+        );
+      });
     }
     return items;
   }
