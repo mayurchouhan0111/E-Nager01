@@ -66,7 +66,7 @@ export default function ServiceHeader() {
       }
     }
     
-    return () => unsubMaint();
+    // No cleanup needed here
   }, []);
 
   useEffect(() => {
