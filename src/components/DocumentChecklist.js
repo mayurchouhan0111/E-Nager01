@@ -254,68 +254,88 @@ export default function DocumentChecklist({ defaultCategory = 'all', compact = f
   return (
     <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-sm space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-5">
-        <div>
-          <div className="flex items-center gap-2">
-            <span className="p-2 rounded-xl bg-emerald-100 text-emerald-800 text-lg font-bold">📋</span>
-            <div>
-              <h2 className="text-lg sm:text-xl font-extrabold text-slate-900">
-                आवश्यक दस्तावेज चैकलिस्ट (Required Document Checklist)
-              </h2>
-              <p className="text-xs text-slate-500 font-medium mt-0.5">
-                नगर पालिका परिषद झाबुआ (म.प्र.) आधिकारिक शासकीय निर्देश सूची
-              </p>
-            </div>
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 pb-4">
+        <div className="flex items-center gap-3">
+          <span className="p-2.5 rounded-2xl bg-emerald-100/80 text-emerald-800 text-xl font-bold shadow-xs border border-emerald-200/60 shrink-0">
+            📋
+          </span>
+          <div>
+            <h2 className="text-lg sm:text-xl font-extrabold text-slate-900 tracking-tight">
+              आवश्यक दस्तावेज चैकलिस्ट (Required Document Checklist)
+            </h2>
+            <p className="text-xs text-slate-500 font-medium mt-0.5">
+              नगर पालिका परिषद झाबुआ (म.प्र.) आधिकारिक शासकीय निर्देश सूची
+            </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
-          {!compact && (
-            <div className="flex gap-1 bg-slate-100 p-1 rounded-xl border border-slate-200 flex-wrap">
-              <button
-                type="button"
-                onClick={() => setActiveCategory('all')}
-                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${activeCategory === 'all' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-600 hover:text-slate-900'
-                  }`}
-              >
-                सभी सूची
-              </button>
-              <button
-                type="button"
-                onClick={() => setActiveCategory('birth')}
-                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${activeCategory === 'birth' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
-                  }`}
-              >
-                👶 जन्म प्रमाण पत्र
-              </button>
-              <button
-                type="button"
-                onClick={() => setActiveCategory('death')}
-                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${activeCategory === 'death' ? 'bg-emerald-700 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
-                  }`}
-              >
-                🕯️ मृत्यु प्रमाण पत्र
-              </button>
-              <button
-                type="button"
-                onClick={() => setActiveCategory('water')}
-                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${activeCategory === 'water' ? 'bg-teal-700 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
-                  }`}
-              >
-                🚰 जल कनेक्शन
-              </button>
-            </div>
-          )}
-
-          <button
-            type="button"
-            onClick={handlePrintChecklist}
-            className="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs flex items-center gap-1.5 transition-all border border-slate-200 shrink-0"
-          >
-            <Printer className="w-3.5 h-3.5" /> प्रिंट / PDF
-          </button>
-        </div>
+        <button
+          type="button"
+          onClick={handlePrintChecklist}
+          className="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs flex items-center gap-1.5 transition-all border border-slate-200 shrink-0 self-start md:self-auto shadow-2xs"
+        >
+          <Printer className="w-3.5 h-3.5 text-slate-600" /> प्रिंट / PDF
+        </button>
       </div>
+
+      {/* Professional Segmented Tab Bar */}
+      {!compact && (
+        <div className="overflow-x-auto pb-1 scrollbar-none border-b border-slate-100 pb-4">
+          <div className="inline-flex items-center gap-1.5 bg-slate-100/90 p-1.5 rounded-2xl border border-slate-200/80 shadow-inner max-w-full">
+            <button
+              type="button"
+              onClick={() => setActiveCategory('all')}
+              className={`px-4 py-2 rounded-xl text-xs font-extrabold whitespace-nowrap transition-all duration-200 flex items-center gap-1.5 ${
+                activeCategory === 'all'
+                  ? 'bg-white text-slate-900 shadow-sm border border-slate-200/90 scale-[1.02]'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-white/50'
+              }`}
+            >
+              <span>✨</span>
+              <span>सभी सूची (All List)</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setActiveCategory('birth')}
+              className={`px-4 py-2 rounded-xl text-xs font-extrabold whitespace-nowrap transition-all duration-200 flex items-center gap-1.5 ${
+                activeCategory === 'birth'
+                  ? 'bg-white text-blue-900 shadow-sm border border-blue-200/90 scale-[1.02]'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-white/50'
+              }`}
+            >
+              <span>👶</span>
+              <span>जन्म प्रमाण पत्र</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setActiveCategory('death')}
+              className={`px-4 py-2 rounded-xl text-xs font-extrabold whitespace-nowrap transition-all duration-200 flex items-center gap-1.5 ${
+                activeCategory === 'death'
+                  ? 'bg-white text-emerald-900 shadow-sm border border-emerald-200/90 scale-[1.02]'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-white/50'
+              }`}
+            >
+              <span>🕯️</span>
+              <span>मृत्यु प्रमाण पत्र</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setActiveCategory('water')}
+              className={`px-4 py-2 rounded-xl text-xs font-extrabold whitespace-nowrap transition-all duration-200 flex items-center gap-1.5 ${
+                activeCategory === 'water'
+                  ? 'bg-white text-teal-900 shadow-sm border border-teal-200/90 scale-[1.02]'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-white/50'
+              }`}
+            >
+              <span>🚰</span>
+              <span>जल कनेक्शन</span>
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Notice Banner */}
       <div className="bg-amber-50/80 border border-amber-200 rounded-2xl p-4 flex items-start gap-3 text-xs text-amber-950">

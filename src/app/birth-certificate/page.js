@@ -413,9 +413,9 @@ export default function BirthCertificatePage() {
                 alt="मध्य प्रदेश शासन" 
                 className="w-14 h-14 object-contain drop-shadow shrink-0" 
               />
-              <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold bg-white/10 text-emerald-200 border border-white/15 backdrop-blur-md">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                मध्य प्रदेश शासन - लोक स्वास्थ्य एवं परिवार कल्याण विभाग
+              <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold bg-white/10 text-emerald-200 border border-white/15 backdrop-blur-md">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                मध्य प्रदेश शासन — नगर पालिका परिषद झाबुआ (जन्म पंजीयन शाखा)
               </span>
             </div>
             <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
@@ -460,39 +460,39 @@ export default function BirthCertificatePage() {
         </div>
 
         {/* Navigation Tabs */}
-        <div className="flex items-center justify-between flex-wrap gap-4">
-          <div className="flex gap-1.5 bg-white border border-slate-200 rounded-2xl p-1.5 shadow-sm">
+        <div className="flex items-center justify-between flex-wrap gap-4 overflow-x-auto pb-1">
+          <div className="flex gap-1.5 bg-slate-100/90 p-1.5 rounded-2xl border border-slate-200/80 shadow-inner max-w-full overflow-x-auto">
             <button
               onClick={() => setActiveTab('apply')}
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all ${
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-extrabold whitespace-nowrap transition-all duration-200 ${
                 activeTab === 'apply'
-                  ? 'bg-emerald-700 text-white shadow-md'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                  ? 'bg-white text-emerald-950 shadow-sm border border-emerald-200/80 scale-[1.02]'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-white/50'
               }`}
             >
-              <FileText className="w-4 h-4" />
+              <FileText className="w-4 h-4 text-emerald-700" />
               <span>{formData.id ? 'आवेदन संपादित करें / पुन: प्रस्तुत करें' : 'नया ऑनलाइन आवेदन दर्ज करें'}</span>
             </button>
             <button
               onClick={() => setActiveTab('track')}
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all ${
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-extrabold whitespace-nowrap transition-all duration-200 ${
                 activeTab === 'track'
-                  ? 'bg-emerald-700 text-white shadow-md'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                  ? 'bg-white text-emerald-950 shadow-sm border border-emerald-200/80 scale-[1.02]'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-white/50'
               }`}
             >
-              <Activity className="w-4 h-4" />
+              <Activity className="w-4 h-4 text-emerald-700" />
               <span>मेरे आवेदन एवं स्थिति ({applications.length})</span>
             </button>
             <button
               onClick={() => setActiveTab('checklist')}
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all ${
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-extrabold whitespace-nowrap transition-all duration-200 ${
                 activeTab === 'checklist'
-                  ? 'bg-emerald-700 text-white shadow-md'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                  ? 'bg-white text-emerald-950 shadow-sm border border-emerald-200/80 scale-[1.02]'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-white/50'
               }`}
             >
-              <ListChecks className="w-4 h-4" />
+              <ListChecks className="w-4 h-4 text-emerald-700" />
               <span>आवश्यक दस्तावेज चैकलिस्ट</span>
             </button>
           </div>
