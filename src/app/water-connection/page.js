@@ -79,10 +79,10 @@ export default function WaterConnectionPage() {
     existingConnectionDetails: { ...defaultExistingConnectionDetails },
     plumberDetails: { ...defaultPlumberDetails },
     documents: {
-      aadhaarCard: null,
-      propertyReceipt: null,
-      affidavitDoc: null,
-      applicantPhoto: null
+      idProofDoc: null,
+      sitePlanDoc: null,
+      connectionChargesReceipt: null,
+      roadCuttingReceipt: null
     }
   });
 
@@ -229,7 +229,7 @@ export default function WaterConnectionPage() {
       propertyDetails: { ...defaultPropertyDetails, ...(app.propertyDetails || {}) },
       existingConnectionDetails: { ...defaultExistingConnectionDetails, ...(app.existingConnectionDetails || {}) },
       plumberDetails: { ...defaultPlumberDetails, ...(app.plumberDetails || {}) },
-      documents: app.documents || { aadhaarCard: null, propertyReceipt: null, affidavitDoc: null, applicantPhoto: null }
+      documents: app.documents || { idProofDoc: null, sitePlanDoc: null, connectionChargesReceipt: null, roadCuttingReceipt: null }
     });
     setActiveTab('apply');
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -246,10 +246,10 @@ export default function WaterConnectionPage() {
       existingConnectionDetails: JSON.parse(JSON.stringify(defaultExistingConnectionDetails)),
       plumberDetails: JSON.parse(JSON.stringify(defaultPlumberDetails)),
       documents: {
-        aadhaarCard: null,
-        propertyReceipt: null,
-        affidavitDoc: null,
-        applicantPhoto: null
+        idProofDoc: null,
+        sitePlanDoc: null,
+        connectionChargesReceipt: null,
+        roadCuttingReceipt: null
       }
     });
   };
@@ -304,20 +304,34 @@ export default function WaterConnectionPage() {
           </div>
         </div>
 
-        {/* Platform Legal Disclaimer & Mandatory Submission Warning */}
-        <div className="bg-amber-50 border-2 border-amber-300 rounded-3xl p-5 shadow-sm space-y-2 text-amber-950">
-          <div className="flex items-center gap-2 text-amber-900 font-extrabold text-xs sm:text-sm">
-            <ShieldAlert className="w-5 h-5 text-amber-600 shrink-0" />
-            <span>⚠️ वैधानिक चेतावनी एवं आवश्यक दिशा-निर्देश (Official Legal Responsibility & Instructions)</span>
+        {/* Official Officer Contact Card */}
+        <div className="bg-white border border-teal-200 rounded-3xl p-5 shadow-sm space-y-3">
+          <div className="flex items-center justify-between flex-wrap gap-2 border-b border-slate-100 pb-2.5">
+            <span className="text-xs sm:text-sm font-extrabold text-slate-900 flex items-center gap-2">
+              <span className="p-1 rounded-lg bg-teal-100 text-teal-800 text-xs">📞</span> जल कनेक्शन आधिकारिक विभागीय संपर्क सूत्र (Water Tax Official Contacts)
+            </span>
+            <span className="text-[10px] font-mono font-bold text-teal-800 bg-teal-50 px-2 py-0.5 rounded border border-teal-200">
+              नगर पालिका परिषद झाबुआ (जल प्रदाय शाखा)
+            </span>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs leading-relaxed font-medium">
-            <div className="bg-white/80 p-3 rounded-2xl border border-amber-200">
-              <strong className="text-amber-900 block mb-1">1. आवेदक का वैधानिक उत्तरदायित्व:</strong>
-              इस संपूर्ण प्लेटफॉर्म पर आवेदक द्वारा प्रविष्ट समस्त विवरण शासकीय अभिलेख हेतु आधिकारिक माना जाएगा। यदि आवेदक द्वारा कोई असत्य, गलत या भ्रामक जानकारी दर्ज की जाती है, तो उसके लिए <strong>केवल आवेदक स्वयं व्यक्तिगत एवं कानूनी रूप से उत्तरदायी</strong> होगा।
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+            <div className="bg-slate-50/80 p-3.5 rounded-2xl border border-slate-200 flex items-center justify-between">
+              <div>
+                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">मुख्य नगर पालिका अधिकारी (नोडल प्रशासक)</span>
+                <span className="font-extrabold text-slate-900 text-sm">CMO Office / Nodal Administrator</span>
+              </div>
+              <a href="tel:9713175838" className="font-mono font-extrabold text-teal-800 bg-teal-100 hover:bg-teal-200 px-3 py-1.5 rounded-xl border border-teal-300 text-xs transition">
+                📞 9713175838
+              </a>
             </div>
-            <div className="bg-white/80 p-3 rounded-2xl border border-amber-200">
-              <strong className="text-amber-900 block mb-1">2. अनिवार्य भौतिक पावती पत्र जमा:</strong>
-              ऑनलाइन आवेदन फॉर्म भरने के पश्चात, जनरेट किए गए <strong>पावती पत्र (Hard Copy Printed Application Letter)</strong> का प्रिंटआउट निकालें और अपने <strong>संलग्न मूल दस्तावेजों सहित नगर पालिका कार्यालय झाबुआ</strong> में अनिवार्य रूप से जमा करें।
+            <div className="bg-slate-50/80 p-3.5 rounded-2xl border border-slate-200 flex items-center justify-between">
+              <div>
+                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">जल कर / नल कनेक्शन प्रभारी अधिकारी</span>
+                <span className="font-extrabold text-slate-900 text-sm">श्री अय्यूब खान (Water Tax Incharge)</span>
+              </div>
+              <a href="tel:8224083390" className="font-mono font-extrabold text-emerald-800 bg-emerald-100 hover:bg-emerald-200 px-3 py-1.5 rounded-xl border border-emerald-300 text-xs transition">
+                📞 8224083390
+              </a>
             </div>
           </div>
         </div>
@@ -719,47 +733,60 @@ export default function WaterConnectionPage() {
               </div>
             </div>
 
-            {/* SECTION 4: DOCUMENT UPLOADER */}
+            {/* SECTION 4: SUPPORTING DOCUMENT PHOTO UPLOADS */}
             <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-sm space-y-5">
-              <h2 className="text-sm sm:text-base font-bold text-slate-900 flex items-center gap-2 border-b border-slate-100 pb-3">
-                <span className="p-1.5 rounded-lg bg-teal-100 text-teal-800 text-xs">📎</span> 4. आवश्यक दस्तावेज अपलोड (Required Document Upload)
-              </h2>
+              <div className="flex items-center justify-between flex-wrap gap-2 border-b border-slate-100 pb-3">
+                <h2 className="text-sm sm:text-base font-bold text-slate-900 flex items-center gap-2">
+                  <span className="p-1.5 rounded-lg bg-teal-100 text-teal-800 text-xs">📎</span> 4. आवश्यक दस्तावेज अपलोड (Supporting Document Uploads)
+                </h2>
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('checklist')}
+                  className="text-xs text-teal-800 font-bold hover:underline flex items-center gap-1 bg-teal-50 px-2.5 py-1 rounded-lg border border-teal-200"
+                >
+                  📋 शासकीय दस्तावेज सूची देखें (View Official Checklist)
+                </button>
+              </div>
 
-              <p className="text-xs text-slate-500">
-                SOP एवं सरकारी नियमानुसार निम्नलिखित दस्तावेजों की फोटो/स्कैन कॉपी अपलोड करें:
+              <p className="text-xs text-slate-500 leading-relaxed">
+                नगर पालिका जल प्रदाय पोर्टल नियमानुसार आवश्यक दस्तावेजों की स्पष्ट फोटो या PDF संलग्न करें (क्रम 1 से 3 अनिवार्य एवं क्रम 4 वैकल्पिक/लागू होने पर):
               </p>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <DocumentUploader
-                  label="1. आवेदक का आधार कार्ड (Aadhaar Card Photo) *"
-                  documentKey="aadhaarCard"
-                  uploadedData={formData.documents.aadhaarCard}
-                  onUpload={(docObj) => handleDocumentUpload('aadhaarCard', docObj)}
-                  onRemove={() => handleDocumentRemove('aadhaarCard')}
+                  title="1. आईडी प्रूफ एवं संपत्ति/शपथ पत्र (ID & Property/Affidavit)"
+                  description="आधार कार्ड / SSSM ID समग्र आईडी / बिजली का बिल / संपत्ति कर की नवीनतम रसीद / नोटरी शपथ नॉन जुडिशल पत्र ₹1000"
+                  required={true}
+                  documentData={formData.documents?.idProofDoc || formData.documents?.aadhaarCard || formData.documents?.propertyReceipt || formData.documents?.affidavitDoc}
+                  onUpload={(doc) => handleDocumentUpload('idProofDoc', doc)}
+                  onRemove={() => handleDocumentRemove('idProofDoc')}
                 />
 
                 <DocumentUploader
-                  label="2. भवन स्वामित्व / संपत्ति कर रसीद (Property Tax / Registry Document) *"
-                  documentKey="propertyReceipt"
-                  uploadedData={formData.documents.propertyReceipt}
-                  onUpload={(docObj) => handleDocumentUpload('propertyReceipt', docObj)}
-                  onRemove={() => handleDocumentRemove('propertyReceipt')}
+                  title="2. साइट प्लान नक्शा (Site Plan)"
+                  description="नल कनेक्शन जिस स्थान से ले जाना है उसका प्रमाणित साइट प्लान नक्शा"
+                  required={true}
+                  documentData={formData.documents?.sitePlanDoc}
+                  onUpload={(doc) => handleDocumentUpload('sitePlanDoc', doc)}
+                  onRemove={() => handleDocumentRemove('sitePlanDoc')}
                 />
 
                 <DocumentUploader
-                  label="3. नोटरी शपथ पत्र (Notarized Affidavit on Stamp Paper) *"
-                  documentKey="affidavitDoc"
-                  uploadedData={formData.documents.affidavitDoc}
-                  onUpload={(docObj) => handleDocumentUpload('affidavitDoc', docObj)}
-                  onRemove={() => handleDocumentRemove('affidavitDoc')}
+                  title="3. नल कनेक्शन शुल्क रसीद (Charges ₹4250/-)"
+                  description="नल कनेक्शन चार्जेज (charges ₹4250/-) की आधिकारिक रसीद की फोटोकॉपी"
+                  required={true}
+                  documentData={formData.documents?.connectionChargesReceipt}
+                  onUpload={(doc) => handleDocumentUpload('connectionChargesReceipt', doc)}
+                  onRemove={() => handleDocumentRemove('connectionChargesReceipt')}
                 />
 
                 <DocumentUploader
-                  label="4. आवेदक का पासपोर्ट साइज फोटो (Applicant Photo) *"
-                  documentKey="applicantPhoto"
-                  uploadedData={formData.documents.applicantPhoto}
-                  onUpload={(docObj) => handleDocumentUpload('applicantPhoto', docObj)}
-                  onRemove={() => handleDocumentRemove('applicantPhoto')}
+                  title="4. सड़क खुदाई शुल्क रसीद (Road Cutting Fee - If Applicable)"
+                  description="सड़क खुदाई शुल्क भुगतान रसीd (Road Cutting Charges - यदि लागू हो)"
+                  required={false}
+                  documentData={formData.documents?.roadCuttingReceipt}
+                  onUpload={(doc) => handleDocumentUpload('roadCuttingReceipt', doc)}
+                  onRemove={() => handleDocumentRemove('roadCuttingReceipt')}
                 />
               </div>
             </div>

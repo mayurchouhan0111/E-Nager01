@@ -87,20 +87,31 @@ export default function GrievancePage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
-            <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100 space-y-1">
-              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">अधिकारी का पद</p>
-              <p className="font-extrabold text-slate-900 text-xs sm:text-sm">मुख्य नगर पालिका अधिकारी (CEO)</p>
-              <p className="text-xs text-slate-500">नगर पालिका परिषद झाबुआ</p>
+            <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-1">
+              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">नोडल प्रशासक अधिकारी</p>
+              <p className="font-extrabold text-slate-900 text-xs sm:text-sm">मुख्य नगर पालिका अधिकारी (CMO)</p>
+              <p className="text-xs text-slate-500 mb-1">नगर पालिका परिषद झाबुआ</p>
+              <a href="tel:9713175838" className="inline-flex items-center gap-1 font-mono font-extrabold text-emerald-800 bg-emerald-100 px-2.5 py-1 rounded-xl border border-emerald-300 text-xs">
+                📞 9713175838
+              </a>
             </div>
-            <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100 space-y-1">
-              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">ई-मेल एवं हेल्पलाइन</p>
-              <p className="font-bold text-emerald-700 text-xs sm:text-sm">cmomjhabua@mp.gov.in</p>
-              <p className="text-xs text-slate-500">फ़ोन: +91-7392-243201</p>
+
+            <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-1">
+              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">जल कर / नल कनेक्शन प्रभारी</p>
+              <p className="font-extrabold text-slate-900 text-xs sm:text-sm">श्री अय्यूब खान</p>
+              <p className="text-xs text-slate-500 mb-1">Water Tax Official</p>
+              <a href="tel:8224083390" className="inline-flex items-center gap-1 font-mono font-extrabold text-teal-800 bg-teal-100 px-2.5 py-1 rounded-xl border border-teal-300 text-xs">
+                📞 8224083390
+              </a>
             </div>
-            <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100 space-y-1">
-              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">कार्यालय का पता</p>
-              <p className="font-semibold text-slate-800 text-xs">नगर पालिका भवन, झाबुआ (म.प्र.) - 457661</p>
-              <p className="text-xs text-slate-500">समय: 10:30 AM - 5:30 PM</p>
+
+            <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-1">
+              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">जन्म एवं मृत्यु पंजीयन प्रभारी</p>
+              <p className="font-extrabold text-slate-900 text-xs sm:text-sm">श्री अरविंद बुंदेला</p>
+              <p className="text-xs text-slate-500 mb-1">Birth & Death Official</p>
+              <a href="tel:9993177917" className="inline-flex items-center gap-1 font-mono font-extrabold text-blue-800 bg-blue-100 px-2.5 py-1 rounded-xl border border-blue-300 text-xs">
+                📞 9993177917
+              </a>
             </div>
           </div>
         </div>

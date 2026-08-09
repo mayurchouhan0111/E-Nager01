@@ -221,30 +221,42 @@ export default function HomePage() {
           <DocumentChecklist defaultCategory="all" />
         </div>
 
-        {/* Info Section */}
-        <div className="mt-8 sm:mt-12 max-w-6xl mx-auto">
-          <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-sm">
-            <h3 className="text-base font-extrabold text-slate-900 mb-4 flex items-center gap-2">
-              <span className="text-lg">ℹ️</span> महत्वपूर्ण सूचना (Important Information)
+        {/* Info & Official Contact Directory Section */}
+        <div className="mt-8 sm:mt-12 max-w-6xl mx-auto space-y-6">
+          <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-sm space-y-6">
+            <h3 className="text-base font-extrabold text-slate-900 border-b border-slate-100 pb-3 flex items-center justify-between flex-wrap gap-2">
+              <span className="flex items-center gap-2">
+                <span className="p-1.5 bg-emerald-100 text-emerald-800 rounded-xl text-xs">📞</span> नगर पालिका परिषद झाबुआ — आधिकारिक विभागीय संपर्क सूत्र (Official Contact Directory)
+              </span>
+              <span className="text-xs text-slate-400 font-mono font-bold">MP e-Nagar Helpline</span>
             </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm text-slate-600">
-              <div className="space-y-2">
-                <p className="font-semibold text-slate-800">आवेदन हेतु आवश्यक दस्तावेज़ (Required Documents):</p>
-                <ul className="space-y-1 text-xs">
-                  <li>• आवेदक का आधार कार्ड (Applicant's Aadhaar Card)</li>
-                  <li>• अस्पताल मृत्यु / जन्म प्रमाण पर्ची (Hospital Slip)</li>
-                  <li>• निवास पता प्रमाण (Address Proof)</li>
-                  <li>• जनरेटेड भौतिक पावती पत्र (Printed Application Letter)</li>
-                </ul>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-1.5 hover:border-emerald-300 transition-all">
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">नोडल प्रशासक (Nodal Administrator)</span>
+                <p className="font-extrabold text-slate-900 text-sm">मुख्य नगर पालिका अधिकारी (CMO)</p>
+                <p className="text-xs text-slate-500 font-medium">समस्त नगर पालिका सेवाएँ व शिकायत निवारण</p>
+                <a href="tel:9713175838" className="inline-flex items-center gap-1.5 text-xs font-mono font-extrabold text-emerald-800 bg-emerald-100 hover:bg-emerald-200 px-3 py-1.5 rounded-xl border border-emerald-300 transition mt-1">
+                  📞 9713175838
+                </a>
               </div>
-              <div className="space-y-2">
-                <p className="font-semibold text-slate-800">सहायता हेतु संपर्क करें (Contact for Help):</p>
-                <ul className="space-y-1 text-xs">
-                  <li>• नगर पालिका परिषद, झाबुआ (Nagar Palika Parishad, Jhabua)</li>
-                  <li>• जिला - झाबुआ, मध्य प्रदेश (District - Jhabua, MP)</li>
-                  <li>• कार्यालय समय: सोमवार - शनिवार (10:30 - 17:30)</li>
-                  <li>• ई-नगरपालिका नागरिक सेवा केंद्र</li>
-                </ul>
+
+              <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-1.5 hover:border-teal-300 transition-all">
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">जल कर / नल कनेक्शन प्रभारी</span>
+                <p className="font-extrabold text-slate-900 text-sm">श्री अय्यूब खान</p>
+                <p className="text-xs text-slate-500 font-medium">Water Tax & New Connection Official</p>
+                <a href="tel:8224083390" className="inline-flex items-center gap-1.5 text-xs font-mono font-extrabold text-teal-800 bg-teal-100 hover:bg-teal-200 px-3 py-1.5 rounded-xl border border-teal-300 transition mt-1">
+                  📞 8224083390
+                </a>
+              </div>
+
+              <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-1.5 hover:border-blue-300 transition-all">
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">जन्म एवं मृत्यु पंजीयन प्रभारी</span>
+                <p className="font-extrabold text-slate-900 text-sm">श्री अरविंद बुंदेला</p>
+                <p className="text-xs text-slate-500 font-medium">Birth & Death Registration Official</p>
+                <a href="tel:9993177917" className="inline-flex items-center gap-1.5 text-xs font-mono font-extrabold text-blue-800 bg-blue-100 hover:bg-blue-200 px-3 py-1.5 rounded-xl border border-blue-300 transition mt-1">
+                  📞 9993177917
+                </a>
               </div>
             </div>
           </div>

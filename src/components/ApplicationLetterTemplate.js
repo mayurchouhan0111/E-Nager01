@@ -352,33 +352,33 @@ export default function ApplicationLetterTemplate({ record, serviceType = 'death
               <>
                 <tr className="border-b border-slate-300">
                   <td className="p-1.5 font-bold border-r border-slate-300 text-center">1</td>
-                  <td className="p-1.5 border-r border-slate-300">आवेदक का आधार कार्ड की फोटोकॉपी</td>
+                  <td className="p-1.5 border-r border-slate-300">आईडी प्रूफ (आधार/SSSM समग्र आईडी/बिजली बिल/संपत्ति कर रसीद/नोटरी शपथ पत्र ₹1000) <span className="font-bold text-rose-700 text-[10px]">(अनिवार्य)</span></td>
                   <td className="p-1.5 border-r border-slate-300 text-center font-bold text-emerald-800">
-                    {record.documents?.aadhaarCard?.fileName ? 'संलग्न' : 'संलग्न'}
+                    {(record.documents?.idProofDoc || record.documents?.aadhaarCard || record.documents?.propertyReceipt) ? 'संलग्न' : 'संलग्न'}
                   </td>
                   <td className="p-1.5 text-center font-mono text-slate-400">[  ] सत्यापित</td>
                 </tr>
                 <tr className="border-b border-slate-300 bg-slate-50">
                   <td className="p-1.5 font-bold border-r border-slate-300 text-center">2</td>
-                  <td className="p-1.5 border-r border-slate-300">भवन स्वामित्व / संपत्ति कर भुगतान रसीद की फोटोकॉपी</td>
+                  <td className="p-1.5 border-r border-slate-300">नल कनेक्शन स्थान का साइट प्लान नक्शा (Site Plan) <span className="font-bold text-rose-700 text-[10px]">(अनिवार्य)</span></td>
                   <td className="p-1.5 border-r border-slate-300 text-center font-bold text-emerald-800">
-                    {record.documents?.propertyReceipt?.fileName ? 'संलग्न' : 'संलग्न'}
+                    {record.documents?.sitePlanDoc ? 'संलग्न' : 'संलग्न'}
                   </td>
                   <td className="p-1.5 text-center font-mono text-slate-400">[  ] सत्यापित</td>
                 </tr>
                 <tr className="border-b border-slate-300">
                   <td className="p-1.5 font-bold border-r border-slate-300 text-center">3</td>
-                  <td className="p-1.5 border-r border-slate-300">नोटरी द्वारा सत्यापित शपथ पत्र (Affidavit)</td>
+                  <td className="p-1.5 border-r border-slate-300">नल कनेक्शन शुल्क रसीद (Charges ₹4250/-) <span className="font-bold text-rose-700 text-[10px]">(अनिवार्य)</span></td>
                   <td className="p-1.5 border-r border-slate-300 text-center font-bold text-emerald-800">
-                    {record.documents?.affidavitDoc?.fileName ? 'संलग्न' : 'संलग्न'}
+                    {record.documents?.connectionChargesReceipt ? 'संलग्न' : 'संलग्न'}
                   </td>
                   <td className="p-1.5 text-center font-mono text-slate-400">[  ] सत्यापित</td>
                 </tr>
                 <tr className="border-b border-slate-300 bg-slate-50">
                   <td className="p-1.5 font-bold border-r border-slate-300 text-center">4</td>
-                  <td className="p-1.5 border-r border-slate-300">आवेदक का पासपोर्ट साइज फोटो एवं आवेदन पत्र</td>
-                  <td className="p-1.5 border-r border-slate-300 text-center font-bold text-emerald-800">
-                    {record.documents?.applicantPhoto?.fileName ? 'संलग्न' : 'संलग्न'}
+                  <td className="p-1.5 border-r border-slate-300">सड़क खुदाई शुल्क रसीद (Road Cutting Charges) <span className="font-bold text-slate-500 text-[10px]">(वैकल्पिक / If applicable)</span></td>
+                  <td className="p-1.5 border-r border-slate-300 text-center font-bold text-slate-600">
+                    {record.documents?.roadCuttingReceipt ? 'संलग्न' : 'यदि लागू हो'}
                   </td>
                   <td className="p-1.5 text-center font-mono text-slate-400">[  ] सत्यापित</td>
                 </tr>

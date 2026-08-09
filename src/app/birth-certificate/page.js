@@ -427,20 +427,34 @@ export default function BirthCertificatePage() {
           </div>
         </div>
 
-        {/* Platform Legal Disclaimer & Mandatory Submission Warning */}
-        <div className="bg-amber-50 border-2 border-amber-300 rounded-3xl p-5 shadow-sm space-y-2 text-amber-950">
-          <div className="flex items-center gap-2 text-amber-900 font-extrabold text-xs sm:text-sm">
-            <ShieldAlert className="w-5 h-5 text-amber-600 shrink-0" />
-            <span>⚠️ वैधानिक चेतावनी एवं आवश्यक निर्देश (Official Legal Responsibility & Instructions)</span>
+        {/* Official Officer Contact Card */}
+        <div className="bg-white border border-emerald-200 rounded-3xl p-5 shadow-sm space-y-3">
+          <div className="flex items-center justify-between flex-wrap gap-2 border-b border-slate-100 pb-2.5">
+            <span className="text-xs sm:text-sm font-extrabold text-slate-900 flex items-center gap-2">
+              <span className="p-1 rounded-lg bg-emerald-100 text-emerald-800 text-xs">📞</span> जन्म प्रमाण पत्र आधिकारिक विभागीय संपर्क सूत्र (Official Department Contacts)
+            </span>
+            <span className="text-[10px] font-mono font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+              नगर पालिका परिषद झाबुआ (म.प्र.)
+            </span>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs leading-relaxed font-medium">
-            <div className="bg-white/80 p-3 rounded-2xl border border-amber-200">
-              <strong className="text-amber-900 block mb-1">1. आवेदक का वैधानिक उत्तरदायित्व:</strong>
-              इस संपूर्ण प्लेटफॉर्म पर दर्ज समस्त विवरण शासकीय अभिलेख हेतु आधिकारिक है। यदि आवेदक द्वारा कोई असत्य या भ्रामक जानकारी दर्ज की जाती है, तो उसके लिए <strong>केवल आवेदक स्वयं व्यक्तिगत एवं कानूनी रूप से उत्तरदायी</strong> होगा।
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+            <div className="bg-slate-50/80 p-3.5 rounded-2xl border border-slate-200 flex items-center justify-between">
+              <div>
+                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">मुख्य नगर पालिका अधिकारी (नोडल प्रशासक)</span>
+                <span className="font-extrabold text-slate-900 text-sm">CMO Office / Nodal Administrator</span>
+              </div>
+              <a href="tel:9713175838" className="font-mono font-extrabold text-emerald-800 bg-emerald-100 hover:bg-emerald-200 px-3 py-1.5 rounded-xl border border-emerald-300 text-xs transition">
+                📞 9713175838
+              </a>
             </div>
-            <div className="bg-white/80 p-3 rounded-2xl border border-amber-200">
-              <strong className="text-amber-900 block mb-1">2. अनिवार्य भौतिक पावती पत्र जमा:</strong>
-              ऑनलाइन आवेदन फॉर्म भरने के पश्चात, जनरेट किए गए <strong>पावती पत्र (Hard Copy Application Letter)</strong> का प्रिंटआउट निकालें और अपने <strong>संलग्न मूल दस्तावेजों सहित नगर पालिका कार्यालय झाबुआ</strong> में अनिवार्य रूप से जमा करें।
+            <div className="bg-slate-50/80 p-3.5 rounded-2xl border border-slate-200 flex items-center justify-between">
+              <div>
+                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">जन्म एवं मृत्यु पंजीयन प्रभारी अधिकारी</span>
+                <span className="font-extrabold text-slate-900 text-sm">श्री अरविंद बुंदेला</span>
+              </div>
+              <a href="tel:9993177917" className="font-mono font-extrabold text-blue-800 bg-blue-100 hover:bg-blue-200 px-3 py-1.5 rounded-xl border border-blue-300 text-xs transition">
+                📞 9993177917
+              </a>
             </div>
           </div>
         </div>
