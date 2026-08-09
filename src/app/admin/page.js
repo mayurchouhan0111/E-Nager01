@@ -526,39 +526,34 @@ export default function AdminPage() {
                               onClick={() => setLetterModal({ isOpen: true, record, serviceType: 'death' })}
                               className="btn btn-secondary btn-sm flex items-center gap-1 font-bold text-emerald-900 bg-emerald-50 hover:bg-emerald-100 border-emerald-200 text-[11px]"
                             >
-                              <Printer className="w-3.5 h-3.5 text-emerald-700" /> પાવતી पत्र (Hard Copy)
+                              <Printer className="w-3.5 h-3.5 text-emerald-700" /> पावती पत्र
                             </button>
 
                             {record.status === 'Submitted' && (
                               <button
-                                onClick={() => setRemarkModal({ isOpen: true, record, serviceType: 'death', targetStatus: 'Under Review', remarkText: '', officerName: 'Nagar Palika Officer' })}
+                                onClick={() => setRemarkModal({ isOpen: true, record, serviceType: 'death', targetStatus: 'Under Review', remarkText: 'समीक्षा हेतु चुना गया', officerName: ADMIN_ACCOUNTS[currentAdminUser]?.name || 'Registrar Officer' })}
                                 className="btn btn-secondary btn-sm bg-blue-50 border-blue-200 text-blue-700 font-bold text-[11px]"
                               >
                                 👁️ समीक्षा करें
                               </button>
                             )}
 
-                            {record.status === 'Under Review' && (
-                              <>
-                                <button
-                                  onClick={() => setRemarkModal({ isOpen: true, record, serviceType: 'death', targetStatus: 'Approved', remarkText: '', officerName: 'Nagar Palika Officer' })}
-                                  className="btn btn-primary btn-sm bg-gradient-to-r from-emerald-600 to-emerald-700 font-bold text-[11px]"
-                                >
-                                  ✅ स्वीकृत करें
-                                </button>
-                                <button
-                                  onClick={() => setRemarkModal({ isOpen: true, record, serviceType: 'death', targetStatus: 'Correction Requested', remarkText: '', officerName: 'Nagar Palika Officer' })}
-                                  className="btn btn-secondary btn-sm bg-amber-50 border-amber-200 text-amber-700 font-bold text-[11px]"
-                                >
-                                  ✏️ सुधार मांगे
-                                </button>
-                                <button
-                                  onClick={() => setRemarkModal({ isOpen: true, record, serviceType: 'death', targetStatus: 'Rejected', remarkText: '', officerName: 'Nagar Palika Officer' })}
-                                  className="btn btn-danger btn-sm font-bold text-[11px]"
-                                >
-                                  ❌ निरस्त करें
-                                </button>
-                              </>
+                            {record.status !== 'Approved' && record.status !== 'Certificate Generated' && record.status !== 'Completed' && (
+                              <button
+                                onClick={() => setRemarkModal({ isOpen: true, record, serviceType: 'death', targetStatus: 'Approved', remarkText: 'सभी दस्तावेज सत्यापित। स्वीकृत।', officerName: ADMIN_ACCOUNTS[currentAdminUser]?.name || 'Registrar Officer' })}
+                                className="btn btn-primary btn-sm bg-gradient-to-r from-emerald-600 to-emerald-700 font-bold text-[11px]"
+                              >
+                                ✅ स्वीकृत करें
+                              </button>
+                            )}
+
+                            {record.status !== 'Rejected' && (
+                              <button
+                                onClick={() => setRemarkModal({ isOpen: true, record, serviceType: 'death', targetStatus: 'Rejected', remarkText: 'दस्तावेज अपूर्ण', officerName: ADMIN_ACCOUNTS[currentAdminUser]?.name || 'Registrar Officer' })}
+                                className="btn btn-danger btn-sm font-bold text-[11px]"
+                              >
+                                ❌ निरस्त
+                              </button>
                             )}
 
                             {(record.status === 'Approved' || record.status === 'Certificate Generated' || record.status === 'Completed') && (
@@ -665,39 +660,34 @@ export default function AdminPage() {
                               onClick={() => setLetterModal({ isOpen: true, record, serviceType: 'birth' })}
                               className="btn btn-secondary btn-sm flex items-center gap-1 font-bold text-blue-900 bg-blue-50 hover:bg-blue-100 border-blue-200 text-[11px]"
                             >
-                              <Printer className="w-3.5 h-3.5 text-blue-700" /> पावती पत्र (Hard Copy)
+                              <Printer className="w-3.5 h-3.5 text-blue-700" /> पावती पत्र
                             </button>
 
                             {record.status === 'Submitted' && (
                               <button
-                                onClick={() => setRemarkModal({ isOpen: true, record, serviceType: 'birth', targetStatus: 'Under Review', remarkText: '', officerName: 'Nagar Palika Officer' })}
+                                onClick={() => setRemarkModal({ isOpen: true, record, serviceType: 'birth', targetStatus: 'Under Review', remarkText: 'समीक्षा हेतु चुना गया', officerName: ADMIN_ACCOUNTS[currentAdminUser]?.name || 'Registrar Officer' })}
                                 className="btn btn-secondary btn-sm bg-blue-50 border-blue-200 text-blue-700 font-bold text-[11px]"
                               >
                                 👁️ समीक्षा करें
                               </button>
                             )}
 
-                            {record.status === 'Under Review' && (
-                              <>
-                                <button
-                                  onClick={() => setRemarkModal({ isOpen: true, record, serviceType: 'birth', targetStatus: 'Approved', remarkText: '', officerName: 'Nagar Palika Officer' })}
-                                  className="btn btn-primary btn-sm bg-gradient-to-r from-emerald-600 to-emerald-700 font-bold text-[11px]"
-                                >
-                                  ✅ स्वीकृत करें
-                                </button>
-                                <button
-                                  onClick={() => setRemarkModal({ isOpen: true, record, serviceType: 'birth', targetStatus: 'Correction Requested', remarkText: '', officerName: 'Nagar Palika Officer' })}
-                                  className="btn btn-secondary btn-sm bg-amber-50 border-amber-200 text-amber-700 font-bold text-[11px]"
-                                >
-                                  ✏️ सुधार मांगे
-                                </button>
-                                <button
-                                  onClick={() => setRemarkModal({ isOpen: true, record, serviceType: 'birth', targetStatus: 'Rejected', remarkText: '', officerName: 'Nagar Palika Officer' })}
-                                  className="btn btn-danger btn-sm font-bold text-[11px]"
-                                >
-                                  ❌ निरस्त करें
-                                </button>
-                              </>
+                            {record.status !== 'Approved' && record.status !== 'Certificate Generated' && record.status !== 'Completed' && (
+                              <button
+                                onClick={() => setRemarkModal({ isOpen: true, record, serviceType: 'birth', targetStatus: 'Approved', remarkText: 'सभी दस्तावेज सत्यापित। स्वीकृत।', officerName: ADMIN_ACCOUNTS[currentAdminUser]?.name || 'Registrar Officer' })}
+                                className="btn btn-primary btn-sm bg-gradient-to-r from-blue-600 to-blue-700 font-bold text-[11px]"
+                              >
+                                ✅ स्वीकृत करें
+                              </button>
+                            )}
+
+                            {record.status !== 'Rejected' && (
+                              <button
+                                onClick={() => setRemarkModal({ isOpen: true, record, serviceType: 'birth', targetStatus: 'Rejected', remarkText: 'दस्तावेज अपूर्ण', officerName: ADMIN_ACCOUNTS[currentAdminUser]?.name || 'Registrar Officer' })}
+                                className="btn btn-danger btn-sm font-bold text-[11px]"
+                              >
+                                ❌ निरस्त
+                              </button>
                             )}
 
                             {(record.status === 'Approved' || record.status === 'Certificate Generated' || record.status === 'Completed') && (
@@ -804,39 +794,34 @@ export default function AdminPage() {
                               onClick={() => setLetterModal({ isOpen: true, record, serviceType: 'water_connection' })}
                               className="btn btn-secondary btn-sm flex items-center gap-1 font-bold text-teal-900 bg-teal-50 hover:bg-teal-100 border-teal-200 text-[11px]"
                             >
-                              <Printer className="w-3.5 h-3.5 text-teal-700" /> पावती पत्र (Hard Copy)
+                              <Printer className="w-3.5 h-3.5 text-teal-700" /> पावती पत्र
                             </button>
 
                             {record.status === 'Submitted' && (
                               <button
-                                onClick={() => setRemarkModal({ isOpen: true, record, serviceType: 'water_connection', targetStatus: 'Under Review', remarkText: '', officerName: ADMIN_ACCOUNTS[currentAdminUser]?.name || 'Water Supply Officer' })}
+                                onClick={() => setRemarkModal({ isOpen: true, record, serviceType: 'water_connection', targetStatus: 'Under Review', remarkText: 'समीक्षा हेतु चुना गया', officerName: ADMIN_ACCOUNTS[currentAdminUser]?.name || 'Water Supply Officer' })}
                                 className="btn btn-secondary btn-sm bg-blue-50 border-blue-200 text-blue-700 font-bold text-[11px]"
                               >
                                 👁️ समीक्षा करें
                               </button>
                             )}
 
-                            {record.status === 'Under Review' && (
-                              <>
-                                <button
-                                  onClick={() => setRemarkModal({ isOpen: true, record, serviceType: 'water_connection', targetStatus: 'Approved', remarkText: '', officerName: ADMIN_ACCOUNTS[currentAdminUser]?.name || 'Water Supply Officer' })}
-                                  className="btn btn-primary btn-sm bg-gradient-to-r from-teal-600 to-emerald-700 font-bold text-[11px]"
-                                >
-                                  ✅ स्वीकृत करें
-                                </button>
-                                <button
-                                  onClick={() => setRemarkModal({ isOpen: true, record, serviceType: 'water_connection', targetStatus: 'Correction Requested', remarkText: '', officerName: ADMIN_ACCOUNTS[currentAdminUser]?.name || 'Water Supply Officer' })}
-                                  className="btn btn-secondary btn-sm bg-amber-50 border-amber-200 text-amber-700 font-bold text-[11px]"
-                                >
-                                  ✏️ सुधार मांगे
-                                </button>
-                                <button
-                                  onClick={() => setRemarkModal({ isOpen: true, record, serviceType: 'water_connection', targetStatus: 'Rejected', remarkText: '', officerName: ADMIN_ACCOUNTS[currentAdminUser]?.name || 'Water Supply Officer' })}
-                                  className="btn btn-danger btn-sm font-bold text-[11px]"
-                                >
-                                  ❌ निरस्त करें
-                                </button>
-                              </>
+                            {record.status !== 'Approved' && record.status !== 'Sanctioned' && record.status !== 'Completed' && (
+                              <button
+                                onClick={() => setRemarkModal({ isOpen: true, record, serviceType: 'water_connection', targetStatus: 'Approved', remarkText: 'साइट प्लान एवं चार्जेज सत्यापित। जल कनेक्शन स्वीकृत।', officerName: ADMIN_ACCOUNTS[currentAdminUser]?.name || 'Water Supply Officer' })}
+                                className="btn btn-primary btn-sm bg-gradient-to-r from-teal-600 to-emerald-700 font-bold text-[11px]"
+                              >
+                                ✅ स्वीकृत करें
+                              </button>
+                            )}
+
+                            {record.status !== 'Rejected' && (
+                              <button
+                                onClick={() => setRemarkModal({ isOpen: true, record, serviceType: 'water_connection', targetStatus: 'Rejected', remarkText: 'दस्तावेज अपूर्ण', officerName: ADMIN_ACCOUNTS[currentAdminUser]?.name || 'Water Supply Officer' })}
+                                className="btn btn-danger btn-sm font-bold text-[11px]"
+                              >
+                                ❌ निरस्त
+                              </button>
                             )}
 
                             {(record.status === 'Approved' || record.status === 'Sanctioned' || record.status === 'Completed') && (
@@ -847,6 +832,13 @@ export default function AdminPage() {
                                 📜 स्वीकृति पत्र
                               </button>
                             )}
+
+                            <button
+                              onClick={() => setSelectedWaterDetail(record)}
+                              className="btn btn-secondary btn-sm flex items-center gap-1 font-bold text-slate-700 text-[11px]"
+                            >
+                              <History className="w-3.5 h-3.5 text-slate-500" /> विवरण
+                            </button>
                           </div>
                         </div>
                       </div>
@@ -1056,9 +1048,9 @@ export default function AdminPage() {
 
         {/* Water Connection Sanction Permit Modal */}
         {waterCertPreview && (
-          <div className="fixed inset-0 bg-slate-900/70 backdrop-blur-md z-50 flex items-center justify-center p-4 overflow-y-auto">
-            <div className="bg-white border border-slate-200 rounded-3xl max-w-4xl w-full p-6 my-8 shadow-2xl space-y-4">
-              <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+          <div className="fixed inset-0 bg-slate-900/75 backdrop-blur-md z-50 flex items-center justify-center p-4 sm:p-6 overflow-hidden">
+            <div className="bg-white border border-slate-200 rounded-3xl max-w-4xl w-full p-6 sm:p-8 shadow-2xl flex flex-col max-h-[90vh]">
+              <div className="flex items-center justify-between border-b border-slate-100 pb-3 shrink-0">
                 <h3 className="text-slate-900 font-extrabold text-base flex items-center gap-2">
                   📜 जल कनेक्शन स्वीकृत आदेश (Water Connection Sanction Permit)
                 </h3>
@@ -1075,11 +1067,214 @@ export default function AdminPage() {
                 </div>
               </div>
 
-              <WaterConnectionTemplate record={waterCertPreview} />
+              <div className="overflow-y-auto flex-1 pr-1 pt-4">
+                <WaterConnectionTemplate record={waterCertPreview} />
+              </div>
             </div>
           </div>
         )}
 
+        {/* ── APPLICATION DETAILS MODAL (विवरण) ────────────────────────── */}
+        {(selectedDeathDetail || selectedBirthDetail || selectedWaterDetail) && (
+          <ApplicationDetailModal
+            record={selectedDeathDetail || selectedBirthDetail || selectedWaterDetail}
+            serviceType={selectedDeathDetail ? 'death' : selectedBirthDetail ? 'birth' : 'water'}
+            onClose={() => {
+              setSelectedDeathDetail(null)
+              setSelectedBirthDetail(null)
+              setSelectedWaterDetail(null)
+            }}
+            onOpenRemark={(rec, status) => {
+              setSelectedDeathDetail(null)
+              setSelectedBirthDetail(null)
+              setSelectedWaterDetail(null)
+              setRemarkModal({
+                isOpen: true,
+                record: rec,
+                serviceType: selectedDeathDetail ? 'death' : selectedBirthDetail ? 'birth' : 'water_connection',
+                targetStatus: status,
+                remarkText: status === 'Approved' ? 'सभी दस्तावेज सत्यापित। स्वीकृत।' : '',
+                officerName: ADMIN_ACCOUNTS[currentAdminUser]?.name || 'Nagar Palika Officer'
+              })
+            }}
+            onOpenLetter={(rec) => {
+              setSelectedDeathDetail(null)
+              setSelectedBirthDetail(null)
+              setSelectedWaterDetail(null)
+              setLetterModal({
+                isOpen: true,
+                record: rec,
+                serviceType: selectedDeathDetail ? 'death' : selectedBirthDetail ? 'birth' : 'water_connection'
+              })
+            }}
+          />
+        )}
+
+      </div>
+    </div>
+  )
+}
+
+function ApplicationDetailModal({ record, serviceType, onClose, onOpenRemark, onOpenLetter }) {
+  if (!record) return null
+
+  const isDeath = serviceType === 'death'
+  const isBirth = serviceType === 'birth'
+  const isWater = serviceType === 'water'
+
+  const applicant = record.applicantDetails || {}
+  const deceased = record.deceasedDetails || {}
+  const child = record.childDetails || {}
+  const mother = record.motherDetails || {}
+  const father = record.fatherDetails || {}
+  const property = record.propertyDetails || {}
+  const docs = record.uploadedDocs || record.documents || []
+
+  return (
+    <div className="fixed inset-0 bg-slate-900/75 backdrop-blur-md z-50 flex items-center justify-center p-4 sm:p-6 overflow-hidden">
+      <div className="bg-white border border-slate-200 rounded-3xl max-w-4xl w-full p-6 sm:p-8 shadow-2xl flex flex-col max-h-[90vh]">
+        {/* Header */}
+        <div className="flex items-center justify-between border-b border-slate-100 pb-3 shrink-0">
+          <div>
+            <div className="flex items-center gap-2 mb-1">
+              <span className="font-mono text-xs font-bold text-emerald-800 bg-emerald-100 px-2.5 py-0.5 rounded border border-emerald-300">
+                {record.applicationNo || 'DRAFT'}
+              </span>
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold border uppercase tracking-wider bg-slate-100 text-slate-700 border-slate-200">
+                {record.status}
+              </span>
+            </div>
+            <h3 className="text-slate-900 font-extrabold text-base">
+              {isDeath && `मृत्यु प्रमाण पत्र विवरण: स्व. ${deceased.fullName || 'N/A'}`}
+              {isBirth && `जन्म प्रमाण पत्र विवरण: शिशु ${child.fullName || 'अनाम'}`}
+              {isWater && `जल कनेक्शन विवरण: ${applicant.fullName || 'N/A'}`}
+            </h3>
+          </div>
+
+          <button onClick={onClose} className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors">
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        {/* Content */}
+        <div className="overflow-y-auto flex-1 pr-1 pt-4 space-y-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-2">
+              <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wider border-b border-slate-200 pb-1">
+                {isDeath ? 'मृतक विवरण' : isBirth ? 'शिशु एवं जन्म विवरण' : 'भवन एवं संपत्ति विवरण'}
+              </h4>
+              <div className="text-xs text-slate-800 space-y-1.5 font-medium">
+                {isDeath && (
+                  <>
+                    <p><span className="text-slate-500">नाम:</span> स्व. {deceased.fullName}</p>
+                    <p><span className="text-slate-500">आयु / लिंग:</span> {deceased.age || '—'} वर्ष | {deceased.gender}</p>
+                    <p><span className="text-slate-500">मृत्यु तिथि:</span> {deceased.dateOfDeath}</p>
+                    <p><span className="text-slate-500">मृत्यु स्थान:</span> {deceased.placeOfDeath}</p>
+                    <p><span className="text-slate-500">पिता/पति नाम:</span> {deceased.fatherHusbandName || '—'}</p>
+                  </>
+                )}
+                {isBirth && (
+                  <>
+                    <p><span className="text-slate-500">शिशु नाम:</span> {child.fullName || 'अनाम'}</p>
+                    <p><span className="text-slate-500">लिंग / वजन:</span> {child.gender} | {child.weight ? `${child.weight} kg` : '—'}</p>
+                    <p><span className="text-slate-500">जन्म तिथि:</span> {child.dateOfBirth}</p>
+                    <p><span className="text-slate-500">जन्म स्थान:</span> {child.placeOfBirth}</p>
+                    <p><span className="text-slate-500">माता नाम:</span> {mother.fullName}</p>
+                    <p><span className="text-slate-500">पिता नाम:</span> {father.fullName}</p>
+                  </>
+                )}
+                {isWater && (
+                  <>
+                    <p><span className="text-slate-500">मकान क्र.:</span> {property.houseNo || '—'}</p>
+                    <p><span className="text-slate-500">वार्ड क्र.:</span> Ward #{applicant.wardNo || '—'}</p>
+                    <p><span className="text-slate-500">कनेक्शन प्रकार:</span> {property.connectionType || 'घरेलू'}</p>
+                    <p><span className="text-slate-500">पाइप साइज:</span> {property.pipeSize || '0.5 inch'}</p>
+                    <p><span className="text-slate-500">BPL कार्ड:</span> {property.bplCardNo || '—'}</p>
+                  </>
+                )}
+              </div>
+            </div>
+
+            <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-2">
+              <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wider border-b border-slate-200 pb-1">आवेदक / संपर्क विवरण</h4>
+              <div className="text-xs text-slate-800 space-y-1.5 font-medium">
+                <p><span className="text-slate-500">आवेदक नाम:</span> {applicant.fullName || '—'}</p>
+                <p><span className="text-slate-500">संबंध:</span> {applicant.relationWithDeceased || applicant.relationWithChild || 'आवेदक'}</p>
+                <p><span className="text-slate-500">मोबाइल:</span> <a href={`tel:${applicant.mobile}`} className="font-mono font-bold text-emerald-700 underline">{applicant.mobile || '—'}</a></p>
+                <p><span className="text-slate-500">ईमेल:</span> {applicant.email || '—'}</p>
+                <p><span className="text-slate-500">आधार:</span> {applicant.aadhaar || '—'}</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white border border-slate-200 rounded-2xl p-4 space-y-3">
+            <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wider border-b border-slate-100 pb-2">
+              📎 संलग्न दस्तावेज एवं फाइलें
+            </h4>
+            {docs && docs.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                {docs.map((doc, idx) => (
+                  <div key={idx} className="flex items-center justify-between bg-slate-50 p-2.5 rounded-xl border border-slate-200 text-xs">
+                    <span className="font-medium text-slate-800 truncate max-w-[200px]">{doc.title || doc.name || `Document #${idx + 1}`}</span>
+                    {doc.url || doc.dataUrl ? (
+                      <a href={doc.url || doc.dataUrl} target="_blank" rel="noopener noreferrer" className="btn btn-secondary btn-sm text-[10px] font-bold text-emerald-800">
+                        📄 पूर्वावलोकन
+                      </a>
+                    ) : (
+                      <span className="text-slate-400 text-[10px]">संलग्न</span>
+                    )}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-xs text-slate-500 italic">मानक दस्तावेज संलग्न हैं (आधार कार्ड, मुक्तिधाम रसीद/साइट प्लान, आदि)</p>
+            )}
+          </div>
+
+          <div className="bg-white border border-slate-200 rounded-2xl p-4 space-y-3">
+            <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wider border-b border-slate-100 pb-2">
+              ⏱️ आवेदन टाइमलाइन इतिहास
+            </h4>
+            <ApplicationTimeline timeline={record.timeline || []} />
+          </div>
+        </div>
+
+        {/* Footer Actions */}
+        <div className="border-t border-slate-100 pt-4 mt-2 shrink-0 flex flex-wrap items-center justify-between gap-2">
+          <button
+            onClick={() => { onClose(); onOpenLetter(record); }}
+            className="btn btn-secondary btn-sm font-bold text-xs flex items-center gap-1"
+          >
+            <Printer className="w-3.5 h-3.5" /> पावती पत्र (Print Pawati)
+          </button>
+
+          <div className="flex items-center gap-1.5 flex-wrap">
+            <button
+              onClick={() => onOpenRemark(record, 'Under Review')}
+              className="btn btn-secondary btn-sm bg-blue-50 border-blue-200 text-blue-700 font-bold text-xs"
+            >
+              👁️ समीक्षा में डालें
+            </button>
+            <button
+              onClick={() => onOpenRemark(record, 'Approved')}
+              className="btn btn-primary btn-sm bg-emerald-700 font-bold text-xs"
+            >
+              ✅ स्वीकृत करें
+            </button>
+            <button
+              onClick={() => onOpenRemark(record, 'Correction Requested')}
+              className="btn btn-secondary btn-sm bg-amber-50 border-amber-200 text-amber-700 font-bold text-xs"
+            >
+              ✏️ सुधार मांगे
+            </button>
+            <button
+              onClick={() => onOpenRemark(record, 'Rejected')}
+              className="btn btn-danger btn-sm font-bold text-xs"
+            >
+              ❌ निरस्त करें
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   )
