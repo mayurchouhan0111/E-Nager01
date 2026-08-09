@@ -1060,6 +1060,10 @@ export default function AdminPage() {
                         className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-slate-300 text-xs font-medium focus:outline-none focus:border-emerald-600 bg-white"
                       />
                     </div>
+                    <button onClick={loadNoDuesRecords} className="btn btn-secondary btn-sm shrink-0">
+                      <RefreshCw className={`w-3.5 h-3.5 ${noDuesLoading ? 'animate-spin' : ''}`} />
+                    </button>
+                  </div>
                 </div>
 
                 {/* Stats Cards */}
