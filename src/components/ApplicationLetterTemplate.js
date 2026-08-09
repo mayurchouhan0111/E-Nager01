@@ -50,7 +50,7 @@ export default function ApplicationLetterTemplate({ record, serviceType = 'death
   const uploadedDocs = record.documents || [];
 
   return (
-    <div className="print-page-a4 bg-white text-slate-900 p-6 max-w-4xl mx-auto border-4 border-slate-700 shadow-xl relative font-sans text-xs print:p-3 print:border-2 print:max-h-[280mm] print:overflow-hidden print:break-inside-avoid">
+    <div className="print-page-a4 print-container bg-white text-slate-900 p-6 max-w-4xl mx-auto border-4 border-slate-700 shadow-xl relative font-sans text-xs print:p-4 print:border-2 print:max-h-none print:overflow-visible">
       
       {/* Official Header */}
       <div className="text-center border-b-2 border-slate-800 pb-4 mb-4">

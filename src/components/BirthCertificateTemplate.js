@@ -39,7 +39,7 @@ export default function BirthCertificateTemplate({ record }) {
   const permanentAddressText = formatAddress(child.permanentAddress);
 
   return (
-    <div className="print-page-a4 bg-white text-slate-900 p-6 max-w-4xl mx-auto border-8 border-double border-blue-900/40 shadow-2xl relative font-serif print:p-3 print:border-4 print:max-h-[280mm] print:overflow-hidden print:break-inside-avoid">
+    <div className="print-page-a4 print-container bg-white text-slate-900 p-6 max-w-4xl mx-auto border-8 border-double border-blue-900/40 shadow-2xl relative font-serif print:p-4 print:border-4 print:max-h-none print:overflow-visible">
       <div className="border border-blue-800/30 p-6 relative">
         
         {/* Official Header */}
