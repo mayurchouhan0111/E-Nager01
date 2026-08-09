@@ -20,34 +20,11 @@ import BirthCertificateTemplate from '@/components/BirthCertificateTemplate'
 import WaterConnectionTemplate from '@/components/WaterConnectionTemplate'
 import ApplicationLetterTemplate from '@/components/ApplicationLetterTemplate'
 import ApplicationTimeline from '@/components/ApplicationTimeline'
+import { DEFAULT_ADMIN_ACCOUNTS, fetchAdminAccounts, updateAdminAccountCredential } from '@/services/adminAuthService'
 import {
   ShieldAlert, Search, Trash2, Download, Edit, Printer, Eye, Activity, FileText, CheckCircle2,
-  AlertCircle, Calendar, UserCheck, History, Info, Lock, LogOut, RefreshCw, X, Settings2, Baby, Eye as EyeIcon, Droplet
+  AlertCircle, Calendar, UserCheck, History, Info, Lock, LogOut, RefreshCw, X, Settings2, Baby, Eye as EyeIcon, Droplet, Key, Save
 } from 'lucide-react'
-
-const ADMIN_ACCOUNTS = {
-  admin: {
-    password: 'jhabua@2024',
-    role: 'birth_death_admin',
-    name: 'जन्म-मृत्यु रजिस्ट्रार अधिकारी (Birth & Death Registrar)',
-    defaultTab: 'death-certificates',
-    allowedTabs: ['death-certificates', 'birth-certificates']
-  },
-  water_admin: {
-    password: 'water@jhabua2024',
-    role: 'water_admin',
-    name: 'जल प्रदाय विभाग अधिकारी (Water Supply Officer)',
-    defaultTab: 'water-connections',
-    allowedTabs: ['water-connections']
-  },
-  super_admin: {
-    password: 'jhabua@super2024',
-    role: 'super_admin',
-    name: 'मुख्य नगर पालिका अधिकारी (Chief Municipal Officer - CMO)',
-    defaultTab: 'death-certificates',
-    allowedTabs: ['death-certificates', 'birth-certificates', 'water-connections', 'audit']
-  }
-}
 
 function formatTimestamp(ts) {
   if (!ts) return '—'
@@ -63,16 +40,36 @@ export default function AdminPage() {
   const [password, setPassword] = useState('')
   const [loginError, setLoginError] = useState('')
 
+  const [adminAccounts, setAdminAccounts] = useState(DEFAULT_ADMIN_ACCOUNTS)
+  const [credEditState, setCredEditState] = useState({
+    admin: { password: '', name: '' },
+    water_admin: { password: '', name: '' },
+    super_admin: { password: '', name: '' }
+  })
+
+  const loadCloudAccounts = useCallback(async () => {
+    const accs = await fetchAdminAccounts()
+    setAdminAccounts(accs)
+    setCredEditState({
+      admin: { password: accs.admin?.password || '', name: accs.admin?.name || '' },
+      water_admin: { password: accs.water_admin?.password || '', name: accs.water_admin?.name || '' },
+      super_admin: { password: accs.super_admin?.password || '', name: accs.super_admin?.name || '' }
+    })
+  }, [])
+
+  useEffect(() => {
+    loadCloudAccounts()
+  }, [loadCloudAccounts])
+
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const stored = sessionStorage.getItem('dc_admin_authenticated')
       const storedUser = sessionStorage.getItem('dc_admin_username')
       const storedRole = sessionStorage.getItem('dc_admin_role')
-      if (stored === 'true' && storedUser && ADMIN_ACCOUNTS[storedUser]) {
+      if (stored === 'true' && storedUser) {
         setIsAdmin(true)
         setCurrentAdminUser(storedUser)
-        setCurrentAdminRole(storedRole || ADMIN_ACCOUNTS[storedUser].role)
-        setActiveTab(ADMIN_ACCOUNTS[storedUser].defaultTab)
+        setCurrentAdminRole(storedRole || 'super_admin')
       }
     }
   }, [])
@@ -176,16 +173,18 @@ export default function AdminPage() {
     }
   }, [isAdmin, loadDeathRecords, loadBirthRecords, loadWaterRecords, loadAuditLogs])
 
-  function handleLogin(e) {
+  async function handleLogin(e) {
     e.preventDefault()
     const cleanUser = username.trim().toLowerCase()
-    const account = ADMIN_ACCOUNTS[cleanUser]
+    const latestAccounts = await fetchAdminAccounts()
+    setAdminAccounts(latestAccounts)
+    const account = latestAccounts[cleanUser]
 
     if (account && password === account.password) {
       setIsAdmin(true)
       setCurrentAdminUser(cleanUser)
       setCurrentAdminRole(account.role)
-      setActiveTab(account.defaultTab)
+      setActiveTab(account.defaultTab || 'death-certificates')
 
       if (typeof window !== 'undefined') {
         sessionStorage.setItem('dc_admin_authenticated', 'true')
@@ -196,6 +195,30 @@ export default function AdminPage() {
       toast.success(`लॉगिन सफल: ${account.name}`)
     } else {
       setLoginError('अमान्य उपयोगकर्ता नाम (Username) या पासवर्ड (Password)')
+    }
+  }
+
+  async function handleUpdateCredentials(targetUsername) {
+    const editData = credEditState[targetUsername]
+    if (!editData || (!editData.password && !editData.name)) {
+      toast.error('कृपया पासवर्ड या नाम दर्ज करें (Please enter password or name to update)')
+      return
+    }
+
+    const toastId = toast.loading(`'${targetUsername}' के क्रेडेंशियल अद्यतन हो रहे हैं...`)
+    const result = await updateAdminAccountCredential({
+      targetUsername,
+      newPassword: editData.password,
+      newName: editData.name,
+      updatedBy: currentAdminUser
+    })
+
+    if (result.success) {
+      toast.success(`✅ '${targetUsername}' का क्रेडेंशियल फायरस्टोर में अद्यतन हो गया!`, { id: toastId })
+      setAdminAccounts(result.updatedAccounts)
+      loadAuditLogs()
+    } else {
+      toast.error(`अपडेट विफल: ${result.error}`, { id: toastId })
     }
   }
 
@@ -350,14 +373,15 @@ export default function AdminPage() {
     )
   })
 
-  const currentAccount = ADMIN_ACCOUNTS[currentAdminUser]
-  const allowedTabs = currentAccount?.allowedTabs || ['death-certificates', 'birth-certificates', 'water-connections', 'audit']
+  const currentAccount = adminAccounts[currentAdminUser]
+  const allowedTabs = currentAccount?.allowedTabs || ['death-certificates', 'birth-certificates', 'water-connections', 'audit', 'security-settings']
 
   const allTabDefs = [
     { key: 'death-certificates', label: 'मृत्यु प्रमाण पत्र आवेदन', labelShort: 'मृत्यु', icon: FileText },
     { key: 'birth-certificates', label: 'जन्म प्रमाण पत्र आवेदन', labelShort: 'जन्म', icon: Baby },
     { key: 'water-connections', label: 'जल कनेक्शन आवेदन', labelShort: 'जल', icon: Droplet },
     { key: 'audit', label: 'ऑडिट लॉग', labelShort: 'ऑडिट', icon: History },
+    { key: 'security-settings', label: 'सुरक्षा एवं क्रेडेंशियल', labelShort: 'सुरक्षा', icon: Key },
   ]
 
   const visibleTabs = allTabDefs.filter(t => allowedTabs.includes(t.key))
@@ -960,6 +984,150 @@ export default function AdminPage() {
                 </div>
               </div>
             )}
+          </div>
+        )}
+
+        {/* Security & Accounts Settings Tab (Super Admin Only) */}
+        {activeTab === 'security-settings' && (
+          <div className="space-y-6 animate-fade-in">
+            <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm space-y-4">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
+                <div>
+                  <h3 className="text-lg font-extrabold text-slate-900 flex items-center gap-2">
+                    <Key className="w-5 h-5 text-purple-600" />
+                    विभाग अनुसार अधिकृत लॉगिन क्रेडेंशियल प्रबंधन (Security Credentials Management)
+                  </h3>
+                  <p className="text-xs text-slate-500 font-medium">
+                    मुख्य नगर पालिका अधिकारी (CMO / Super Admin) सुरक्षा हेतु अधिकारियों के पासवर्ड एवं नाम अद्यतन कर सकते हैं।
+                  </p>
+                </div>
+                <button
+                  onClick={loadCloudAccounts}
+                  className="btn btn-secondary btn-sm text-xs font-bold flex items-center gap-1.5"
+                >
+                  <RefreshCw className="w-3.5 h-3.5" /> क्लाउड सिंक (Sync Cloud)
+                </button>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {/* 1. Birth & Death Registrar */}
+                <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 space-y-4 relative">
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-xs">1</div>
+                    <div>
+                      <h4 className="font-extrabold text-slate-900 text-sm">जन्म व मृत्यु रजिस्ट्रार</h4>
+                      <p className="text-[10px] text-slate-500 font-mono font-bold">यूजर: admin</p>
+                    </div>
+                  </div>
+
+                  <div className="space-y-3 text-xs">
+                    <div>
+                      <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">अधिकारी नाम (Display Name)</label>
+                      <input
+                        type="text"
+                        value={credEditState.admin?.name || ''}
+                        onChange={(e) => setCredEditState(prev => ({ ...prev, admin: { ...prev.admin, name: e.target.value } }))}
+                        className="w-full border border-slate-300 rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:border-emerald-600 bg-white"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">सुरक्षा पासवर्ड (Password)</label>
+                      <input
+                        type="text"
+                        value={credEditState.admin?.password || ''}
+                        onChange={(e) => setCredEditState(prev => ({ ...prev, admin: { ...prev.admin, password: e.target.value } }))}
+                        className="w-full border border-slate-300 rounded-xl px-3 py-2 text-xs font-mono font-bold focus:outline-none focus:border-emerald-600 bg-white"
+                        placeholder="jhabua@2024"
+                      />
+                    </div>
+                    <button
+                      onClick={() => handleUpdateCredentials('admin')}
+                      className="w-full btn btn-primary btn-sm text-xs font-bold flex items-center justify-center gap-1.5 mt-2"
+                    >
+                      <Save className="w-3.5 h-3.5" /> क्रेडेंशियल सहेजें
+                    </button>
+                  </div>
+                </div>
+
+                {/* 2. Water Supply Officer */}
+                <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 space-y-4 relative">
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 rounded-lg bg-cyan-100 text-cyan-800 flex items-center justify-center font-bold text-xs">2</div>
+                    <div>
+                      <h4 className="font-extrabold text-slate-900 text-sm">जल प्रदाय विभाग अधिकारी</h4>
+                      <p className="text-[10px] text-slate-500 font-mono font-bold">यूजर: water_admin</p>
+                    </div>
+                  </div>
+
+                  <div className="space-y-3 text-xs">
+                    <div>
+                      <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">अधिकारी नाम (Display Name)</label>
+                      <input
+                        type="text"
+                        value={credEditState.water_admin?.name || ''}
+                        onChange={(e) => setCredEditState(prev => ({ ...prev, water_admin: { ...prev.water_admin, name: e.target.value } }))}
+                        className="w-full border border-slate-300 rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:border-emerald-600 bg-white"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">सुरक्षा पासवर्ड (Password)</label>
+                      <input
+                        type="text"
+                        value={credEditState.water_admin?.password || ''}
+                        onChange={(e) => setCredEditState(prev => ({ ...prev, water_admin: { ...prev.water_admin, password: e.target.value } }))}
+                        className="w-full border border-slate-300 rounded-xl px-3 py-2 text-xs font-mono font-bold focus:outline-none focus:border-emerald-600 bg-white"
+                        placeholder="water@jhabua2024"
+                      />
+                    </div>
+                    <button
+                      onClick={() => handleUpdateCredentials('water_admin')}
+                      className="w-full btn btn-primary btn-sm text-xs font-bold flex items-center justify-center gap-1.5 mt-2"
+                    >
+                      <Save className="w-3.5 h-3.5" /> क्रेडेंशियल सहेजें
+                    </button>
+                  </div>
+                </div>
+
+                {/* 3. Chief Municipal Officer (Super Admin) */}
+                <div className="bg-purple-50/60 border border-purple-200 rounded-2xl p-5 space-y-4 relative">
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 rounded-lg bg-purple-700 text-white flex items-center justify-center font-bold text-xs">3</div>
+                    <div>
+                      <h4 className="font-extrabold text-slate-900 text-sm">मुख्य अधिकारी (Super Admin)</h4>
+                      <p className="text-[10px] text-purple-700 font-mono font-bold">यूजर: super_admin</p>
+                    </div>
+                  </div>
+
+                  <div className="space-y-3 text-xs">
+                    <div>
+                      <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">अधिकारी नाम (Display Name)</label>
+                      <input
+                        type="text"
+                        value={credEditState.super_admin?.name || ''}
+                        onChange={(e) => setCredEditState(prev => ({ ...prev, super_admin: { ...prev.super_admin, name: e.target.value } }))}
+                        className="w-full border border-slate-300 rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:border-purple-600 bg-white"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">सुरक्षा पासवर्ड (Password)</label>
+                      <input
+                        type="text"
+                        value={credEditState.super_admin?.password || ''}
+                        onChange={(e) => setCredEditState(prev => ({ ...prev, super_admin: { ...prev.super_admin, password: e.target.value } }))}
+                        className="w-full border border-slate-300 rounded-xl px-3 py-2 text-xs font-mono font-bold focus:outline-none focus:border-purple-600 bg-white"
+                        placeholder="jhabua@super2024"
+                      />
+                    </div>
+                    <button
+                      onClick={() => handleUpdateCredentials('super_admin')}
+                      className="w-full bg-purple-700 hover:bg-purple-800 text-white py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 mt-2 transition-all shadow-md"
+                    >
+                      <Save className="w-3.5 h-3.5" /> सुपर एडमिन सहेजें
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         )}
 
