@@ -289,15 +289,13 @@ export async function updateDeathCertificateStatus({
 
   const isLocalId = !id || String(id).startsWith('local-');
 
-  if (!isLocalId) {
-    try {
-      const docRef = doc(db, COLLECTION_NAME, id);
-      const snap = await getDoc(docRef);
-      if (snap && snap.exists()) {
-        existing = { ...existing, ...snap.data() };
-      }
-    } catch (e) {}
-  }
+  try {
+    const docRef = doc(db, COLLECTION_NAME, id);
+    const snap = await getDoc(docRef);
+    if (snap && snap.exists()) {
+      existing = { ...existing, ...snap.data() };
+    }
+  } catch (e) {}
 
   const oldStatus = existing.status || 'Submitted';
   const updatedTimeline = [...(existing.timeline || []), timelineEntry];
@@ -316,16 +314,16 @@ export async function updateDeathCertificateStatus({
     updatePayload.certificateNo = certificateNo || existing.certificateNo || `DC-CERT-${Date.now().toString().slice(-6)}`;
   }
 
-  if (!isLocalId) {
-    try {
-      const docRef = doc(db, COLLECTION_NAME, id);
-      await setDoc(docRef, updatePayload, { merge: true });
-    } catch (error) {
-      console.warn('[DeathCertificateService] Status updated in local storage');
-    }
+  const fullRecord = { ...existing, ...updatePayload, id };
+
+  try {
+    const docRef = doc(db, COLLECTION_NAME, id);
+    await setDoc(docRef, fullRecord, { merge: true });
+  } catch (error) {
+    console.warn('[DeathCertificateService] Status updated in local storage');
   }
 
-  syncLocalRecord({ id, ...existing, ...updatePayload });
+  syncLocalRecord(fullRecord);
 
   try {
     await addDoc(collection(db, AUDIT_LOGS_COLLECTION), {
