@@ -42,7 +42,7 @@ export default function DeathCertificateTemplate({ record }) {
   ].filter(Boolean).join(', ');
 
   return (
-    <div className="bg-white text-slate-900 p-8 max-w-4xl mx-auto border-8 border-double border-amber-900/40 shadow-2xl relative font-serif">
+    <div className="print-page-a4 bg-white text-slate-900 p-6 max-w-4xl mx-auto border-8 border-double border-amber-900/40 shadow-2xl relative font-serif print:p-3 print:border-4 print:max-h-[280mm] print:overflow-hidden print:break-inside-avoid">
       <div className="border border-amber-800/30 p-6 relative">
         
         <div className="text-center border-b-2 border-amber-900/30 pb-4 mb-6">

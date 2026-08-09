@@ -139,8 +139,8 @@ export async function saveWaterConnectionDraft(data, existingId = null) {
 import { formatOfficialDocumentVault } from '../utils/documentVault';
 
 export async function submitWaterConnection(data, existingId = null) {
-  const isResubmission = Boolean(existingId && data.status === 'Correction Requested');
   const applicationNo = data.applicationNo || generateAppNumber();
+  const isResubmission = Boolean(existingId || data.applicationNo || data.status === 'Correction Requested');
   const now = new Date().toISOString();
 
   const formattedDocuments = formatOfficialDocumentVault(data.documents, applicationNo, 'water_connection');
@@ -157,59 +157,75 @@ export async function submitWaterConnection(data, existingId = null) {
     performedBy: data.applicantDetails?.fullName || 'Citizen',
     role: 'Citizen',
     remarks: isResubmission 
-      ? 'सुधार पश्चात जल कनेक्शन आवेदन पुनः प्रस्तुत किया गया (Resubmitted after correction)' 
+      ? 'अधिकारी की टिप्पणी अनुसार सुधार कर जल कनेक्शन आवेदन पुनः प्रस्तुत किया गया (Resubmitted after correction)' 
       : 'जल कनेक्शन आवेदन प्रस्तुत किया गया (Water connection application submitted)',
     timestamp: now
   };
 
-  let docId = existingId || `local-wc-${Date.now()}`;
+  let docRef = null;
+  let docId = existingId;
+  let existingData = {};
 
   try {
-    if (existingId) {
-      const docRef = doc(db, COLLECTION_NAME, existingId);
-      const existingSnap = await getDoc(docRef);
-      const existingData = existingSnap.exists() ? existingSnap.data() : {};
-      const updatedTimeline = [...(existingData.timeline || []), timelineItem];
+    const q = query(collection(db, COLLECTION_NAME), where('applicationNo', '==', applicationNo));
+    const snap = await getDocs(q);
 
-      const updateData = {
-        ...processedData,
-        applicationNo,
-        status: 'Submitted',
-        updatedAt: now,
-        resubmittedAt: isResubmission ? now : existingData.resubmittedAt || null,
-        timeline: updatedTimeline
-      };
-      await updateDoc(docRef, updateData);
-      syncLocalRecord({ id: existingId, ...updateData });
-    } else {
-      const newDoc = {
-        ...processedData,
-        applicationNo,
-        status: 'Submitted',
-        appliedAt: now,
-        updatedAt: now,
-        createdAtServer: serverTimestamp(),
-        timeline: [timelineItem]
-      };
-      const docRef = await addDoc(collection(db, COLLECTION_NAME), newDoc);
-      docId = docRef.id;
-      syncLocalRecord({ id: docId, ...newDoc });
+    if (!snap.empty) {
+      const existingDoc = snap.docs[0];
+      docRef = existingDoc.ref;
+      docId = existingDoc.id;
+      existingData = existingDoc.data() || {};
+    } else if (existingId) {
+      docRef = doc(db, COLLECTION_NAME, existingId);
+      const existingSnap = await getDoc(docRef).catch(() => null);
+      if (existingSnap && existingSnap.exists()) {
+        existingData = existingSnap.data() || {};
+      }
     }
+
+    const updatedTimeline = [...(existingData.timeline || []), timelineItem];
+
+    const finalDoc = {
+      ...existingData,
+      ...processedData,
+      id: docId || (docRef ? docRef.id : `wc-${Date.now()}`),
+      applicationNo,
+      status: 'Submitted',
+      isResubmitted: isResubmission,
+      appliedAt: existingData.appliedAt || now,
+      updatedAt: now,
+      resubmittedAt: isResubmission ? now : (existingData.resubmittedAt || null),
+      timeline: updatedTimeline
+    };
+
+    const sanitizedPayload = sanitizeFirestorePayload(finalDoc);
+
+    if (docRef) {
+      await setDoc(docRef, sanitizedPayload, { merge: true });
+    } else {
+      const newRef = doc(collection(db, COLLECTION_NAME));
+      finalDoc.id = newRef.id;
+      docId = newRef.id;
+      await setDoc(newRef, sanitizeFirestorePayload(finalDoc), { merge: true });
+    }
+
+    syncLocalRecord(finalDoc);
   } catch (error) {
     console.warn('[WaterConnectionService] Firestore submit fallback to local storage:', error.message);
     const existingList = getLocalWaterConnections();
-    const existingObj = existingList.find(r => r.id === docId) || {};
+    const existingObj = existingList.find(r => r.applicationNo === applicationNo || r.id === docId) || {};
     const updatedTimeline = [...(existingObj.timeline || []), timelineItem];
 
     const localDoc = {
       ...existingObj,
       ...data,
-      id: docId,
+      id: existingObj.id || docId || `local-wc-${Date.now()}`,
       applicationNo,
       status: 'Submitted',
+      isResubmitted: isResubmission,
       appliedAt: existingObj.appliedAt || now,
       updatedAt: now,
-      resubmittedAt: isResubmission ? now : existingObj.resubmittedAt || null,
+      resubmittedAt: isResubmission ? now : (existingObj.resubmittedAt || null),
       timeline: updatedTimeline
     };
     syncLocalRecord(localDoc);
@@ -222,7 +238,9 @@ export async function submitWaterConnection(data, existingId = null) {
     recipientId: 'all',
     event: isResubmission ? 'APPLICATION_RESUBMITTED' : 'APPLICATION_SUBMITTED',
     status: 'Submitted',
-    message: `जल कनेक्शन आवेदन (${applicationNo}) सफलतापूर्वक जमा किया गया। (Water connection application submitted successfully.)`,
+    message: isResubmission 
+      ? `🔄 जल कनेक्शन आवेदन (${applicationNo}) में आवेदक द्वारा सुधार कर पुनः जमा किया गया।` 
+      : `जल कनेक्शन आवेदन (${applicationNo}) सफलतापूर्वक जमा किया गया।`,
     officerRemark: '',
     officerName: 'Citizen System'
   });
