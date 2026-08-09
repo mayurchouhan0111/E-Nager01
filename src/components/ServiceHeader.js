@@ -310,18 +310,6 @@ export default function ServiceHeader() {
                 <Building2 className={`w-3.5 h-3.5 shrink-0 ${isCurrentTab('/no-dues-certificate') ? 'text-amber-300' : 'text-amber-600'}`} />
                 <span>नो ड्यूज NOC</span>
               </Link>
-              <Link href="/privacy-policy" className={`px-2.5 py-1.5 rounded-xl text-xs font-bold transition-all duration-200 flex items-center gap-1.5 whitespace-nowrap icon-hover-bounce ${isCurrentTab('/privacy-policy') ? 'bg-slate-800 text-white shadow-sm' : 'text-slate-600 hover:text-slate-900 hover:bg-white/80'}`}>
-                <ShieldCheck className={`w-3.5 h-3.5 shrink-0 ${isCurrentTab('/privacy-policy') ? 'text-emerald-400' : 'text-slate-500'}`} />
-                <span>DPDP प्राइवेसी</span>
-              </Link>
-              <Link href="/presentation" className={`px-2.5 py-1.5 rounded-xl text-xs font-bold transition-all duration-200 flex items-center gap-1.5 whitespace-nowrap icon-hover-bounce ${isCurrentTab('/presentation') ? 'bg-purple-700 text-white shadow-sm' : 'text-slate-600 hover:text-slate-900 hover:bg-white/80'}`}>
-                <Presentation className={`w-3.5 h-3.5 shrink-0 ${isCurrentTab('/presentation') ? 'text-purple-300' : 'text-purple-600'}`} />
-                <span>SOP प्रेजेंटेशन</span>
-              </Link>
-              <Link href="/grievance" className={`px-2.5 py-1.5 rounded-xl text-xs font-bold transition-all duration-200 flex items-center gap-1.5 whitespace-nowrap icon-hover-bounce ${isCurrentTab('/grievance') ? 'bg-slate-800 text-white shadow-sm' : 'text-slate-600 hover:text-slate-900 hover:bg-white/80'}`}>
-                <Building2 className={`w-3.5 h-3.5 shrink-0 ${isCurrentTab('/grievance') ? 'text-amber-400' : 'text-slate-500'}`} />
-                <span>शिकायत</span>
-              </Link>
             </nav>
 
             <div className="flex items-center gap-2">

@@ -1,6 +1,7 @@
 import { Toaster } from 'react-hot-toast'
 import './globals.css'
 import AuthProvider from '@/components/AuthProvider'
+import Footer from '@/components/Footer'
 
 const baseUrl = 'https://jhabua-nagarpalika-aapke-dwar.netlify.app'
 
@@ -147,6 +148,7 @@ export default function RootLayout({ children }) {
             }} 
           />
           {children}
+          <Footer />
         </AuthProvider>
       </body>
     </html>
