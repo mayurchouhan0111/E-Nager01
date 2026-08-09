@@ -1,9 +1,5 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
-  swcMinify: true,
   compress: true,
   images: {
     formats: ['image/avif', 'image/webp'],
@@ -40,15 +36,6 @@ const nextConfig = {
           {
             key: 'X-XSS-Protection',
             value: '1; mode=block',
-          },
-        ],
-      },
-      {
-        source: '/_next/static/:path*',
-        headers: [
-          {
-            key: 'Cache-Control',
-            value: 'public, max-age=31536000, immutable',
           },
         ],
       },

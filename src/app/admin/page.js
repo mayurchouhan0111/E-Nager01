@@ -1438,6 +1438,8 @@ function ApplicationDetailModal({ record, serviceType, onClose, onOpenRemark, on
               </div>
             </div>
           </div>
+        )}
+
         {/* Footer Actions */}
         <div className="border-t border-slate-100 pt-4 mt-2 shrink-0 flex flex-wrap items-center justify-between gap-2">
           <button
