@@ -1158,6 +1158,8 @@ export default function AdminPage() {
 }
 
 function ApplicationDetailModal({ record, serviceType, onClose, onOpenRemark, onOpenLetter }) {
+  const [previewDoc, setPreviewDoc] = useState(null);
+
   if (!record) return null
 
   const isDeath = serviceType === 'death'
@@ -1171,7 +1173,63 @@ function ApplicationDetailModal({ record, serviceType, onClose, onOpenRemark, on
   const mother = record.motherDetails || {}
   const father = record.fatherDetails || {}
   const property = record.propertyDetails || {}
-  const docs = record.uploadedDocs || record.documents || []
+
+  // Official document key title mapping
+  const docTitleMap = {
+    hospitalSlip: '1. प्रसूति / अस्पताल पर्ची (Hospital Birth Slip)',
+    motherAadhaar: '2. माता का आधार कार्ड (Mother Aadhaar)',
+    fatherAadhaar: '3. पिता का आधार कार्ड (Father Aadhaar)',
+    samagraId: '4. समग्र आईडी (Samagra ID)',
+    anganwadiLetter: '5. आंगनवाड़ी / एएनएम रिपोर्ट (Anganwadi / ANM Report)',
+    mcpCard: '6. मातृ एवं शिशु सुरक्षा कार्ड (MCP Card)',
+    addressProof: '7. निवास प्रमाण पत्र (Address Proof)',
+    deceasedAadhaar: '1. मृतक का आधार कार्ड (Deceased Aadhaar)',
+    applicantAadhaar: '2. आवेदक का आधार कार्ड (Informant Aadhaar)',
+    cremationReceipt: '3. श्मशान / कब्रिस्तान रसीद (Cremation / Burial Receipt)',
+    panchnamaLetter: '4. पंचनामा / पुलिस मर्ग रिपोर्ट (Panchnama / Police Report)',
+    hospitalDeathSlip: '5. अस्पताल मृत्यु पर्ची (Hospital Death Slip)',
+    idProofDoc: '1. आईडी प्रूफ एवं संपत्ति / शपथ पत्र (ID & Property / Affidavit)',
+    sitePlanDoc: '2. साइट प्लान नक्शा (Site Plan Map)',
+    connectionChargesReceipt: '3. नल कनेक्शन शुल्क रसीद (Connection Fee Receipt)',
+    roadCuttingReceipt: '4. सड़क खुदाई शुल्क रसीद (Road Cutting Fee Receipt)'
+  };
+
+  const getNormalizedDocs = () => {
+    const rawDocs = record.documents || record.uploadedDocs;
+    if (!rawDocs) return [];
+
+    if (typeof rawDocs === 'object' && !Array.isArray(rawDocs)) {
+      return Object.entries(rawDocs)
+        .filter(([_, val]) => val && typeof val === 'object' && (val.fileData || val.fileUrl || val.url))
+        .map(([key, val]) => ({
+          key,
+          title: val.title || docTitleMap[key] || val.fileName || key,
+          fileName: val.fileName || `${key}.jpg`,
+          fileType: val.fileType || (val.fileData?.includes('image') ? 'image/jpeg' : 'application/pdf'),
+          fileSize: val.fileSize || '',
+          fileData: val.fileData || val.fileUrl || val.url,
+          uploadedAt: val.uploadedAt
+        }));
+    }
+
+    if (Array.isArray(rawDocs)) {
+      return rawDocs
+        .filter(val => val && typeof val === 'object' && (val.fileData || val.fileUrl || val.url))
+        .map((val, idx) => ({
+          key: val.key || `doc_${idx}`,
+          title: val.title || docTitleMap[val.key] || val.fileName || val.name || `संलग्न दस्तावेज #${idx + 1}`,
+          fileName: val.fileName || val.name || `Document_${idx + 1}`,
+          fileType: val.fileType || val.type || 'image/jpeg',
+          fileSize: val.fileSize || val.size || '',
+          fileData: val.fileData || val.fileUrl || val.url,
+          uploadedAt: val.uploadedAt
+        }));
+    }
+
+    return [];
+  };
+
+  const docEntries = getNormalizedDocs();
 
   return (
     <div className="fixed inset-0 bg-slate-900/75 backdrop-blur-md z-50 overflow-y-auto p-3 sm:p-6 flex items-start justify-center pt-4 sm:pt-8">
@@ -1224,9 +1282,9 @@ function ApplicationDetailModal({ record, serviceType, onClose, onOpenRemark, on
                 {isBirth && (
                   <>
                     <p><span className="text-slate-500">शिशु नाम:</span> {child.fullName || 'अनाम'}</p>
-                    <p><span className="text-slate-500">लिंग / वजन:</span> {child.gender} | {child.weight ? `${child.weight} kg` : '—'}</p>
+                    <p><span className="text-slate-500">लिंग / वजन:</span> {child.gender} | {child.birthWeight ? `${child.birthWeight} kg` : '—'}</p>
                     <p><span className="text-slate-500">जन्म तिथि:</span> {child.dateOfBirth}</p>
-                    <p><span className="text-slate-500">जन्म स्थान:</span> {child.placeOfBirth}</p>
+                    <p><span className="text-slate-500">जन्म स्थान:</span> {child.placeOfBirth || child.hospitalName || child.homeAddress || '—'}</p>
                     <p><span className="text-slate-500">माता नाम:</span> {mother.fullName}</p>
                     <p><span className="text-slate-500">पिता नाम:</span> {father.fullName}</p>
                   </>
@@ -1235,9 +1293,9 @@ function ApplicationDetailModal({ record, serviceType, onClose, onOpenRemark, on
                   <>
                     <p><span className="text-slate-500">मकान क्र.:</span> {property.houseNo || '—'}</p>
                     <p><span className="text-slate-500">वार्ड क्र.:</span> Ward #{applicant.wardNo || '—'}</p>
-                    <p><span className="text-slate-500">कनेक्शन प्रकार:</span> {property.connectionType || 'घरेलू'}</p>
-                    <p><span className="text-slate-500">पाइप साइज:</span> {property.pipeSize || '0.5 inch'}</p>
-                    <p><span className="text-slate-500">BPL कार्ड:</span> {property.bplCardNo || '—'}</p>
+                    <p><span className="text-slate-500">कनेक्शन प्रकार:</span> {property.connectionSize || '1/2 इंच'} | {property.usagePurpose}</p>
+                    <p><span className="text-slate-500">भवन स्वामी:</span> {property.houseOwnerName || applicant.fullName}</p>
+                    <p><span className="text-slate-500">लाइसेंस प्लम्बर:</span> {record.plumberDetails?.plumberName || '—'}</p>
                   </>
                 )}
               </div>
@@ -1247,35 +1305,74 @@ function ApplicationDetailModal({ record, serviceType, onClose, onOpenRemark, on
               <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wider border-b border-slate-200 pb-1">आवेदक / संपर्क विवरण</h4>
               <div className="text-xs text-slate-800 space-y-1.5 font-medium">
                 <p><span className="text-slate-500">आवेदक नाम:</span> {applicant.fullName || '—'}</p>
-                <p><span className="text-slate-500">संबंध:</span> {applicant.relationWithDeceased || applicant.relationWithChild || 'आवेदक'}</p>
+                <p><span className="text-slate-500">संबंध:</span> {applicant.relationWithDeceased || applicant.relationWithChild || (applicant.isTenant ? 'किराएदार' : 'मकान मालिक')}</p>
                 <p><span className="text-slate-500">मोबाइल:</span> <a href={`tel:${applicant.mobile}`} className="font-mono font-bold text-emerald-700 underline">{applicant.mobile || '—'}</a></p>
                 <p><span className="text-slate-500">ईमेल:</span> {applicant.email || '—'}</p>
-                <p><span className="text-slate-500">आधार:</span> {applicant.aadhaar || '—'}</p>
+                <p><span className="text-slate-500">आधार:</span> {applicant.aadhaarNo || applicant.aadhaar || '—'}</p>
+                <p><span className="text-slate-500">पता:</span> {applicant.address || applicant.villageCity || 'झाबुआ (म.प्र.)'}</p>
               </div>
             </div>
           </div>
 
-          <div className="bg-white border border-slate-200 rounded-2xl p-4 space-y-3">
-            <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wider border-b border-slate-100 pb-2">
-              📎 संलग्न दस्तावेज एवं फाइलें
+          <div className="bg-white border border-slate-200 rounded-2xl p-4 space-y-3 shadow-xs">
+            <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider border-b border-slate-100 pb-2 flex items-center justify-between">
+              <span>📎 आवेदक द्वारा अपलोड संलग्न फोटो व दस्तावेज ({docEntries.length})</span>
+              <span className="text-[10px] text-emerald-800 font-semibold bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                अधिकारी सत्यापन केंद्र (Inspector Verification)
+              </span>
             </h4>
-            {docs && docs.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                {docs.map((doc, idx) => (
-                  <div key={idx} className="flex items-center justify-between bg-slate-50 p-2.5 rounded-xl border border-slate-200 text-xs">
-                    <span className="font-medium text-slate-800 truncate max-w-[200px]">{doc.title || doc.name || `Document #${idx + 1}`}</span>
-                    {doc.url || doc.dataUrl ? (
-                      <a href={doc.url || doc.dataUrl} target="_blank" rel="noopener noreferrer" className="btn btn-secondary btn-sm text-[10px] font-bold text-emerald-800">
-                        📄 पूर्वावलोकन
+            {docEntries.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {docEntries.map((doc, idx) => (
+                  <div key={idx} className="flex items-center justify-between bg-slate-50 hover:bg-emerald-50/40 p-3 rounded-2xl border border-slate-200 transition-all">
+                    <div className="flex items-center gap-3 overflow-hidden">
+                      {doc.fileType?.includes('image') || (doc.fileData && doc.fileData.startsWith('data:image')) ? (
+                        <div 
+                          onClick={() => setPreviewDoc(doc)}
+                          className="w-12 h-12 rounded-xl bg-slate-200 border border-slate-300 overflow-hidden cursor-pointer shrink-0 relative group"
+                        >
+                          <img src={doc.fileData} alt={doc.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform" />
+                          <div className="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                            <Eye className="w-4 h-4 text-white" />
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="w-12 h-12 rounded-xl bg-blue-100 text-blue-800 flex items-center justify-center shrink-0 border border-blue-200 font-bold text-xs">
+                          📄 PDF
+                        </div>
+                      )}
+
+                      <div className="min-w-0">
+                        <p className="text-xs font-bold text-slate-900 truncate">{doc.title}</p>
+                        <p className="text-[10px] text-slate-500 truncate mt-0.5">{doc.fileName} {doc.fileSize ? `(${doc.fileSize})` : ''}</p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-1 shrink-0 ml-2">
+                      <button
+                        type="button"
+                        onClick={() => setPreviewDoc(doc)}
+                        className="btn btn-secondary btn-sm text-[11px] font-bold text-emerald-800 bg-white hover:bg-emerald-100 px-2.5 py-1.5 flex items-center gap-1 border border-slate-200 shadow-xs"
+                      >
+                        <Eye className="w-3.5 h-3.5 text-emerald-700" /> देखें
+                      </button>
+                      <a
+                        href={doc.fileData}
+                        download={doc.fileName || 'document.jpg'}
+                        className="p-1.5 text-slate-500 hover:text-slate-800 hover:bg-slate-200 rounded-lg transition"
+                        title="डाउनलोड करें"
+                      >
+                        <Download className="w-4 h-4" />
                       </a>
-                    ) : (
-                      <span className="text-slate-400 text-[10px]">संलग्न</span>
-                    )}
+                    </div>
                   </div>
                 ))}
               </div>
             ) : (
-              <p className="text-xs text-slate-500 italic">मानक दस्तावेज संलग्न हैं (आधार कार्ड, मुक्तिधाम रसीद/साइट प्लान, आदि)</p>
+              <div className="p-4 bg-amber-50 border border-amber-200 rounded-xl text-center space-y-1">
+                <p className="text-xs font-bold text-amber-900">⚠️ कोई इलेक्ट्रॉनिक दस्तावेज संलग्न नहीं है</p>
+                <p className="text-[11px] text-amber-800">आवेदक ने केवल फॉर्म ऑनलाइन दर्ज किया है। भौतिक पावती पत्र (Hard Copy Application) प्राप्त कर कार्यालय में मूल दस्तावेजों का सत्यापन करें।</p>
+              </div>
             )}
           </div>
 
@@ -1287,6 +1384,58 @@ function ApplicationDetailModal({ record, serviceType, onClose, onOpenRemark, on
           </div>
         </div>
 
+        {/* HIGH-RES DOCUMENT & PHOTO PREVIEW MODAL FOR OFFICERS */}
+        {previewDoc && (
+          <div className="fixed inset-0 bg-slate-900/85 backdrop-blur-md z-[100] flex items-center justify-center p-3 sm:p-6 animate-fade-in">
+            <div className="bg-white border border-slate-200 rounded-3xl max-w-3xl w-full p-4 sm:p-6 shadow-2xl flex flex-col max-h-[90vh]">
+              <div className="flex items-center justify-between border-b border-slate-100 pb-3 shrink-0">
+                <div>
+                  <h3 className="text-sm sm:text-base font-extrabold text-slate-900">{previewDoc.title}</h3>
+                  <p className="text-[11px] text-slate-500 font-mono">{previewDoc.fileName}</p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <a
+                    href={previewDoc.fileData}
+                    download={previewDoc.fileName || 'document.jpg'}
+                    className="btn btn-secondary btn-sm text-xs font-bold flex items-center gap-1"
+                  >
+                    <Download className="w-4 h-4" /> डाउनलोड
+                  </a>
+                  <button
+                    onClick={() => setPreviewDoc(null)}
+                    className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+              </div>
+
+              <div className="overflow-y-auto flex-1 p-3 bg-slate-100 rounded-2xl my-3 flex items-center justify-center min-h-[300px]">
+                {previewDoc.fileType?.includes('image') || (previewDoc.fileData && previewDoc.fileData.startsWith('data:image')) ? (
+                  <img
+                    src={previewDoc.fileData}
+                    alt={previewDoc.title}
+                    className="max-h-[65vh] w-auto object-contain rounded-xl shadow-md"
+                  />
+                ) : (
+                  <iframe
+                    src={previewDoc.fileData}
+                    title={previewDoc.title}
+                    className="w-full h-[65vh] rounded-xl border-0"
+                  />
+                )}
+              </div>
+
+              <div className="flex justify-end pt-1 shrink-0">
+                <button
+                  onClick={() => setPreviewDoc(null)}
+                  className="btn btn-secondary text-xs font-bold"
+                >
+                  बंद करें (Close)
+                </button>
+              </div>
+            </div>
+          </div>
         {/* Footer Actions */}
         <div className="border-t border-slate-100 pt-4 mt-2 shrink-0 flex flex-wrap items-center justify-between gap-2">
           <button
