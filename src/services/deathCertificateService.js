@@ -222,18 +222,32 @@ export async function submitDeathCertificate(data, existingId = null) {
 }
 
 export async function getDeathCertificates() {
+  const localItems = getLocalDeathCertificates();
   try {
     const snap = await getDocs(collection(db, COLLECTION_NAME));
-    const items = snap.docs.map(d => ({
+    const remoteItems = snap.docs.map(d => ({
       id: d.id,
       ...d.data()
     }));
+
+    const mergedMap = new Map();
+    remoteItems.forEach(item => mergedMap.set(item.id, item));
+    localItems.forEach(item => {
+      const existingRemote = mergedMap.get(item.id);
+      if (existingRemote) {
+        mergedMap.set(item.id, { ...existingRemote, ...item });
+      } else {
+        mergedMap.set(item.id, item);
+      }
+    });
+
+    const items = Array.from(mergedMap.values());
     items.sort((a, b) => new Date(b.appliedAt || b.updatedAt || 0) - new Date(a.appliedAt || a.updatedAt || 0));
     saveLocalDeathCertificates(items);
     return items;
   } catch (error) {
     console.warn('[DeathCertificateService] Firestore read fallback to local storage:', error.message);
-    return getLocalDeathCertificates();
+    return localItems;
   }
 }
 

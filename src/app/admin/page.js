@@ -273,6 +273,19 @@ export default function AdminPage() {
       setSelectedBirthDetail(prev => updateLocalDetail(prev))
       setSelectedWaterDetail(prev => updateLocalDetail(prev))
 
+      // Direct React State Update for instant top stats counter & list card updates
+      const updateRecordState = (list) => list.map(r => r.id === remarkModal.record.id ? { 
+        ...r, 
+        status: remarkModal.targetStatus,
+        lastOfficerRemark: remarkModal.remarkText.trim(),
+        lastOfficerName: officerName,
+        timeline: [...(r.timeline || []), updatedTimelineItem]
+      } : r)
+
+      setDeathRecords(prev => updateRecordState(prev))
+      setBirthRecords(prev => updateRecordState(prev))
+      setWaterRecords(prev => updateRecordState(prev))
+
       setRemarkModal({ isOpen: false, record: null, serviceType: 'death', targetStatus: '', remarkText: '', officerName: 'Nagar Palika Officer' })
       loadDeathRecords()
       loadBirthRecords()
