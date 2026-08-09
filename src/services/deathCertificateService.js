@@ -10,7 +10,7 @@ import {
   deleteDoc,
   serverTimestamp 
 } from 'firebase/firestore';
-import { sendNotification } from './notificationService';
+import { sendNotification, notifyDepartmentHeadOnNewSubmission } from './notificationService';
 import { getCurrentCitizen, createOrUpdateLocalCitizenProfile } from './citizenAuthService';
 
 const COLLECTION_NAME = 'deathCertificates';
@@ -256,6 +256,7 @@ export async function submitDeathCertificate(data, existingId = null) {
     serviceType: 'death_certificate',
     applicationId: docId,
     applicationNo,
+    userEmail: processedData.userEmail,
     recipientId: 'all',
     event: isResubmission ? 'APPLICATION_RESUBMITTED' : 'APPLICATION_SUBMITTED',
     status: 'Submitted',
@@ -265,6 +266,15 @@ export async function submitDeathCertificate(data, existingId = null) {
     officerRemark: '',
     officerName: 'Citizen System'
   });
+
+  notifyDepartmentHeadOnNewSubmission({
+    serviceType: 'death',
+    applicationNo,
+    applicantName: data.applicantDetails?.fullName || 'नागरिक',
+    applicantMobile: data.applicantDetails?.mobile || 'N/A',
+    applicantEmail: processedData.userEmail || 'N/A',
+    details: data
+  }).catch(e => console.warn('[Death] Officer notification dispatch error:', e));
 
   return { success: true, id: docId, applicationNo };
 }

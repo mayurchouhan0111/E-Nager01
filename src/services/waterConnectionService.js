@@ -10,7 +10,7 @@ import {
   deleteDoc,
   serverTimestamp 
 } from 'firebase/firestore';
-import { sendNotification } from './notificationService';
+import { sendNotification, notifyDepartmentHeadOnNewSubmission } from './notificationService';
 import { getCurrentCitizen, createOrUpdateLocalCitizenProfile } from './citizenAuthService';
 
 const COLLECTION_NAME = 'waterConnections';
@@ -266,6 +266,15 @@ export async function submitWaterConnection(data, existingId = null) {
     officerRemark: '',
     officerName: 'Citizen System'
   });
+
+  notifyDepartmentHeadOnNewSubmission({
+    serviceType: 'water_connection',
+    applicationNo,
+    applicantName: data.applicantDetails?.fullName || 'नागरिक',
+    applicantMobile: data.applicantDetails?.mobile || 'N/A',
+    applicantEmail: processedData.userEmail || 'N/A',
+    details: data
+  }).catch(e => console.warn('[Water] Officer notification dispatch error:', e));
 
   return { success: true, id: docId, applicationNo };
 }

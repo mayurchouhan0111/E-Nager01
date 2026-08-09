@@ -10,7 +10,7 @@ import {
   deleteDoc,
   serverTimestamp 
 } from 'firebase/firestore';
-import { sendNotification } from './notificationService';
+import { sendNotification, notifyDepartmentHeadOnNewSubmission } from './notificationService';
 import { getCurrentCitizen, createOrUpdateLocalCitizenProfile } from './citizenAuthService';
 
 const COLLECTION_NAME = 'birthCertificates';
@@ -266,6 +266,15 @@ export async function submitBirthCertificate(data, existingId = null) {
     officerRemark: '',
     officerName: 'Citizen System'
   });
+
+  notifyDepartmentHeadOnNewSubmission({
+    serviceType: 'birth',
+    applicationNo,
+    applicantName: data.applicantDetails?.fullName || data.childDetails?.fullName || 'नागरिक',
+    applicantMobile: data.applicantDetails?.mobile || 'N/A',
+    applicantEmail: processedData.userEmail || 'N/A',
+    details: data
+  }).catch(e => console.warn('[Birth] Officer notification dispatch error:', e));
 
   return { success: true, id: docId, applicationNo };
 }

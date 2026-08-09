@@ -10,7 +10,7 @@ import {
   deleteDoc,
   serverTimestamp 
 } from 'firebase/firestore';
-import { sendNotification } from './notificationService';
+import { sendNotification, notifyDepartmentHeadOnNewSubmission } from './notificationService';
 import { getCurrentCitizen, createOrUpdateLocalCitizenProfile } from './citizenAuthService';
 
 const COLLECTION_NAME = 'noDuesCertificates';
@@ -220,6 +220,15 @@ export async function submitNoDuesCertificate(data, existingId = null) {
       officerRemark: 'आवेदन समीक्षा हेतु लंबित है।'
     });
   } catch (e) {}
+
+  notifyDepartmentHeadOnNewSubmission({
+    serviceType: 'no_dues',
+    applicationNo: appNo,
+    applicantName: data.applicantDetails?.fullName || 'नागरिक',
+    applicantMobile: data.applicantDetails?.mobile || 'N/A',
+    applicantEmail: userEmail || 'N/A',
+    details: data
+  }).catch(e => console.warn('[NoDues] Officer notification dispatch error:', e));
 
   return { 
     success: true, 

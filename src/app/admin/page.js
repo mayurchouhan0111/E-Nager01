@@ -34,7 +34,7 @@ import { DEFAULT_ADMIN_ACCOUNTS, fetchAdminAccounts, updateAdminAccountCredentia
 import { subscribeToMaintenance, toggleMaintenanceMode } from '@/services/maintenanceService'
 import {
   ShieldAlert, Search, Trash2, Download, Edit, Printer, Eye, Activity, FileText, CheckCircle2,
-  AlertCircle, Calendar, UserCheck, History, Info, Lock, LogOut, RefreshCw, X, Settings2, Baby, Eye as EyeIcon, Droplet, Key, Save, Building2
+  AlertCircle, Calendar, UserCheck, History, Info, Lock, LogOut, RefreshCw, X, Settings2, Baby, Eye as EyeIcon, Droplet, Key, Save, Building2, Bell, Mail
 } from 'lucide-react'
 
 function formatTimestamp(ts) {
@@ -53,20 +53,20 @@ export default function AdminPage() {
 
   const [adminAccounts, setAdminAccounts] = useState(DEFAULT_ADMIN_ACCOUNTS)
   const [credEditState, setCredEditState] = useState({
-    admin: { password: '', name: '' },
-    water_admin: { password: '', name: '' },
-    nodues_admin: { password: '', name: '' },
-    super_admin: { password: '', name: '' }
+    admin: { password: '', name: '', email: '' },
+    water_admin: { password: '', name: '', email: '' },
+    nodues_admin: { password: '', name: '', email: '' },
+    super_admin: { password: '', name: '', email: '' }
   })
 
   const loadCloudAccounts = useCallback(async () => {
     const accs = await fetchAdminAccounts()
     setAdminAccounts(accs)
     setCredEditState({
-      admin: { password: accs.admin?.password || '', name: accs.admin?.name || '' },
-      water_admin: { password: accs.water_admin?.password || '', name: accs.water_admin?.name || '' },
-      nodues_admin: { password: accs.nodues_admin?.password || '', name: accs.nodues_admin?.name || '' },
-      super_admin: { password: accs.super_admin?.password || '', name: accs.super_admin?.name || '' }
+      admin: { password: accs.admin?.password || '', name: accs.admin?.name || '', email: accs.admin?.email || '' },
+      water_admin: { password: accs.water_admin?.password || '', name: accs.water_admin?.name || '', email: accs.water_admin?.email || '' },
+      nodues_admin: { password: accs.nodues_admin?.password || '', name: accs.nodues_admin?.name || '', email: accs.nodues_admin?.email || '' },
+      super_admin: { password: accs.super_admin?.password || '', name: accs.super_admin?.name || '', email: accs.super_admin?.email || '' }
     })
   }, [])
 
@@ -133,10 +133,20 @@ export default function AdminPage() {
   // Tab navigation
   const [activeTab, setActiveTab] = useState('death-certificates') // 'death-certificates' | 'birth-certificates' | 'water-connections' | 'no-dues-certificates' | 'audit'
 
-  // Audit Logs state
-  const [auditLogs, setAuditLogs] = useState([])
-  const [auditLoading, setAuditLoading] = useState(false)
-  const [auditSearch, setAuditSearch] = useState('')
+  // Officer Real-Time Notifications State
+  const [officerNotifications, setOfficerNotifications] = useState([])
+  const [showOfficerNotifs, setShowOfficerNotifs] = useState(false)
+
+  const loadOfficerNotifications = useCallback(async () => {
+    try {
+      const q = query(collection(db, 'notifications'), orderBy('timestamp', 'desc'), limit(50))
+      const snap = await getDocs(q)
+      const notifs = snap.docs.map(d => ({ id: d.id, ...d.data() }))
+      setOfficerNotifications(notifs)
+    } catch (e) {
+      console.warn('Failed to load officer notifications:', e)
+    }
+  }, [])
 
   // Remark Modal State
   const [remarkModal, setRemarkModal] = useState({
@@ -211,8 +221,9 @@ export default function AdminPage() {
       loadWaterRecords()
       loadNoDuesRecords()
       loadAuditLogs()
+      loadOfficerNotifications()
     }
-  }, [isAdmin, loadDeathRecords, loadBirthRecords, loadWaterRecords, loadNoDuesRecords, loadAuditLogs])
+  }, [isAdmin, loadDeathRecords, loadBirthRecords, loadWaterRecords, loadNoDuesRecords, loadAuditLogs, loadOfficerNotifications])
 
   async function handleLogin(e) {
     e.preventDefault()
@@ -241,8 +252,8 @@ export default function AdminPage() {
 
   async function handleUpdateCredentials(targetUsername) {
     const editData = credEditState[targetUsername]
-    if (!editData || (!editData.password && !editData.name)) {
-      toast.error('कृपया पासवर्ड या नाम दर्ज करें (Please enter password or name to update)')
+    if (!editData || (!editData.password && !editData.name && !editData.email)) {
+      toast.error('कृपया पासवर्ड, नाम या ईमेल दर्ज करें (Please enter details to update)')
       return
     }
 
@@ -251,6 +262,7 @@ export default function AdminPage() {
       targetUsername,
       newPassword: editData.password,
       newName: editData.name,
+      newEmail: editData.email,
       updatedBy: currentAdminUser
     })
 
@@ -551,6 +563,65 @@ export default function AdminPage() {
 
           {isAdmin && (
             <div className="flex items-center gap-2 shrink-0">
+              {/* Officer Notification Bell Dropdown */}
+              <div className="relative">
+                <button
+                  onClick={() => setShowOfficerNotifs(!showOfficerNotifs)}
+                  className="relative p-2 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 hover:bg-amber-100 transition shadow-sm flex items-center gap-1.5"
+                  title="नये फॉर्म सबमिशन नोटिफिकेशन"
+                >
+                  <Bell className="w-4 h-4 text-amber-700 animate-pulse" />
+                  <span className="text-[11px] font-bold hidden sm:inline">नोटिफिकेशन</span>
+                  {officerNotifications.length > 0 && (
+                    <span className="min-w-[18px] h-[18px] px-1 rounded-full bg-rose-600 text-white text-[10px] font-extrabold flex items-center justify-center">
+                      {officerNotifications.length}
+                    </span>
+                  )}
+                </button>
+
+                {showOfficerNotifs && (
+                  <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-white border border-slate-200 rounded-2xl shadow-2xl z-[100] overflow-hidden animate-scale-in">
+                    <div className="px-4 py-3 bg-amber-50/80 border-b border-amber-100 flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Bell className="w-4 h-4 text-amber-700" />
+                        <h3 className="text-xs font-extrabold text-slate-900">नये आवेदक फॉर्म नोटिफिकेशन (New Forms Alert)</h3>
+                      </div>
+                      <button onClick={() => setShowOfficerNotifs(false)} className="p-1 text-slate-400 hover:text-slate-700">
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+
+                    <div className="max-h-80 overflow-y-auto divide-y divide-slate-100">
+                      {officerNotifications.length === 0 ? (
+                        <div className="p-6 text-center text-xs text-slate-500 font-medium">कोई नया फॉर्म सबमिशन नोटिफिकेशन नहीं है</div>
+                      ) : (
+                        officerNotifications.map(n => (
+                          <div key={n.id} className="p-3.5 hover:bg-slate-50 transition-colors space-y-1">
+                            <div className="flex items-center justify-between text-[11px] font-bold">
+                              <span className="text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded font-mono">
+                                {n.applicationNo || 'Form'}
+                              </span>
+                              <span className="text-slate-400 font-mono text-[10px]">
+                                {formatTimestamp(n.timestamp || n.createdAt)}
+                              </span>
+                            </div>
+                            <p className="text-xs font-semibold text-slate-800 leading-snug">
+                              {n.message}
+                            </p>
+                            {n.applicantName && (
+                              <div className="text-[10px] text-slate-500 font-medium flex items-center gap-2 pt-0.5 flex-wrap">
+                                <span>👤 आवेदक: <strong>{n.applicantName}</strong></span>
+                                <span>📞 फोन: <strong>{n.applicantMobile}</strong></span>
+                              </div>
+                            )}
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+
               <button 
                 onClick={handlePurgeAnonymousData}
                 className="btn btn-secondary btn-sm flex items-center gap-1 text-rose-700 bg-rose-50 border-rose-200 hover:bg-rose-100 font-bold text-xs"
@@ -1350,6 +1421,16 @@ export default function AdminPage() {
                       />
                     </div>
                     <div>
+                      <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">विभागाध्यक्ष ईमेल (Official Email)</label>
+                      <input
+                        type="email"
+                        value={credEditState.admin?.email || ''}
+                        onChange={(e) => setCredEditState(prev => ({ ...prev, admin: { ...prev.admin, email: e.target.value } }))}
+                        className="w-full border border-slate-300 rounded-xl px-3 py-2 text-xs font-mono focus:outline-none focus:border-emerald-600 bg-white"
+                        placeholder="birthdeath.jhabua@mp.gov.in"
+                      />
+                    </div>
+                    <div>
                       <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">सुरक्षा पासवर्ड (Password)</label>
                       <input
                         type="text"
@@ -1386,6 +1467,16 @@ export default function AdminPage() {
                         value={credEditState.water_admin?.name || ''}
                         onChange={(e) => setCredEditState(prev => ({ ...prev, water_admin: { ...prev.water_admin, name: e.target.value } }))}
                         className="w-full border border-slate-300 rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:border-emerald-600 bg-white"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">विभागाध्यक्ष ईमेल (Official Email)</label>
+                      <input
+                        type="email"
+                        value={credEditState.water_admin?.email || ''}
+                        onChange={(e) => setCredEditState(prev => ({ ...prev, water_admin: { ...prev.water_admin, email: e.target.value } }))}
+                        className="w-full border border-slate-300 rounded-xl px-3 py-2 text-xs font-mono focus:outline-none focus:border-emerald-600 bg-white"
+                        placeholder="water.jhabua@mp.gov.in"
                       />
                     </div>
                     <div>
@@ -1428,6 +1519,16 @@ export default function AdminPage() {
                       />
                     </div>
                     <div>
+                      <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">विभागाध्यक्ष ईमेल (Official Email)</label>
+                      <input
+                        type="email"
+                        value={credEditState.nodues_admin?.email || ''}
+                        onChange={(e) => setCredEditState(prev => ({ ...prev, nodues_admin: { ...prev.nodues_admin, email: e.target.value } }))}
+                        className="w-full border border-slate-300 rounded-xl px-3 py-2 text-xs font-mono focus:outline-none focus:border-emerald-600 bg-white"
+                        placeholder="revenue.jhabua@mp.gov.in"
+                      />
+                    </div>
+                    <div>
                       <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">सुरक्षा पासवर्ड (Password)</label>
                       <input
                         type="text"
@@ -1446,10 +1547,10 @@ export default function AdminPage() {
                   </div>
                 </div>
 
-                {/* 3. Chief Municipal Officer (Super Admin) */}
+                {/* 4. Chief Municipal Officer (Super Admin) */}
                 <div className="bg-purple-50/60 border border-purple-200 rounded-2xl p-5 space-y-4 relative">
                   <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-lg bg-purple-700 text-white flex items-center justify-center font-bold text-xs">3</div>
+                    <div className="w-8 h-8 rounded-lg bg-purple-700 text-white flex items-center justify-center font-bold text-xs">4</div>
                     <div>
                       <h4 className="font-extrabold text-slate-900 text-sm">मुख्य अधिकारी (Super Admin)</h4>
                       <p className="text-[10px] text-purple-700 font-mono font-bold">यूजर: super_admin</p>
@@ -1464,6 +1565,16 @@ export default function AdminPage() {
                         value={credEditState.super_admin?.name || ''}
                         onChange={(e) => setCredEditState(prev => ({ ...prev, super_admin: { ...prev.super_admin, name: e.target.value } }))}
                         className="w-full border border-slate-300 rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:border-purple-600 bg-white"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">विभागाध्यक्ष ईमेल (Official Email)</label>
+                      <input
+                        type="email"
+                        value={credEditState.super_admin?.email || ''}
+                        onChange={(e) => setCredEditState(prev => ({ ...prev, super_admin: { ...prev.super_admin, email: e.target.value } }))}
+                        className="w-full border border-slate-300 rounded-xl px-3 py-2 text-xs font-mono focus:outline-none focus:border-purple-600 bg-white"
+                        placeholder="cmo.jhabua@mp.gov.in"
                       />
                     </div>
                     <div>

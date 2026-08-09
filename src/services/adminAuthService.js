@@ -6,6 +6,7 @@ export const DEFAULT_ADMIN_ACCOUNTS = {
     password: 'jhabua@2024',
     role: 'birth_death_admin',
     name: 'जन्म-मृत्यु रजिस्ट्रार अधिकारी (Birth & Death Registrar)',
+    email: 'birthdeath.jhabua@mp.gov.in',
     defaultTab: 'death-certificates',
     allowedTabs: ['death-certificates', 'birth-certificates']
   },
@@ -13,6 +14,7 @@ export const DEFAULT_ADMIN_ACCOUNTS = {
     password: 'water@jhabua2024',
     role: 'water_admin',
     name: 'जल प्रदाय विभाग अधिकारी (Water Supply Officer)',
+    email: 'water.jhabua@mp.gov.in',
     defaultTab: 'water-connections',
     allowedTabs: ['water-connections']
   },
@@ -20,6 +22,7 @@ export const DEFAULT_ADMIN_ACCOUNTS = {
     password: 'nodues@jhabua2024',
     role: 'nodues_admin',
     name: 'संपत्ति कर व नो ड्यूज अधिकारी (Revenue & No-Dues NOC Officer)',
+    email: 'revenue.jhabua@mp.gov.in',
     defaultTab: 'no-dues-certificates',
     allowedTabs: ['no-dues-certificates']
   },
@@ -27,6 +30,7 @@ export const DEFAULT_ADMIN_ACCOUNTS = {
     password: 'jhabua@super2024',
     role: 'super_admin',
     name: 'मुख्य नगर पालिका अधिकारी (Chief Municipal Officer - CMO)',
+    email: 'cmo.jhabua@mp.gov.in',
     defaultTab: 'death-certificates',
     allowedTabs: ['death-certificates', 'birth-certificates', 'water-connections', 'no-dues-certificates', 'audit', 'security-settings']
   }
@@ -67,7 +71,7 @@ export async function fetchAdminAccounts() {
   }
 }
 
-export async function updateAdminAccountCredential({ targetUsername, newPassword, newName, updatedBy }) {
+export async function updateAdminAccountCredential({ targetUsername, newPassword, newName, newEmail, updatedBy }) {
   try {
     const currentAccounts = await fetchAdminAccounts();
     if (!currentAccounts[targetUsername]) {
@@ -78,6 +82,7 @@ export async function updateAdminAccountCredential({ targetUsername, newPassword
       ...currentAccounts[targetUsername],
       ...(newPassword ? { password: newPassword } : {}),
       ...(newName ? { name: newName } : {}),
+      ...(newEmail ? { email: newEmail } : {}),
       updatedAt: new Date().toISOString(),
       updatedBy: updatedBy || 'super_admin'
     };
