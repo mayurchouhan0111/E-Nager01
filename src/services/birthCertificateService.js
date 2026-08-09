@@ -259,18 +259,17 @@ export async function updateBirthCertificateStatus({
     timestamp: now
   };
 
-  let existing = {};
-  const localList = getLocalBirthCertificates();
-  const localObj = localList.find(r => r.id === id);
-  if (localObj) existing = localObj;
+  const isLocalId = !id || String(id).startsWith('local-');
 
-  try {
-    const docRef = doc(db, COLLECTION_NAME, id);
-    const snap = await getDoc(docRef);
-    if (snap.exists()) {
-      existing = { ...existing, ...snap.data() };
-    }
-  } catch (e) {}
+  if (!isLocalId) {
+    try {
+      const docRef = doc(db, COLLECTION_NAME, id);
+      const snap = await getDoc(docRef);
+      if (snap && snap.exists()) {
+        existing = { ...existing, ...snap.data() };
+      }
+    } catch (e) {}
+  }
 
   const oldStatus = existing.status || 'Submitted';
   const updatedTimeline = [...(existing.timeline || []), timelineEntry];
@@ -289,11 +288,13 @@ export async function updateBirthCertificateStatus({
     updatePayload.certificateNo = certificateNo || existing.certificateNo || `BC-CERT-${Date.now().toString().slice(-6)}`;
   }
 
-  try {
-    const docRef = doc(db, COLLECTION_NAME, id);
-    await setDoc(docRef, updatePayload, { merge: true });
-  } catch (error) {
-    console.warn('[BirthCertificateService] Status update fallback to local storage:', error.message);
+  if (!isLocalId) {
+    try {
+      const docRef = doc(db, COLLECTION_NAME, id);
+      await setDoc(docRef, updatePayload, { merge: true });
+    } catch (error) {
+      console.warn('[BirthCertificateService] Status updated in local storage');
+    }
   }
 
   syncLocalRecord({ id, ...existing, ...updatePayload });

@@ -1,0 +1,21 @@
+{
+  "name": "ई-नगर पालिका झाबुआ | जन्म एवं मृत्यु प्रमाण पत्र पोर्टल",
+  "short_name": "ई-नगर झाबुआ",
+  "description": "नगर पालिका परिषद झाबुआ (मध्य प्रदेश) - जन्म, मृत्यु एवं जल कनेक्शन ऑनलाइन नागरिक सेवा पोर्टल",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#047857",
+  "theme_color": "#047857",
+  "icons": [
+    {
+      "src": "/mp-logo.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/mp-logo.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
