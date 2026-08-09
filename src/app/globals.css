@@ -351,13 +351,7 @@ html, body {
 @media print {
   @page {
     size: A4 portrait;
-    margin: 10mm 12mm 12mm 12mm;
-    @bottom-right {
-      content: "नगर पालिका परिषद झाबुआ (म.प्र.) | शासकीय अभिलेख";
-      font-size: 8pt;
-      font-family: sans-serif;
-      color: #64748b;
-    }
+    margin: 8mm 10mm;
   }
 
   html, body {
@@ -373,25 +367,29 @@ html, body {
     print-color-adjust: exact !important;
   }
 
-  /* Hide header, navigation, form containers, timelines, footers, admin dashboards, and all non-print background elements */
+  /* Hide non-printable web UI components only */
   .no-print, 
   header, 
   nav, 
   button, 
   .btn, 
   footer, 
-  form, 
-  main,
-  div.min-h-screen > *:not(.fixed),
-  body > div > *:not(.fixed),
-  .fixed > div > div.border-b {
+  form,
+  .border-b.shrink-0 {
     display: none !important;
   }
 
-  /* Expand fixed overlays and modals to fit natural document height without surrounding UI */
+  /* When a printable modal (.fixed) is active, hide the background dashboard content */
+  body:has(.fixed) main > *:not(.fixed),
+  body:has(.fixed) .max-w-7xl,
+  body:has(.fixed) .no-print-when-modal {
+    display: none !important;
+  }
+
+  /* Expand modal viewport container to natural A4 paper flow */
   .fixed {
     position: static !important;
-    background: transparent !important;
+    background: white !important;
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
     padding: 0 !important;
@@ -403,6 +401,17 @@ html, body {
     height: auto !important;
     width: 100% !important;
     display: block !important;
+  }
+
+  .fixed > div {
+    max-height: none !important;
+    height: auto !important;
+    box-shadow: none !important;
+    border: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    background: white !important;
+    overflow: visible !important;
   }
 
   .max-h-\[80vh\],
@@ -424,15 +433,17 @@ html, body {
   /* Minimum Required Pages Layout for all print templates */
   .print-page-a4,
   .print-container {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
     page-break-inside: auto !important;
     max-height: none !important;
     height: auto !important;
     overflow: visible !important;
-    padding: 8mm 10mm !important;
+    padding: 6mm 8mm !important;
     margin: 0 auto !important;
-    border: 3px double #0f172a !important;
-    box-shadow: none !important;
-    position: relative !important;
+    border: 2px solid #0f172a !important;
+    background: white !important;
   }
 
   /* Repeating Table Headers & Footers across multiple pages */
@@ -445,7 +456,7 @@ html, body {
   }
 
   /* Prevent awkward mid-section cuts and keep sections intact on pages */
-  tr, td, th, .print-break-avoid, blockquote, .border-t, .space-y-4 > div {
+  tr, td, th, .print-break-avoid, blockquote, .border-t {
     page-break-inside: avoid !important;
     break-inside: avoid !important;
   }

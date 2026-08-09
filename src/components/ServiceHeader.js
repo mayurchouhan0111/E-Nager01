@@ -146,30 +146,30 @@ export default function ServiceHeader() {
               </div>
             </Link>
 
-            <nav className="hidden lg:flex items-center gap-1 bg-slate-100/80 p-1 rounded-2xl border border-slate-200/60 shadow-inner">
-              <Link href="/death-certificate" className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all duration-200 flex items-center gap-1.5 icon-hover-bounce ${isCurrentTab('/death-certificate') ? 'bg-emerald-700 text-white shadow-md' : 'text-slate-600 hover:text-slate-900'}`}>
-                <FileText className={`w-3.5 h-3.5 ${isCurrentTab('/death-certificate') ? 'text-emerald-300' : 'text-emerald-600'}`} />
-                <span>मृतक प्रमाण पत्र</span>
+            <nav className="hidden lg:flex items-center gap-1 bg-slate-100/90 p-1.5 rounded-2xl border border-slate-200/80 shadow-sm">
+              <Link href="/death-certificate" className={`px-2.5 py-1.5 rounded-xl text-xs font-bold transition-all duration-200 flex items-center gap-1.5 whitespace-nowrap icon-hover-bounce ${isCurrentTab('/death-certificate') ? 'bg-emerald-700 text-white shadow-sm' : 'text-slate-600 hover:text-slate-900 hover:bg-white/80'}`}>
+                <FileText className={`w-3.5 h-3.5 shrink-0 ${isCurrentTab('/death-certificate') ? 'text-emerald-300' : 'text-emerald-600'}`} />
+                <span>मृतक</span>
               </Link>
-              <Link href="/birth-certificate" className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all duration-200 flex items-center gap-1.5 icon-hover-bounce ${isCurrentTab('/birth-certificate') ? 'bg-emerald-700 text-white shadow-md' : 'text-slate-600 hover:text-slate-900'}`}>
-                <Baby className={`w-3.5 h-3.5 ${isCurrentTab('/birth-certificate') ? 'text-blue-300' : 'text-blue-600'}`} />
-                <span>जन्म प्रमाण पत्र</span>
+              <Link href="/birth-certificate" className={`px-2.5 py-1.5 rounded-xl text-xs font-bold transition-all duration-200 flex items-center gap-1.5 whitespace-nowrap icon-hover-bounce ${isCurrentTab('/birth-certificate') ? 'bg-emerald-700 text-white shadow-sm' : 'text-slate-600 hover:text-slate-900 hover:bg-white/80'}`}>
+                <Baby className={`w-3.5 h-3.5 shrink-0 ${isCurrentTab('/birth-certificate') ? 'text-blue-300' : 'text-blue-600'}`} />
+                <span>जन्म</span>
               </Link>
-              <Link href="/water-connection" className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all duration-200 flex items-center gap-1.5 icon-hover-bounce ${isCurrentTab('/water-connection') ? 'bg-teal-700 text-white shadow-md' : 'text-slate-600 hover:text-slate-900'}`}>
-                <Droplets className={`w-3.5 h-3.5 ${isCurrentTab('/water-connection') ? 'text-cyan-300' : 'text-cyan-600'}`} />
+              <Link href="/water-connection" className={`px-2.5 py-1.5 rounded-xl text-xs font-bold transition-all duration-200 flex items-center gap-1.5 whitespace-nowrap icon-hover-bounce ${isCurrentTab('/water-connection') ? 'bg-teal-700 text-white shadow-sm' : 'text-slate-600 hover:text-slate-900 hover:bg-white/80'}`}>
+                <Droplets className={`w-3.5 h-3.5 shrink-0 ${isCurrentTab('/water-connection') ? 'text-cyan-300' : 'text-cyan-600'}`} />
                 <span>जल कनेक्शन</span>
               </Link>
-              <Link href="/privacy-policy" className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all duration-200 flex items-center gap-1.5 icon-hover-bounce ${isCurrentTab('/privacy-policy') ? 'bg-slate-800 text-white shadow-md' : 'text-slate-600 hover:text-slate-900'}`}>
-                <ShieldCheck className={`w-3.5 h-3.5 ${isCurrentTab('/privacy-policy') ? 'text-emerald-400' : 'text-slate-500'}`} />
+              <Link href="/privacy-policy" className={`px-2.5 py-1.5 rounded-xl text-xs font-bold transition-all duration-200 flex items-center gap-1.5 whitespace-nowrap icon-hover-bounce ${isCurrentTab('/privacy-policy') ? 'bg-slate-800 text-white shadow-sm' : 'text-slate-600 hover:text-slate-900 hover:bg-white/80'}`}>
+                <ShieldCheck className={`w-3.5 h-3.5 shrink-0 ${isCurrentTab('/privacy-policy') ? 'text-emerald-400' : 'text-slate-500'}`} />
                 <span>DPDP प्राइवेसी</span>
               </Link>
-              <Link href="/presentation" className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all duration-200 flex items-center gap-1.5 icon-hover-bounce ${isCurrentTab('/presentation') ? 'bg-purple-700 text-white shadow-md' : 'text-slate-600 hover:text-slate-900'}`}>
-                <Presentation className={`w-3.5 h-3.5 ${isCurrentTab('/presentation') ? 'text-purple-300' : 'text-purple-600'}`} />
+              <Link href="/presentation" className={`px-2.5 py-1.5 rounded-xl text-xs font-bold transition-all duration-200 flex items-center gap-1.5 whitespace-nowrap icon-hover-bounce ${isCurrentTab('/presentation') ? 'bg-purple-700 text-white shadow-sm' : 'text-slate-600 hover:text-slate-900 hover:bg-white/80'}`}>
+                <Presentation className={`w-3.5 h-3.5 shrink-0 ${isCurrentTab('/presentation') ? 'text-purple-300' : 'text-purple-600'}`} />
                 <span>SOP प्रेजेंटेशन</span>
               </Link>
-              <Link href="/grievance" className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all duration-200 flex items-center gap-1.5 icon-hover-bounce ${isCurrentTab('/grievance') ? 'bg-slate-800 text-white shadow-md' : 'text-slate-600 hover:text-slate-900'}`}>
-                <Building2 className={`w-3.5 h-3.5 ${isCurrentTab('/grievance') ? 'text-amber-400' : 'text-slate-500'}`} />
-                <span>शिकायत निवारण</span>
+              <Link href="/grievance" className={`px-2.5 py-1.5 rounded-xl text-xs font-bold transition-all duration-200 flex items-center gap-1.5 whitespace-nowrap icon-hover-bounce ${isCurrentTab('/grievance') ? 'bg-slate-800 text-white shadow-sm' : 'text-slate-600 hover:text-slate-900 hover:bg-white/80'}`}>
+                <Building2 className={`w-3.5 h-3.5 shrink-0 ${isCurrentTab('/grievance') ? 'text-amber-400' : 'text-slate-500'}`} />
+                <span>शिकायत</span>
               </Link>
             </nav>
 

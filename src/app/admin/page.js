@@ -412,7 +412,7 @@ export default function AdminPage() {
       </header>
 
       {/* Main Panel Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full flex flex-col space-y-6 no-print print:hidden">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full flex flex-col space-y-6">
 
         {/* Login Portal Screen */}
         {!isAdmin && (
