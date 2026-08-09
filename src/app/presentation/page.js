@@ -12,9 +12,9 @@ import {
 const SLIDES = [
   {
     id: 1,
-    title: 'झाबुआ नगर पालिका ई-सेवा पोर्टल — एसओपी प्रेज़ेंटेशन',
-    subtitle: 'मानक संचालन प्रक्रिया (SOP) एवं डिजिटल प्लेटफॉर्म वास्तुकला',
-    category: 'ओवरव्यू (OVERVIEW)',
+    title: 'Jhabua Nagar Palika e-Sewa Portal — SOP Presentation',
+    subtitle: 'Executive SOP & Digital Platform Architecture (Hinglish)',
+    category: 'OVERVIEW',
     badgeColor: 'bg-emerald-100 text-emerald-800 border-emerald-300',
     icon: Building2,
     content: (
@@ -22,13 +22,13 @@ const SLIDES = [
         <div className="bg-gradient-to-br from-emerald-900 to-slate-900 text-white rounded-3xl p-6 sm:p-8 shadow-xl relative overflow-hidden">
           <div className="relative z-10 space-y-3">
             <span className="bg-emerald-500/20 text-emerald-300 text-[11px] font-bold px-3.5 py-1 rounded-full border border-emerald-400/30 uppercase tracking-widest inline-block">
-              मध्य प्रदेश शासन — नगरीय विकास एवं आवास विभाग
+              Madhya Pradesh Govt — Urban Development & Housing Department
             </span>
             <h2 className="text-xl sm:text-3xl font-extrabold leading-tight">
-              कार्यालय नगर पालिका परिषद झाबुआ (म.प्र.)
+              Karyalay Nagar Palika Parishad Jhabua (M.P.)
             </h2>
             <p className="text-slate-300 text-xs sm:text-sm max-w-2xl leading-relaxed">
-              झाबुआ के नागरिकों के लिए जन्म प्रमाण पत्र, मृत्यु प्रमाण पत्र एवं जल कनेक्शन की 100% ऑनलाइन, पारदर्शी एवं तीव्र सेवाओं हेतु यह एकीकृत डिजिटल प्लेटफॉर्म तैयार किया गया है।
+              Jhabua nagarikon ke liye Birth Certificate, Death Certificate aur Water Connection ki 100% online, transparent aur fast services ke liye ye Integrated Digital Intelligence Platform taiyar kiya gaya hai.
             </p>
           </div>
           <div className="absolute -right-10 -bottom-10 opacity-10 pointer-events-none">
@@ -41,9 +41,9 @@ const SLIDES = [
             <div className="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-700 font-bold">
               <FileText className="w-5 h-5" />
             </div>
-            <h3 className="font-extrabold text-slate-900 text-sm">मृत्यु प्रमाण पत्र सेवा</h3>
+            <h3 className="font-extrabold text-slate-900 text-sm">Death Certificate Service</h3>
             <p className="text-xs text-slate-600 leading-relaxed">
-              गृह अथवा अस्पताल मृत्यु पंजीकरण, पंचनामा एवं मुक्तिधाम रसीद सत्यापन के साथ 7 कार्य दिवसों में प्रमाण पत्र जारी किया जाता है।
+              Home ya Hospital death registration, Panchnama aur Muktidham receipt verification ke sath 7 working days me Certificate issue kiya jata hai.
             </p>
           </div>
 
@@ -51,9 +51,9 @@ const SLIDES = [
             <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-700 font-bold">
               <Baby className="w-5 h-5" />
             </div>
-            <h3 className="font-extrabold text-slate-900 text-sm">जन्म प्रमाण पत्र सेवा</h3>
+            <h3 className="font-extrabold text-slate-900 text-sm">Birth Certificate Service</h3>
             <p className="text-xs text-slate-600 leading-relaxed">
-              नवजात शिशु पंजीकरण, आंगनवाड़ी/एएनएम रिपोर्ट एवं माता-पिता आधार सत्यापन के साथ 7 कार्य दिवसों में डिजिटल प्रमाण पत्र प्राप्त होता है।
+              Newborn baby registration, Anganwadi/ANM report aur Mother-Father Aadhaar verification ke sath 7 working days me Digital Certificate milta hai.
             </p>
           </div>
 
@@ -61,9 +61,9 @@ const SLIDES = [
             <div className="w-10 h-10 rounded-xl bg-teal-50 border border-teal-200 flex items-center justify-center text-teal-700 font-bold">
               <Droplets className="w-5 h-5" />
             </div>
-            <h3 className="font-extrabold text-slate-900 text-sm">जल कनेक्शन सेवा</h3>
+            <h3 className="font-extrabold text-slate-900 text-sm">Water Connection Service</h3>
             <p className="text-xs text-slate-600 leading-relaxed">
-              नया घरेलू/वाणिज्यिक नल कनेक्शन, संपत्ति कर रसीद एवं प्लंबर तकनीकी जांच के साथ 15 कार्य दिवसों में स्वीकृति पत्र प्रदान किया जाता है।
+              New Home/Commercial tap connection, Property Tax receipt aur Plumber technical verification ke sath 15 working days me Sanction Permit milta hai.
             </p>
           </div>
         </div>
@@ -72,40 +72,40 @@ const SLIDES = [
   },
   {
     id: 2,
-    title: 'मृत्यु प्रमाण पत्र — मानक संचालन प्रक्रिया (Death Certificate SOP)',
-    subtitle: 'जन्म एवं मृत्यु पंजीकरण अधिनियम 1969 एवं संशोधित नियम 2023',
+    title: 'Death Certificate — Standard Operating Procedure (SOP)',
+    subtitle: 'Registration of Births & Deaths Act 1969 & Amended Rules 2023',
     category: 'SOP — DEATH CERTIFICATE',
     badgeColor: 'bg-amber-100 text-amber-800 border-amber-300',
     icon: FileText,
     content: (
       <div className="space-y-6 font-sans">
         <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 text-xs text-amber-900 leading-relaxed">
-          <span className="font-bold block text-sm mb-1">🏛️ शासकीय नियम एवं समयावधि (SLA Rules):</span>
-          मृत्यु घटना के 21 दिनों के भीतर नि:शुल्क पंजीकरण किया जाता है। भौतिक पावती पत्र जमा करने की सीमा न्यूनतम 1 से अधिकतम 3 दिन है।
+          <span className="font-bold block text-sm mb-1">🏛️ Govt SLA Rules & Timelines:</span>
+          Death event ke 21 days ke andar free registration hota hai. Hard copy submission aur physical verification ki range minimum 1 day se maximum 3 days tak hai.
         </div>
 
         <div className="space-y-3">
-          <h3 className="font-bold text-slate-900 text-sm">चरणबद्ध आवेदन एवं सत्यापन प्रक्रिया (Step-by-Step SOP):</h3>
+          <h3 className="font-bold text-slate-900 text-sm">Step-by-Step SOP Workflow (Hinglish):</h3>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
             <div className="bg-white border border-slate-200 p-4 rounded-xl space-y-1">
-              <span className="font-bold text-emerald-800 block">चरण 1: ऑनलाइन आवेदन प्रविष्टि</span>
-              <p className="text-slate-600">गूगल साइन-इन के साथ मृतक विवरण, मृत्यु तिथि, स्थान एवं सांख्यिकी जानकारी दर्ज करें।</p>
+              <span className="font-bold text-emerald-800 block">Step 1: Online Application Submission</span>
+              <p className="text-slate-600">Google Sign-in karke deceased details, death date, place aur statistical information fill karein.</p>
             </div>
 
             <div className="bg-white border border-slate-200 p-4 rounded-xl space-y-1">
-              <span className="font-bold text-emerald-800 block">चरण 2: आवश्यक दस्तावेज अपलोड</span>
-              <p className="text-slate-600">मृतक आधार, आवेदक आधार, पंचनामा/अस्पताल डिस्चार्ज समरी एवं श्मशान/कब्रिस्तान रसीद संलग्न करें।</p>
+              <span className="font-bold text-emerald-800 block">Step 2: Document Upload</span>
+              <p className="text-slate-600">Deceased Aadhaar, Applicant Aadhaar, Panchnama/Hospital summary aur Shamshan receipt attach karein.</p>
             </div>
 
             <div className="bg-white border border-slate-200 p-4 rounded-xl space-y-1">
-              <span className="font-bold text-emerald-800 block">चरण 3: भौतिक प्रति जमा (1 से 3 दिन)</span>
-              <p className="text-slate-600">पोर्टल से पावती पत्र प्रिंट करके नगर पालिका झाबुआ कार्यालय में 1-3 दिनों के भीतर जमा करें।</p>
+              <span className="font-bold text-emerald-800 block">Step 3: Hard Copy Submission (1 to 3 Days)</span>
+              <p className="text-slate-600">Application Letter print karke Nagar Palika Jhabua office me 1-3 days ke andar submit karein.</p>
             </div>
 
             <div className="bg-white border border-slate-200 p-4 rounded-xl space-y-1">
-              <span className="font-bold text-emerald-800 block">चरण 4: अधिकारी जांच एवं प्रमाण पत्र निर्गमन</span>
-              <p className="text-slate-600">रजिस्ट्रार द्वारा ऑनलाइन स्वीकृति के उपरांत आधिकारिक प्रपत्र-6 हस्ताक्षरित प्रमाण पत्र पोर्टल पर अपलोड किया जाता है।</p>
+              <span className="font-bold text-emerald-800 block">Step 4: Officer Approval & Certificate Download</span>
+              <p className="text-slate-600">Registrar approve karke signed Form-6 Certificate upload karte hain jo portal se download ho jata hai.</p>
             </div>
           </div>
         </div>
@@ -114,40 +114,40 @@ const SLIDES = [
   },
   {
     id: 3,
-    title: 'जन्म प्रमाण पत्र — मानक संचालन प्रक्रिया (Birth Certificate SOP)',
-    subtitle: 'प्रपत्र-5 (Form-5) शासकीय प्रारूप एवं डिजिटल सत्यापन प्रक्रिया',
+    title: 'Birth Certificate — Standard Operating Procedure (SOP)',
+    subtitle: 'Form-5 Official Govt Format & Digital Verification',
     category: 'SOP — BIRTH CERTIFICATE',
     badgeColor: 'bg-blue-100 text-blue-800 border-blue-300',
     icon: Baby,
     content: (
       <div className="space-y-6 font-sans">
         <div className="bg-blue-50 border border-blue-200 rounded-2xl p-4 text-xs text-blue-900 leading-relaxed">
-          <span className="font-bold block text-sm mb-1">👶 शिशु पंजीकरण दिशा-निर्देश:</span>
-          अस्पताल अथवा गृह जन्म की सूचना 21 दिनों में ऑनलाइन दर्ज करें। माता-पिता का आधार कार्ड एवं डिस्चार्ज कार्ड आवश्यक है।
+          <span className="font-bold block text-sm mb-1">👶 Birth Registration Guidelines:</span>
+          Hospital ya Home birth event ke 21 days ke andar online apply karein. Parents Aadhaar aur Discharge Card zaroori hai.
         </div>
 
         <div className="space-y-3">
-          <h3 className="font-bold text-slate-900 text-sm">जन्म प्रमाण पत्र एसओपी प्रक्रिया:</h3>
+          <h3 className="font-bold text-slate-900 text-sm">Birth Certificate SOP Workflow (Hinglish):</h3>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
             <div className="bg-white border border-slate-200 p-4 rounded-xl space-y-1">
-              <span className="font-bold text-blue-800 block">1. गूगल लॉगिन व शिशु विवरण</span>
-              <p className="text-slate-600">नागरिक अपने गूगल अकाउंट से लॉगिन करके शिशु का नाम, जन्म तिथि एवं लिंग दर्ज करते हैं।</p>
+              <span className="font-bold text-blue-800 block">Step 1: Google Login & Child Details</span>
+              <p className="text-slate-600">Citizen apne Google account se login karke child name, date of birth aur gender enter karte hain.</p>
             </div>
 
             <div className="bg-white border border-slate-200 p-4 rounded-xl space-y-1">
-              <span className="font-bold text-blue-800 block">2. माता-पिता आधार एवं पता सत्यापन</span>
-              <p className="text-slate-600">माता व पिता का 12-अंकों का आधार नंबर दर्ज कर वर्तमान व स्थायी पते का चयन करें।</p>
+              <span className="font-bold text-blue-800 block">Step 2: Parents Aadhaar & Address</span>
+              <p className="text-slate-600">Mother aur Father ka 12-digit Aadhaar number fill karke present & permanent address select karein.</p>
             </div>
 
             <div className="bg-white border border-slate-200 p-4 rounded-xl space-y-1">
-              <span className="font-bold text-blue-800 block">3. भौतिक पावती जमा (1 से 3 दिन)</span>
-              <p className="text-slate-600">आवेदन पत्र की प्रति झाबुआ नगर पालिका लोक सेवा केंद्र में 1 से 3 कार्य दिवस में प्रस्तुत करें।</p>
+              <span className="font-bold text-blue-800 block">Step 3: Hard Copy Verification (1 to 3 Days)</span>
+              <p className="text-slate-600">Generated Submission Letter ki hard copy Nagar Palika Jhabua me 1 se 3 days ke andar submit karein.</p>
             </div>
 
             <div className="bg-white border border-slate-200 p-4 rounded-xl space-y-1">
-              <span className="font-bold text-blue-800 block">4. प्रपत्र-5 हस्ताक्षरित प्रमाण पत्र</span>
-              <p className="text-slate-600">अधिकारी द्वारा अनुमोदित होने पर बारकोड एवं क्यूआर कोड युक्त शासकीय जन्म प्रमाण पत्र डाउनलोड करें।</p>
+              <span className="font-bold text-blue-800 block">Step 4: Form-5 Signed Certificate</span>
+              <p className="text-slate-600">Officer approve hone par barcode & QR code wala official Birth Certificate download kar sakte hain.</p>
             </div>
           </div>
         </div>
@@ -156,40 +156,40 @@ const SLIDES = [
   },
   {
     id: 4,
-    title: 'जल प्रदाय कनेक्शन — मानक संचालन प्रक्रिया (Water Connection SOP)',
-    subtitle: 'नगरीय जल प्रदाय नियम एवं तकनीकी स्वीकृति प्रक्रिया',
+    title: 'Water Connection — Standard Operating Procedure (SOP)',
+    subtitle: 'Urban Water Supply Rules & Technical Approval Process',
     category: 'SOP — WATER CONNECTION',
     badgeColor: 'bg-teal-100 text-teal-800 border-teal-300',
     icon: Droplets,
     content: (
       <div className="space-y-6 font-sans">
         <div className="bg-teal-50 border border-teal-200 rounded-2xl p-4 text-xs text-teal-900 leading-relaxed">
-          <span className="font-bold block text-sm mb-1">💧 जल कनेक्शन नियम एवं समय-सीमा:</span>
-          घरेलू/वाणिज्यिक नल कनेक्शन हेतु संपत्ति कर रसीद अनिवार्य है। कुल सेवा सीमा अधिकतम 15 कार्य दिवस है।
+          <span className="font-bold block text-sm mb-1">💧 Water Connection Rules & SLA:</span>
+          Home/Commercial tap connection ke liye Property Tax receipt required hai. Overall service SLA limit maximum 15 days hai.
         </div>
 
         <div className="space-y-3">
-          <h3 className="font-bold text-slate-900 text-sm">जल प्रदाय स्वीकृति चरण:</h3>
+          <h3 className="font-bold text-slate-900 text-sm">Water Connection Approval Stages (Hinglish):</h3>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
             <div className="bg-white border border-slate-200 p-4 rounded-xl space-y-1">
-              <span className="font-bold text-teal-800 block">चरण 1: संपत्ति एवं भवन विवरण प्रविष्टि</span>
-              <p className="text-slate-600">भवन क्रमांक, वार्ड नंबर, मकान का क्षेत्रफल एवं कनेक्शन साइज (1/2 इंच या 3/4 इंच) चुनें।</p>
+              <span className="font-bold text-teal-800 block">Step 1: Property & Building Details</span>
+              <p className="text-slate-600">House No, Ward No, Property Plot Area aur connection size (1/2 inch ya 3/4 inch) select karein.</p>
             </div>
 
             <div className="bg-white border border-slate-200 p-4 rounded-xl space-y-1">
-              <span className="font-bold text-teal-800 block">चरण 2: प्लंबर एवं संपत्ति कर दस्तावेज</span>
-              <p className="text-slate-600">अधिकृत प्लंबर का नाम, लाइसेंस नंबर एवं अद्यतन संपत्ति कर रसीद अपलोड करें।</p>
+              <span className="font-bold text-teal-800 block">Step 2: Plumber & Tax Receipts</span>
+              <p className="text-slate-600">Licensed Plumber details aur latest Property Tax payment receipt attach karein.</p>
             </div>
 
             <div className="bg-white border border-slate-200 p-4 rounded-xl space-y-1">
-              <span className="font-bold text-teal-800 block">चरण 3: स्थल निरीक्षण एवं पावती जमा (1-3 दिन)</span>
-              <p className="text-slate-600">जल विभाग इंजीनियर द्वारा स्थल निरीक्षण किया जाता है तथा पावती पत्र की हार्ड कॉपी जमा की जाती है।</p>
+              <span className="font-bold text-teal-800 block">Step 3: Site Inspection & Hard Copy (1-3 Days)</span>
+              <p className="text-slate-600">Water Dept engineer site inspection karte hain aur hard copy submission receipt 1-3 days me li jati hai.</p>
             </div>
 
             <div className="bg-white border border-slate-200 p-4 rounded-xl space-y-1">
-              <span className="font-bold text-teal-800 block">चरण 4: स्वीकृति आदेश एवं नल कनेक्शन</span>
-              <p className="text-slate-600">सुपर एडमिन/जल प्रदाय अधिकारी द्वारा स्वीकृत आदेश एवं कनेक्शन परमिट जारी किया जाता है।</p>
+              <span className="font-bold text-teal-800 block">Step 4: Sanction Permit Issue</span>
+              <p className="text-slate-600">Water Supply Admin approve karke official Sanction Order & Connection Permit issue karte hain.</p>
             </div>
           </div>
         </div>
@@ -198,8 +198,8 @@ const SLIDES = [
   },
   {
     id: 5,
-    title: 'शासकीय सेवा गारंटी समय-सीमा (Service Level Agreement SLA)',
-    subtitle: 'नागरिक सेवा गारंटी अधिनियम के अंतर्गत निर्धारित समयावधि तालिका',
+    title: 'Guaranteed SLA Service Timelines Table',
+    subtitle: 'Citizen Service Guarantee Act Specified Timelines Table',
     category: 'SLA TIMELINES',
     badgeColor: 'bg-purple-100 text-purple-800 border-purple-300',
     icon: Clock,
@@ -209,30 +209,30 @@ const SLIDES = [
           <table className="w-full text-xs text-left">
             <thead className="bg-slate-900 text-white uppercase text-[10px] tracking-wider">
               <tr>
-                <th className="p-3">सेवा का नाम (Service Name)</th>
-                <th className="p-3">भौतिक पावती जमा (Hard Copy Limit)</th>
-                <th className="p-3">अधिकारी जांच (Inspection Limit)</th>
-                <th className="p-3">अंतिम सेवा समय-सीमा (Final SLA)</th>
+                <th className="p-3">Service Name</th>
+                <th className="p-3">Hard Copy Submission Range</th>
+                <th className="p-3">Officer Inspection Limit</th>
+                <th className="p-3">Final Service SLA</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-200 bg-white font-medium">
               <tr className="hover:bg-slate-50">
-                <td className="p-3 font-bold text-slate-900">मृत्यु प्रमाण पत्र (Death Certificate)</td>
-                <td className="p-3 text-emerald-700 font-bold">1 से 3 दिन (Range 1-3 Days)</td>
-                <td className="p-3 text-slate-600">2 कार्य दिवस</td>
-                <td className="p-3 text-blue-900 font-extrabold">7 कार्य दिवस (7 Days)</td>
+                <td className="p-3 font-bold text-slate-900">Death Certificate</td>
+                <td className="p-3 text-emerald-700 font-bold">1 to 3 Days Range (Min 1 - Max 3 Days)</td>
+                <td className="p-3 text-slate-600">2 Working Days</td>
+                <td className="p-3 text-blue-900 font-extrabold">7 Working Days</td>
               </tr>
               <tr className="hover:bg-slate-50">
-                <td className="p-3 font-bold text-slate-900">जन्म प्रमाण पत्र (Birth Certificate)</td>
-                <td className="p-3 text-emerald-700 font-bold">1 से 3 दिन (Range 1-3 Days)</td>
-                <td className="p-3 text-slate-600">2 कार्य दिवस</td>
-                <td className="p-3 text-blue-900 font-extrabold">7 कार्य दिवस (7 Days)</td>
+                <td className="p-3 font-bold text-slate-900">Birth Certificate</td>
+                <td className="p-3 text-emerald-700 font-bold">1 to 3 Days Range (Min 1 - Max 3 Days)</td>
+                <td className="p-3 text-slate-600">2 Working Days</td>
+                <td className="p-3 text-blue-900 font-extrabold">7 Working Days</td>
               </tr>
               <tr className="hover:bg-slate-50">
-                <td className="p-3 font-bold text-slate-900">जल प्रदाय कनेक्शन (Water Connection)</td>
-                <td className="p-3 text-emerald-700 font-bold">1 से 3 दिन (Range 1-3 Days)</td>
-                <td className="p-3 text-slate-600">5 कार्य दिवस</td>
-                <td className="p-3 text-teal-900 font-extrabold">15 कार्य दिवस (15 Days)</td>
+                <td className="p-3 font-bold text-slate-900">Water Connection</td>
+                <td className="p-3 text-emerald-700 font-bold">1 to 3 Days Range (Min 1 - Max 3 Days)</td>
+                <td className="p-3 text-slate-600">5 Working Days</td>
+                <td className="p-3 text-teal-900 font-extrabold">15 Working Days</td>
               </tr>
             </tbody>
           </table>
@@ -241,8 +241,8 @@ const SLIDES = [
         <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 text-xs text-emerald-900 leading-relaxed flex items-start gap-3">
           <CheckCircle2 className="w-5 h-5 text-emerald-700 shrink-0 mt-0.5" />
           <div>
-            <span className="font-bold block mb-0.5">पारदर्शिता एवं त्वरित निवारण:</span>
-            सभी आवेदनों की स्थिति नागरिक अपने मोबाइल पर लाइव ट्रैक कर सकते हैं। समय-सीमा से अधिक विलंब होने पर सुपर एडमिन ऑटो-अलर्ट जारी होता है।
+            <span className="font-bold block mb-0.5">Transparency & Fast Resolution:</span>
+            Sabhi applications ki live status citizen apne phone par track kar sakte hain. Delay hone par Super Admin alert auto-trigger hota hai.
           </div>
         </div>
       </div>
@@ -250,8 +250,8 @@ const SLIDES = [
   },
   {
     id: 6,
-    title: 'सुरक्षा, रोल-बेस्ड एक्सेस एवं ऑडिट सुरक्षा (Security & Compliance)',
-    subtitle: 'DPDP डेटा सुरक्षा अधिनियम 2023 एवं सुपर एडमिन आपातकालीन नियंत्रण',
+    title: 'Security, Role-Based Access & Maintenance Mode',
+    subtitle: 'DPDP Data Protection Act 2023 & Emergency Super Admin Controls',
     category: 'SECURITY & GOVERNANCE',
     badgeColor: 'bg-rose-100 text-rose-800 border-rose-300',
     icon: ShieldCheck,
@@ -261,31 +261,31 @@ const SLIDES = [
           <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm space-y-2">
             <div className="flex items-center gap-2 text-slate-900 font-bold text-sm">
               <ShieldAlert className="w-4 h-4 text-rose-600" />
-              <span>आपातकालीन मेंटेनेंस / रूटीन चेक</span>
+              <span>Emergency Maintenance Toggle</span>
             </div>
             <p className="text-xs text-slate-600 leading-relaxed">
-              सुरक्षा अपडेट अथवा तकनीकी जांच के समय सुपर एडमिन 1-क्लिक में पोर्टल को मेंटेनेंस मोड पर डाल सकते हैं, जिससे डेटा रिस्क शून्य हो जाता है।
+              Security update ya routine check ke time Super Admin 1-click me website ko Maintenance Mode par roll out kar sakte hain jisse data risk zero ho jata hai.
             </p>
           </div>
 
           <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm space-y-2">
             <div className="flex items-center gap-2 text-slate-900 font-bold text-sm">
               <ShieldCheck className="w-4 h-4 text-emerald-600" />
-              <span>विभागीय क्रेडेंशियल्स नियंत्रण</span>
+              <span>Department Credentials Management</span>
             </div>
             <p className="text-xs text-slate-600 leading-relaxed">
-              रजिस्ट्रार एवं जल प्रदाय प्रशासक के यूजरनेम व पासवर्ड केवल सुपर एडमिन द्वारा अपडेट किए जा सकते हैं, जिससे अनाधिकृत पहुंच पूर्णतः प्रतिबंधित रहती है।
+              Registrar aur Water Admin ke username & password sirf Super Admin update kar sakte hain jisse unauthorized access stop rehti hai.
             </p>
           </div>
         </div>
 
         <div className="bg-slate-900 text-white rounded-2xl p-5 space-y-3">
           <div className="flex items-center justify-between">
-            <h3 className="font-extrabold text-sm text-emerald-400">100% डिजिटल सुरक्षा एवं ऑडिट ट्रेल</h3>
+            <h3 className="font-extrabold text-sm text-emerald-400">100% Digital Audit Trail & Safety</h3>
             <span className="text-[10px] bg-emerald-500/20 text-emerald-300 px-2.5 py-0.5 rounded border border-emerald-400/30">DPDP Act 2023 Compliant</span>
           </div>
           <p className="text-xs text-slate-300 leading-relaxed">
-            प्रत्येक अधिकारी की गतिविधि (स्वीकृति, निरस्तीकरण एवं टिप्पणी) का संपूर्ण टाइमलाइन और डिजिटल ऑडिट लॉग सुरक्षित रखा जाता है।
+            Har officer activity (approval, rejection, remark aur certificate upload) complete timeline aur digital audit log ke sath secure rehti hai.
           </p>
         </div>
       </div>
@@ -328,10 +328,10 @@ export default function PresentationPage() {
             </div>
             <div>
               <h1 className="text-base sm:text-lg font-black text-white flex items-center gap-2">
-                झाबुआ ई-नगर पालिका SOP प्रेज़ेंटेशन
+                Jhabua e-Nagar Palika SOP Presentation (Hinglish)
               </h1>
               <p className="text-xs text-slate-400 font-medium">
-                स्लाइड {currentSlide + 1} / {SLIDES.length} — {slide.category}
+                Slide {currentSlide + 1} / {SLIDES.length} — {slide.category}
               </p>
             </div>
           </div>
@@ -344,7 +344,7 @@ export default function PresentationPage() {
               }`}
             >
               {isPlaying ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
-              <span>{isPlaying ? 'ऑटो प्ले रोकें' : 'ऑटो स्लाइड चालू करें'}</span>
+              <span>{isPlaying ? 'Pause Auto-Play' : 'Auto-Play Slides'}</span>
             </button>
 
             <button
@@ -352,7 +352,7 @@ export default function PresentationPage() {
               className="btn btn-primary btn-sm text-xs font-bold flex items-center gap-1.5 bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-md hover:from-emerald-500 hover:to-teal-500"
             >
               <Download className="w-3.5 h-3.5" />
-              <span>📥 पूरी SOP प्रेज़ेंटेशन डाउनलोड करें (PDF)</span>
+              <span>📥 पूरी SOP प्रेज़ेंटेशन डाउनलोड करें (Download SOP PDF)</span>
             </button>
           </div>
         </div>
@@ -387,7 +387,7 @@ export default function PresentationPage() {
               onClick={() => setCurrentSlide((prev) => (prev > 0 ? prev - 1 : SLIDES.length - 1))}
               className="btn btn-secondary btn-sm bg-slate-800 hover:bg-slate-700 text-slate-200 border-slate-700 text-xs font-bold flex items-center gap-1"
             >
-              <ChevronLeft className="w-4 h-4" /> पिछली स्लाइड
+              <ChevronLeft className="w-4 h-4" /> Previous Slide
             </button>
 
             {/* Slide Dots */}
@@ -408,7 +408,7 @@ export default function PresentationPage() {
               onClick={() => setCurrentSlide((prev) => (prev + 1) % SLIDES.length)}
               className="btn btn-primary btn-sm bg-emerald-600 hover:bg-emerald-500 text-white border-none text-xs font-bold flex items-center gap-1"
             >
-              अगली स्लाइड <ChevronRight className="w-4 h-4" />
+              Next Slide <ChevronRight className="w-4 h-4" />
             </button>
           </div>
 
