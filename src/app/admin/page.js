@@ -274,7 +274,7 @@ export default function AdminPage() {
       setSelectedWaterDetail(prev => updateLocalDetail(prev))
 
       // Direct React State Update for instant top stats counter & list card updates
-      const updateRecordState = (list) => list.map(r => r.id === remarkModal.record.id ? { 
+      const updateRecordState = (list) => list.map(r => (r.id === remarkModal.record.id || (r.applicationNo && r.applicationNo === remarkModal.record.applicationNo)) ? { 
         ...r, 
         status: remarkModal.targetStatus,
         lastOfficerRemark: remarkModal.remarkText.trim(),

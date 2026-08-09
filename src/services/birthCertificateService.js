@@ -39,7 +39,7 @@ function saveLocalBirthCertificates(list) {
 
 function syncLocalRecord(record) {
   const list = getLocalBirthCertificates();
-  const idx = list.findIndex(r => r.id === record.id);
+  const idx = list.findIndex(r => r.id === record.id || (record.applicationNo && r.applicationNo === record.applicationNo));
   if (idx >= 0) {
     list[idx] = { ...list[idx], ...record };
   } else {
@@ -240,17 +240,22 @@ export async function getBirthCertificates() {
     }));
 
     const mergedMap = new Map();
-    remoteItems.forEach(item => mergedMap.set(item.id, item));
+    remoteItems.forEach(item => {
+      const key = item.applicationNo || item.id;
+      mergedMap.set(key, item);
+    });
+
     localItems.forEach(item => {
-      const existingRemote = mergedMap.get(item.id);
+      const key = item.applicationNo || item.id;
+      const existingRemote = mergedMap.get(key) || mergedMap.get(item.id);
       if (existingRemote) {
-        mergedMap.set(item.id, { ...item, ...existingRemote });
+        mergedMap.set(key, { ...item, ...existingRemote });
       } else {
-        mergedMap.set(item.id, item);
+        mergedMap.set(key, item);
         if (item.id && item.status && item.status !== 'Draft') {
           try {
             const docRef = doc(db, COLLECTION_NAME, item.id);
-            setDoc(docRef, item, { merge: true }).catch(() => {});
+            setDoc(docRef, sanitizeFirestorePayload(item), { merge: true }).catch(() => {});
           } catch (e) {}
         }
       }
