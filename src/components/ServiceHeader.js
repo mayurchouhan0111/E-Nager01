@@ -126,69 +126,72 @@ export default function ServiceHeader() {
   };
 
   return (
-    <header className="bg-white/90 backdrop-blur-md border-b border-slate-200 sticky top-0 z-50 shadow-sm font-sans">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
-          
-          <Link href="/" className="flex items-center gap-3 group">
-            <img 
-              src="/mp-logo.png" 
-              alt="मध्य प्रदेश शासन" 
-              className="w-11 h-11 object-contain drop-shadow-sm group-hover:scale-105 transition-transform duration-300" 
-            />
-            <div className="hidden sm:block">
-              <div className="text-slate-900 font-extrabold text-sm leading-tight flex items-center gap-2">
-                नगर पालिका ई-सेवा पोर्टल
-                <span className="text-[9px] bg-emerald-100 text-emerald-800 border border-emerald-200 px-2 py-0.5 rounded-full uppercase tracking-wider font-bold">MP e-Nagar</span>
-              </div>
-              <p className="text-[11px] text-slate-400 font-medium">झाबुआ — मध्य प्रदेश शासन</p>
-            </div>
-          </Link>
-
-          <nav className="hidden lg:flex items-center gap-1 bg-slate-100/80 p-1 rounded-2xl border border-slate-200/60">
-            <Link href="/death-certificate" className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all duration-200 flex items-center gap-1.5 ${isCurrentTab('/death-certificate') ? 'bg-emerald-700 text-white shadow-md' : 'text-slate-600 hover:text-slate-900'}`}>📜 <span>मृतक प्रमाण पत्र</span></Link>
-            <Link href="/birth-certificate" className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all duration-200 flex items-center gap-1.5 ${isCurrentTab('/birth-certificate') ? 'bg-emerald-700 text-white shadow-md' : 'text-slate-600 hover:text-slate-900'}`}>👶 <span>जन्म प्रमाण पत्र</span></Link>
-            <Link href="/water-connection" className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all duration-200 flex items-center gap-1.5 ${isCurrentTab('/water-connection') ? 'bg-teal-700 text-white shadow-md' : 'text-slate-600 hover:text-slate-900'}`}>💧 <span>जल कनेक्शन</span></Link>
-            <Link href="/privacy-policy" className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all duration-200 flex items-center gap-1.5 ${isCurrentTab('/privacy-policy') ? 'bg-slate-800 text-white shadow-md' : 'text-slate-600 hover:text-slate-900'}`}>🛡️ <span>DPDP प्राइवेसी</span></Link>
-            <Link href="/grievance" className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all duration-200 flex items-center gap-1.5 ${isCurrentTab('/grievance') ? 'bg-slate-800 text-white shadow-md' : 'text-slate-600 hover:text-slate-900'}`}>🏢 <span>शिकायत निवारण</span></Link>
-          </nav>
-
-          <div className="flex items-center gap-2">
-            <button onClick={() => { setShowTrackModal(true); setHasSearched(false); }} aria-label="आवेदन स्थिति खोजें" className="px-3 py-2 rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 text-xs font-bold flex items-center gap-1.5">
-              <Search className="w-3.5 h-3.5" /> <span className="hidden sm:inline">स्थिति खोजें</span>
-            </button>
-
-            <div className="relative">
-              <button onClick={() => setShowNotifications(!showNotifications)} aria-label="सूचनाएँ (Notifications)" className="relative p-2.5 rounded-xl bg-white border border-slate-200 text-slate-500 hover:bg-slate-50 shadow-sm transition-all duration-200">
-                <Bell className="w-4 h-4" />
-                {unreadCount > 0 && <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] rounded-full bg-rose-500 text-white text-[9px] flex items-center justify-center animate-pulse">{unreadCount}</span>}
-              </button>
-              {showNotifications && (
-                <div className="absolute right-0 mt-2 w-80 bg-white border border-slate-200 rounded-2xl shadow-2xl z-50 overflow-hidden">
-                  <div className="px-4 py-3 border-b bg-slate-50/80 flex items-center justify-between">
-                    <h3 className="text-xs font-extrabold uppercase">सूचनाएँ</h3>
-                    <button onClick={() => setShowNotifications(false)} aria-label="सूचना पैनल बंद करें"><X className="w-4 h-4" /></button>
-                  </div>
-                  <div ref={listRef} className="max-h-80 overflow-y-auto">
-                    {notifications.length === 0 ? <div className="p-8 text-center text-xs text-slate-500">कोई नई सूचना नहीं है</div> : notifications.map((n) => (
-                      <div key={n.id} onClick={() => handleMarkAsRead(n.id)} className={`px-4 py-3.5 border-b cursor-pointer ${!n.isRead ? 'bg-emerald-50/40' : ''}`}>
-                        <p className="text-xs font-semibold text-slate-800">{n.message}</p>
-                      </div>
-                    ))}
-                  </div>
+    <>
+      <header className="bg-white/90 backdrop-blur-md border-b border-slate-200 sticky top-0 z-40 font-sans shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            
+            <Link href="/" className="flex items-center gap-3 group">
+              <img 
+                src="/mp-logo.png" 
+                alt="मध्य प्रदेश शासन" 
+                className="w-11 h-11 object-contain drop-shadow-sm group-hover:scale-105 transition-transform duration-300" 
+              />
+              <div className="hidden sm:block">
+                <div className="text-slate-900 font-extrabold text-sm leading-tight flex items-center gap-2">
+                  नगर पालिका ई-सेवा पोर्टल
+                  <span className="text-[9px] bg-emerald-100 text-emerald-800 border border-emerald-200 px-2 py-0.5 rounded-full uppercase tracking-wider font-bold">MP e-Nagar</span>
                 </div>
-              )}
-            </div>
-
-            <Link href="/admin" aria-label="अधिकारी लॉगिन" className={`px-3 py-2 rounded-xl text-xs font-bold border transition-all flex items-center gap-1.5 ${isCurrentTab('/admin') ? 'bg-emerald-700 text-white border-emerald-700' : 'bg-emerald-50 text-emerald-800 border-emerald-200'}`}>
-              <ShieldAlert className="w-3.5 h-3.5" /> <span className="hidden sm:inline">अधिकारी लॉगिन</span>
+                <p className="text-[11px] text-slate-400 font-medium">झाबुआ — मध्य प्रदेश शासन</p>
+              </div>
             </Link>
+
+            <nav className="hidden lg:flex items-center gap-1 bg-slate-100/80 p-1 rounded-2xl border border-slate-200/60">
+              <Link href="/death-certificate" className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all duration-200 flex items-center gap-1.5 ${isCurrentTab('/death-certificate') ? 'bg-emerald-700 text-white shadow-md' : 'text-slate-600 hover:text-slate-900'}`}>📜 <span>मृतक प्रमाण पत्र</span></Link>
+              <Link href="/birth-certificate" className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all duration-200 flex items-center gap-1.5 ${isCurrentTab('/birth-certificate') ? 'bg-emerald-700 text-white shadow-md' : 'text-slate-600 hover:text-slate-900'}`}>👶 <span>जन्म प्रमाण पत्र</span></Link>
+              <Link href="/water-connection" className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all duration-200 flex items-center gap-1.5 ${isCurrentTab('/water-connection') ? 'bg-teal-700 text-white shadow-md' : 'text-slate-600 hover:text-slate-900'}`}>💧 <span>जल कनेक्शन</span></Link>
+              <Link href="/privacy-policy" className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all duration-200 flex items-center gap-1.5 ${isCurrentTab('/privacy-policy') ? 'bg-slate-800 text-white shadow-md' : 'text-slate-600 hover:text-slate-900'}`}>🛡️ <span>DPDP प्राइवेसी</span></Link>
+              <Link href="/grievance" className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all duration-200 flex items-center gap-1.5 ${isCurrentTab('/grievance') ? 'bg-slate-800 text-white shadow-md' : 'text-slate-600 hover:text-slate-900'}`}>🏢 <span>शिकायत निवारण</span></Link>
+            </nav>
+
+            <div className="flex items-center gap-2">
+              <button onClick={() => { setShowTrackModal(true); setHasSearched(false); }} aria-label="आवेदन स्थिति खोजें" className="px-3 py-2 rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 text-xs font-bold flex items-center gap-1.5">
+                <Search className="w-3.5 h-3.5" /> <span className="hidden sm:inline">स्थिति खोजें</span>
+              </button>
+
+              <div className="relative">
+                <button onClick={() => setShowNotifications(!showNotifications)} aria-label="सूचनाएँ (Notifications)" className="relative p-2.5 rounded-xl bg-white border border-slate-200 text-slate-500 hover:bg-slate-50 shadow-sm transition-all duration-200">
+                  <Bell className="w-4 h-4" />
+                  {unreadCount > 0 && <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] rounded-full bg-rose-500 text-white text-[9px] flex items-center justify-center animate-pulse">{unreadCount}</span>}
+                </button>
+                {showNotifications && (
+                  <div className="absolute right-0 mt-2 w-80 bg-white border border-slate-200 rounded-2xl shadow-2xl z-50 overflow-hidden">
+                    <div className="px-4 py-3 border-b bg-slate-50/80 flex items-center justify-between">
+                      <h3 className="text-xs font-extrabold uppercase">सूचनाएँ</h3>
+                      <button onClick={() => setShowNotifications(false)} aria-label="सूचना पैनल बंद करें"><X className="w-4 h-4" /></button>
+                    </div>
+                    <div ref={listRef} className="max-h-80 overflow-y-auto">
+                      {notifications.length === 0 ? <div className="p-8 text-center text-xs text-slate-500">कोई नई सूचना नहीं है</div> : notifications.map((n) => (
+                        <div key={n.id} onClick={() => handleMarkAsRead(n.id)} className={`px-4 py-3.5 border-b cursor-pointer ${!n.isRead ? 'bg-emerald-50/40' : ''}`}>
+                          <p className="text-xs font-semibold text-slate-800">{n.message}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <Link href="/admin" aria-label="अधिकारी लॉगिन" className={`px-3 py-2 rounded-xl text-xs font-bold border transition-all flex items-center gap-1.5 ${isCurrentTab('/admin') ? 'bg-emerald-700 text-white border-emerald-700' : 'bg-emerald-50 text-emerald-800 border-emerald-200'}`}>
+                <ShieldAlert className="w-3.5 h-3.5" /> <span className="hidden sm:inline">अधिकारी लॉगिन</span>
+              </Link>
+            </div>
           </div>
         </div>
-      </div>
+      </header>
 
+      {/* MODALS RENDERED OUTSIDE HEADER STACKING CONTEXT AT TOP VIEWPORT LEVEL */}
       {showTrackModal && (
-        <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-md z-[100] overflow-y-auto p-3 sm:p-6 flex items-start sm:items-center justify-center pt-14 sm:pt-6">
+        <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-md z-[9999] overflow-y-auto p-3 sm:p-6 flex items-start sm:items-center justify-center pt-14 sm:pt-6">
           <div className="bg-white border border-slate-200 rounded-3xl max-w-2xl w-full p-4 sm:p-6 shadow-2xl flex flex-col max-h-[80vh] sm:max-h-[85vh] my-auto">
             <div className="flex items-center justify-between pb-3 border-b border-slate-100 shrink-0">
               <h3 className="font-extrabold text-sm sm:text-base text-slate-900 flex items-center gap-2">
@@ -272,7 +275,7 @@ export default function ServiceHeader() {
       )}
 
       {selectedRecord && modalType === 'letter' && (
-        <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-md z-[100] overflow-y-auto p-3 sm:p-6 flex items-start sm:items-center justify-center pt-14 sm:pt-6">
+        <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-md z-[9999] overflow-y-auto p-3 sm:p-6 flex items-start sm:items-center justify-center pt-14 sm:pt-6">
           <div className="bg-white rounded-3xl max-w-4xl w-full p-4 sm:p-6 shadow-2xl flex flex-col max-h-[80vh] sm:max-h-[85vh] my-auto">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3 shrink-0 mb-2">
               <span className="font-extrabold text-slate-900 text-sm">📄 पावती पत्र (Submission Letter)</span>
@@ -286,7 +289,7 @@ export default function ServiceHeader() {
       )}
 
       {selectedRecord && modalType === 'certificate' && (
-        <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-md z-[100] overflow-y-auto p-3 sm:p-6 flex items-start sm:items-center justify-center pt-14 sm:pt-6">
+        <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-md z-[9999] overflow-y-auto p-3 sm:p-6 flex items-start sm:items-center justify-center pt-14 sm:pt-6">
           <div className="bg-white rounded-3xl max-w-4xl w-full p-4 sm:p-6 shadow-2xl flex flex-col max-h-[80vh] sm:max-h-[85vh] my-auto">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3 shrink-0 mb-2">
               <span className="font-extrabold text-slate-900 text-sm">📜 प्रमाण पत्र (Certificate Preview)</span>
@@ -300,6 +303,6 @@ export default function ServiceHeader() {
           </div>
         </div>
       )}
-    </header>
+    </>
   );
 }
