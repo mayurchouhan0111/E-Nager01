@@ -18,9 +18,16 @@ import {
   updateWaterConnectionStatus,
   purgeAnonymousWaterConnections
 } from '@/services/waterConnectionService'
+import {
+  getNoDuesCertificates,
+  updateNoDuesCertificateStatus,
+  purgeAnonymousNoDuesCertificates
+} from '@/services/noDuesService'
 import DeathCertificateTemplate from '@/components/DeathCertificateTemplate'
 import BirthCertificateTemplate from '@/components/BirthCertificateTemplate'
 import WaterConnectionTemplate from '@/components/WaterConnectionTemplate'
+import NoDuesCertificateTemplate from '@/components/NoDuesCertificateTemplate'
+import NoDuesLetterTemplate from '@/components/NoDuesLetterTemplate'
 import ApplicationLetterTemplate from '@/components/ApplicationLetterTemplate'
 import ApplicationTimeline from '@/components/ApplicationTimeline'
 import { DEFAULT_ADMIN_ACCOUNTS, fetchAdminAccounts, updateAdminAccountCredential } from '@/services/adminAuthService'
@@ -108,6 +115,13 @@ export default function AdminPage() {
   const [selectedWaterDetail, setSelectedWaterDetail] = useState(null)
   const [waterCertPreview, setWaterCertPreview] = useState(null)
 
+  // No Dues Certificate state
+  const [noDuesRecords, setNoDuesRecords] = useState([])
+  const [noDuesLoading, setNoDuesLoading] = useState(false)
+  const [noDuesSearch, setNoDuesSearch] = useState('')
+  const [selectedNoDuesDetail, setSelectedNoDuesDetail] = useState(null)
+  const [noDuesCertPreview, setNoDuesCertPreview] = useState(null)
+
   // Application Letter Modal State
   const [letterModal, setLetterModal] = useState({ isOpen: false, record: null, serviceType: 'death' })
 
@@ -115,7 +129,7 @@ export default function AdminPage() {
   const [photoPreview, setPhotoPreview] = useState(null)
 
   // Tab navigation
-  const [activeTab, setActiveTab] = useState('death-certificates') // 'death-certificates' | 'birth-certificates' | 'water-connections' | 'audit'
+  const [activeTab, setActiveTab] = useState('death-certificates') // 'death-certificates' | 'birth-certificates' | 'water-connections' | 'no-dues-certificates' | 'audit'
 
   // Audit Logs state
   const [auditLogs, setAuditLogs] = useState([])
@@ -165,6 +179,17 @@ export default function AdminPage() {
     setWaterLoading(false)
   }, [])
 
+  const loadNoDuesRecords = useCallback(async () => {
+    setNoDuesLoading(true)
+    try {
+      const list = await getNoDuesCertificates(true)
+      setNoDuesRecords(list)
+    } catch (e) {
+      toast.error('Failed to load no dues NOC: ' + e.message)
+    }
+    setNoDuesLoading(false)
+  }, [])
+
   const loadAuditLogs = useCallback(async () => {
     setAuditLoading(true)
     try {
@@ -182,9 +207,10 @@ export default function AdminPage() {
       loadDeathRecords()
       loadBirthRecords()
       loadWaterRecords()
+      loadNoDuesRecords()
       loadAuditLogs()
     }
-  }, [isAdmin, loadDeathRecords, loadBirthRecords, loadWaterRecords, loadAuditLogs])
+  }, [isAdmin, loadDeathRecords, loadBirthRecords, loadWaterRecords, loadNoDuesRecords, loadAuditLogs])
 
   async function handleLogin(e) {
     e.preventDefault()
@@ -295,6 +321,14 @@ export default function AdminPage() {
         officerName,
         officialUploadedCertificate: remarkModal.officialCertFile || null
       })
+    } else if (remarkModal.serviceType === 'no_dues') {
+      res = await updateNoDuesCertificateStatus({
+        id: remarkModal.record.id,
+        newStatus: remarkModal.targetStatus,
+        remarks: remarkModal.remarkText,
+        officerName,
+        officialUploadedCertificate: remarkModal.officialCertFile || null
+      })
     } else {
       res = await updateDeathCertificateStatus({
         id: remarkModal.record.id,
@@ -333,6 +367,7 @@ export default function AdminPage() {
       setSelectedDeathDetail(prev => updateLocalDetail(prev))
       setSelectedBirthDetail(prev => updateLocalDetail(prev))
       setSelectedWaterDetail(prev => updateLocalDetail(prev))
+      setSelectedNoDuesDetail(prev => updateLocalDetail(prev))
 
       // Direct React State Update for instant top stats counter & list card updates
       const updateRecordState = (list) => list.map(r => (r.id === remarkModal.record.id || (r.applicationNo && r.applicationNo === remarkModal.record.applicationNo)) ? { 
@@ -346,6 +381,7 @@ export default function AdminPage() {
       setDeathRecords(prev => updateRecordState(prev))
       setBirthRecords(prev => updateRecordState(prev))
       setWaterRecords(prev => updateRecordState(prev))
+      setNoDuesRecords(prev => updateRecordState(prev))
 
       // Send Targeted Notification to Citizen Email & UID
       const rec = remarkModal.record;
@@ -368,6 +404,7 @@ export default function AdminPage() {
       loadDeathRecords()
       loadBirthRecords()
       loadWaterRecords()
+      loadNoDuesRecords()
     } else {
       toast.error(`अपडेट विफल: ${res.error} (Update failed)`, { id: toastId })
     }
@@ -446,13 +483,26 @@ export default function AdminPage() {
     )
   })
 
+  const filteredNoDuesRecords = noDuesRecords.filter(r => {
+    if (!noDuesSearch) return true
+    const search = noDuesSearch.toLowerCase()
+    return (
+      r.applicationNo?.toLowerCase().includes(search) ||
+      r.applicantDetails?.fullName?.toLowerCase().includes(search) ||
+      r.propertyDetails?.propertyId?.toLowerCase().includes(search) ||
+      r.applicantDetails?.wardNo?.toLowerCase().includes(search) ||
+      r.status?.toLowerCase().includes(search)
+    )
+  })
+
   const currentAccount = adminAccounts[currentAdminUser]
-  const allowedTabs = currentAccount?.allowedTabs || ['death-certificates', 'birth-certificates', 'water-connections', 'audit', 'security-settings']
+  const allowedTabs = currentAccount?.allowedTabs || ['death-certificates', 'birth-certificates', 'water-connections', 'no-dues-certificates', 'audit', 'security-settings']
 
   const allTabDefs = [
     { key: 'death-certificates', label: 'मृत्यु प्रमाण पत्र आवेदन', labelShort: 'मृत्यु', icon: FileText },
     { key: 'birth-certificates', label: 'जन्म प्रमाण पत्र आवेदन', labelShort: 'जन्म', icon: Baby },
     { key: 'water-connections', label: 'जल कनेक्शन आवेदन', labelShort: 'जल', icon: Droplet },
+    { key: 'no-dues-certificates', label: 'नो ड्यूज NOC प्रभाग', labelShort: 'नो ड्यूज NOC', icon: Building2 },
     { key: 'audit', label: 'ऑडिट लॉग', labelShort: 'ऑडिट', icon: History },
     { key: 'security-settings', label: 'सुरक्षा एवं क्रेडेंशियल', labelShort: 'सुरक्षा', icon: Key },
   ]
@@ -992,6 +1042,135 @@ export default function AdminPage() {
               </div>
             )}
 
+            {/* ── NO DUES NOC TAB ──────────────────────────────────────────── */}
+            {activeTab === 'no-dues-certificates' && (
+              <div className="space-y-6">
+                <div className="flex flex-col gap-4">
+                  <div>
+                    <h2 className="text-base sm:text-lg font-extrabold text-slate-900">नो ड्यूज प्रमाण पत्र (Property Tax NOC) प्रभाग</h2>
+                    <p className="text-xs text-slate-500 mt-0.5">प्राप्त NOC आवेदनों का सत्यापन, चुकता रसीद जांच व आधिकारिक हस्ताक्षरित प्रमाण पत्र जारी करना</p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="relative flex-1">
+                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                      <input
+                        value={noDuesSearch}
+                        onChange={e => setNoDuesSearch(e.target.value)}
+                        placeholder="आवेदन क्रमांक, नाम, या संपत्ति आईडी से खोजें..."
+                        className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-slate-300 text-xs font-medium focus:outline-none focus:border-emerald-600 bg-white"
+                      />
+                    </div>
+                    <button onClick={loadNoDuesRecords} className="btn btn-secondary btn-sm flex items-center gap-1 font-bold text-xs">
+                      <RefreshCw className={`w-3.5 h-3.5 ${noDuesLoading ? 'animate-spin' : ''}`} /> रिफ्रेश
+                    </button>
+                  </div>
+                </div>
+
+                {noDuesLoading ? (
+                  <div className="p-12 text-center text-slate-500 bg-white rounded-3xl border border-slate-200">
+                    <RefreshCw className="animate-spin w-8 h-8 text-emerald-600 mx-auto mb-2" />
+                    नो ड्यूज रिकॉर्ड्स लोड हो रहे हैं...
+                  </div>
+                ) : filteredNoDuesRecords.length === 0 ? (
+                  <div className="p-12 text-center text-slate-400 text-xs bg-white rounded-3xl border border-slate-200 space-y-2">
+                    <Building2 className="w-10 h-10 text-slate-300 mx-auto" />
+                    <p className="font-bold text-slate-600">कोई नो ड्यूज आवेदन नहीं मिला</p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {filteredNoDuesRecords.map(record => (
+                      <div key={record.id} className="bg-white border border-slate-200 rounded-3xl p-5 sm:p-6 shadow-sm hover:shadow-md transition-shadow space-y-4">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-3">
+                          <div className="space-y-1">
+                            <div className="flex items-center gap-2">
+                              <span className="font-mono text-xs font-extrabold text-emerald-900 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-full">
+                                {record.applicationNo}
+                              </span>
+                              <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-extrabold border ${getStatusChip(record.status)}`}>
+                                {record.status}
+                              </span>
+                            </div>
+                            <h3 className="font-extrabold text-slate-900 text-sm sm:text-base">
+                              {record.applicantDetails?.fullName} (पिता: {record.applicantDetails?.fatherHusbandName})
+                            </h3>
+                            <p className="text-xs text-slate-600 font-medium">
+                              संपत्ति आईडी: <strong className="text-slate-900 font-mono">{record.propertyDetails?.propertyId}</strong> | टी.आर.आई. रिफरेंस: <strong className="text-slate-900 font-mono">{record.taxDetails?.triRefNo}</strong> | जमा कर: <strong>₹{record.taxDetails?.amountPaid}</strong>
+                            </p>
+                          </div>
+
+                          <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 w-full sm:w-auto">
+                            {/* Submission Letter Modal */}
+                            <button
+                              onClick={() => setLetterModal({ isOpen: true, record, serviceType: 'no_dues' })}
+                              className="btn btn-secondary btn-sm flex items-center gap-1 font-bold text-emerald-900 bg-emerald-50 hover:bg-emerald-100 border-emerald-200 text-[11px]"
+                            >
+                              <Printer className="w-3.5 h-3.5 text-emerald-700" /> आवेदन पत्र
+                            </button>
+
+                            {/* View Uploaded Tax Receipt */}
+                            {record.documents?.taxReceipt && (
+                              <a
+                                href={record.documents.taxReceipt.data}
+                                download={record.documents.taxReceipt.name || 'Property_Tax_Receipt.pdf'}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="btn btn-secondary btn-sm flex items-center gap-1 font-bold text-blue-900 bg-blue-50 border-blue-200 text-[11px]"
+                              >
+                                📄 कर रसीद देखें
+                              </a>
+                            )}
+
+                            {record.status === 'Submitted' && (
+                              <button
+                                onClick={() => setRemarkModal({ isOpen: true, record, serviceType: 'no_dues', targetStatus: 'Under Review', remarkText: 'कर रसीद व SAF सत्यापन हेतु चुना गया', officerName: adminAccounts[currentAdminUser]?.name || 'Zonal Revenue Officer' })}
+                                className="btn btn-secondary btn-sm bg-blue-50 border-blue-200 text-blue-700 font-bold text-[11px]"
+                              >
+                                👁️ समीक्षा करें
+                              </button>
+                            )}
+
+                            {record.status !== 'Approved' && record.status !== 'Certificate Generated' && record.status !== 'Completed' && (
+                              <button
+                                onClick={() => setRemarkModal({ isOpen: true, record, serviceType: 'no_dues', targetStatus: 'Approved', remarkText: 'संपत्ति कर व SAF पूर्णतः सत्यापित। नो ड्यूज प्रमाण पत्र स्वीकृत।', officerName: adminAccounts[currentAdminUser]?.name || 'Zonal Revenue Officer' })}
+                                className="btn btn-primary btn-sm bg-gradient-to-r from-emerald-700 to-teal-800 font-bold text-[11px]"
+                              >
+                                ✅ स्वीकृत करें व NOC जारी करें
+                              </button>
+                            )}
+
+                            {record.status !== 'Rejected' && (
+                              <button
+                                onClick={() => setRemarkModal({ isOpen: true, record, serviceType: 'no_dues', targetStatus: 'Rejected', remarkText: 'वर्तमान कर रसीद या दस्तावेज अमान्य', officerName: adminAccounts[currentAdminUser]?.name || 'Zonal Revenue Officer' })}
+                                className="btn btn-danger btn-sm font-bold text-[11px]"
+                              >
+                                ❌ निरस्त
+                              </button>
+                            )}
+
+                            {(record.status === 'Approved' || record.status === 'Certificate Generated' || record.status === 'Completed') && (
+                              <button
+                                onClick={() => setNoDuesCertPreview(record)}
+                                className="btn btn-primary btn-sm bg-emerald-800 font-bold text-[11px]"
+                              >
+                                📜 नो ड्यूज प्रमाण पत्र
+                              </button>
+                            )}
+
+                            <button
+                              onClick={() => setSelectedNoDuesDetail(record)}
+                              className="btn btn-secondary btn-sm flex items-center gap-1 font-bold text-slate-700 text-[11px]"
+                            >
+                              <History className="w-3.5 h-3.5 text-slate-500" /> विवरण
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
             {/* ── AUDIT LOGS TAB ──────────────────────────────────────────── */}
             {activeTab === 'audit' && (
               <div className="space-y-4">
@@ -1363,7 +1542,11 @@ export default function AdminPage() {
               </div>
 
               <div className="overflow-y-auto flex-1 pr-1 pt-3">
-                <ApplicationLetterTemplate record={letterModal.record} serviceType={letterModal.serviceType} />
+                {letterModal.serviceType === 'no_dues' ? (
+                  <NoDuesLetterTemplate record={letterModal.record} />
+                ) : (
+                  <ApplicationLetterTemplate record={letterModal.record} serviceType={letterModal.serviceType} />
+                )}
               </div>
             </div>
           </div>
@@ -1448,6 +1631,34 @@ export default function AdminPage() {
 
               <div className="overflow-y-auto flex-1 pr-1 pt-3">
                 <WaterConnectionTemplate record={waterCertPreview} />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* No Dues Certificate Preview Modal */}
+        {noDuesCertPreview && (
+          <div className="fixed inset-0 bg-slate-900/75 backdrop-blur-md z-[70] overflow-y-auto p-3 sm:p-6 flex items-start justify-center pt-4 sm:pt-8">
+            <div className="bg-white border border-slate-200 rounded-3xl max-w-4xl w-full p-4 sm:p-6 shadow-2xl flex flex-col max-h-[84vh] sm:max-h-[86vh]">
+              <div className="flex items-center justify-between border-b border-slate-100 pb-3 shrink-0">
+                <h3 className="text-slate-900 font-extrabold text-base flex items-center gap-2">
+                  📜 नो ड्यूज प्रमाण पत्र पूर्वावलोकन (No Dues Certificate Preview)
+                </h3>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => window.print()}
+                    className="btn btn-primary btn-sm flex items-center gap-1 font-bold text-xs bg-emerald-700"
+                  >
+                    <Printer className="w-3.5 h-3.5" /> प्रिंट / PDF डाउनलोड
+                  </button>
+                  <button onClick={() => setNoDuesCertPreview(null)} className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors">
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+              </div>
+
+              <div className="overflow-y-auto flex-1 pr-1 pt-3">
+                <NoDuesCertificateTemplate record={noDuesCertPreview} />
               </div>
             </div>
           </div>

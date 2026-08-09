@@ -6,11 +6,14 @@ import { getNotifications, markNotificationAsRead } from '../services/notificati
 import { getBirthCertificates } from '../services/birthCertificateService';
 import { getDeathCertificates } from '../services/deathCertificateService';
 import { getWaterConnections } from '../services/waterConnectionService';
+import { getNoDuesCertificates } from '../services/noDuesService';
 import { useAutoAnimate } from '@formkit/auto-animate/react';
 import ApplicationLetterTemplate from './ApplicationLetterTemplate';
 import BirthCertificateTemplate from './BirthCertificateTemplate';
 import DeathCertificateTemplate from './DeathCertificateTemplate';
 import WaterConnectionTemplate from './WaterConnectionTemplate';
+import NoDuesCertificateTemplate from './NoDuesCertificateTemplate';
+import NoDuesLetterTemplate from './NoDuesLetterTemplate';
 import { Layers, ShieldAlert, Bell, X, Search, Printer, FileText, Baby, Droplets, ShieldCheck, Building2, Sparkles, CheckCircle2, Presentation, LogOut, User } from 'lucide-react';
 import { subscribeToMaintenance } from '../services/maintenanceService';
 import { loginWithGoogle, logoutCitizen, getCurrentCitizen, subscribeToCitizenAuth, loginWithMobileOrEmail } from '../services/citizenAuthService';
@@ -123,10 +126,11 @@ export default function ServiceHeader() {
     const cleanQuery = queryText.trim().toLowerCase();
 
     try {
-      const [births, deaths, waters] = await Promise.all([
+      const [births, deaths, waters, nodues] = await Promise.all([
         getBirthCertificates(),
         getDeathCertificates(),
-        getWaterConnections()
+        getWaterConnections(),
+        getNoDuesCertificates()
       ]);
 
       const matches = [];
@@ -135,15 +139,40 @@ export default function ServiceHeader() {
         const appNo = (app.applicationNo || '').toLowerCase();
         const appId = (app.id || '').toLowerCase();
         const certNo = (app.certificateNo || app.permitNo || '').toLowerCase();
-        const mobile = (app.applicantDetails?.mobile || '').replace(/[\s-]/g, '');
+        const propId = (app.propertyDetails?.propertyId || '').toLowerCase();
+        const name = (
+          app.childDetails?.fullName || 
+          app.deceasedDetails?.fullName || 
+          app.applicantDetails?.fullName || ''
+        ).toLowerCase();
+        const mobile = (app.applicantDetails?.mobile || app.informantMobile || '').replace(/[\s-]/g, '');
         const q = cleanQuery.replace(/[\s-]/g, '');
 
-        return appNo.includes(cleanQuery) || appId.includes(cleanQuery) || certNo.includes(cleanQuery) || (mobile && mobile.includes(q));
+        return (
+          appNo.includes(cleanQuery) || 
+          appId.includes(cleanQuery) || 
+          certNo.includes(cleanQuery) ||
+          propId.includes(cleanQuery) ||
+          name.includes(cleanQuery) || 
+          (mobile && mobile.includes(q))
+        );
       };
 
-      births.filter(isMatch).forEach(b => matches.push({ ...b, serviceType: 'birth', serviceName: 'जन्म प्रमाण पत्र' }));
-      deaths.filter(isMatch).forEach(d => matches.push({ ...d, serviceType: 'death', serviceName: 'मृत्यु प्रमाण पत्र' }));
-      waters.filter(isMatch).forEach(w => matches.push({ ...w, serviceType: 'water_connection', serviceName: 'जल कनेक्शन' }));
+      births.forEach(app => {
+        if (isMatch(app)) matches.push({ ...app, serviceName: 'जन्म प्रमाण पत्र', serviceType: 'birth' });
+      });
+
+      deaths.forEach(app => {
+        if (isMatch(app)) matches.push({ ...app, serviceName: 'मृत्यु प्रमाण पत्र', serviceType: 'death' });
+      });
+
+      waters.forEach(app => {
+        if (isMatch(app)) matches.push({ ...app, serviceName: 'जल कनेक्शन', serviceType: 'water_connection' });
+      });
+
+      nodues.forEach(app => {
+        if (isMatch(app)) matches.push({ ...app, serviceName: 'नो ड्यूज NOC', serviceType: 'no_dues' });
+      });
 
       setSearchResults(matches);
     } catch (err) {
@@ -276,6 +305,10 @@ export default function ServiceHeader() {
               <Link href="/water-connection" className={`px-2.5 py-1.5 rounded-xl text-xs font-bold transition-all duration-200 flex items-center gap-1.5 whitespace-nowrap icon-hover-bounce ${isCurrentTab('/water-connection') ? 'bg-teal-700 text-white shadow-sm' : 'text-slate-600 hover:text-slate-900 hover:bg-white/80'}`}>
                 <Droplets className={`w-3.5 h-3.5 shrink-0 ${isCurrentTab('/water-connection') ? 'text-cyan-300' : 'text-cyan-600'}`} />
                 <span>जल कनेक्शन</span>
+              </Link>
+              <Link href="/no-dues-certificate" className={`px-2.5 py-1.5 rounded-xl text-xs font-bold transition-all duration-200 flex items-center gap-1.5 whitespace-nowrap icon-hover-bounce ${isCurrentTab('/no-dues-certificate') ? 'bg-emerald-800 text-white shadow-sm' : 'text-slate-600 hover:text-slate-900 hover:bg-white/80'}`}>
+                <Building2 className={`w-3.5 h-3.5 shrink-0 ${isCurrentTab('/no-dues-certificate') ? 'text-amber-300' : 'text-amber-600'}`} />
+                <span>नो ड्यूज NOC</span>
               </Link>
               <Link href="/privacy-policy" className={`px-2.5 py-1.5 rounded-xl text-xs font-bold transition-all duration-200 flex items-center gap-1.5 whitespace-nowrap icon-hover-bounce ${isCurrentTab('/privacy-policy') ? 'bg-slate-800 text-white shadow-sm' : 'text-slate-600 hover:text-slate-900 hover:bg-white/80'}`}>
                 <ShieldCheck className={`w-3.5 h-3.5 shrink-0 ${isCurrentTab('/privacy-policy') ? 'text-emerald-400' : 'text-slate-500'}`} />
