@@ -12,6 +12,8 @@ import {
   submitWaterConnection, 
   getWaterConnections 
 } from '@/services/waterConnectionService';
+import { getCurrentCitizen, loginWithGoogle } from '@/services/citizenAuthService';
+import toast from 'react-hot-toast';
 import { 
   Droplet, Activity, CheckCircle2, AlertCircle, RefreshCw, Printer, X, History, Plus, 
   Building2, User, Home, FileText, Download, ShieldAlert, CheckSquare, Wrench, ListChecks
@@ -212,6 +214,20 @@ export default function WaterConnectionPage() {
       setMessage({ type: 'error', text: 'कृपया फॉर्म में त्रुटियों को सुधारें (Please resolve validation errors)' });
       window.scrollTo({ top: 100, behavior: 'smooth' });
       return;
+    }
+
+    // Citizen Google Auth requirement for tracking personal data
+    let citizen = getCurrentCitizen();
+    if (!citizen) {
+      toast.loading('🔐 नागरिक डेटा ट्रैकिंग हेतु गूगल साइन-इन आवश्यक है...', { id: 'g-auth' });
+      const authRes = await loginWithGoogle();
+      toast.dismiss('g-auth');
+      if (!authRes.success) {
+        setMessage({ type: 'error', text: '⚠️ व्यक्तिगत डेटा सुरक्षा एवं आवेदन ट्रैकिंग हेतु गूगल लॉगिन अनिवार्य है।' });
+        return;
+      }
+      citizen = authRes.user;
+      toast.success(`नमस्ते ${citizen.displayName}! गूगल अकाउंट सफलतापूर्वक जुड़ गया।`);
     }
 
     setFormErrors([]);
@@ -919,13 +935,25 @@ export default function WaterConnectionPage() {
                           <Printer className="w-3.5 h-3.5 text-teal-700" /> पावती पत्र (Letter)
                         </button>
 
-                        {(app.status === 'Approved' || app.status === 'Sanctioned' || app.status === 'Completed') && (
-                          <button
-                            onClick={() => { setSelectedApp(app); setShowCertModal(true); }}
-                            className="btn btn-primary btn-sm bg-teal-700 font-bold text-xs"
+                        {app.officialUploadedCertificate ? (
+                          <a
+                            href={app.officialUploadedCertificate.fileData}
+                            download={app.officialUploadedCertificate.fileName || 'Official_Signed_Water_Sanction_Permit.pdf'}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="btn btn-primary btn-sm bg-teal-700 hover:bg-teal-800 text-white font-bold text-xs flex items-center gap-1 shadow-md"
                           >
-                            📜 स्वीकृति पत्र (Permit)
-                          </button>
+                            <Download className="w-3.5 h-3.5" /> 📜 अधिकारी हस्ताक्षरित आदेश
+                          </a>
+                        ) : (
+                          (app.status === 'Approved' || app.status === 'Sanctioned' || app.status === 'Completed') && (
+                            <button
+                              onClick={() => { setSelectedApp(app); setShowCertModal(true); }}
+                              className="btn btn-primary btn-sm bg-teal-700 font-bold text-xs"
+                            >
+                              📜 स्वीकृति पत्र (Permit)
+                            </button>
+                          )
                         )}
 
                         {app.status === 'Correction Requested' && (

@@ -132,7 +132,7 @@ export default function AdminPage() {
   const loadDeathRecords = useCallback(async () => {
     setDeathLoading(true)
     try {
-      const list = await getDeathCertificates()
+      const list = await getDeathCertificates(null, true)
       setDeathRecords(list)
     } catch (e) {
       toast.error('Failed to load death certificates: ' + e.message)
@@ -143,7 +143,7 @@ export default function AdminPage() {
   const loadBirthRecords = useCallback(async () => {
     setBirthLoading(true)
     try {
-      const list = await getBirthCertificates()
+      const list = await getBirthCertificates(null, true)
       setBirthRecords(list)
     } catch (e) {
       toast.error('Failed to load birth certificates: ' + e.message)
@@ -154,7 +154,7 @@ export default function AdminPage() {
   const loadWaterRecords = useCallback(async () => {
     setWaterLoading(true)
     try {
-      const list = await getWaterConnections()
+      const list = await getWaterConnections(null, true)
       setWaterRecords(list)
     } catch (e) {
       toast.error('Failed to load water connections: ' + e.message)
@@ -281,21 +281,24 @@ export default function AdminPage() {
         id: remarkModal.record.id,
         newStatus: remarkModal.targetStatus,
         remarks: remarkModal.remarkText,
-        officerName
+        officerName,
+        officialUploadedCertificate: remarkModal.officialCertFile || null
       })
     } else if (remarkModal.serviceType === 'water_connection' || remarkModal.serviceType === 'water') {
       res = await updateWaterConnectionStatus({
         id: remarkModal.record.id,
         newStatus: remarkModal.targetStatus,
         remarks: remarkModal.remarkText,
-        officerName
+        officerName,
+        officialUploadedCertificate: remarkModal.officialCertFile || null
       })
     } else {
       res = await updateDeathCertificateStatus({
         id: remarkModal.record.id,
         newStatus: remarkModal.targetStatus,
         remarks: remarkModal.remarkText,
-        officerName
+        officerName,
+        officialUploadedCertificate: remarkModal.officialCertFile || null
       })
     }
 
@@ -1231,8 +1234,57 @@ export default function AdminPage() {
                   />
                 </div>
 
+                {/* Upload Official Signed Certificate / Sanction Order */}
+                {(remarkModal.targetStatus === 'Approved' || remarkModal.targetStatus === 'Certificate Generated' || remarkModal.targetStatus === 'Completed' || remarkModal.targetStatus === 'Sanctioned') && (
+                  <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-2">
+                    <label className="block text-[11px] font-extrabold text-slate-900 mb-1">
+                      📤 आधिकारिक हस्ताक्षरित प्रमाण पत्र / स्वीकृति आदेश संलग्न करें (Upload Official Signed Certificate PDF/Image)
+                    </label>
+                    <p className="text-[10px] text-slate-500">
+                      नगर पालिका द्वारा तैयार भौतिक हस्ताक्षरित PDF या स्कैन कॉपी संलग्न करें। यह फ़ाइल नागरिक अपने पोर्टल से सीधे डाउनलोड कर सकेगा।
+                    </p>
+                    <input
+                      type="file"
+                      accept="application/pdf,image/*"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          const reader = new FileReader();
+                          reader.onload = (evt) => {
+                            setRemarkModal(prev => ({
+                              ...prev,
+                              officialCertFile: {
+                                fileData: evt.target.result,
+                                fileName: file.name,
+                                fileType: file.type,
+                                uploadedAt: new Date().toISOString(),
+                                uploadedBy: adminAccounts[currentAdminUser]?.name || 'Municipal Officer'
+                              }
+                            }));
+                            toast.success(`फ़ाइल '${file.name}' संलग्न की गई!`);
+                          };
+                          reader.readAsDataURL(file);
+                        }
+                      }}
+                      className="w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-emerald-100 file:text-emerald-800 hover:file:bg-emerald-200 cursor-pointer border border-slate-300 rounded-xl p-1.5 bg-white"
+                    />
+                    {remarkModal.officialCertFile && (
+                      <div className="flex items-center justify-between text-xs bg-emerald-50 border border-emerald-200 p-2.5 rounded-xl text-emerald-900 font-bold mt-1">
+                        <span>✅ संलग्न फ़ाइल: {remarkModal.officialCertFile.fileName}</span>
+                        <button
+                          type="button"
+                          onClick={() => setRemarkModal(prev => ({ ...prev, officialCertFile: null }))}
+                          className="text-rose-600 hover:underline text-[10px]"
+                        >
+                          हटाएं
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )}
+
                 <div className="flex justify-end gap-2">
-                  <button type="button" onClick={() => setRemarkModal({ isOpen: false, record: null, serviceType: 'death', targetStatus: '', remarkText: '', officerName: 'Nagar Palika Officer' })} className="btn btn-secondary">
+                  <button type="button" onClick={() => setRemarkModal({ isOpen: false, record: null, serviceType: 'death', targetStatus: '', remarkText: '', officerName: 'Nagar Palika Officer', officialCertFile: null })} className="btn btn-secondary">
                     रद्द करें
                   </button>
                   <button type="submit" className="btn btn-primary">

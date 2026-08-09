@@ -4,31 +4,31 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import ServiceHeader from '@/components/ServiceHeader';
 import { 
-  Presentation, ChevronLeft, ChevronRight, Play, Pause, Maximize2, 
+  Presentation, ChevronLeft, ChevronRight, Play, Pause, 
   FileText, Baby, Droplets, ShieldCheck, CheckCircle2, AlertCircle, 
-  Clock, RefreshCw, Printer, ShieldAlert, Sparkles, Building2, Layers, Download
+  Clock, RefreshCw, Printer, ShieldAlert, Sparkles, Building2, Download
 } from 'lucide-react';
 
 const SLIDES = [
   {
     id: 1,
-    title: 'झाबुआ नगर पालिका ई-सेवा पोर्टल — एस.ओ.पी. प्रस्तुतीकरण',
-    subtitle: 'Executive SOP & Platform Architecture Overview',
+    title: 'Jhabua Nagar Palika e-Sewa Portal — SOP Presentation Overview',
+    subtitle: 'Executive SOP & Platform Architecture Overview (Hinglish)',
     category: 'OVERVIEW',
     badgeColor: 'bg-emerald-100 text-emerald-800 border-emerald-300',
     icon: Building2,
     content: (
-      <div className="space-y-6">
-        <div className="bg-gradient-to-br from-emerald-900 to-slate-900 text-white rounded-3xl p-8 shadow-xl relative overflow-hidden">
-          <div className="relative z-10 space-y-4">
-            <span className="bg-emerald-500/20 text-emerald-300 text-xs font-bold px-3 py-1 rounded-full border border-emerald-400/30 uppercase tracking-widest inline-block">
-              मध्य प्रदेश शासन — नगरीय विकास एवं आवास विभाग
+      <div className="space-y-6 font-sans">
+        <div className="bg-gradient-to-br from-emerald-900 to-slate-900 text-white rounded-3xl p-6 sm:p-8 shadow-xl relative overflow-hidden">
+          <div className="relative z-10 space-y-3">
+            <span className="bg-emerald-500/20 text-emerald-300 text-[11px] font-bold px-3.5 py-1 rounded-full border border-emerald-400/30 uppercase tracking-widest inline-block">
+              Madhya Pradesh Govt — Urban Development & Housing Department
             </span>
-            <h2 className="text-2xl sm:text-3xl font-extrabold leading-tight">
-              कार्यालय नगर पालिका परिषद झाबुआ (म.प्र.)
+            <h2 className="text-xl sm:text-3xl font-extrabold leading-tight">
+              Karyalay Nagar Palika Parishad Jhabua (M.P.)
             </h2>
-            <p className="text-slate-300 text-sm max-w-2xl leading-relaxed">
-              नागरिकों को जन्म प्रमाण पत्र, मृत्यु प्रमाण पत्र एवं जल (नल) कनेक्शन की 100% ऑनलाइन, पारदर्शी एवं समयबद्ध सेवाएं प्रदान करने हेतु निर्मित एकीकृत डिजिटल इंटेलिजेंस प्लेटफॉर्म।
+            <p className="text-slate-300 text-xs sm:text-sm max-w-2xl leading-relaxed">
+              Jhabua nagarikon ke liye Birth Certificate, Death Certificate aur Water Connection ki 100% online, transparent aur fast services ke liye ye Integrated Digital Intelligence Platform taiyar kiya gaya hai.
             </p>
           </div>
           <div className="absolute -right-10 -bottom-10 opacity-10 pointer-events-none">
@@ -38,27 +38,33 @@ const SLIDES = [
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm space-y-2">
-            <div className="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-700">
+            <div className="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-700 font-bold">
               <FileText className="w-5 h-5" />
             </div>
-            <h3 className="font-extrabold text-slate-900 text-sm">मृत्यु प्रमाण पत्र सेवा</h3>
-            <p className="text-xs text-slate-500 leading-relaxed">घर/अस्पताल मृत्यु पंजीकरण, पंचनामा एवं मुक्तिधाम रसीद सत्यापन के साथ 7 दिनों में प्रमाण पत्र जारी।</p>
+            <h3 className="font-extrabold text-slate-900 text-sm">Death Certificate Service</h3>
+            <p className="text-xs text-slate-600 leading-relaxed">
+              Home ya Hospital death registration, Panchnama aur Muktidham receipt verification ke sath 7 working days me Certificate issue kiya jata hai.
+            </p>
           </div>
 
           <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm space-y-2">
-            <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-700">
+            <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-700 font-bold">
               <Baby className="w-5 h-5" />
             </div>
-            <h3 className="font-extrabold text-slate-900 text-sm">जन्म प्रमाण पत्र सेवा</h3>
-            <p className="text-xs text-slate-500 leading-relaxed">नवजात शिशु पंजीकरण, आँगनवाड़ी सील पत्र एवं माता-पिता आधार लिंक के साथ त्वरित डिजिटल जारीकरण।</p>
+            <h3 className="font-extrabold text-slate-900 text-sm">Birth Certificate Service</h3>
+            <p className="text-xs text-slate-600 leading-relaxed">
+              Newborn baby registration, Anganwadi/ANM report aur Mother-Father Aadhaar verification ke sath 7 working days me Digital Certificate milta hai.
+            </p>
           </div>
 
           <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm space-y-2">
-            <div className="w-10 h-10 rounded-xl bg-cyan-50 border border-cyan-200 flex items-center justify-center text-cyan-700">
+            <div className="w-10 h-10 rounded-xl bg-cyan-50 border border-cyan-200 flex items-center justify-center text-cyan-700 font-bold">
               <Droplets className="w-5 h-5" />
             </div>
-            <h3 className="font-extrabold text-slate-900 text-sm">जल (नल) कनेक्शन सेवा</h3>
-            <p className="text-xs text-slate-500 leading-relaxed">साइट प्लान नक्शा, प्लम्बर लाइसेंस एवं ₹4250 शुल्क चालान सत्यापन उपरांत CMO स्वीकृत परमिट।</p>
+            <h3 className="font-extrabold text-slate-900 text-sm">Water Connection Service</h3>
+            <p className="text-xs text-slate-600 leading-relaxed">
+              Property Details, Site Plan map, Plumber license aur ₹4,250 Connection Fee receipt verification ke baad CMO approval permit milta hai.
+            </p>
           </div>
         </div>
       </div>
@@ -66,51 +72,55 @@ const SLIDES = [
   },
   {
     id: 2,
-    title: 'नागरिक अधिकार पत्र एवं सेवा समयावधि (SLA Rules)',
-    subtitle: 'Service Level Agreements & Mandated Resolution Timelines',
-    category: 'CITIZEN CHARTER',
+    title: 'Nagarik Adhikar Patra & Timelines (MP Lok Seva Guarantee Act)',
+    subtitle: 'Service Level Agreements (SLA) & Hard Copy Verification Timelines',
+    category: 'SLA TIMELINES',
     badgeColor: 'bg-blue-100 text-blue-800 border-blue-300',
     icon: Clock,
     content: (
-      <div className="space-y-6">
+      <div className="space-y-6 font-sans">
         <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm space-y-4">
           <h3 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
             <Clock className="w-5 h-5 text-emerald-600" />
-            शासकीय सेवा समयावधि (Guaranteed Timelines as per MP Lok Seva Guarantee Act)
+            Government Guaranteed Timelines Table (SLA & Hard Copy Verification)
           </h3>
 
           <div className="overflow-x-auto">
             <table className="w-full text-xs text-left border-collapse border border-slate-200">
               <thead>
                 <tr className="bg-slate-100 text-slate-800 font-bold border-b border-slate-300">
-                  <th className="p-3 border-r border-slate-200">क्र.</th>
-                  <th className="p-3 border-r border-slate-200">सेवा का नाम (Service Name)</th>
-                  <th className="p-3 border-r border-slate-200">प्रकार (Category)</th>
-                  <th className="p-3 border-r border-slate-200">स्वीकृति समयावधि (SLA)</th>
-                  <th className="p-3">उत्तरदायी अधिकारी (Nodal Officer)</th>
+                  <th className="p-3 border-r border-slate-200 text-center">S.No.</th>
+                  <th className="p-3 border-r border-slate-200">Service Name (Seva Ka Naam)</th>
+                  <th className="p-3 border-r border-slate-200">Category / Process</th>
+                  <th className="p-3 border-r border-slate-200">Hard Copy Submission & Verification Range</th>
+                  <th className="p-3 border-r border-slate-200">Final SLA Approval Timeline</th>
+                  <th className="p-3">Nodal Officer (Jawabdar Adhikari)</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-200 font-medium text-slate-700">
                 <tr className="hover:bg-slate-50">
                   <td className="p-3 font-bold border-r border-slate-200 text-center">1</td>
-                  <td className="p-3 border-r border-slate-200 font-bold text-slate-900">मृत्यु प्रमाण पत्र (Death Cert)</td>
-                  <td className="p-3 border-r border-slate-200">अस्पताल मृत्यु / घर पर मृत्यु</td>
-                  <td className="p-3 border-r border-slate-200 font-bold text-emerald-800">7 कार्य दिवस (Days)</td>
-                  <td className="p-3">जन्म-मृत्यु रजिस्ट्रार अधिकारी</td>
+                  <td className="p-3 border-r border-slate-200 font-bold text-slate-900">Death Certificate (Mrityu Praman Patra)</td>
+                  <td className="p-3 border-r border-slate-200">Hospital Death / Home Death</td>
+                  <td className="p-3 border-r border-slate-200 font-bold text-amber-800 bg-amber-50/60">Min 1 Day — Max 3 Days (1 se 3 Din)</td>
+                  <td className="p-3 border-r border-slate-200 font-bold text-emerald-800">7 Working Days (Karya Divas)</td>
+                  <td className="p-3">Birth-Death Registrar Officer</td>
                 </tr>
                 <tr className="hover:bg-slate-50">
                   <td className="p-3 font-bold border-r border-slate-200 text-center">2</td>
-                  <td className="p-3 border-r border-slate-200 font-bold text-slate-900">जन्म प्रमाण पत्र (Birth Cert)</td>
-                  <td className="p-3 border-r border-slate-200">अस्पताल प्रसव / घर पर प्रसव</td>
-                  <td className="p-3 border-r border-slate-200 font-bold text-emerald-800">7 कार्य दिवस (Days)</td>
-                  <td className="p-3">जन्म-मृत्यु रजिस्ट्रार अधिकारी</td>
+                  <td className="p-3 border-r border-slate-200 font-bold text-slate-900">Birth Certificate (Janma Praman Patra)</td>
+                  <td className="p-3 border-r border-slate-200">Hospital Delivery / Home Delivery</td>
+                  <td className="p-3 border-r border-slate-200 font-bold text-amber-800 bg-amber-50/60">Min 1 Day — Max 3 Days (1 se 3 Din)</td>
+                  <td className="p-3 border-r border-slate-200 font-bold text-emerald-800">7 Working Days (Karya Divas)</td>
+                  <td className="p-3">Birth-Death Registrar Officer</td>
                 </tr>
                 <tr className="hover:bg-slate-50">
                   <td className="p-3 font-bold border-r border-slate-200 text-center">3</td>
-                  <td className="p-3 border-r border-slate-200 font-bold text-slate-900">नवीन जल कनेक्शन (Water Conn)</td>
-                  <td className="p-3 border-r border-slate-200">घरेलू / व्यावसायिक कनेक्शन</td>
-                  <td className="p-3 border-r border-slate-200 font-bold text-blue-800">15 कार्य दिवस (Days)</td>
-                  <td className="p-3">जल प्रदाय शाखा / CMO झाबुआ</td>
+                  <td className="p-3 border-r border-slate-200 font-bold text-slate-900">Water Connection (Nal Connection)</td>
+                  <td className="p-3 border-r border-slate-200">Domestic / Commercial Connection</td>
+                  <td className="p-3 border-r border-slate-200 font-bold text-amber-800 bg-amber-50/60">Min 1 Day — Max 3 Days (1 se 3 Din)</td>
+                  <td className="p-3 border-r border-slate-200 font-bold text-blue-800">15 Working Days (Karya Divas)</td>
+                  <td className="p-3">Water Supply Branch / CMO Jhabua</td>
                 </tr>
               </tbody>
             </table>
@@ -120,11 +130,11 @@ const SLIDES = [
         <div className="bg-amber-50 border border-amber-200 rounded-2xl p-5 text-amber-950 space-y-2 text-xs">
           <div className="font-bold flex items-center gap-2 text-amber-900 text-sm">
             <AlertCircle className="w-4 h-4 text-amber-600" />
-            <span>अनिवार्य नियम (Key Verification Rules):</span>
+            <span>Mandatory Verification Rules (Anivarya Niyam):</span>
           </div>
           <ul className="list-disc list-inside space-y-1 pl-2 font-medium">
-            <li>अंग्रेजी में नाम की स्पेलिंग <strong>CAPITAL LETTERS</strong> में होना अनिवार्य है (सूचना पट्ट निर्देश 5 एवं 6)।</li>
-            <li>ऑनलाइन आवेदन उपरांत <strong>भौतिक पावती पत्र (Submission Letter)</strong> का प्रिंट निकालकर मूल दस्तावेजों के साथ नगर पालिका कार्यालय में जमा करना अनिवार्य है।</li>
+            <li>English me Deceased aur Child ka naam <strong>CAPITAL LETTERS</strong> me hona compulsory hai (Notice Board Rule 5 & 6).</li>
+            <li>Online application fill karne ke baad <strong>Hard Copy Submission Letter (Pavti Patra)</strong> ka print nikal kar <strong>Minimum 1 day se Maximum 3 days ke andar</strong> Nagar Palika office me original documents ke sath submit karna hoga.</li>
           </ul>
         </div>
       </div>
@@ -132,51 +142,51 @@ const SLIDES = [
   },
   {
     id: 3,
-    title: 'नागरिक आवेदन एस.ओ.पी. (Citizen Application Workflow)',
+    title: 'Nagarik Application Workflow (Citizen SOP Step-by-Step)',
     subtitle: 'Standard Operating Procedure for Online Applicants',
     category: 'CITIZEN WORKFLOW',
     badgeColor: 'bg-cyan-100 text-cyan-800 border-cyan-300',
     icon: FileText,
     content: (
-      <div className="space-y-6">
+      <div className="space-y-6 font-sans">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div className="bg-white border-2 border-emerald-200 rounded-2xl p-5 shadow-sm space-y-2 relative">
             <span className="w-7 h-7 rounded-full bg-emerald-700 text-white font-bold text-xs flex items-center justify-center">1</span>
-            <h4 className="font-extrabold text-slate-900 text-sm">फॉर्म प्रविष्टि (Form Filing)</h4>
-            <p className="text-xs text-slate-500 leading-relaxed">
-              त्रुटि होने पर स्वचालित नेविगेशन (Auto Navigation to missed fields) एवं रियल-टाइम इनलाइन अलर्ट के साथ फॉर्म भरें।
+            <h4 className="font-extrabold text-slate-900 text-sm">Online Form Entry</h4>
+            <p className="text-xs text-slate-600 leading-relaxed">
+              Smart Auto-Navigation aur Google Sign-In with real-time error alert ke sath form fill karein.
             </p>
           </div>
 
           <div className="bg-white border-2 border-blue-200 rounded-2xl p-5 shadow-sm space-y-2 relative">
             <span className="w-7 h-7 rounded-full bg-blue-700 text-white font-bold text-xs flex items-center justify-center">2</span>
-            <h4 className="font-extrabold text-slate-900 text-sm">दस्तावेज अपलोड (Doc Vault)</h4>
-            <p className="text-xs text-slate-500 leading-relaxed">
-              आधार कार्ड, समग्र आईडी, मुक्तिधाम रसीद/अस्पताल स्लिप का डिजिटल दस्तावेज अपलोड करें।
+            <h4 className="font-extrabold text-slate-900 text-sm">Document Upload Vault</h4>
+            <p className="text-xs text-slate-600 leading-relaxed">
+              Aadhaar card, Samagra ID, Muktidham receipt ya Hospital slip digital vault me upload karein.
             </p>
           </div>
 
           <div className="bg-white border-2 border-amber-200 rounded-2xl p-5 shadow-sm space-y-2 relative">
             <span className="w-7 h-7 rounded-full bg-amber-700 text-white font-bold text-xs flex items-center justify-center">3</span>
-            <h4 className="font-extrabold text-slate-900 text-sm">पावती पत्र प्रिंट (Print Letter)</h4>
-            <p className="text-xs text-slate-500 leading-relaxed">
-              भौतिक पावती पत्र (1 Page Submission Receipt) प्रिंट करें एवं नगर पालिका कार्यालय में भौतिक सत्यापन कराएं।
+            <h4 className="font-extrabold text-slate-900 text-sm">Hard Copy Submission</h4>
+            <p className="text-xs text-slate-600 leading-relaxed">
+              1-Page Pavti Letter print karke <strong>1 to 3 days range me</strong> Nagar Palika me physical verification karayein.
             </p>
           </div>
 
           <div className="bg-white border-2 border-purple-200 rounded-2xl p-5 shadow-sm space-y-2 relative">
             <span className="w-7 h-7 rounded-full bg-purple-700 text-white font-bold text-xs flex items-center justify-center">4</span>
-            <h4 className="font-extrabold text-slate-900 text-sm">लाइव ट्रैक (Live Tracking)</h4>
-            <p className="text-xs text-slate-500 leading-relaxed">
-              आवेदन क्रमांक (App No) दर्ज कर स्थिति (Submitted ➔ Under Review ➔ Approved) ट्रैक करें।
+            <h4 className="font-extrabold text-slate-900 text-sm">Live Mobile Tracking</h4>
+            <p className="text-xs text-slate-600 leading-relaxed">
+              Application No se live status (Submitted ➔ Under Review ➔ Approved) track karein aur digital Certificate download karein.
             </p>
           </div>
         </div>
 
         <div className="bg-slate-900 text-white rounded-2xl p-5 text-xs flex items-center justify-between gap-4">
           <div className="space-y-1">
-            <span className="font-bold text-emerald-400">💡 स्मार्ट फीचर (Smart Auto-Nav):</span>
-            <p className="text-slate-300">यदि फॉर्म भरते समय कोई फील्ड छूट जाता है, तो बटन दबाते ही स्क्रीन स्वतः उस फील्ड पर स्क्रॉल हो जाती है और लाल बॉक्स में त्रुटि दिखाती है।</p>
+            <span className="font-bold text-emerald-400">💡 Google Auth & Individual Tracking:</span>
+            <p className="text-slate-300">Har nagarik apna personal form secure Google Sign-In se track kar sakta hai. Isse duplicate forms, shared cache issue aur privacy risk 100% resolve hota hai.</p>
           </div>
         </div>
       </div>
@@ -184,58 +194,58 @@ const SLIDES = [
   },
   {
     id: 4,
-    title: 'अधिकारी सत्यापन एस.ओ.पी. (Officer Audit Workflow)',
+    title: 'Adhikari Verification SOP (Officer Audit & Approval Workflow)',
     subtitle: 'Standard Operating Procedure for Administrative Officers',
     category: 'ADMIN WORKFLOW',
     badgeColor: 'bg-emerald-100 text-emerald-800 border-emerald-300',
     icon: ShieldAlert,
     content: (
-      <div className="space-y-6">
+      <div className="space-y-6 font-sans">
         <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm space-y-4">
           <h3 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
             <ShieldAlert className="w-5 h-5 text-emerald-700" />
-            अधिकारी प्रशासन पोर्टल (`/admin`) सत्यापन चरण
+            Officer Admin Portal (`/admin`) Verification Steps
           </h3>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
             <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-2">
-              <span className="font-bold text-slate-900 text-sm block">1. भूमिका आधारित लॉगिन</span>
-              <p className="text-slate-600">जन्म-मृत्यु रजिस्ट्रार अधिकारी एवं जल प्रदाय विभाग अधिकारी पृथक-पृथक क्रेडेंशियल से लॉगिन करते हैं।</p>
+              <span className="font-bold text-slate-900 text-sm block">1. Role-Based Login</span>
+              <p className="text-slate-600">Birth-Death Registrar Officer aur Water Supply Officer apne dedicated credentials se `/admin` portal par login karte hain.</p>
             </div>
 
             <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-2">
-              <span className="font-bold text-slate-900 text-sm block">2. भौतिक दस्तावेज जांच</span>
-              <p className="text-slate-600">नागरिक द्वारा प्रस्तुत मूल पावती एवं संलग्न फोटोकॉपी का मिलान ऑनलाइन पोर्टल डेटा से किया जाता है।</p>
+              <span className="font-bold text-slate-900 text-sm block">2. Hard Copy & Vault Audit</span>
+              <p className="text-slate-600">Nagarik dwara submit ki gayi 1 to 3 days hard copy ka online Firestore document vault data se matching kiya jata hai.</p>
             </div>
 
             <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-2">
-              <span className="font-bold text-slate-900 text-sm block">3. स्थिति परिवर्तन एवं डिजिटल सील</span>
-              <p className="text-slate-600">अधिकारी द्वारा स्वीकृत करने पर डिजिटल प्रमाण पत्र पर आधिकारिक नगर पालिका सील एवं QR कोड स्वतः अंकित हो जाता है।</p>
+              <span className="font-bold text-slate-900 text-sm block">3. Digital Seal & QR Release</span>
+              <p className="text-slate-600">Adhikari dwara Approve karne par official Nagar Palika Digital Seal aur QR code certificate par automatic embed ho jata hai.</p>
             </div>
           </div>
         </div>
 
         <div className="bg-emerald-950 text-white rounded-2xl p-5 text-xs space-y-2">
-          <span className="font-bold text-emerald-400">🛡️ अधिकारी टिप्पणी (Officer Remarks System):</span>
-          <p className="text-slate-300">यदि किसी दस्तावेज में कमी पाई जाती है, तो अधिकारी स्थिति को **Correction Requested (सुधार की आवश्यकता)** में बदल कर स्पष्ट टिप्पणी (Remark) लिख सकते हैं, जो नागरिक के मोबाइल ट्रैक पैनल पर तुरंत प्रदर्शित होती है।</p>
+          <span className="font-bold text-emerald-400">🛡️ Officer Remarks & Correction Protocol:</span>
+          <p className="text-slate-300">Dastavez me koi kami hone par Adhikari status ko **Correction Requested** me badal kar exact remark likhte hain, jo nagarik ke tracking dashboard par instant show hota hai.</p>
         </div>
       </div>
     )
   },
   {
     id: 5,
-    title: 'सुधार चक्र एवं ओवरराइट प्रोटोकॉल (Resubmission Protocol)',
-    subtitle: 'Automated Record Overwrite & Alert Mechanism for Corrected Files',
+    title: 'Resubmission & Firestore Overwrite Protocol',
+    subtitle: 'Zero Duplication Engine for Corrected Applications',
     category: 'RESUBMISSION ENGINE',
     badgeColor: 'bg-amber-100 text-amber-800 border-amber-300',
     icon: RefreshCw,
     content: (
-      <div className="space-y-6">
+      <div className="space-y-6 font-sans">
         <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm space-y-4">
           <div className="flex items-center justify-between border-b border-slate-100 pb-3">
             <h3 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
               <RefreshCw className="w-5 h-5 text-amber-600" />
-              आवेदन सुधार एवं पुनः प्रस्तुतीकरण चक्र (Resubmission Engine)
+              Resubmission & Automated Overwrite Engine
             </h3>
             <span className="text-xs font-bold text-amber-900 bg-amber-100 px-3 py-1 rounded-full border border-amber-300">
               Zero Duplication Loop
@@ -244,16 +254,16 @@ const SLIDES = [
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
             <div className="bg-amber-50/60 border border-amber-200 rounded-2xl p-4 space-y-2">
-              <h4 className="font-extrabold text-amber-950 text-sm">❌ पुरानी व्यवस्था की समस्या (The Issue)</h4>
+              <h4 className="font-extrabold text-amber-950 text-sm">❌ Purani System Ki Problem</h4>
               <p className="text-slate-700 leading-relaxed">
-                पहले जब नागरिक सुधार के बाद पुनः प्रस्तुत करता था, तो प्रणाली नया डुप्लिकेट आवेदन बना देती थी जिससे पुराना एवं नया आवेदन भ्रम पैदा करता था।
+                Pehle jab nagarik correction ke baad form submit karta tha, to naya duplicate record ban jata tha jisse Adhikari confuse ho jate the.
               </p>
             </div>
 
             <div className="bg-emerald-50/60 border border-emerald-200 rounded-2xl p-4 space-y-2">
-              <h4 className="font-extrabold text-emerald-950 text-sm">✅ समाधान: फायरस्टोर ओवरराइट मर्ज (The Solution)</h4>
+              <h4 className="font-extrabold text-emerald-950 text-sm">✅ Perfect Solution: Firestore Overwrite</h4>
               <p className="text-slate-700 leading-relaxed">
-                अब प्रणाली `applicationNo` द्वारा मूल रिकॉर्ड खोजती है और उसी रिकॉर्ड को अद्यतन करती है। अधिकारी पैनल में तत्काल **`🔄 सुधारित आवेदन पुनः प्राप्त (Resubmitted)`** का अलर्ट दिखता है।
+                Ab system `applicationNo` se original record ko locate karta hai aur same record ko update karta hai. Officer panel par instant **`🔄 Resubmitted`** alert notification milta hai.
               </p>
             </div>
           </div>
@@ -261,8 +271,8 @@ const SLIDES = [
 
         <div className="bg-slate-900 text-white rounded-2xl p-5 text-xs flex items-center justify-between">
           <div className="space-y-1">
-            <span className="font-bold text-emerald-400">🔔 ऑटो नोटिफिकेशन इंजन:</span>
-            <p className="text-slate-300">सुधारित आवेदन जमा होते ही अधिकारियों एवं नागरिकों को लाइव अलर्ट नोटिफिकेशन प्रसारित हो जाता है।</p>
+            <span className="font-bold text-emerald-400">🔔 Live Notification Engine:</span>
+            <p className="text-slate-300">Resubmitted form submit hote hi real-time push alert Adhikari aur Nagarik dono ko transmit ho jata hai.</p>
           </div>
         </div>
       </div>
@@ -270,46 +280,52 @@ const SLIDES = [
   },
   {
     id: 6,
-    title: 'सुरक्षा, DPDP प्राइवेसी एवं क्यूआर सत्यापन (Security & Validation)',
-    subtitle: 'DPDP Act 2023 Compliance & Cryptographic QR Verification',
+    title: 'Security, DPDP Act Compliance & QR Verification',
+    subtitle: 'DPDP Act 2023 Rules & Cryptographic Digital Verification',
     category: 'SECURITY & VERIFICATION',
     badgeColor: 'bg-emerald-100 text-emerald-800 border-emerald-300',
     icon: ShieldCheck,
     content: (
-      <div className="space-y-6">
+      <div className="space-y-6 font-sans">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm space-y-2">
-            <div className="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-700">
+            <div className="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-700 font-bold">
               <ShieldCheck className="w-5 h-5" />
             </div>
-            <h3 className="font-extrabold text-slate-900 text-sm">DPDP Act 2023 प्राइवेसी</h3>
-            <p className="text-xs text-slate-500 leading-relaxed">डिजिटल व्यक्तिगत डेटा संरक्षण अधिनियम के तहत नागरिक सहमति अनिवार्य। डेटा एन्क्रिप्टेड स्टोरेज में सुरक्षित।</p>
+            <h3 className="font-extrabold text-slate-900 text-sm">DPDP Act 2023 Privacy</h3>
+            <p className="text-xs text-slate-600 leading-relaxed">
+              Digital Personal Data Protection Act ke andar nagarik consent compulsory. Data Firebase encrypted cloud vault me secure hai.
+            </p>
           </div>
 
           <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm space-y-2">
-            <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-700">
+            <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-700 font-bold">
               <Sparkles className="w-5 h-5" />
             </div>
-            <h3 className="font-extrabold text-slate-900 text-sm">क्यूआर कोड सत्यापन</h3>
-            <p className="text-xs text-slate-500 leading-relaxed">प्रत्येक प्रमाण पत्र एवं जल परमिट पर एन्क्रिप्टेड QR कोड अंकित होता है जिसे किसी भी स्मार्टफोन से स्कैन कर सत्यापित किया जा सकता है।</p>
+            <h3 className="font-extrabold text-slate-900 text-sm">QR Code Live Verification</h3>
+            <p className="text-xs text-slate-600 leading-relaxed">
+              Har Certificate aur Water permit par encrypted QR code stamped hota hai jise kisi bhi smartphone camera se scan karke verify kiya ja sakta hai.
+            </p>
           </div>
 
           <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm space-y-2">
-            <div className="w-10 h-10 rounded-xl bg-purple-50 border border-purple-200 flex items-center justify-center text-purple-700">
+            <div className="w-10 h-10 rounded-xl bg-purple-50 border border-purple-200 flex items-center justify-center text-purple-700 font-bold">
               <Printer className="w-5 h-5" />
             </div>
-            <h3 className="font-extrabold text-slate-900 text-sm">CSS Paged Media PDF</h3>
-            <p className="text-xs text-slate-500 leading-relaxed">शासकीय वॉटरमार्क एवं दोहराए जाने वाले टेबल हेडर के साथ मिनिमम पेजेस PDF प्रिंट इंजन।</p>
+            <h3 className="font-extrabold text-slate-900 text-sm">CSS Paged Media Print Engine</h3>
+            <p className="text-xs text-slate-600 leading-relaxed">
+              State Emblem watermark, repeated table headers aur minimal pages layout ke sath official PDF export engine.
+            </p>
           </div>
         </div>
 
         <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm text-xs space-y-3">
-          <h4 className="font-bold text-slate-900 text-sm border-b pb-2">सत्यापन सुरक्षा सारांश (Verification Security Summary)</h4>
+          <h4 className="font-bold text-slate-900 text-sm border-b pb-2">Platform Technical Specs Summary</h4>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-slate-700">
-            <div><span className="text-slate-400 block">डाटाबेस:</span><span className="font-bold">Firebase Cloud Firestore</span></div>
-            <div><span className="text-slate-400 block">प्रमाण पत्र सील:</span><span className="font-bold">Digital Nagar Palika Seal</span></div>
-            <div><span className="text-slate-400 block">QR सत्यापन URL:</span><span className="font-bold font-mono text-[10px]">jhabua-nagarpalika-aapke-dwar.netlify.app</span></div>
-            <div><span className="text-slate-400 block">पीडीएफ प्रिंट:</span><span className="font-bold">CSS Paged Media `@page`</span></div>
+            <div><span className="text-slate-400 block">Database Vault:</span><span className="font-bold">Firebase Cloud Firestore</span></div>
+            <div><span className="text-slate-400 block">Digital Seal:</span><span className="font-bold">Nagar Palika Official Seal</span></div>
+            <div><span className="text-slate-400 block">QR Verification Domain:</span><span className="font-bold font-mono text-[10px]">jhabua-nagarpalika-aapke-dwar.netlify.app</span></div>
+            <div><span className="text-slate-400 block">PDF Deck Printer:</span><span className="font-bold">CSS Paged Media `@page`</span></div>
           </div>
         </div>
       </div>
@@ -354,6 +370,10 @@ export default function PresentationPage() {
 
   const SlideIcon = currentSlide.icon;
 
+  const handleDownloadFullSOP = () => {
+    window.print();
+  };
+
   return (
     <div className="min-h-screen bg-slate-100 text-slate-900 flex flex-col font-sans">
       <ServiceHeader />
@@ -361,21 +381,21 @@ export default function PresentationPage() {
       <main className="max-w-6xl mx-auto px-4 sm:px-6 py-6 flex-1 w-full flex flex-col space-y-4">
         
         {/* Presentation Header Bar */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm no-print">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-emerald-700 text-white flex items-center justify-center shadow-md">
+            <div className="w-10 h-10 rounded-xl bg-emerald-700 text-white flex items-center justify-center shadow-md shrink-0">
               <Presentation className="w-5 h-5" />
             </div>
             <div>
               <h1 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
-                प्लेटफ़ॉर्म एस.ओ.पी. एवं आर्किटेक्चर प्रेजेंटेशन (Platform SOP Presentation)
+                Platform SOP & Architecture Presentation (Hinglish Deck)
               </h1>
-              <p className="text-xs text-slate-500 font-medium">नगर पालिका परिषद झाबुआ — ई-सेवा डिजिटल गवर्नेंस प्रस्तुतीकरण</p>
+              <p className="text-xs text-slate-500 font-medium">Nagar Palika Parishad Jhabua — Official e-Nagar Governance Presentation</p>
             </div>
           </div>
 
           {/* Presentation Controls */}
-          <div className="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-end border-t sm:border-t-0 pt-2 sm:pt-0">
+          <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto justify-between sm:justify-end border-t sm:border-t-0 pt-2 sm:pt-0">
             <button
               onClick={() => setIsPlaying(!isPlaying)}
               className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all ${
@@ -383,20 +403,22 @@ export default function PresentationPage() {
               }`}
             >
               {isPlaying ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
-              <span>{isPlaying ? 'रोकें (Pause)' : 'स्वचालित चलाएं (Auto Play)'}</span>
+              <span>{isPlaying ? 'Pause' : 'Auto Play'}</span>
             </button>
 
+            {/* 1-Click Complete SOP PDF Download Button */}
             <button
-              onClick={() => window.print()}
-              className="btn btn-secondary btn-sm text-xs font-bold flex items-center gap-1"
+              onClick={handleDownloadFullSOP}
+              className="btn btn-primary btn-sm text-xs font-bold flex items-center gap-1.5 bg-emerald-700 hover:bg-emerald-800 text-white shadow-md transition-all"
             >
-              <Printer className="w-3.5 h-3.5" /> प्रिंट प्रेजेंटेशन
+              <Download className="w-3.5 h-3.5" />
+              <span>📥 पूरी SOP डाउनलोड / प्रिंट करें (Download Complete SOP PDF)</span>
             </button>
           </div>
         </div>
 
-        {/* Main Slide Presentation Stage */}
-        <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-xl flex-1 flex flex-col justify-between space-y-6 min-h-[520px] relative overflow-hidden">
+        {/* Screen Interactive Single Slide Display View */}
+        <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-xl flex-1 flex flex-col justify-between space-y-6 min-h-[520px] relative overflow-hidden no-print">
           
           {/* Slide Top Metadata Bar */}
           <div className="flex items-center justify-between border-b border-slate-100 pb-4">
@@ -453,18 +475,59 @@ export default function PresentationPage() {
                 onClick={handlePrev}
                 className="btn btn-secondary btn-sm font-bold flex items-center gap-1 text-slate-800"
               >
-                <ChevronLeft className="w-4 h-4" /> पिछला (Prev)
+                <ChevronLeft className="w-4 h-4" /> Prev
               </button>
 
               <button
                 onClick={handleNext}
                 className="btn btn-primary btn-sm font-bold flex items-center gap-1"
               >
-                अगला (Next) <ChevronRight className="w-4 h-4" />
+                Next <ChevronRight className="w-4 h-4" />
               </button>
             </div>
           </div>
 
+        </div>
+
+        {/* ── PRINT ONLY ALL-SLIDES FULL SOP DECK CONTAINER ────────────────── */}
+        <div className="hidden print:block space-y-8 font-sans">
+          <div className="text-center border-b-2 border-slate-900 pb-4 mb-6">
+            <h1 className="text-2xl font-extrabold text-slate-900">
+              कार्यालय नगर पालिका परिषद झाबुआ (म.प्र.)
+            </h1>
+            <p className="text-sm font-bold text-slate-700">
+              संपूर्ण प्लेटफ़ॉर्म एस.ओ.पी. एवं गवर्नेंस प्रेज़ेंटेशन (Complete SOP Presentation Deck)
+            </p>
+            <p className="text-xs text-slate-500 font-mono mt-1">
+              MP Lok Seva Guarantee Act & DPDP Act 2023 Compliant Platform
+            </p>
+          </div>
+
+          {SLIDES.map((slide, idx) => {
+            const Icon = slide.icon;
+            return (
+              <div key={slide.id} className="page-break-after border border-slate-300 rounded-2xl p-6 bg-white space-y-4">
+                <div className="flex items-center justify-between border-b pb-2">
+                  <div className="flex items-center gap-2">
+                    <span className="font-extrabold text-xs bg-slate-900 text-white px-2.5 py-0.5 rounded">
+                      SLIDE {idx + 1} / {SLIDES.length}
+                    </span>
+                    <span className="text-xs font-bold text-slate-600 uppercase">{slide.category}</span>
+                  </div>
+                  <Icon className="w-5 h-5 text-emerald-800" />
+                </div>
+
+                <div>
+                  <h2 className="text-lg font-extrabold text-slate-900">{slide.title}</h2>
+                  <p className="text-xs text-slate-500 font-medium">{slide.subtitle}</p>
+                </div>
+
+                <div className="pt-2">
+                  {slide.content}
+                </div>
+              </div>
+            );
+          })}
         </div>
 
       </main>

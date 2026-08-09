@@ -12,6 +12,8 @@ import {
   submitDeathCertificate, 
   getDeathCertificates 
 } from '../../services/deathCertificateService';
+import { getCurrentCitizen, loginWithGoogle } from '../../services/citizenAuthService';
+import toast from 'react-hot-toast';
 import { validateDeathCertificateForm, navigateToFirstErrorField } from '../../utils/formValidationHelper';
 import { 
   FileText, Activity, CheckCircle2, AlertCircle, RefreshCw, Printer, X, History, Plus, 
@@ -332,6 +334,20 @@ export default function DeathCertificatePage() {
       setMessage({ type: 'error', text: `⚠️ फॉर्म में ${errorList.length} आवश्यक जानकारी छूटी है। स्वतः उस स्थान पर ले जाया जा रहा है...` });
       navigateToFirstErrorField(errs);
       return;
+    }
+
+    // Citizen Google Auth requirement for tracking personal data
+    let citizen = getCurrentCitizen();
+    if (!citizen) {
+      toast.loading('🔐 नागरिक डेटा ट्रैकिंग हेतु गूगल साइन-इन आवश्यक है...', { id: 'g-auth' });
+      const authRes = await loginWithGoogle();
+      toast.dismiss('g-auth');
+      if (!authRes.success) {
+        setMessage({ type: 'error', text: '⚠️ व्यक्तिगत डेटा सुरक्षा एवं आवेदन ट्रैकिंग हेतु गूगल लॉगिन अनिवार्य है।' });
+        return;
+      }
+      citizen = authRes.user;
+      toast.success(`नमस्ते ${citizen.displayName}! गूगल अकाउंट सफलतापूर्वक जुड़ गया।`);
     }
 
     setFieldErrors({});
@@ -1322,14 +1338,26 @@ export default function DeathCertificatePage() {
                         </button>
                       )}
 
-                      {/* View & Download Certificate */}
-                      {(app.status === 'Approved' || app.status === 'Certificate Generated' || app.status === 'Completed') && (
-                        <button
-                          onClick={() => { setSelectedApp(app); setShowCertModal(true); }}
-                          className="btn btn-primary btn-sm bg-gradient-to-r from-emerald-600 to-emerald-700 text-white font-bold"
+                      {/* View & Download Official Uploaded Certificate or Auto Generated Certificate */}
+                      {app.officialUploadedCertificate ? (
+                        <a
+                          href={app.officialUploadedCertificate.fileData}
+                          download={app.officialUploadedCertificate.fileName || 'Official_Signed_Death_Certificate.pdf'}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="btn btn-primary btn-sm bg-gradient-to-r from-emerald-700 to-emerald-800 text-white font-bold flex items-center gap-1 shadow-md"
                         >
-                          📜 प्रमाण पत्र डाउनलोड करें
-                        </button>
+                          <Download className="w-3.5 h-3.5" /> 📜 अधिकारी हस्ताक्षरित प्रमाण पत्र
+                        </a>
+                      ) : (
+                        (app.status === 'Approved' || app.status === 'Certificate Generated' || app.status === 'Completed') && (
+                          <button
+                            onClick={() => { setSelectedApp(app); setShowCertModal(true); }}
+                            className="btn btn-primary btn-sm bg-gradient-to-r from-emerald-600 to-emerald-700 text-white font-bold"
+                          >
+                            📜 प्रमाण पत्र डाउनलोड करें
+                          </button>
+                        )
                       )}
 
                       {/* View Timeline Modal Button */}

@@ -10,6 +10,7 @@ import {
   serverTimestamp 
 } from 'firebase/firestore';
 import { sendNotification } from './notificationService';
+import { getCurrentCitizen } from './citizenAuthService';
 
 const COLLECTION_NAME = 'waterConnections';
 const AUDIT_LOGS_COLLECTION = 'auditLogs';
@@ -142,10 +143,14 @@ export async function submitWaterConnection(data, existingId = null) {
   const applicationNo = data.applicationNo || generateAppNumber();
   const isResubmission = Boolean(existingId || data.applicationNo || data.status === 'Correction Requested');
   const now = new Date().toISOString();
+  const citizen = getCurrentCitizen();
 
   const formattedDocuments = formatOfficialDocumentVault(data.documents, applicationNo, 'water_connection');
   const processedData = {
     ...data,
+    userEmail: citizen?.email || data.userEmail || null,
+    userUid: citizen?.uid || data.userUid || null,
+    userDisplayName: citizen?.displayName || data.userDisplayName || null,
     documents: formattedDocuments,
     documentVaultPath: `applications/water_connection/${new Date().getFullYear()}/${applicationNo}/documents/`
   };
@@ -154,7 +159,7 @@ export async function submitWaterConnection(data, existingId = null) {
     id: `t-${Date.now()}`,
     action: isResubmission ? 'Application Resubmitted' : 'Application Submitted',
     status: 'Submitted',
-    performedBy: data.applicantDetails?.fullName || 'Citizen',
+    performedBy: data.applicantDetails?.fullName || citizen?.displayName || 'Citizen',
     role: 'Citizen',
     remarks: isResubmission 
       ? 'अधिकारी की टिप्पणी अनुसार सुधार कर जल कनेक्शन आवेदन पुनः प्रस्तुत किया गया (Resubmitted after correction)' 
@@ -278,8 +283,11 @@ function mergeRecords(existing, incoming) {
   }
 }
 
-export async function getWaterConnections() {
+export async function getWaterConnections(filterEmail = null, isOfficer = false) {
+  const citizen = getCurrentCitizen();
+  const targetEmail = isOfficer ? null : (filterEmail || citizen?.email);
   const localItems = getLocalWaterConnections();
+
   try {
     const snap = await getDocs(collection(db, COLLECTION_NAME));
     const remoteItems = snap.docs.map(d => ({
@@ -308,13 +316,31 @@ export async function getWaterConnections() {
       }
     });
 
-    const items = Array.from(mergedMap.values());
+    let items = Array.from(mergedMap.values());
+
+    // Filter for citizen personal applications if not an officer and targetEmail exists
+    if (!isOfficer && targetEmail) {
+      items = items.filter(item => 
+        item.userEmail === targetEmail || 
+        item.userUid === citizen?.uid || 
+        item.applicantDetails?.email === targetEmail
+      );
+    }
+
     items.sort((a, b) => new Date(b.updatedAt || b.appliedAt || 0) - new Date(a.updatedAt || a.appliedAt || 0));
     saveLocalWaterConnections(items);
     return items;
   } catch (error) {
     console.warn('[WaterConnectionService] Firestore read fallback to local storage:', error.message);
-    return localItems;
+    let items = localItems;
+    if (!isOfficer && targetEmail) {
+      items = items.filter(item => 
+        item.userEmail === targetEmail || 
+        item.userUid === citizen?.uid || 
+        item.applicantDetails?.email === targetEmail
+      );
+    }
+    return items;
   }
 }
 
@@ -323,7 +349,8 @@ export async function updateWaterConnectionStatus({
   newStatus,
   remarks,
   officerName = 'Water Supply Officer',
-  permitNo = null
+  permitNo = null,
+  officialUploadedCertificate = null
 }) {
   if (!remarks || !remarks.trim()) {
     return { success: false, error: 'अधिकारी टिप्पणी आवश्यक है (Mandatory officer remark required)' };
@@ -365,6 +392,10 @@ export async function updateWaterConnectionStatus({
     lastOfficerName: officerName,
     timeline: updatedTimeline
   };
+
+  if (officialUploadedCertificate) {
+    updatePayload.officialUploadedCertificate = officialUploadedCertificate;
+  }
 
   if (newStatus === 'Approved' || newStatus === 'Certificate Generated' || newStatus === 'Sanctioned' || newStatus === 'Completed') {
     updatePayload.approvedAt = existing.approvedAt || now;

@@ -11,8 +11,10 @@ import ApplicationLetterTemplate from './ApplicationLetterTemplate';
 import BirthCertificateTemplate from './BirthCertificateTemplate';
 import DeathCertificateTemplate from './DeathCertificateTemplate';
 import WaterConnectionTemplate from './WaterConnectionTemplate';
-import { Layers, ShieldAlert, Bell, X, Search, Printer, FileText, Baby, Droplets, ShieldCheck, Building2, Sparkles, CheckCircle2, Presentation } from 'lucide-react';
+import { Layers, ShieldAlert, Bell, X, Search, Printer, FileText, Baby, Droplets, ShieldCheck, Building2, Sparkles, CheckCircle2, Presentation, LogOut, User } from 'lucide-react';
 import { subscribeToMaintenance } from '../services/maintenanceService';
+import { loginWithGoogle, logoutCitizen, getCurrentCitizen, subscribeToCitizenAuth } from '../services/citizenAuthService';
+import toast from 'react-hot-toast';
 
 export default function ServiceHeader() {
   const pathname = usePathname();
@@ -20,6 +22,7 @@ export default function ServiceHeader() {
   const [showNotifications, setShowNotifications] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
   const [maintStatus, setMaintStatus] = useState({ isMaintenanceMode: false });
+  const [citizenUser, setCitizenUser] = useState(null);
   const [listRef] = useAutoAnimate({ duration: 250, easing: 'ease-out' });
 
   // Public Track Search Modal State
@@ -52,6 +55,28 @@ export default function ServiceHeader() {
       }
     }
   }, []);
+
+  useEffect(() => {
+    const unsubAuth = subscribeToCitizenAuth((user) => {
+      setCitizenUser(user);
+    });
+    return () => unsubAuth();
+  }, []);
+
+  const handleGoogleLogin = async () => {
+    const res = await loginWithGoogle();
+    if (res.success) {
+      toast.success(`नमस्ते ${res.user.displayName}! गूगल लॉगिन सफल।`);
+    } else {
+      toast.error('गूगल लॉगिन में विफलता: ' + (res.error || ''));
+    }
+  };
+
+  const handleCitizenLogout = async () => {
+    await logoutCitizen();
+    setCitizenUser(null);
+    toast.success('गूगल साइन आउट सफल');
+  };
 
   const loadNotifications = async () => {
     const data = await getNotifications(null, null, 20);
@@ -270,6 +295,37 @@ export default function ServiceHeader() {
                 )}
               </div>
 
+              {/* Google Citizen Auth Badge / Sign In Button */}
+              {citizenUser ? (
+                <div className="flex items-center gap-1.5 bg-slate-100 p-1 pl-1.5 rounded-xl border border-slate-200 shadow-inner">
+                  {citizenUser.photoURL ? (
+                    <img src={citizenUser.photoURL} alt="" className="w-6 h-6 rounded-full border border-slate-300 object-cover shrink-0" />
+                  ) : (
+                    <div className="w-6 h-6 rounded-full bg-emerald-700 text-white font-extrabold text-[10px] flex items-center justify-center shrink-0">
+                      {citizenUser.displayName?.[0]?.toUpperCase() || 'C'}
+                    </div>
+                  )}
+                  <span className="text-[11px] font-bold text-slate-800 hidden md:inline truncate max-w-[90px]">
+                    {citizenUser.displayName}
+                  </span>
+                  <button
+                    onClick={handleCitizenLogout}
+                    title="गूगल साइन आउट (Sign Out)"
+                    className="p-1 text-slate-400 hover:text-rose-600 rounded-lg hover:bg-slate-200 transition-colors"
+                  >
+                    <LogOut className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              ) : (
+                <button
+                  onClick={handleGoogleLogin}
+                  className="px-3 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold flex items-center gap-1.5 transition-all shadow-sm icon-hover-bounce shrink-0"
+                >
+                  <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="" className="w-3.5 h-3.5 shrink-0" />
+                  <span className="hidden sm:inline">गूगल साइन इन</span>
+                </button>
+              )}
+
               <Link href="/admin" aria-label="अधिकारी लॉगिन" className={`px-3 py-2 rounded-xl text-xs font-bold border transition-all flex items-center gap-1.5 icon-hover-bounce ${isCurrentTab('/admin') ? 'bg-emerald-700 text-white border-emerald-700 shadow-md' : 'bg-emerald-50 text-emerald-800 border-emerald-200'}`}>
                 <ShieldAlert className="w-3.5 h-3.5 animate-pulse text-amber-500" /> <span className="hidden sm:inline">अधिकारी लॉगिन</span>
               </Link>
@@ -344,13 +400,25 @@ export default function ServiceHeader() {
                             <Printer className="w-3.5 h-3.5 text-slate-600" /> पावती पत्र देखें
                           </button>
 
-                          {(rec.status === 'Approved' || rec.status === 'Sanctioned' || rec.status === 'Certificate Generated' || rec.status === 'Completed') && (
-                            <button 
-                              onClick={() => { setSelectedRecord(rec); setModalType('certificate'); }} 
-                              className="btn btn-primary btn-sm text-[11px] font-bold flex items-center gap-1"
+                          {rec.officialUploadedCertificate ? (
+                            <a 
+                              href={rec.officialUploadedCertificate.fileData} 
+                              download={rec.officialUploadedCertificate.fileName || 'Official_Signed_Certificate.pdf'} 
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="btn btn-primary btn-sm text-[11px] font-bold flex items-center gap-1 bg-emerald-700 hover:bg-emerald-800 text-white shadow-md"
                             >
-                              📜 प्रमाण पत्र डाउनलोड
-                            </button>
+                              <Download className="w-3.5 h-3.5" /> 📜 अधिकारी हस्ताक्षरित प्रमाण पत्र
+                            </a>
+                          ) : (
+                            (rec.status === 'Approved' || rec.status === 'Sanctioned' || rec.status === 'Certificate Generated' || rec.status === 'Completed') && (
+                              <button 
+                                onClick={() => { setSelectedRecord(rec); setModalType('certificate'); }} 
+                                className="btn btn-primary btn-sm text-[11px] font-bold flex items-center gap-1"
+                              >
+                                📜 प्रमाण पत्र डाउनलोड
+                              </button>
+                            )
                           )}
                         </div>
                       </div>
