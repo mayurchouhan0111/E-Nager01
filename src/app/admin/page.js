@@ -6,14 +6,17 @@ import toast from 'react-hot-toast'
 import {
   getDeathCertificates,
   updateDeathCertificateStatus,
+  purgeAnonymousDeathCertificates
 } from '@/services/deathCertificateService'
 import {
   getBirthCertificates,
   updateBirthCertificateStatus,
+  purgeAnonymousBirthCertificates
 } from '@/services/birthCertificateService'
 import {
   getWaterConnections,
-  updateWaterConnectionStatus
+  updateWaterConnectionStatus,
+  purgeAnonymousWaterConnections
 } from '@/services/waterConnectionService'
 import DeathCertificateTemplate from '@/components/DeathCertificateTemplate'
 import BirthCertificateTemplate from '@/components/BirthCertificateTemplate'
@@ -370,6 +373,24 @@ export default function AdminPage() {
     }
   }
 
+  const handlePurgeAnonymousData = async () => {
+    if (typeof window !== 'undefined' && !confirm('⚠️ क्या आप प्रणाली से सभी अनाम (Anonymous) डेटा को साफ़ करना चाहते हैं?')) {
+      return;
+    }
+    const toastId = toast.loading('🧹 अनाम डेटा प्रणाली से हटाया जा रहा है...');
+    try {
+      await purgeAnonymousDeathCertificates();
+      await purgeAnonymousBirthCertificates();
+      await purgeAnonymousWaterConnections();
+      toast.success('✅ सभी अनाम डेटा सफलता से हटा दिया गया!', { id: toastId });
+      loadDeathRecords();
+      loadBirthRecords();
+      loadWaterRecords();
+    } catch (err) {
+      toast.error('त्रुटि: ' + err.message, { id: toastId });
+    }
+  };
+
   const getStatusChip = (status) => {
     switch (status) {
       case 'Approved':
@@ -472,6 +493,13 @@ export default function AdminPage() {
 
           {isAdmin && (
             <div className="flex items-center gap-2 shrink-0">
+              <button 
+                onClick={handlePurgeAnonymousData}
+                className="btn btn-secondary btn-sm flex items-center gap-1 text-rose-700 bg-rose-50 border-rose-200 hover:bg-rose-100 font-bold text-xs"
+                title="प्रणाली से सभी अनाम व अनधिकृत डेटा हटाएं"
+              >
+                <span>🧹</span> <span className="hidden sm:inline">अनाम डेटा साफ़ करें</span>
+              </button>
               <span className="hidden sm:inline-flex items-center gap-1.5 text-xs text-emerald-800 bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded-full font-semibold">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"/>
                 {currentAccount?.name || currentAdminUser}

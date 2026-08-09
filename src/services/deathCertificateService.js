@@ -7,6 +7,7 @@ import {
   doc, 
   updateDoc, 
   setDoc,
+  deleteDoc,
   serverTimestamp 
 } from 'firebase/firestore';
 import { sendNotification } from './notificationService';
@@ -457,4 +458,27 @@ export async function updateDeathCertificateStatus({
   });
 
   return { success: true, certificateNo: updatePayload.certificateNo };
+}
+
+export async function purgeAnonymousDeathCertificates() {
+  if (typeof window !== 'undefined') {
+    const list = getLocalDeathCertificates();
+    const cleanList = list.filter(item => item.userEmail || item.userUid || item.applicantDetails?.email);
+    saveLocalDeathCertificates(cleanList);
+  }
+  try {
+    const colRef = collection(db, COLLECTION_NAME);
+    const snap = await getDocs(colRef);
+    const deletePromises = [];
+    snap.docs.forEach(docSnap => {
+      const data = docSnap.data();
+      if (!data.userEmail && !data.userUid && (!data.applicantDetails || !data.applicantDetails.email)) {
+        deletePromises.push(deleteDoc(doc(db, COLLECTION_NAME, docSnap.id)));
+      }
+    });
+    await Promise.all(deletePromises);
+    return { success: true, count: deletePromises.length };
+  } catch (e) {
+    return { success: false, error: e.message };
+  }
 }
