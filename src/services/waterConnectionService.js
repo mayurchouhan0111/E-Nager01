@@ -244,7 +244,7 @@ export async function getWaterConnections() {
     localItems.forEach(item => {
       const existingRemote = mergedMap.get(item.id);
       if (existingRemote) {
-        mergedMap.set(item.id, { ...existingRemote, ...item });
+        mergedMap.set(item.id, { ...item, ...existingRemote });
       } else {
         mergedMap.set(item.id, item);
       }
