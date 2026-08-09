@@ -6,6 +6,7 @@ import {
   getDoc, 
   doc, 
   updateDoc, 
+  setDoc,
   serverTimestamp 
 } from 'firebase/firestore';
 import { sendNotification } from './notificationService';
@@ -290,7 +291,7 @@ export async function updateDeathCertificateStatus({
 
   try {
     const docRef = doc(db, COLLECTION_NAME, id);
-    await updateDoc(docRef, updatePayload);
+    await setDoc(docRef, updatePayload, { merge: true });
   } catch (error) {
     console.warn('[DeathCertificateService] Status update fallback to local storage:', error.message);
   }
