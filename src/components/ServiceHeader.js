@@ -12,12 +12,14 @@ import BirthCertificateTemplate from './BirthCertificateTemplate';
 import DeathCertificateTemplate from './DeathCertificateTemplate';
 import WaterConnectionTemplate from './WaterConnectionTemplate';
 import { Layers, ShieldAlert, Bell, X, Search, Printer, FileText, Baby, Droplets, ShieldCheck, Building2, Sparkles, CheckCircle2, Presentation } from 'lucide-react';
+import { subscribeToMaintenance } from '../services/maintenanceService';
 
 export default function ServiceHeader() {
   const pathname = usePathname();
   const [notifications, setNotifications] = useState([]);
   const [showNotifications, setShowNotifications] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [maintStatus, setMaintStatus] = useState({ isMaintenanceMode: false });
   const [listRef] = useAutoAnimate({ duration: 250, easing: 'ease-out' });
 
   // Public Track Search Modal State
@@ -28,6 +30,13 @@ export default function ServiceHeader() {
   const [hasSearched, setHasSearched] = useState(false);
   const [selectedRecord, setSelectedRecord] = useState(null);
   const [modalType, setModalType] = useState(null);
+
+  useEffect(() => {
+    const unsub = subscribeToMaintenance((status) => {
+      setMaintStatus(status);
+    });
+    return () => unsub();
+  }, []);
 
   useEffect(() => {
     loadNotifications();
@@ -127,6 +136,16 @@ export default function ServiceHeader() {
 
   return (
     <>
+      {/* Real-time System Maintenance Banner */}
+      {maintStatus.isMaintenanceMode && (
+        <div className="bg-rose-600 text-white px-4 py-2.5 text-xs font-bold shadow-md flex items-center justify-between gap-3 animate-pulse no-print border-b border-rose-700 z-[60] relative">
+          <div className="max-w-7xl mx-auto flex items-center justify-center gap-2 text-center w-full">
+            <ShieldAlert className="w-4 h-4 shrink-0" />
+            <span>🛠️ शासकीय सूचना: {maintStatus.message || 'सुरक्षा एवं तकनीकी रखरखाव हेतु पोर्टल पर रूटीन अद्यतन जारी है। सेवाएं शीघ्र बहाल होंगी।'}</span>
+          </div>
+        </div>
+      )}
+
       <header className="bg-white/90 backdrop-blur-md border-b border-slate-200 sticky top-0 z-40 font-sans shadow-sm no-print print:hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">

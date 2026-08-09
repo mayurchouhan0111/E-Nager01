@@ -21,6 +21,7 @@ import WaterConnectionTemplate from '@/components/WaterConnectionTemplate'
 import ApplicationLetterTemplate from '@/components/ApplicationLetterTemplate'
 import ApplicationTimeline from '@/components/ApplicationTimeline'
 import { DEFAULT_ADMIN_ACCOUNTS, fetchAdminAccounts, updateAdminAccountCredential } from '@/services/adminAuthService'
+import { subscribeToMaintenance, toggleMaintenanceMode } from '@/services/maintenanceService'
 import {
   ShieldAlert, Search, Trash2, Download, Edit, Printer, Eye, Activity, FileText, CheckCircle2,
   AlertCircle, Calendar, UserCheck, History, Info, Lock, LogOut, RefreshCw, X, Settings2, Baby, Eye as EyeIcon, Droplet, Key, Save
@@ -55,6 +56,15 @@ export default function AdminPage() {
       water_admin: { password: accs.water_admin?.password || '', name: accs.water_admin?.name || '' },
       super_admin: { password: accs.super_admin?.password || '', name: accs.super_admin?.name || '' }
     })
+  }, [])
+
+  const [maintState, setMaintState] = useState({ isMaintenanceMode: false })
+
+  useEffect(() => {
+    const unsub = subscribeToMaintenance((status) => {
+      setMaintState(status)
+    })
+    return () => unsub()
   }, [])
 
   useEffect(() => {
@@ -219,6 +229,28 @@ export default function AdminPage() {
       loadAuditLogs()
     } else {
       toast.error(`अपडेट विफल: ${result.error}`, { id: toastId })
+    }
+  }
+
+  async function handleToggleMaintenance() {
+    const targetState = !maintState.isMaintenanceMode
+    const actionName = targetState ? 'सुरक्षा अद्यतन / रखरखाव मोड' : 'सामान्य पोर्टल स्थिति'
+    const toastId = toast.loading(`${actionName} परिवर्तित किया जा रहा है...`)
+
+    const res = await toggleMaintenanceMode({
+      isEnabled: targetState,
+      message: targetState 
+        ? 'सुरक्षा एवं तकनीकी रखरखाव हेतु पोर्टल अस्थायी रूप से स्थगित है। शीघ्र सेवाएं पुनः शुरू की जाएंगी।'
+        : 'पोर्टल सामान्य स्थिति में कार्यरत है।',
+      reason: 'सुपर एडमिन सुरक्षा एवं रूटीन चेक',
+      updatedBy: currentAdminUser
+    })
+
+    if (res.success) {
+      toast.success(`✅ पोर्टल अब ${targetState ? 'रखरखाव / रूटीन चेक मोड में है (Maintenance ON)' : 'सामान्य स्थिति में बहाल हो गया (System Online)'}`, { id: toastId })
+      loadAuditLogs()
+    } else {
+      toast.error(`विफलता: ${res.error}`, { id: toastId })
     }
   }
 
@@ -990,6 +1022,42 @@ export default function AdminPage() {
         {/* Security & Accounts Settings Tab (Super Admin Only) */}
         {activeTab === 'security-settings' && (
           <div className="space-y-6 animate-fade-in">
+
+            {/* Master Maintenance & Routine Security Check Toggle */}
+            <div className={`p-6 rounded-3xl border transition-all ${
+              maintState.isMaintenanceMode 
+                ? 'bg-rose-50 border-rose-300 text-rose-950 shadow-md' 
+                : 'bg-emerald-50/60 border-emerald-200 text-emerald-950 shadow-sm'
+            }`}>
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div className="flex items-start gap-3">
+                  <div className={`p-3 rounded-2xl ${maintState.isMaintenanceMode ? 'bg-rose-600 text-white' : 'bg-emerald-600 text-white'}`}>
+                    <ShieldAlert className="w-6 h-6 animate-pulse" />
+                  </div>
+                  <div>
+                    <h4 className="font-extrabold text-base flex items-center gap-2">
+                      {maintState.isMaintenanceMode ? '🔴 रूटीन सुरक्षा अद्यतन / रखरखाव मोड सक्रिय (Maintenance Lockdown ON)' : '🟢 प्रणाली सामान्य स्थिति में कार्यरत है (System Online)'}
+                    </h4>
+                    <p className="text-xs text-slate-600 mt-1">
+                      सुरक्षा जांच, सर्वर अद्यतन या तकनीकी बदलाव के समय मुख्य अधिकारी पोर्टल को **रखरखाव / रूटीन चेक मोड** में लॉक कर सकते हैं।
+                    </p>
+                  </div>
+                </div>
+
+                <button
+                  onClick={handleToggleMaintenance}
+                  className={`px-5 py-2.5 rounded-2xl text-xs font-extrabold flex items-center gap-2 transition-all shadow-md shrink-0 ${
+                    maintState.isMaintenanceMode
+                      ? 'bg-emerald-700 hover:bg-emerald-800 text-white'
+                      : 'bg-rose-700 hover:bg-rose-800 text-white'
+                  }`}
+                >
+                  <RefreshCw className="w-4 h-4" />
+                  <span>{maintState.isMaintenanceMode ? 'सुरक्षा अद्यतन समाप्त करें (Restore Website)' : 'रूटीन सुरक्षा अद्यतन मोड चालू करें (Enable Maintenance Lockdown)'}</span>
+                </button>
+              </div>
+            </div>
+
             <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm space-y-4">
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
                 <div>
