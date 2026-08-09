@@ -11,7 +11,7 @@ import ApplicationLetterTemplate from './ApplicationLetterTemplate';
 import BirthCertificateTemplate from './BirthCertificateTemplate';
 import DeathCertificateTemplate from './DeathCertificateTemplate';
 import WaterConnectionTemplate from './WaterConnectionTemplate';
-import { Layers, ShieldAlert, Bell, X, Search, Printer, FileText, Baby, Droplets, ShieldCheck, Building2, Sparkles, CheckCircle2 } from 'lucide-react';
+import { Layers, ShieldAlert, Bell, X, Search, Printer, FileText, Baby, Droplets, ShieldCheck, Building2, Sparkles, CheckCircle2, Presentation } from 'lucide-react';
 
 export default function ServiceHeader() {
   const pathname = usePathname();
@@ -162,6 +162,10 @@ export default function ServiceHeader() {
               <Link href="/privacy-policy" className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all duration-200 flex items-center gap-1.5 icon-hover-bounce ${isCurrentTab('/privacy-policy') ? 'bg-slate-800 text-white shadow-md' : 'text-slate-600 hover:text-slate-900'}`}>
                 <ShieldCheck className={`w-3.5 h-3.5 ${isCurrentTab('/privacy-policy') ? 'text-emerald-400' : 'text-slate-500'}`} />
                 <span>DPDP प्राइवेसी</span>
+              </Link>
+              <Link href="/presentation" className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all duration-200 flex items-center gap-1.5 icon-hover-bounce ${isCurrentTab('/presentation') ? 'bg-purple-700 text-white shadow-md' : 'text-slate-600 hover:text-slate-900'}`}>
+                <Presentation className={`w-3.5 h-3.5 ${isCurrentTab('/presentation') ? 'text-purple-300' : 'text-purple-600'}`} />
+                <span>SOP प्रेजेंटेशन</span>
               </Link>
               <Link href="/grievance" className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all duration-200 flex items-center gap-1.5 icon-hover-bounce ${isCurrentTab('/grievance') ? 'bg-slate-800 text-white shadow-md' : 'text-slate-600 hover:text-slate-900'}`}>
                 <Building2 className={`w-3.5 h-3.5 ${isCurrentTab('/grievance') ? 'text-amber-400' : 'text-slate-500'}`} />
