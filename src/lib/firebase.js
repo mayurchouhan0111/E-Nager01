@@ -1,6 +1,6 @@
 import { initializeApp, getApps } from 'firebase/app'
 import { getFirestore } from 'firebase/firestore'
-import { getAuth, signInAnonymously, onAuthStateChanged } from 'firebase/auth'
+import { getAuth, onAuthStateChanged } from 'firebase/auth'
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || "AIzaSyAMIz2LvnXZaK1hcg597-AofScFI-yWBMA",
@@ -17,14 +17,8 @@ export const db = getFirestore(app)
 export const auth = getAuth(app)
 
 export async function ensureFirebaseAuth() {
-  if (typeof window === 'undefined') return;
-  if (!auth.currentUser) {
-    try {
-      await signInAnonymously(auth);
-    } catch (err) {
-      console.warn('[Firebase Auth] Anonymous sign in notice:', err.message);
-    }
-  }
+  // Pure Google Auth only - Anonymous Auth removed
+  return;
 }
 
 /**
@@ -45,9 +39,5 @@ export function sanitizeFirestorePayload(obj) {
   return clean;
 }
 
-if (typeof window !== 'undefined') {
-  ensureFirebaseAuth();
-}
-
-export { signInAnonymously, onAuthStateChanged }
+export { onAuthStateChanged }
 export default app

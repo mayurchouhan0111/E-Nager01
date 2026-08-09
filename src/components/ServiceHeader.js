@@ -45,6 +45,14 @@ export default function ServiceHeader() {
     loadNotifications();
 
     if (typeof window !== 'undefined') {
+      const SYSTEM_VERSION = 'v2.0_clean_reset';
+      const storedVersion = localStorage.getItem('enagar_system_version');
+      if (storedVersion !== SYSTEM_VERSION) {
+        localStorage.clear();
+        localStorage.setItem('enagar_system_version', SYSTEM_VERSION);
+        console.log('[System Reset] Chrome LocalStorage automatically freed & updated to latest version.');
+      }
+
       const params = new URLSearchParams(window.location.search);
       const appNoParam = params.get('appNo') || params.get('applicationNo') || params.get('id');
       if (appNoParam && appNoParam.trim()) {
@@ -54,6 +62,8 @@ export default function ServiceHeader() {
         performQuerySearch(queryVal);
       }
     }
+    
+    return () => unsubMaint();
   }, []);
 
   useEffect(() => {
@@ -62,6 +72,14 @@ export default function ServiceHeader() {
     });
     return () => unsubAuth();
   }, []);
+
+  const handleClearChromeStorage = () => {
+    if (typeof window !== 'undefined') {
+      localStorage.clear();
+      toast.success('✅ क्रोम लोकल स्टोरेज साफ़ कर दिया गया! (Chrome LocalStorage Freed)');
+      setTimeout(() => window.location.reload(), 800);
+    }
+  };
 
   const handleGoogleLogin = async () => {
     const toastId = toast.loading('🔐 गूगल साइन-इन खुल रहा है...');
@@ -289,7 +307,16 @@ export default function ServiceHeader() {
                       <h3 className="text-xs font-extrabold uppercase text-slate-800 flex items-center gap-1.5">
                         <Bell className="w-3.5 h-3.5 text-emerald-600 animate-pulse" /> सूचनाएँ (Notifications)
                       </h3>
-                      <button onClick={() => setShowNotifications(false)} aria-label="सूचना पैनल बंद करें" className="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100"><X className="w-4 h-4" /></button>
+                      <div className="flex items-center gap-1">
+                        <button
+                          onClick={handleClearChromeStorage}
+                          title="क्रोम लोकल स्टोरेज पूर्णतः साफ़ करें"
+                          className="px-2 py-0.5 rounded text-[10px] font-bold text-rose-700 bg-rose-50 border border-rose-200 hover:bg-rose-100 transition-colors"
+                        >
+                          🧹 क्रोम स्टोरेज साफ़ करें
+                        </button>
+                        <button onClick={() => setShowNotifications(false)} aria-label="सूचना पैनल बंद करें" className="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100"><X className="w-4 h-4" /></button>
+                      </div>
                     </div>
                     <div ref={listRef} className="max-h-80 overflow-y-auto">
                       {notifications.length === 0 ? <div className="p-8 text-center text-xs text-slate-500 font-medium">कोई नई सूचना नहीं है</div> : notifications.map((n) => (
