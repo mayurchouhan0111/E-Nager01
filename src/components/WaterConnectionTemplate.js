@@ -1,6 +1,4 @@
-'use client';
-
-import React from 'react';
+import QRCodeGenerator from './QRCodeGenerator';
 
 export default function WaterConnectionTemplate({ record }) {
   if (!record) return null;
@@ -121,10 +119,9 @@ export default function WaterConnectionTemplate({ record }) {
         <div className="flex items-end justify-between pt-6 border-t border-teal-900/30">
           <div className="text-center">
             <div className="w-24 h-24 border-2 border-slate-800 p-1 mx-auto mb-1 bg-white flex items-center justify-center">
-              <img 
-                src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(`https://jhabua-nagarpalika-aapke-dwar.netlify.app/?appNo=${record.applicationNo || record.id}`)}`} 
-                alt="QR Verified Official" 
-                className="w-full h-full object-contain" 
+              <QRCodeGenerator 
+                value={`https://jhabua-nagarpalika-aapke-dwar.netlify.app/?appNo=${record.applicationNo || record.id}`}
+                size={84}
               />
             </div>
             <span className="text-[10px] font-mono text-slate-500 block">QR VERIFIED OFFICIAL PERMIT</span>
