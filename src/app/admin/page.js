@@ -965,7 +965,7 @@ export default function AdminPage() {
 
         {/* Status Update Remark Modal */}
         {remarkModal.isOpen && (
-          <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="fixed inset-0 bg-slate-900/75 backdrop-blur-md z-[80] flex items-center justify-center p-4">
             <div className="bg-white border border-slate-200 rounded-3xl max-w-lg w-full p-6 shadow-2xl space-y-4">
               <div className="flex items-center justify-between border-b border-slate-100 pb-3">
                 <h3 className="text-slate-900 font-extrabold text-base">
@@ -978,7 +978,7 @@ export default function AdminPage() {
 
               <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 text-xs text-amber-900">
                 <span className="font-bold block mb-1">⚠️ आवेदन: {remarkModal.record?.applicationNo}</span>
-                <p>नाम: {remarkModal.record?.deceasedDetails?.fullName || remarkModal.record?.childDetails?.fullName || 'N/A'}</p>
+                <p>नाम: {remarkModal.record?.deceasedDetails?.fullName || remarkModal.record?.childDetails?.fullName || remarkModal.record?.applicantDetails?.fullName || 'N/A'}</p>
               </div>
 
               <form onSubmit={handleConfirmStatusUpdate} className="space-y-4">
@@ -1010,7 +1010,7 @@ export default function AdminPage() {
 
         {/* Application Letter Modal */}
         {letterModal.isOpen && letterModal.record && (
-          <div className="fixed inset-0 bg-slate-900/75 backdrop-blur-md z-50 overflow-y-auto p-3 sm:p-6 flex items-start justify-center pt-4 sm:pt-8">
+          <div className="fixed inset-0 bg-slate-900/75 backdrop-blur-md z-[70] overflow-y-auto p-3 sm:p-6 flex items-start justify-center pt-4 sm:pt-8">
             <div className="bg-white border border-slate-200 rounded-3xl max-w-4xl w-full p-4 sm:p-6 shadow-2xl flex flex-col max-h-[84vh] sm:max-h-[86vh]">
               <div className="flex items-center justify-between border-b border-slate-100 pb-3 shrink-0">
                 <h3 className="text-slate-900 font-extrabold text-base flex items-center gap-2">
@@ -1038,7 +1038,7 @@ export default function AdminPage() {
 
         {/* Death Certificate Preview Modal */}
         {deathCertPreview && (
-          <div className="fixed inset-0 bg-slate-900/75 backdrop-blur-md z-50 overflow-y-auto p-3 sm:p-6 flex items-start justify-center pt-4 sm:pt-8">
+          <div className="fixed inset-0 bg-slate-900/75 backdrop-blur-md z-[70] overflow-y-auto p-3 sm:p-6 flex items-start justify-center pt-4 sm:pt-8">
             <div className="bg-white border border-slate-200 rounded-3xl max-w-4xl w-full p-4 sm:p-6 shadow-2xl flex flex-col max-h-[84vh] sm:max-h-[86vh]">
               <div className="flex items-center justify-between border-b border-slate-100 pb-3 shrink-0">
                 <h3 className="text-slate-900 font-extrabold text-base flex items-center gap-2">
@@ -1066,7 +1066,7 @@ export default function AdminPage() {
 
         {/* Birth Certificate Preview Modal */}
         {birthCertPreview && (
-          <div className="fixed inset-0 bg-slate-900/75 backdrop-blur-md z-50 overflow-y-auto p-3 sm:p-6 flex items-start justify-center pt-4 sm:pt-8">
+          <div className="fixed inset-0 bg-slate-900/75 backdrop-blur-md z-[70] overflow-y-auto p-3 sm:p-6 flex items-start justify-center pt-4 sm:pt-8">
             <div className="bg-white border border-slate-200 rounded-3xl max-w-4xl w-full p-4 sm:p-6 shadow-2xl flex flex-col max-h-[84vh] sm:max-h-[86vh]">
               <div className="flex items-center justify-between border-b border-slate-100 pb-3 shrink-0">
                 <h3 className="text-slate-900 font-extrabold text-base flex items-center gap-2">
@@ -1094,7 +1094,7 @@ export default function AdminPage() {
 
         {/* Water Connection Sanction Permit Modal */}
         {waterCertPreview && (
-          <div className="fixed inset-0 bg-slate-900/75 backdrop-blur-md z-50 overflow-y-auto p-3 sm:p-6 flex items-start justify-center pt-4 sm:pt-8">
+          <div className="fixed inset-0 bg-slate-900/75 backdrop-blur-md z-[70] overflow-y-auto p-3 sm:p-6 flex items-start justify-center pt-4 sm:pt-8">
             <div className="bg-white border border-slate-200 rounded-3xl max-w-4xl w-full p-4 sm:p-6 shadow-2xl flex flex-col max-h-[84vh] sm:max-h-[86vh]">
               <div className="flex items-center justify-between border-b border-slate-100 pb-3 shrink-0">
                 <h3 className="text-slate-900 font-extrabold text-base flex items-center gap-2">
