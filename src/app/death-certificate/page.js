@@ -1336,8 +1336,8 @@ export default function DeathCertificatePage() {
 
         {/* APPLICATION SUBMISSION LETTER MODAL */}
         {selectedApp && showLetterModal && (
-          <div className="fixed inset-0 bg-slate-900/75 backdrop-blur-md z-50 flex items-center justify-center p-4 sm:p-6 overflow-hidden">
-            <div className="bg-white border border-slate-200 rounded-3xl max-w-4xl w-full p-6 sm:p-8 shadow-2xl flex flex-col max-h-[90vh]">
+          <div className="fixed inset-0 bg-slate-900/75 backdrop-blur-md z-50 overflow-y-auto p-3 sm:p-6 flex items-start justify-center pt-4 sm:pt-8">
+            <div className="bg-white border border-slate-200 rounded-3xl max-w-4xl w-full p-4 sm:p-6 shadow-2xl flex flex-col max-h-[84vh] sm:max-h-[86vh]">
               <div className="flex items-center justify-between border-b border-slate-100 pb-3 shrink-0">
                 <h3 className="text-slate-900 font-extrabold text-base flex items-center gap-2">
                   📄 भौतिक सत्यापन आवेदन पत्र (Application Submission Letter)
@@ -1355,7 +1355,7 @@ export default function DeathCertificatePage() {
                 </div>
               </div>
 
-              <div className="overflow-y-auto flex-1 pr-1 pt-4">
+              <div className="overflow-y-auto flex-1 pr-1 pt-3">
                 <ApplicationLetterTemplate record={selectedApp} serviceType="death" />
               </div>
             </div>
@@ -1364,8 +1364,8 @@ export default function DeathCertificatePage() {
 
         {/* CERTIFICATE PREVIEW MODAL */}
         {selectedApp && showCertModal && (
-          <div className="fixed inset-0 bg-slate-900/75 backdrop-blur-md z-50 flex items-center justify-center p-4 sm:p-6 overflow-hidden">
-            <div className="bg-white border border-slate-200 rounded-3xl max-w-4xl w-full p-6 sm:p-8 shadow-2xl flex flex-col max-h-[90vh]">
+          <div className="fixed inset-0 bg-slate-900/75 backdrop-blur-md z-50 overflow-y-auto p-3 sm:p-6 flex items-start justify-center pt-4 sm:pt-8">
+            <div className="bg-white border border-slate-200 rounded-3xl max-w-4xl w-full p-4 sm:p-6 shadow-2xl flex flex-col max-h-[84vh] sm:max-h-[86vh]">
               <div className="flex items-center justify-between border-b border-slate-100 pb-3 shrink-0">
                 <h3 className="text-slate-900 font-extrabold text-base flex items-center gap-2">
                   📜 आधिकारिक मृत्यु प्रमाण पत्र पूर्वावलोकन (Official Death Certificate Preview)
@@ -1383,7 +1383,7 @@ export default function DeathCertificatePage() {
                 </div>
               </div>
 
-              <div className="overflow-y-auto flex-1 pr-1 pt-4">
+              <div className="overflow-y-auto flex-1 pr-1 pt-3">
                 <DeathCertificateTemplate record={selectedApp} />
               </div>
             </div>

@@ -970,9 +970,9 @@ export default function AdminPage() {
 
         {/* Application Letter Modal */}
         {letterModal.isOpen && letterModal.record && (
-          <div className="fixed inset-0 bg-slate-900/70 backdrop-blur-md z-50 flex items-center justify-center p-4 overflow-y-auto">
-            <div className="bg-white border border-slate-200 rounded-3xl max-w-4xl w-full p-6 my-8 shadow-2xl space-y-4">
-              <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+          <div className="fixed inset-0 bg-slate-900/75 backdrop-blur-md z-50 overflow-y-auto p-3 sm:p-6 flex items-start justify-center pt-4 sm:pt-8">
+            <div className="bg-white border border-slate-200 rounded-3xl max-w-4xl w-full p-4 sm:p-6 shadow-2xl flex flex-col max-h-[84vh] sm:max-h-[86vh]">
+              <div className="flex items-center justify-between border-b border-slate-100 pb-3 shrink-0">
                 <h3 className="text-slate-900 font-extrabold text-base flex items-center gap-2">
                   📄 भौतिक पावती पत्र (Official Physical Submission Letter)
                 </h3>
@@ -983,22 +983,24 @@ export default function AdminPage() {
                   >
                     <Printer className="w-3.5 h-3.5" /> प्रिंट / PDF डाउनलोड
                   </button>
-                  <button onClick={() => setLetterModal({ isOpen: false, record: null, serviceType: 'death' })} className="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100">
+                  <button onClick={() => setLetterModal({ isOpen: false, record: null, serviceType: 'death' })} className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors">
                     <X className="w-5 h-5" />
                   </button>
                 </div>
               </div>
 
-              <ApplicationLetterTemplate record={letterModal.record} serviceType={letterModal.serviceType} />
+              <div className="overflow-y-auto flex-1 pr-1 pt-3">
+                <ApplicationLetterTemplate record={letterModal.record} serviceType={letterModal.serviceType} />
+              </div>
             </div>
           </div>
         )}
 
         {/* Death Certificate Preview Modal */}
         {deathCertPreview && (
-          <div className="fixed inset-0 bg-slate-900/70 backdrop-blur-md z-50 flex items-center justify-center p-4 overflow-y-auto">
-            <div className="bg-white border border-slate-200 rounded-3xl max-w-4xl w-full p-6 my-8 shadow-2xl space-y-4">
-              <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+          <div className="fixed inset-0 bg-slate-900/75 backdrop-blur-md z-50 overflow-y-auto p-3 sm:p-6 flex items-start justify-center pt-4 sm:pt-8">
+            <div className="bg-white border border-slate-200 rounded-3xl max-w-4xl w-full p-4 sm:p-6 shadow-2xl flex flex-col max-h-[84vh] sm:max-h-[86vh]">
+              <div className="flex items-center justify-between border-b border-slate-100 pb-3 shrink-0">
                 <h3 className="text-slate-900 font-extrabold text-base flex items-center gap-2">
                   📜 आधिकारिक मृत्यु प्रमाण पत्र पूर्वावलोकन (Death Certificate Preview)
                 </h3>
@@ -1009,22 +1011,24 @@ export default function AdminPage() {
                   >
                     <Printer className="w-3.5 h-3.5" /> प्रिंट / PDF डाउनलोड
                   </button>
-                  <button onClick={() => setDeathCertPreview(null)} className="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100">
+                  <button onClick={() => setDeathCertPreview(null)} className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors">
                     <X className="w-5 h-5" />
                   </button>
                 </div>
               </div>
 
-              <DeathCertificateTemplate record={deathCertPreview} />
+              <div className="overflow-y-auto flex-1 pr-1 pt-3">
+                <DeathCertificateTemplate record={deathCertPreview} />
+              </div>
             </div>
           </div>
         )}
 
         {/* Birth Certificate Preview Modal */}
         {birthCertPreview && (
-          <div className="fixed inset-0 bg-slate-900/70 backdrop-blur-md z-50 flex items-center justify-center p-4 overflow-y-auto">
-            <div className="bg-white border border-slate-200 rounded-3xl max-w-4xl w-full p-6 my-8 shadow-2xl space-y-4">
-              <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+          <div className="fixed inset-0 bg-slate-900/75 backdrop-blur-md z-50 overflow-y-auto p-3 sm:p-6 flex items-start justify-center pt-4 sm:pt-8">
+            <div className="bg-white border border-slate-200 rounded-3xl max-w-4xl w-full p-4 sm:p-6 shadow-2xl flex flex-col max-h-[84vh] sm:max-h-[86vh]">
+              <div className="flex items-center justify-between border-b border-slate-100 pb-3 shrink-0">
                 <h3 className="text-slate-900 font-extrabold text-base flex items-center gap-2">
                   📜 आधिकारिक जन्म प्रमाण पत्र पूर्वावलोकन (Birth Certificate Preview)
                 </h3>
@@ -1035,21 +1039,23 @@ export default function AdminPage() {
                   >
                     <Printer className="w-3.5 h-3.5" /> प्रिंट / PDF डाउनलोड
                   </button>
-                  <button onClick={() => setBirthCertPreview(null)} className="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100">
+                  <button onClick={() => setBirthCertPreview(null)} className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors">
                     <X className="w-5 h-5" />
                   </button>
                 </div>
               </div>
 
-              <BirthCertificateTemplate record={birthCertPreview} />
+              <div className="overflow-y-auto flex-1 pr-1 pt-3">
+                <BirthCertificateTemplate record={birthCertPreview} />
+              </div>
             </div>
           </div>
         )}
 
         {/* Water Connection Sanction Permit Modal */}
         {waterCertPreview && (
-          <div className="fixed inset-0 bg-slate-900/75 backdrop-blur-md z-50 flex items-center justify-center p-4 sm:p-6 overflow-hidden">
-            <div className="bg-white border border-slate-200 rounded-3xl max-w-4xl w-full p-6 sm:p-8 shadow-2xl flex flex-col max-h-[90vh]">
+          <div className="fixed inset-0 bg-slate-900/75 backdrop-blur-md z-50 overflow-y-auto p-3 sm:p-6 flex items-start justify-center pt-4 sm:pt-8">
+            <div className="bg-white border border-slate-200 rounded-3xl max-w-4xl w-full p-4 sm:p-6 shadow-2xl flex flex-col max-h-[84vh] sm:max-h-[86vh]">
               <div className="flex items-center justify-between border-b border-slate-100 pb-3 shrink-0">
                 <h3 className="text-slate-900 font-extrabold text-base flex items-center gap-2">
                   📜 जल कनेक्शन स्वीकृत आदेश (Water Connection Sanction Permit)
@@ -1061,13 +1067,13 @@ export default function AdminPage() {
                   >
                     <Printer className="w-3.5 h-3.5" /> प्रिंट / PDF डाउनलोड
                   </button>
-                  <button onClick={() => setWaterCertPreview(null)} className="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100">
+                  <button onClick={() => setWaterCertPreview(null)} className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors">
                     <X className="w-5 h-5" />
                   </button>
                 </div>
               </div>
 
-              <div className="overflow-y-auto flex-1 pr-1 pt-4">
+              <div className="overflow-y-auto flex-1 pr-1 pt-3">
                 <WaterConnectionTemplate record={waterCertPreview} />
               </div>
             </div>
@@ -1131,8 +1137,8 @@ function ApplicationDetailModal({ record, serviceType, onClose, onOpenRemark, on
   const docs = record.uploadedDocs || record.documents || []
 
   return (
-    <div className="fixed inset-0 bg-slate-900/75 backdrop-blur-md z-50 flex items-center justify-center p-4 sm:p-6 overflow-hidden">
-      <div className="bg-white border border-slate-200 rounded-3xl max-w-4xl w-full p-6 sm:p-8 shadow-2xl flex flex-col max-h-[90vh]">
+    <div className="fixed inset-0 bg-slate-900/75 backdrop-blur-md z-50 overflow-y-auto p-3 sm:p-6 flex items-start justify-center pt-4 sm:pt-8">
+      <div className="bg-white border border-slate-200 rounded-3xl max-w-4xl w-full p-4 sm:p-6 shadow-2xl flex flex-col max-h-[84vh] sm:max-h-[86vh]">
         {/* Header */}
         <div className="flex items-center justify-between border-b border-slate-100 pb-3 shrink-0">
           <div>
