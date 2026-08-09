@@ -95,7 +95,7 @@ export default function ApplicationLetterTemplate({ record, serviceType = 'death
       </div>
 
       {/* Notice Alert Box */}
-      <div className="bg-amber-50 border-2 border-amber-400 p-3 rounded-lg text-amber-950 font-medium mb-5 leading-relaxed space-y-1.5">
+      <div className="bg-amber-50 border-2 border-amber-400 p-3 rounded-lg text-amber-950 font-medium mb-4 leading-relaxed space-y-1.5 text-xs">
         <div>
           <span className="font-bold text-amber-900 underline">📌 अनिवार्य निर्देश (MANDATORY INSTRUCTIONS):</span>
           कृपया इस ऑनलाइन आवेदन पत्र का <strong>प्रिंट आउट (Hard Copy)</strong> निकालें और अपने <strong>संलग्न मूल दस्तावेजों एवं छायाप्रतियों</strong> के साथ <strong>नगर पालिका कार्यालय झाबुआ ({isWater ? 'जल प्रदाय शाखा' : 'जन्म-मृत्यु पंजीकरण शाखा'})</strong> में भौतिक सत्यापन (Physical Verification) हेतु अनिवार्यतः जमा करें।
@@ -105,9 +105,17 @@ export default function ApplicationLetterTemplate({ record, serviceType = 'death
         </div>
       </div>
 
+      {/* Official CMO Salutation */}
+      <div className="mb-4 text-xs font-semibold text-slate-900 bg-slate-50/80 p-3 rounded-lg border border-slate-300 space-y-1">
+        <p><span className="font-bold text-slate-950">सेवा में,</span></p>
+        <p className="pl-4 font-bold text-slate-950">मुख्य नगर पालिका अधिकारी (CMO)</p>
+        <p className="pl-4 text-slate-700">नगर पालिका परिषद झाबुआ, जिला झाबुआ (म.प्र.)</p>
+        <p className="pt-1"><span className="font-bold text-slate-950">विषय:</span> {isWater ? 'नवीन जल (नल) कनेक्शन स्वीकृति हेतु आवेदन पत्र।' : isBirth ? `नवीन जन्म पंजीकरण एवं जन्म प्रमाण पत्र (${child.placeType?.includes('घर') ? 'घर पर जन्म' : child.hospitalName?.includes('वरदान') ? 'वरदान हॉस्पिटल जन्म' : 'अस्पताल जन्म'}) जारी करने बाबत।` : `मृत्यु पंजीकरण एवं मृत्यु प्रमाण पत्र (${deceased.placeType?.includes('घर') ? 'घर पर मृत्यु' : 'अस्पताल मृत्यु'}) जारी करने बाबत।`}</p>
+      </div>
+
       {/* Details Section */}
       {isWater ? (
-        /* WATER CONNECTION DETAILS TABLE (Matching image.png) */
+        /* WATER CONNECTION DETAILS TABLE */
         <div className="space-y-4 mb-4">
           <div>
             <h3 className="font-bold text-slate-900 border-b border-slate-400 pb-1 mb-2 uppercase text-xs">
@@ -253,6 +261,47 @@ export default function ApplicationLetterTemplate({ record, serviceType = 'death
         </div>
       )}
 
+      {/* MANDATORY CAPITAL LETTERS SPELLING BLOCK (As per official notice board rule 5 & 6) */}
+      {!isWater && (
+        <div className="mb-4 border-2 border-slate-800 p-3 rounded bg-slate-50">
+          <h4 className="font-extrabold text-slate-950 text-xs border-b border-slate-400 pb-1 mb-2 uppercase tracking-wide flex items-center justify-between">
+            <span>🔤 शासकीय रिकॉर्ड हेतु अंग्रेजी (CAPITAL LETTERS) में स्पेलिंग (Mandatory Spelling in Capital Letters)</span>
+            <span className="text-[10px] font-normal text-slate-600 italic">सूचना पट्ट निर्देश क्र. {isBirth ? '5' : '6'}</span>
+          </h4>
+          {isBirth ? (
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs font-mono font-bold text-slate-950">
+              <div className="bg-white p-2 rounded border border-slate-300">
+                <span className="text-[10px] text-slate-500 font-sans font-semibold block">1. Child Name (शिशु का नाम):</span>
+                <span className="text-sm tracking-wider text-emerald-950">{child.fullName ? child.fullName.toUpperCase() : 'NOT NAMED YET'}</span>
+              </div>
+              <div className="bg-white p-2 rounded border border-slate-300">
+                <span className="text-[10px] text-slate-500 font-sans font-semibold block">2. Mother Name (माता का नाम):</span>
+                <span className="text-sm tracking-wider text-slate-900">{mother.fullName ? mother.fullName.toUpperCase() : 'N/A'}</span>
+              </div>
+              <div className="bg-white p-2 rounded border border-slate-300">
+                <span className="text-[10px] text-slate-500 font-sans font-semibold block">3. Father Name (पिता का नाम):</span>
+                <span className="text-sm tracking-wider text-slate-900">{father.fullName ? father.fullName.toUpperCase() : 'N/A'}</span>
+              </div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs font-mono font-bold text-slate-950">
+              <div className="bg-white p-2 rounded border border-slate-300">
+                <span className="text-[10px] text-slate-500 font-sans font-semibold block">1. Deceased Name (मृतक का नाम):</span>
+                <span className="text-sm tracking-wider text-emerald-950">{deceased.fullName ? deceased.fullName.toUpperCase() : 'N/A'}</span>
+              </div>
+              <div className="bg-white p-2 rounded border border-slate-300">
+                <span className="text-[10px] text-slate-500 font-sans font-semibold block">2. Father/Husband Name (पिता/पति का नाम):</span>
+                <span className="text-sm tracking-wider text-slate-900">{parentSpouse.fatherHusbandName ? parentSpouse.fatherHusbandName.toUpperCase() : 'N/A'}</span>
+              </div>
+              <div className="bg-white p-2 rounded border border-slate-300">
+                <span className="text-[10px] text-slate-500 font-sans font-semibold block">3. Mother Name (माता का नाम):</span>
+                <span className="text-sm tracking-wider text-slate-900">{parentSpouse.motherName ? parentSpouse.motherName.toUpperCase() : 'N/A'}</span>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
       {/* APPLICANT / INFORMANT DETAILS */}
       <div className="mb-4">
         <h3 className="font-bold text-slate-900 border-b border-slate-400 pb-1 mb-2 uppercase text-xs">
@@ -284,17 +333,17 @@ export default function ApplicationLetterTemplate({ record, serviceType = 'death
         </table>
       </div>
 
-      {/* ATTACHED DOCUMENTS CHECKLIST */}
+      {/* ATTACHED DOCUMENTS CHECKLIST (Dynamically Matching Official Notice Board Rules) */}
       <div className="mb-5">
         <h3 className="font-bold text-slate-900 border-b border-slate-400 pb-1 mb-2 uppercase text-xs">
-          3. संलग्न दस्तावेजों की सूची (Attached Supporting Documents Checklist)
+          3. आवश्यक संलग्न दस्तावेजों की शासकीय जांच सूची (Official Attached Documents Checklist)
         </h3>
         <table className="w-full border-collapse border border-slate-400 text-xs">
           <thead>
             <tr className="bg-slate-200 text-slate-800 font-bold border-b border-slate-400">
-              <th className="p-1.5 text-left border-r border-slate-400 w-12">क्र.</th>
-              <th className="p-1.5 text-left border-r border-slate-400">दस्तावेज का नाम (Document Name)</th>
-              <th className="p-1.5 text-center border-r border-slate-400 w-28">ऑनलाइन स्थिति</th>
+              <th className="p-1.5 text-left border-r border-slate-400 w-10">क्र.</th>
+              <th className="p-1.5 text-left border-r border-slate-400">आवश्यक दस्तावेज विवरण (Document Title)</th>
+              <th className="p-1.5 text-center border-r border-slate-400 w-28">पोर्टल स्थिति</th>
               <th className="p-1.5 text-center w-32">कार्यालयीन भौतिक जांच [ ✓ ]</th>
             </tr>
           </thead>
@@ -303,7 +352,7 @@ export default function ApplicationLetterTemplate({ record, serviceType = 'death
               <>
                 <tr className="border-b border-slate-300">
                   <td className="p-1.5 font-bold border-r border-slate-300 text-center">1</td>
-                  <td className="p-1.5 border-r border-slate-300">आवेदक का आधार कार्ड फोटो (Applicant Aadhaar Photo)</td>
+                  <td className="p-1.5 border-r border-slate-300">आवेदक का आधार कार्ड की फोटोकॉपी</td>
                   <td className="p-1.5 border-r border-slate-300 text-center font-bold text-emerald-800">
                     {record.documents?.aadhaarCard?.fileName ? 'संलग्न' : 'संलग्न'}
                   </td>
@@ -311,7 +360,7 @@ export default function ApplicationLetterTemplate({ record, serviceType = 'death
                 </tr>
                 <tr className="border-b border-slate-300 bg-slate-50">
                   <td className="p-1.5 font-bold border-r border-slate-300 text-center">2</td>
-                  <td className="p-1.5 border-r border-slate-300">भवन स्वामित्व / संपत्ति कर रसीद (Property Tax / Registry Document)</td>
+                  <td className="p-1.5 border-r border-slate-300">भवन स्वामित्व / संपत्ति कर भुगतान रसीद की फोटोकॉपी</td>
                   <td className="p-1.5 border-r border-slate-300 text-center font-bold text-emerald-800">
                     {record.documents?.propertyReceipt?.fileName ? 'संलग्न' : 'संलग्न'}
                   </td>
@@ -319,7 +368,7 @@ export default function ApplicationLetterTemplate({ record, serviceType = 'death
                 </tr>
                 <tr className="border-b border-slate-300">
                   <td className="p-1.5 font-bold border-r border-slate-300 text-center">3</td>
-                  <td className="p-1.5 border-r border-slate-300">नोटरी शपथ पत्र (Notarized Affidavit on Stamp Paper)</td>
+                  <td className="p-1.5 border-r border-slate-300">नोटरी द्वारा सत्यापित शपथ पत्र (Affidavit)</td>
                   <td className="p-1.5 border-r border-slate-300 text-center font-bold text-emerald-800">
                     {record.documents?.affidavitDoc?.fileName ? 'संलग्न' : 'संलग्न'}
                   </td>
@@ -327,7 +376,7 @@ export default function ApplicationLetterTemplate({ record, serviceType = 'death
                 </tr>
                 <tr className="border-b border-slate-300 bg-slate-50">
                   <td className="p-1.5 font-bold border-r border-slate-300 text-center">4</td>
-                  <td className="p-1.5 border-r border-slate-300">आवेदक का पासपोर्ट साइज फोटो (Applicant Photo)</td>
+                  <td className="p-1.5 border-r border-slate-300">आवेदक का पासपोर्ट साइज फोटो एवं आवेदन पत्र</td>
                   <td className="p-1.5 border-r border-slate-300 text-center font-bold text-emerald-800">
                     {record.documents?.applicantPhoto?.fileName ? 'संलग्न' : 'संलग्न'}
                   </td>
@@ -335,67 +384,193 @@ export default function ApplicationLetterTemplate({ record, serviceType = 'death
                 </tr>
               </>
             ) : isBirth ? (
-              <>
-                <tr className="border-b border-slate-300">
-                  <td className="p-1.5 font-bold border-r border-slate-300 text-center">1</td>
-                  <td className="p-1.5 border-r border-slate-300">अस्पताल जन्म डिस्चार्ज कार्ड / पर्ची (Hospital Birth Slip)</td>
-                  <td className="p-1.5 border-r border-slate-300 text-center font-bold text-emerald-800">
-                    {record.documents?.hospitalSlip?.fileName ? 'संलग्न' : 'संलग्न'}
-                  </td>
-                  <td className="p-1.5 text-center font-mono text-slate-400">[  ] सत्यापित</td>
-                </tr>
-                <tr className="border-b border-slate-300 bg-slate-50">
-                  <td className="p-1.5 font-bold border-r border-slate-300 text-center">2</td>
-                  <td className="p-1.5 border-r border-slate-300">माता का आधार कार्ड फोटो (Mother Aadhaar Photo)</td>
-                  <td className="p-1.5 border-r border-slate-300 text-center font-bold text-emerald-800">
-                    {record.documents?.motherAadhaar?.fileName ? 'संलग्न' : 'संलग्न'}
-                  </td>
-                  <td className="p-1.5 text-center font-mono text-slate-400">[  ] सत्यापित</td>
-                </tr>
-                <tr className="border-b border-slate-300">
-                  <td className="p-1.5 font-bold border-r border-slate-300 text-center">3</td>
-                  <td className="p-1.5 border-r border-slate-300">पिता का आधार कार्ड फोटो (Father Aadhaar Photo)</td>
-                  <td className="p-1.5 border-r border-slate-300 text-center font-bold text-emerald-800">
-                    {record.documents?.fatherAadhaar?.fileName ? 'संलग्न' : 'संलग्न'}
-                  </td>
-                  <td className="p-1.5 text-center font-mono text-slate-400">[  ] सत्यापित</td>
-                </tr>
-                <tr className="border-b border-slate-300 bg-slate-50">
-                  <td className="p-1.5 font-bold border-r border-slate-300 text-center">4</td>
-                  <td className="p-1.5 border-r border-slate-300">निवास प्रमाण (Address Proof)</td>
-                  <td className="p-1.5 border-r border-slate-300 text-center font-bold text-emerald-800">
-                    {record.documents?.addressProof?.fileName ? 'संलग्न' : 'संलग्न'}
-                  </td>
-                  <td className="p-1.5 text-center font-mono text-slate-400">[  ] सत्यापित</td>
-                </tr>
-              </>
+              child.placeType?.includes('घर') ? (
+                /* Birth at Home - 5 mandatory documents from Notice Board */
+                <>
+                  <tr className="border-b border-slate-300">
+                    <td className="p-1.5 font-bold border-r border-slate-300 text-center">1</td>
+                    <td className="p-1.5 border-r border-slate-300">बच्चे के माता-पिता के आधार कार्ड की फोटोकॉपी</td>
+                    <td className="p-1.5 border-r border-slate-300 text-center font-bold text-emerald-800">
+                      {(record.documents?.motherAadhaar || record.documents?.fatherAadhaar) ? 'संलग्न' : 'संलग्न'}
+                    </td>
+                    <td className="p-1.5 text-center font-mono text-slate-400">[  ] सत्यापित</td>
+                  </tr>
+                  <tr className="border-b border-slate-300 bg-slate-50">
+                    <td className="p-1.5 font-bold border-r border-slate-300 text-center">2</td>
+                    <td className="p-1.5 border-r border-slate-300">समग्र परिवार आई.डी. फोटोकॉपी (माता-पिता का नाम अनिवार्य)</td>
+                    <td className="p-1.5 border-r border-slate-300 text-center font-bold text-emerald-800">
+                      {record.documents?.samagraId ? 'संलग्न' : 'संलग्न'}
+                    </td>
+                    <td className="p-1.5 text-center font-mono text-slate-400">[  ] सत्यापित</td>
+                  </tr>
+                  <tr className="border-b border-slate-300">
+                    <td className="p-1.5 font-bold border-r border-slate-300 text-center">3</td>
+                    <td className="p-1.5 border-r border-slate-300">आँगनवाड़ी कार्यकर्ता द्वारा प्रमाणित पत्र (सील व हस्ताक्षर सहित कि बच्चा घर पर हुआ है)</td>
+                    <td className="p-1.5 border-r border-slate-300 text-center font-bold text-emerald-800">
+                      {record.documents?.anganwadiLetter ? 'संलग्न' : 'संलग्न'}
+                    </td>
+                    <td className="p-1.5 text-center font-mono text-slate-400">[  ] सत्यापित</td>
+                  </tr>
+                  <tr className="border-b border-slate-300 bg-slate-50">
+                    <td className="p-1.5 font-bold border-r border-slate-300 text-center">4</td>
+                    <td className="p-1.5 border-r border-slate-300">जच्चा-बच्चा कार्ड (MCP Card) फोटोकॉपी</td>
+                    <td className="p-1.5 border-r border-slate-300 text-center font-bold text-emerald-800">
+                      {record.documents?.mcpCard ? 'संलग्न' : 'संलग्न'}
+                    </td>
+                    <td className="p-1.5 text-center font-mono text-slate-400">[  ] सत्यापित</td>
+                  </tr>
+                  <tr className="border-b border-slate-300">
+                    <td className="p-1.5 font-bold border-r border-slate-300 text-center">5</td>
+                    <td className="p-1.5 border-r border-slate-300">मुख्य नगर पालिका अधिकारी के नाम आवेदन पत्र (केपिटल लेटर्स स्पेलिंग सहित)</td>
+                    <td className="p-1.5 border-r border-slate-300 text-center font-bold text-emerald-800">मूल पावती पत्र</td>
+                    <td className="p-1.5 text-center font-mono text-slate-400">[  ] सत्यापित</td>
+                  </tr>
+                </>
+              ) : child.hospitalName?.includes('वरदान') ? (
+                /* Birth at Vardan Hospital - 3 documents from Notice Board */
+                <>
+                  <tr className="border-b border-slate-300">
+                    <td className="p-1.5 font-bold border-r border-slate-300 text-center">1</td>
+                    <td className="p-1.5 border-r border-slate-300">बच्चे के माता-पिता के आधार कार्ड की फोटोकॉपी</td>
+                    <td className="p-1.5 border-r border-slate-300 text-center font-bold text-emerald-800">
+                      {(record.documents?.motherAadhaar || record.documents?.fatherAadhaar) ? 'संलग्न' : 'संलग्न'}
+                    </td>
+                    <td className="p-1.5 text-center font-mono text-slate-400">[  ] सत्यापित</td>
+                  </tr>
+                  <tr className="border-b border-slate-300 bg-slate-50">
+                    <td className="p-1.5 font-bold border-r border-slate-300 text-center">2</td>
+                    <td className="p-1.5 border-r border-slate-300">समग्र परिवार आई.डी. फोटोकॉपी (माता-पिता का नाम अनिवार्य)</td>
+                    <td className="p-1.5 border-r border-slate-300 text-center font-bold text-emerald-800">
+                      {record.documents?.samagraId ? 'संलग्न' : 'संलग्न'}
+                    </td>
+                    <td className="p-1.5 text-center font-mono text-slate-400">[  ] सत्यापित</td>
+                  </tr>
+                  <tr className="border-b border-slate-300">
+                    <td className="p-1.5 font-bold border-r border-slate-300 text-center">3</td>
+                    <td className="p-1.5 border-r border-slate-300">वरदान हॉस्पिटल की रजिस्ट्रेशन स्लिप व डिस्चार्ज कार्ड की फोटोकॉपी</td>
+                    <td className="p-1.5 border-r border-slate-300 text-center font-bold text-emerald-800">
+                      {record.documents?.hospitalSlip ? 'संलग्न' : 'संलग्न'}
+                    </td>
+                    <td className="p-1.5 text-center font-mono text-slate-400">[  ] सत्यापित</td>
+                  </tr>
+                </>
+              ) : (
+                /* General Hospital Birth - 3 documents */
+                <>
+                  <tr className="border-b border-slate-300">
+                    <td className="p-1.5 font-bold border-r border-slate-300 text-center">1</td>
+                    <td className="p-1.5 border-r border-slate-300">बच्चे के माता-पिता के आधार कार्ड की फोटोकॉपी</td>
+                    <td className="p-1.5 border-r border-slate-300 text-center font-bold text-emerald-800">
+                      {(record.documents?.motherAadhaar || record.documents?.fatherAadhaar) ? 'संलग्न' : 'संलग्न'}
+                    </td>
+                    <td className="p-1.5 text-center font-mono text-slate-400">[  ] सत्यापित</td>
+                  </tr>
+                  <tr className="border-b border-slate-300 bg-slate-50">
+                    <td className="p-1.5 font-bold border-r border-slate-300 text-center">2</td>
+                    <td className="p-1.5 border-r border-slate-300">समग्र परिवार आई.डी. फोटोकॉपी (माता-पिता का नाम दर्ज)</td>
+                    <td className="p-1.5 border-r border-slate-300 text-center font-bold text-emerald-800">
+                      {record.documents?.samagraId ? 'संलग्न' : 'संलग्न'}
+                    </td>
+                    <td className="p-1.5 text-center font-mono text-slate-400">[  ] सत्यापित</td>
+                  </tr>
+                  <tr className="border-b border-slate-300">
+                    <td className="p-1.5 font-bold border-r border-slate-300 text-center">3</td>
+                    <td className="p-1.5 border-r border-slate-300">अस्पताल प्रसव सूचना पर्ची / डिस्चार्ज कार्ड फोटोकॉपी</td>
+                    <td className="p-1.5 border-r border-slate-300 text-center font-bold text-emerald-800">
+                      {record.documents?.hospitalSlip ? 'संलग्न' : 'संलग्न'}
+                    </td>
+                    <td className="p-1.5 text-center font-mono text-slate-400">[  ] सत्यापित</td>
+                  </tr>
+                </>
+              )
             ) : (
-              <>
-                <tr className="border-b border-slate-300">
-                  <td className="p-1.5 font-bold border-r border-slate-300 text-center">1</td>
-                  <td className="p-1.5 border-r border-slate-300">अस्पताल मृत्यु प्रमाण पत्र / दाह संस्कार रसीद (Hospital/Cremation Slip)</td>
-                  <td className="p-1.5 border-r border-slate-300 text-center font-bold text-emerald-800">
-                    {record.documents?.deathSlip?.fileName ? 'संलग्न' : 'संलग्न'}
-                  </td>
-                  <td className="p-1.5 text-center font-mono text-slate-400">[  ] सत्यापित</td>
-                </tr>
-                <tr className="border-b border-slate-300 bg-slate-50">
-                  <td className="p-1.5 font-bold border-r border-slate-300 text-center">2</td>
-                  <td className="p-1.5 border-r border-slate-300">आवेदक आधार कार्ड (Applicant Aadhaar Photo)</td>
-                  <td className="p-1.5 border-r border-slate-300 text-center font-bold text-emerald-800">
-                    {record.documents?.applicantAadhaar?.fileName ? 'संलग्न' : 'संलग्न'}
-                  </td>
-                  <td className="p-1.5 text-center font-mono text-slate-400">[  ] सत्यापित</td>
-                </tr>
-                <tr className="border-b border-slate-300">
-                  <td className="p-1.5 font-bold border-r border-slate-300 text-center">3</td>
-                  <td className="p-1.5 border-r border-slate-300">निवास पता प्रमाण (Address Proof Photo)</td>
-                  <td className="p-1.5 border-r border-slate-300 text-center font-bold text-emerald-800">
-                    {record.documents?.addressProof?.fileName ? 'संलग्न' : 'संलग्न'}
-                  </td>
-                  <td className="p-1.5 text-center font-mono text-slate-400">[  ] सत्यापित</td>
-                </tr>
-              </>
+              deceased.placeType?.includes('घर') ? (
+                /* Death at Home - 6 mandatory documents from Notice Board */
+                <>
+                  <tr className="border-b border-slate-300">
+                    <td className="p-1.5 font-bold border-r border-slate-300 text-center">1</td>
+                    <td className="p-1.5 border-r border-slate-300">मृतक के आधार कार्ड की फोटोकॉपी</td>
+                    <td className="p-1.5 border-r border-slate-300 text-center font-bold text-emerald-800">
+                      {record.documents?.deceasedAadhaar ? 'संलग्न' : 'संलग्न'}
+                    </td>
+                    <td className="p-1.5 text-center font-mono text-slate-400">[  ] सत्यापित</td>
+                  </tr>
+                  <tr className="border-b border-slate-300 bg-slate-50">
+                    <td className="p-1.5 font-bold border-r border-slate-300 text-center">2</td>
+                    <td className="p-1.5 border-r border-slate-300">सूचनादाता के आधार कार्ड की फोटोकॉपी</td>
+                    <td className="p-1.5 border-r border-slate-300 text-center font-bold text-emerald-800">
+                      {record.documents?.applicantAadhaar ? 'संलग्न' : 'संलग्न'}
+                    </td>
+                    <td className="p-1.5 text-center font-mono text-slate-400">[  ] सत्यापित</td>
+                  </tr>
+                  <tr className="border-b border-slate-300">
+                    <td className="p-1.5 font-bold border-r border-slate-300 text-center">3</td>
+                    <td className="p-1.5 border-r border-slate-300">मुक्तिधाम / मुस्लिम पंचायत / चर्च द्वारा जारी की रसीद</td>
+                    <td className="p-1.5 border-r border-slate-300 text-center font-bold text-emerald-800">
+                      {record.documents?.cremationReceipt ? 'संलग्न' : 'संलग्न'}
+                    </td>
+                    <td className="p-1.5 text-center font-mono text-slate-400">[  ] सत्यापित</td>
+                  </tr>
+                  <tr className="border-b border-slate-300 bg-slate-50">
+                    <td className="p-1.5 font-bold border-r border-slate-300 text-center">4</td>
+                    <td className="p-1.5 border-r border-slate-300">मृतक की समग्र आई.डी. की फोटोकॉपी</td>
+                    <td className="p-1.5 border-r border-slate-300 text-center font-bold text-emerald-800">
+                      {record.documents?.samagraId ? 'संलग्न' : 'संलग्न'}
+                    </td>
+                    <td className="p-1.5 text-center font-mono text-slate-400">[  ] सत्यापित</td>
+                  </tr>
+                  <tr className="border-b border-slate-300">
+                    <td className="p-1.5 font-bold border-r border-slate-300 text-center">5</td>
+                    <td className="p-1.5 border-r border-slate-300">पंचनामा अथवा वार्ड पार्षद द्वारा प्रमाणित पत्र कि मृत्यु कहाँ पर हुई</td>
+                    <td className="p-1.5 border-r border-slate-300 text-center font-bold text-emerald-800">
+                      {record.documents?.panchnamaLetter ? 'संलग्न' : 'संलग्न'}
+                    </td>
+                    <td className="p-1.5 text-center font-mono text-slate-400">[  ] सत्यापित</td>
+                  </tr>
+                  <tr className="border-b border-slate-300 bg-slate-50">
+                    <td className="p-1.5 font-bold border-r border-slate-300 text-center">6</td>
+                    <td className="p-1.5 border-r border-slate-300">मुख्य नगर पालिका अधिकारी के नाम से आवेदन (केपिटल लेटर्स स्पेलिंग सहित)</td>
+                    <td className="p-1.5 border-r border-slate-300 text-center font-bold text-emerald-800">मूल पावती पत्र</td>
+                    <td className="p-1.5 text-center font-mono text-slate-400">[  ] सत्यापित</td>
+                  </tr>
+                </>
+              ) : (
+                /* Hospital Death - 4 documents from Notice Board */
+                <>
+                  <tr className="border-b border-slate-300">
+                    <td className="p-1.5 font-bold border-r border-slate-300 text-center">1</td>
+                    <td className="p-1.5 border-r border-slate-300">मृतक के आधार कार्ड की फोटोकॉपी</td>
+                    <td className="p-1.5 border-r border-slate-300 text-center font-bold text-emerald-800">
+                      {record.documents?.deceasedAadhaar ? 'संलग्न' : 'संलग्न'}
+                    </td>
+                    <td className="p-1.5 text-center font-mono text-slate-400">[  ] सत्यापित</td>
+                  </tr>
+                  <tr className="border-b border-slate-300 bg-slate-50">
+                    <td className="p-1.5 font-bold border-r border-slate-300 text-center">2</td>
+                    <td className="p-1.5 border-r border-slate-300">सूचनादाता के आधार कार्ड की फोटोकॉपी</td>
+                    <td className="p-1.5 border-r border-slate-300 text-center font-bold text-emerald-800">
+                      {record.documents?.applicantAadhaar ? 'संलग्न' : 'संलग्न'}
+                    </td>
+                    <td className="p-1.5 text-center font-mono text-slate-400">[  ] सत्यापित</td>
+                  </tr>
+                  <tr className="border-b border-slate-300">
+                    <td className="p-1.5 font-bold border-r border-slate-300 text-center">3</td>
+                    <td className="p-1.5 border-r border-slate-300">अस्पताल द्वारा जारी मृत्यु सह चिकित्सा प्रमाण पत्र (Form 4/4A)</td>
+                    <td className="p-1.5 border-r border-slate-300 text-center font-bold text-emerald-800">
+                      {record.documents?.hospitalDeathSlip ? 'संलग्न' : 'संलग्न'}
+                    </td>
+                    <td className="p-1.5 text-center font-mono text-slate-400">[  ] सत्यापित</td>
+                  </tr>
+                  <tr className="border-b border-slate-300 bg-slate-50">
+                    <td className="p-1.5 font-bold border-r border-slate-300 text-center">4</td>
+                    <td className="p-1.5 border-r border-slate-300">मृतक की समग्र आई.डी. की फोटोकॉपी</td>
+                    <td className="p-1.5 border-r border-slate-300 text-center font-bold text-emerald-800">
+                      {record.documents?.samagraId ? 'संलग्न' : 'संलग्न'}
+                    </td>
+                    <td className="p-1.5 text-center font-mono text-slate-400">[  ] सत्यापित</td>
+                  </tr>
+                </>
+              )
             )}
           </tbody>
         </table>

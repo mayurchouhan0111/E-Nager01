@@ -105,8 +105,12 @@ export default function DeathCertificatePage() {
     parentSpouseDetails: { ...defaultParentSpouseDetails },
     statisticalDetails: { ...defaultStatisticalDetails },
     documents: {
-      deathSlip: null,
+      deceasedAadhaar: null,
       applicantAadhaar: null,
+      samagraId: null,
+      cremationReceipt: null,
+      panchnamaLetter: null,
+      hospitalDeathSlip: null,
       addressProof: null
     }
   });
@@ -350,7 +354,7 @@ export default function DeathCertificatePage() {
         ...(app.statisticalDetails || {}),
         lifestyleHistory: { ...defaultStatisticalDetails.lifestyleHistory, ...(app.statisticalDetails?.lifestyleHistory || {}) }
       },
-      documents: app.documents || { deathSlip: null, applicantAadhaar: null, addressProof: null }
+      documents: app.documents || { deceasedAadhaar: null, applicantAadhaar: null, samagraId: null, cremationReceipt: null, panchnamaLetter: null, hospitalDeathSlip: null, addressProof: null }
     };
     setFormData(normalizedApp);
     setActiveTab('apply');
@@ -368,8 +372,12 @@ export default function DeathCertificatePage() {
       parentSpouseDetails: JSON.parse(JSON.stringify(defaultParentSpouseDetails)),
       statisticalDetails: JSON.parse(JSON.stringify(defaultStatisticalDetails)),
       documents: {
-        deathSlip: null,
+        deceasedAadhaar: null,
         applicantAadhaar: null,
+        samagraId: null,
+        cremationReceipt: null,
+        panchnamaLetter: null,
+        hospitalDeathSlip: null,
         addressProof: null
       }
     });

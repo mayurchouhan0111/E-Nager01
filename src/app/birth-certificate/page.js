@@ -102,6 +102,9 @@ export default function BirthCertificatePage() {
       hospitalSlip: null,
       motherAadhaar: null,
       fatherAadhaar: null,
+      samagraId: null,
+      anganwadiLetter: null,
+      mcpCard: null,
       addressProof: null
     }
   });
@@ -345,7 +348,7 @@ export default function BirthCertificatePage() {
       motherDetails: { ...defaultMotherDetails, ...(app.motherDetails || {}) },
       fatherDetails: { ...defaultFatherDetails, ...(app.fatherDetails || {}) },
       applicantDetails: { ...defaultApplicantDetails, ...(app.applicantDetails || {}) },
-      documents: app.documents || { hospitalSlip: null, motherAadhaar: null, fatherAadhaar: null, addressProof: null }
+      documents: app.documents || { hospitalSlip: null, motherAadhaar: null, fatherAadhaar: null, samagraId: null, anganwadiLetter: null, mcpCard: null, addressProof: null }
     };
     setFormData(normalizedApp);
     setActiveTab('apply');
@@ -366,6 +369,9 @@ export default function BirthCertificatePage() {
         hospitalSlip: null,
         motherAadhaar: null,
         fatherAadhaar: null,
+        samagraId: null,
+        anganwadiLetter: null,
+        mcpCard: null,
         addressProof: null
       }
     });
