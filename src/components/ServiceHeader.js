@@ -188,26 +188,87 @@ export default function ServiceHeader() {
       </div>
 
       {showTrackModal && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-50 flex items-center justify-center p-4">
-          <div className="bg-white border border-slate-200 rounded-3xl max-w-2xl w-full p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
-            <div className="flex justify-between pb-3 border-b">
-              <h3 className="font-extrabold flex items-center gap-2"><Search className="w-5 h-5 text-emerald-700" /> आवेदन स्थिति खोजें</h3>
-              <button onClick={() => setShowTrackModal(false)}><X className="w-5 h-5" /></button>
+        <div className="fixed inset-0 bg-slate-900/75 backdrop-blur-md z-50 overflow-y-auto p-3 sm:p-6 flex items-start justify-center pt-4 sm:pt-8">
+          <div className="bg-white border border-slate-200 rounded-3xl max-w-2xl w-full p-4 sm:p-6 shadow-2xl flex flex-col max-h-[85vh] sm:max-h-[88vh]">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100 shrink-0">
+              <h3 className="font-extrabold text-sm sm:text-base text-slate-900 flex items-center gap-2">
+                <Search className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-700" /> 
+                आवेदन स्थिति खोजें (Track Application Status)
+              </h3>
+              <button 
+                onClick={() => setShowTrackModal(false)}
+                className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
             </div>
-            <form onSubmit={handlePublicSearch} className="py-4 flex gap-2">
-              <input type="text" required value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="आवेदन क्रमांक या मोबाइल नंबर दर्ज करें..." className="flex-1 border rounded-xl px-4 py-2.5 text-sm" />
-              <button type="submit" className="bg-emerald-700 text-white px-5 rounded-xl text-xs font-bold">{searching ? 'खोज रहे...' : 'खोजें'}</button>
+
+            <form onSubmit={handlePublicSearch} className="py-3 sm:py-4 flex gap-2 shrink-0">
+              <input 
+                type="text" 
+                required 
+                value={searchQuery} 
+                onChange={(e) => setSearchQuery(e.target.value)} 
+                placeholder="आवेदन क्र. या मोबाइल नंबर दर्ज करें..." 
+                className="input flex-1 text-xs sm:text-sm" 
+              />
+              <button 
+                type="submit" 
+                className="btn btn-primary text-xs font-bold px-4 sm:px-5"
+              >
+                {searching ? 'खोज रहे...' : 'खोजें'}
+              </button>
             </form>
-            {hasSearched && (
-              <div className="space-y-3">
-                {searchResults.map((rec) => (
-                  <div key={rec.id} className="bg-slate-50 p-4 rounded-2xl border space-y-2">
-                    <div className="flex justify-between items-center text-xs font-bold">
-                      <span>{rec.applicationNo}</span>
-                      <span className={`px-2 py-0.5 rounded-full border ${getStatusChip(rec.status)}`}>{rec.status}</span>
+
+            <div className="overflow-y-auto flex-1 pr-1">
+              {hasSearched && (
+                <div className="space-y-3 pt-1">
+                  {searchResults.length === 0 ? (
+                    <div className="text-center py-8 text-slate-500 text-xs font-medium bg-slate-50 rounded-2xl border border-dashed border-slate-200">
+                      कोई आवेदन नहीं मिला। कृपया सही आवेदन क्रमांक या मोबाइल नंबर दर्ज करें।
                     </div>
-                    <div className="flex gap-2">
-                      <button onClick={() => { setSelectedRecord(rec); setModalType('letter'); }} className="text-[11px] font-bold flex items-center gap-1 text-emerald-700"><Printer className="w-3.5 h-3.5" /> पावती</button>
+                  ) : (
+                    searchResults.map((rec) => (
+                      <div key={rec.id} className="bg-slate-50 p-3.5 sm:p-4 rounded-2xl border border-slate-200 space-y-2.5 shadow-sm">
+                        <div className="flex items-center justify-between gap-2 text-xs font-bold flex-wrap">
+                          <div className="flex items-center gap-1.5 flex-wrap">
+                            <span className="font-mono text-emerald-900 bg-emerald-100 px-2.5 py-0.5 rounded border border-emerald-200">{rec.applicationNo}</span>
+                            <span className="text-slate-500 font-medium text-[11px]">({rec.serviceName})</span>
+                          </div>
+                          <span className={`px-2.5 py-0.5 rounded-full text-[10px] uppercase font-bold border ${getStatusChip(rec.status)}`}>{rec.status}</span>
+                        </div>
+
+                        <div className="text-xs text-slate-800 font-medium">
+                          <p><span className="text-slate-500">नाम:</span> {rec.deceasedDetails?.fullName ? `स्व. ${rec.deceasedDetails.fullName}` : rec.childDetails?.fullName || rec.applicantDetails?.fullName || 'N/A'}</p>
+                          <p className="text-[11px] text-slate-500 mt-0.5">आवेदन तिथि: {new Date(rec.appliedAt || rec.createdAt || Date.now()).toLocaleDateString('hi-IN')}</p>
+                        </div>
+
+                        <div className="flex items-center gap-2 pt-1 border-t border-slate-200/60 flex-wrap">
+                          <button 
+                            onClick={() => { setSelectedRecord(rec); setModalType('letter'); }} 
+                            className="btn btn-secondary btn-sm text-[11px] font-bold text-slate-800 flex items-center gap-1 bg-white"
+                          >
+                            <Printer className="w-3.5 h-3.5 text-slate-600" /> पावती पत्र देखें
+                          </button>
+
+                          {(rec.status === 'Approved' || rec.status === 'Sanctioned' || rec.status === 'Certificate Generated' || rec.status === 'Completed') && (
+                            <button 
+                              onClick={() => { setSelectedRecord(rec); setModalType('certificate'); }} 
+                              className="btn btn-primary btn-sm text-[11px] font-bold flex items-center gap-1"
+                            >
+                              📜 प्रमाण पत्र डाउनलोड
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}ter gap-1 text-emerald-700"><Printer className="w-3.5 h-3.5" /> पावती</button>
                       {(rec.status === 'Approved' || rec.status === 'Certificate Generated') && (
                         <button onClick={() => { setSelectedRecord(rec); setModalType('certificate'); }} className="text-[11px] font-bold text-emerald-800">📜 प्रमाण पत्र</button>
                       )}
