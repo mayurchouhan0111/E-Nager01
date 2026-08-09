@@ -43,6 +43,10 @@ export default function DeathCertificateTemplate({ record }) {
 
   return (
     <div className="print-page-a4 print-container bg-white text-slate-900 p-6 max-w-4xl mx-auto border-8 border-double border-amber-900/40 shadow-2xl relative font-serif print:p-4 print:border-4 print:max-h-none print:overflow-visible">
+      {/* Subtle Official Watermark */}
+      <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.04] overflow-hidden select-none z-0">
+        <img src="/mp-logo.png" alt="" className="w-[420px] h-[420px] object-contain" />
+      </div>
       <div className="border border-amber-800/30 p-6 relative">
         
         <div className="text-center border-b-2 border-amber-900/30 pb-4 mb-6">

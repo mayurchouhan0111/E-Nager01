@@ -346,23 +346,31 @@ html, body {
   }
 }
 
-/* ── Print Styles (Minimum Pages Required Architecture) ───────────────────────────── */
+/* ── Government-Grade PDF & Print Engine (Paged Media Architecture) ────────── */
 
 @media print {
   @page {
     size: A4 portrait;
-    margin: 8mm 10mm;
+    margin: 10mm 12mm 12mm 12mm;
+    @bottom-right {
+      content: "नगर पालिका परिषद झाबुआ (म.प्र.) | शासकीय अभिलेख";
+      font-size: 8pt;
+      font-family: sans-serif;
+      color: #64748b;
+    }
   }
-  
+
   html, body {
     background: white !important;
-    color: black !important;
+    color: #020617 !important;
     overflow: visible !important;
     height: auto !important;
     max-height: none !important;
     width: 100% !important;
     margin: 0 !important;
     padding: 0 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
   }
 
   /* Hide header, navigation, form containers, timelines, footers, admin dashboards, and all non-print background elements */
@@ -420,15 +428,32 @@ html, body {
     max-height: none !important;
     height: auto !important;
     overflow: visible !important;
-    padding: 6mm 8mm !important;
+    padding: 8mm 10mm !important;
     margin: 0 auto !important;
-    border: 2px solid #0f172a !important;
+    border: 3px double #0f172a !important;
+    box-shadow: none !important;
+    position: relative !important;
+  }
+
+  /* Repeating Table Headers & Footers across multiple pages */
+  thead {
+    display: table-header-group !important;
+  }
+
+  tfoot {
+    display: table-footer-group !important;
   }
 
   /* Prevent awkward mid-section cuts and keep sections intact on pages */
-  table, tr, td, th, .print-break-avoid, blockquote, .border-t {
+  tr, td, th, .print-break-avoid, blockquote, .border-t, .space-y-4 > div {
     page-break-inside: avoid !important;
     break-inside: avoid !important;
+  }
+
+  /* Prevent orphaned headings at page bottoms */
+  h1, h2, h3, h4, h5, h6 {
+    page-break-after: avoid !important;
+    break-after: avoid !important;
   }
 }
 

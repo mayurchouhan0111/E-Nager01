@@ -51,6 +51,10 @@ export default function ApplicationLetterTemplate({ record, serviceType = 'death
 
   return (
     <div className="print-page-a4 print-container bg-white text-slate-900 p-6 max-w-4xl mx-auto border-4 border-slate-700 shadow-xl relative font-sans text-xs print:p-4 print:border-2 print:max-h-none print:overflow-visible">
+      {/* Subtle Official Watermark */}
+      <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.03] overflow-hidden select-none z-0">
+        <img src="/mp-logo.png" alt="" className="w-[420px] h-[420px] object-contain" />
+      </div>
       
       {/* Official Header */}
       <div className="text-center border-b-2 border-slate-800 pb-4 mb-4">
