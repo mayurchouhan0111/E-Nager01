@@ -38,6 +38,8 @@ export async function sendNotification({
   applicationId = '',
   applicationNo = '',
   recipientId = 'citizen',
+  userEmail = '',
+  userUid = '',
   event = 'STATUS_UPDATE',
   status = '',
   message = '',
@@ -48,7 +50,9 @@ export async function sendNotification({
     serviceType,
     applicationId,
     applicationNo,
-    recipientId,
+    recipientId: userEmail || userUid || recipientId || 'citizen',
+    userEmail: userEmail || '',
+    userUid: userUid || '',
     event,
     status,
     message: message || `Status changed to ${status} (स्थिति बदली: ${status})`,
@@ -73,7 +77,7 @@ export async function sendNotification({
   }
 }
 
-export async function getNotifications(serviceType = null, recipientId = null, maxResults = 50) {
+export async function getNotifications({ serviceType = null, targetEmail = null, targetUid = null, recipientId = null, maxResults = 50 } = {}) {
   try {
     const notifRef = collection(db, NOTIFICATIONS_COLLECTION);
     const snap = await getDocs(notifRef);
@@ -86,7 +90,16 @@ export async function getNotifications(serviceType = null, recipientId = null, m
     if (serviceType) {
       notifications = notifications.filter(n => n.serviceType === serviceType);
     }
-    if (recipientId) {
+
+    // Email & UID Filtered Citizen Notifications
+    if (targetEmail || targetUid) {
+      notifications = notifications.filter(n => {
+        if (n.recipientId === 'all' || n.recipientId === 'public') return true;
+        if (targetEmail && (n.userEmail === targetEmail || n.recipientId === targetEmail)) return true;
+        if (targetUid && (n.userUid === targetUid || n.recipientId === targetUid)) return true;
+        return false;
+      });
+    } else if (recipientId) {
       notifications = notifications.filter(n => n.recipientId === recipientId || n.recipientId === 'all');
     }
 
@@ -99,7 +112,14 @@ export async function getNotifications(serviceType = null, recipientId = null, m
     if (serviceType) {
       notifications = notifications.filter(n => n.serviceType === serviceType);
     }
-    if (recipientId) {
+    if (targetEmail || targetUid) {
+      notifications = notifications.filter(n => {
+        if (n.recipientId === 'all' || n.recipientId === 'public') return true;
+        if (targetEmail && (n.userEmail === targetEmail || n.recipientId === targetEmail)) return true;
+        if (targetUid && (n.userUid === targetUid || n.recipientId === targetUid)) return true;
+        return false;
+      });
+    } else if (recipientId) {
       notifications = notifications.filter(n => n.recipientId === recipientId || n.recipientId === 'all');
     }
     notifications.sort((a, b) => new Date(b.timestamp || 0) - new Date(a.timestamp || 0));

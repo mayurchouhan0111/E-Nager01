@@ -344,7 +344,24 @@ export default function AdminPage() {
       setBirthRecords(prev => updateRecordState(prev))
       setWaterRecords(prev => updateRecordState(prev))
 
-      setRemarkModal({ isOpen: false, record: null, serviceType: 'death', targetStatus: '', remarkText: '', officerName: 'Nagar Palika Officer' })
+      // Send Targeted Notification to Citizen Email & UID
+      const rec = remarkModal.record;
+      if (rec) {
+        sendNotification({
+          serviceType: remarkModal.serviceType,
+          applicationId: rec.id,
+          applicationNo: rec.applicationNo,
+          userEmail: rec.userEmail || rec.applicantDetails?.email || '',
+          userUid: rec.userUid || '',
+          event: 'STATUS_UPDATE',
+          status: remarkModal.targetStatus,
+          message: `आपके आवेदन (${rec.applicationNo || 'N/A'}) की स्थिति अपडेट कर '${remarkModal.targetStatus}' कर दी गई है।`,
+          officerRemark: remarkModal.remarkText.trim(),
+          officerName
+        }).catch(err => console.warn('[Admin] Send notification error:', err));
+      }
+
+      setRemarkModal({ isOpen: false, record: null, serviceType: 'death', targetStatus: '', remarkText: '', officerName: 'Nagar Palika Officer', officialCertFile: null })
       loadDeathRecords()
       loadBirthRecords()
       loadWaterRecords()

@@ -83,7 +83,11 @@ export default function ServiceHeader() {
   };
 
   const loadNotifications = async () => {
-    const data = await getNotifications(null, null, 20);
+    const data = await getNotifications({
+      targetEmail: citizenUser?.email || null,
+      targetUid: citizenUser?.uid || null,
+      maxResults: 20
+    });
     setNotifications(data);
     setUnreadCount(data.filter(n => !n.isRead).length);
   };

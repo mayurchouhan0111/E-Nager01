@@ -6,159 +6,311 @@ export default function DeathCertificateTemplate({ record }) {
   const deceased = record.deceasedDetails || {};
   const applicant = record.applicantDetails || {};
   const parentSpouse = record.parentSpouseDetails || {};
-  const statistical = record.statisticalDetails || {};
 
-  const formattedDate = (dateStr) => {
-    if (!dateStr) return 'N/A';
-    return new Date(dateStr).toLocaleDateString('hi-IN', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
+  const formatDateStr = (dStr) => {
+    if (!dStr) return 'N/A';
+    try {
+      const d = new Date(dStr);
+      if (isNaN(d.getTime())) return dStr;
+      const day = String(d.getDate()).padStart(2, '0');
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const year = d.getFullYear();
+      return `${day}-${month}-${year}`;
+    } catch (e) {
+      return dStr;
+    }
   };
 
   const formatAddress = (addrObj) => {
-    if (!addrObj) return null;
+    if (!addrObj) return 'N/A';
     if (addrObj.isSameAsPresent) return 'वर्तमान पते के समान (Same as Present Address)';
     const parts = [
       addrObj.houseNo && `मकान क्र. ${addrObj.houseNo}`,
       addrObj.street,
-      addrObj.villageCity,
-      addrObj.district,
-      addrObj.state,
+      addrObj.villageCity || addrObj.city,
+      addrObj.district || 'झाबुआ',
+      addrObj.state || 'मध्य प्रदेश',
       addrObj.pincode && `पिन: ${addrObj.pincode}`
     ].filter(Boolean);
-    return parts.length > 0 ? parts.join(', ') : null;
+    return parts.length > 0 ? parts.join(', ') : 'झाबुआ, मध्य प्रदेश';
   };
 
-  const presentAddressText = formatAddress(deceased.presentAddress);
-  const permanentAddressText = formatAddress(deceased.permanentAddress);
-  const applicantAddressText = [
-    applicant.address,
-    applicant.villageCity,
-    applicant.district,
-    applicant.state,
-    applicant.pincode && `पिन: ${applicant.pincode}`
-  ].filter(Boolean).join(', ');
+  const renderAadhaarBoxes = (aadhaarStr) => {
+    const raw = (aadhaarStr || '').replace(/\D/g, '');
+    const digits = raw ? raw.padEnd(12, 'X').slice(0, 12).split('') : Array(12).fill('X');
+    return (
+      <div className="inline-flex items-center gap-0.5 font-mono text-[10px] sm:text-xs">
+        {digits.map((d, i) => (
+          <span
+            key={i}
+            className="w-3.5 sm:w-4 h-4 sm:h-5 border border-slate-700 flex items-center justify-center bg-slate-50 text-slate-900 font-bold"
+          >
+            {d}
+          </span>
+        ))}
+      </div>
+    );
+  };
+
+  const presentAddressText = formatAddress(deceased.presentAddress || applicant);
+  const permanentAddressText = formatAddress(deceased.permanentAddress || deceased.presentAddress || applicant);
+  const regNo = record.certificateNo || `DC-${new Date().getFullYear()}-${record.applicationNo?.slice(-6) || record.id?.slice(-6)}`;
+  const regDate = formatDateStr(record.approvedAt || record.createdAt || Date.now());
+  const issueDate = formatDateStr(record.approvedAt || Date.now());
 
   return (
-    <div className="print-page-a4 print-container bg-white text-slate-900 p-6 max-w-4xl mx-auto border-8 border-double border-amber-900/40 shadow-2xl relative font-serif print:p-4 print:border-4 print:max-h-none print:overflow-visible">
-      {/* Subtle Official Watermark */}
-      <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.04] overflow-hidden select-none z-0">
-        <img src="/mp-logo.png" alt="" className="w-[420px] h-[420px] object-contain" />
-      </div>
-      <div className="border border-amber-800/30 p-6 relative">
+    <div className="print-page-a4 print-container bg-white text-slate-900 p-6 sm:p-8 max-w-4xl mx-auto border-2 border-slate-900 shadow-2xl relative font-serif text-xs leading-normal print:p-4 print:max-h-none print:shadow-none">
+      {/* Outer Border */}
+      <div className="border border-slate-800 p-4 sm:p-6 relative space-y-4">
         
-        <div className="text-center border-b-2 border-amber-900/30 pb-4 mb-6">
-          <img 
-            src="/mp-logo.png" 
-            alt="मध्य प्रदेश शासन" 
-            className="w-20 h-20 mx-auto mb-2 object-contain" 
-          />
-          <h2 className="text-sm uppercase tracking-widest text-slate-600 font-semibold mb-1">
-            मध्य प्रदेश शासन - लोक स्वास्थ्य एवं परिवार कल्याण विभाग (Govt. of MP - Dept. of Public Health & Family Welfare)
+        {/* TOP HEADER SECTION */}
+        <div className="flex justify-between items-start border-b border-slate-300 pb-3">
+          {/* Left: State Govt emblem box */}
+          <div className="w-24 text-center border border-slate-400 p-1 rounded bg-slate-50 shrink-0">
+            <img src="/mp-logo.png" alt="State Govt Emblem" className="w-12 h-12 mx-auto object-contain mb-0.5" />
+            <span className="text-[8px] font-bold text-slate-600 uppercase block">State Govt. Emblem</span>
+          </div>
+
+          {/* Center Title */}
+          <div className="text-center flex-1 px-2 space-y-0.5">
+            <h2 className="text-[11px] sm:text-xs font-bold uppercase tracking-wider text-slate-800">
+              मध्य प्रदेश सरकार / GOVERNMENT OF MADHYA PRADESH
+            </h2>
+            <h3 className="text-[10px] font-bold text-slate-600 uppercase">
+              नगरीय विकास एवं आवास विभाग / DEPARTMENT OF URBAN DEVELOPMENT & HOUSING
+            </h3>
+            <h1 className="text-sm sm:text-base font-extrabold text-slate-950 uppercase tracking-wide">
+              कार्यालय नगर पालिका परिषद झाबुआ (म.प्र.) / Office of Nagar Palika Parishad Jhabua (M.P.)
+            </h1>
+          </div>
+
+          {/* Right: Form-6 & CRS Logo */}
+          <div className="w-24 text-right shrink-0">
+            <span className="text-[10px] font-bold text-slate-800 block">प्रपत्र - 6</span>
+            <span className="text-[9px] font-bold text-slate-600 block mb-1">Form-6</span>
+            <div className="w-12 h-12 ml-auto border border-slate-900 bg-slate-900 text-white rounded flex items-center justify-center font-bold text-[9px] text-center leading-tight">
+              CRS ORGI
+            </div>
+          </div>
+        </div>
+
+        {/* MAIN CERTIFICATE TITLE */}
+        <div className="text-center space-y-1">
+          <h2 className="text-base sm:text-lg font-black text-slate-950 uppercase tracking-wider underline decoration-2 underline-offset-4">
+            मृत्यु प्रमाण पत्र / DEATH CERTIFICATE
           </h2>
-          <h1 className="text-2xl font-bold text-amber-950 uppercase tracking-wider">
-            कार्यालय नगर पालिका परिषद झाबुआ (म.प्र.) (Office of Nagar Palika Parishad Jhabua, MP)
-          </h1>
-          <h3 className="text-xl font-extrabold text-blue-950 underline decoration-amber-700 decoration-2 underline-offset-4 mt-2">
-            मृत्यु प्रमाण पत्र (DEATH CERTIFICATE)
-          </h3>
-          <p className="text-xs text-slate-600 mt-1 italic">
-            (जन्म और मृत्यु पंजीकरण अधिनियम, 1969 की धारा 12/17 तथा मध्य प्रदेश जन्म-मृत्यु पंजीकरण नियम, 1999 के अधीन जारी)
+          <p className="text-[9px] sm:text-[10px] text-slate-600 italic max-w-2xl mx-auto leading-tight">
+            (जन्म और मृत्यु रजिस्ट्रीकरण अधिनियम, 1969 (2023 में संशोधित) की धारा 12 / 17 तथा मध्य प्रदेश जन्म और मृत्यु रजिस्ट्रीकरण नियम के नियम 8 / 13 के अंतर्गत जारी किया गया)
+            <br />
+            (Issued under Section 12 / 17 of the Registration of Births and Deaths Act, 1969 (amended in 2023) and Rule 8 / 13 of the Madhya Pradesh Registration of Births and Deaths Rules)
           </p>
         </div>
 
-        <div className="flex justify-between items-center bg-amber-500/10 p-3 rounded border border-amber-700/20 text-xs font-semibold text-amber-950 mb-6">
-          <div>
-            पंजीकरण क्रमांक (Reg. No): <span className="font-bold text-blue-900 font-mono text-sm">{record.certificateNo || `DC-CERT-${record.id?.slice(-6)}`}</span>
-          </div>
-          <div>
-            आवेदन क्रमांक (App No): <span className="font-mono text-slate-800">{record.applicationNo}</span>
-          </div>
-          <div>
-            पंजीकरण तिथि (Reg Date): <span className="font-mono text-slate-800">{formattedDate(record.approvedAt || record.updatedAt)}</span>
-          </div>
+        {/* CERTIFICATION TEXT */}
+        <div className="text-[10px] sm:text-[11px] text-slate-900 leading-relaxed text-justify bg-slate-50/50 p-2.5 rounded border border-slate-200">
+          यह प्रमाणित किया जाता है कि निम्नलिखित सूचना मृत्यु के मूल लेख से ली गई है जो कि (स्थानीय क्षेत्र) <strong>नगर पालिका परिषद झाबुआ</strong>, उप-जिला <strong>झाबुआ</strong>, जिला <strong>झाबुआ</strong>, राज्य <strong>मध्य प्रदेश</strong> के रजिस्टर में उल्लिखित है।
+          <br />
+          <span className="text-slate-600 italic">
+            (This is to certify that the following information has been taken from the original record of death which is the register for (local area/local body) Nagar Palika Parishad Jhabua of Sub-district Jhabua of District Jhabua of State/Union territory Madhya Pradesh)
+          </span>
         </div>
 
-        <p className="text-sm leading-relaxed mb-6 text-justify">
-          प्रमाणित किया जाता है कि निम्नलिखित जानकारी मृत्यु के मूल अभिलेख से ली गई है, जो कि नगर पालिका परिषद झाबुआ, तहसील झाबुआ, जिला झाबुआ, राज्य मध्य प्रदेश के रजिस्टर में दर्ज है:
-        </p>
-
-        <table className="w-full text-xs border-collapse border border-slate-400 mb-6">
+        {/* BILINGUAL FORM TABLE */}
+        <table className="w-full text-[10px] sm:text-xs border-collapse border border-slate-400">
           <tbody>
-            <tr className="border-b border-slate-300 bg-slate-50">
-              <td className="p-2.5 font-bold text-slate-700 border-r border-slate-300 w-1/3">मृतक का पूरा नाम (Full Name of Deceased):</td>
-              <td className="p-2.5 font-bold text-slate-900 text-sm">स्व. {deceased.fullName || 'N/A'}</td>
-            </tr>
             <tr className="border-b border-slate-300">
-              <td className="p-2.5 font-bold text-slate-700 border-r border-slate-300">लिंग (Gender) / आयु (Age):</td>
-              <td className="p-2.5 text-slate-900">{deceased.gender || 'N/A'} / {deceased.age ? `${deceased.age} वर्ष (yrs)` : 'N/A'}</td>
-            </tr>
-            <tr className="border-b border-slate-300 bg-slate-50">
-              <td className="p-2.5 font-bold text-slate-700 border-r border-slate-300">मृत्यु की तिथि (Date of Death):</td>
-              <td className="p-2.5 font-semibold text-blue-950 text-sm">{formattedDate(deceased.dateOfDeath)}</td>
-            </tr>
-            <tr className="border-b border-slate-300">
-              <td className="p-2.5 font-bold text-slate-700 border-r border-slate-300">मृत्यु का स्थान (Place of Death):</td>
-              <td className="p-2.5 text-slate-900">
-                {deceased.hospitalName || deceased.placeOfDeath || 'N/A'} ({deceased.placeType || 'Hospital/Home'})
+              <td className="p-2 font-bold text-slate-800 border-r border-slate-300 w-1/2">
+                नाम / Name:
+              </td>
+              <td className="p-2 font-black text-slate-950 text-xs sm:text-sm uppercase">
+                स्व. {deceased.fullName || 'N/A'}
               </td>
             </tr>
-            <tr className="border-b border-slate-300 bg-slate-50">
-              <td className="p-2.5 font-bold text-slate-700 border-r border-slate-300">मृतक का वर्तमान पता (Present Address at Death):</td>
-              <td className="p-2.5 text-slate-900">{presentAddressText || deceased.placeOfDeath || 'झाबुआ, मध्य प्रदेश'}</td>
-            </tr>
-            <tr className="border-b border-slate-300">
-              <td className="p-2.5 font-bold text-slate-700 border-r border-slate-300">मृतक का स्थायी पता (Permanent Address):</td>
-              <td className="p-2.5 text-slate-900">{permanentAddressText || presentAddressText || 'झाबुआ, मध्य प्रदेश'}</td>
-            </tr>
-            <tr className="border-b border-slate-300 bg-slate-50">
-              <td className="p-2.5 font-bold text-slate-700 border-r border-slate-300">पिता / पति का नाम (Father / Husband Name):</td>
-              <td className="p-2.5 text-slate-900">{parentSpouse.fatherHusbandName || 'N/A'}</td>
-            </tr>
-            <tr className="border-b border-slate-300">
-              <td className="p-2.5 font-bold text-slate-700 border-r border-slate-300">माता का नाम (Mother's Name):</td>
-              <td className="p-2.5 text-slate-900">{parentSpouse.motherName || 'N/A'}</td>
-            </tr>
-            <tr className="border-b border-slate-300 bg-slate-50">
-              <td className="p-2.5 font-bold text-slate-700 border-r border-slate-300">चिकित्सीय प्रमाणन (Medical Certification):</td>
-              <td className="p-2.5 text-slate-900">
-                {statistical.isMedicallyCertified || 'हाँ (Yes)'} {deceased.causeOfDeath ? `| कारण (Cause): ${deceased.causeOfDeath}` : ''}
+
+            <tr className="border-b border-slate-300 bg-slate-50/60">
+              <td className="p-2 font-bold text-slate-800 border-r border-slate-300">
+                मृतक का आधार नं. / Aadhaar No. of deceased:
+              </td>
+              <td className="p-2">
+                {renderAadhaarBoxes(deceased.aadhaarNo)}
               </td>
             </tr>
+
             <tr className="border-b border-slate-300">
-              <td className="p-2.5 font-bold text-slate-700 border-r border-slate-300">आवेदक / सूचनाकर्ता (Applicant / Informant):</td>
-              <td className="p-2.5 text-slate-900">{applicant.fullName || 'N/A'} ({applicant.relationWithDeceased || 'Rel'})</td>
+              <td className="p-2 font-bold text-slate-800 border-r border-slate-300">
+                लिंग / Sex:
+              </td>
+              <td className="p-2 font-bold text-slate-900">
+                {deceased.gender || 'N/A'} {deceased.age ? `(${deceased.age} वर्ष)` : ''}
+              </td>
             </tr>
+
+            <tr className="border-b border-slate-300 bg-slate-50/60">
+              <td className="p-2 font-bold text-slate-800 border-r border-slate-300">
+                मृत्यु की तिथि / Date of Death:
+              </td>
+              <td className="p-2 font-bold text-slate-900">
+                {formatDateStr(deceased.dateOfDeath)}
+              </td>
+            </tr>
+
+            <tr className="border-b border-slate-300">
+              <td className="p-2 font-bold text-slate-800 border-r border-slate-300">
+                मृत्यु का स्थान / Place of Death:
+              </td>
+              <td className="p-2 font-medium text-slate-900">
+                {deceased.placeType === 'Hospital' ? `${deceased.hospitalName || 'जिला अस्पताल झाबुआ'}, झाबुआ` : deceased.placeOfDeath || 'झाबुआ (म.प्र.)'}
+              </td>
+            </tr>
+
+            <tr className="border-b border-slate-300 bg-slate-50/60">
+              <td className="p-2 font-bold text-slate-800 border-r border-slate-300">
+                माता का नाम / Name of Mother:
+              </td>
+              <td className="p-2 font-bold text-slate-900 uppercase">
+                {parentSpouse.motherName || 'N/A'}
+              </td>
+            </tr>
+
+            <tr className="border-b border-slate-300">
+              <td className="p-2 font-bold text-slate-800 border-r border-slate-300">
+                माता का आधार नं. / Aadhaar No. of Mother:
+              </td>
+              <td className="p-2">
+                {renderAadhaarBoxes(parentSpouse.motherAadhaarNo)}
+              </td>
+            </tr>
+
+            <tr className="border-b border-slate-300 bg-slate-50/60">
+              <td className="p-2 font-bold text-slate-800 border-r border-slate-300">
+                पिता का नाम / Name of Father:
+              </td>
+              <td className="p-2 font-bold text-slate-900 uppercase">
+                {parentSpouse.fatherName || 'N/A'}
+              </td>
+            </tr>
+
+            <tr className="border-b border-slate-300">
+              <td className="p-2 font-bold text-slate-800 border-r border-slate-300">
+                पिता का आधार नं. / Aadhaar No. of Father:
+              </td>
+              <td className="p-2">
+                {renderAadhaarBoxes(parentSpouse.fatherAadhaarNo)}
+              </td>
+            </tr>
+
+            <tr className="border-b border-slate-300 bg-slate-50/60">
+              <td className="p-2 font-bold text-slate-800 border-r border-slate-300">
+                पति/पत्नी का नाम / Name of Husband / Wife:
+              </td>
+              <td className="p-2 font-bold text-slate-900 uppercase">
+                {parentSpouse.spouseName || 'N/A'}
+              </td>
+            </tr>
+
+            <tr className="border-b border-slate-300">
+              <td className="p-2 font-bold text-slate-800 border-r border-slate-300">
+                पति/पत्नी का आधार नं. / Aadhaar No. of Husband / Wife:
+              </td>
+              <td className="p-2">
+                {renderAadhaarBoxes(parentSpouse.spouseAadhaarNo)}
+              </td>
+            </tr>
+
+            <tr className="border-b border-slate-300 bg-slate-50/60">
+              <td className="p-2 font-bold text-slate-800 border-r border-slate-300">
+                मृतक का मृत्यु के समय का पता /
+                <br />
+                <span className="font-normal text-slate-600">Address of the deceased at the time of death:</span>
+              </td>
+              <td className="p-2 font-medium text-slate-900 leading-tight">
+                {presentAddressText}
+              </td>
+            </tr>
+
+            <tr className="border-b border-slate-300">
+              <td className="p-2 font-bold text-slate-800 border-r border-slate-300">
+                मृतक का स्थायी पता /
+                <br />
+                <span className="font-normal text-slate-600">Permanent address of the deceased:</span>
+              </td>
+              <td className="p-2 font-medium text-slate-900 leading-tight">
+                {permanentAddressText}
+              </td>
+            </tr>
+
+            <tr className="border-b border-slate-300 bg-slate-50/60">
+              <td className="p-2 font-bold text-slate-800 border-r border-slate-300">
+                पंजीकरण संख्या / Registration No:
+              </td>
+              <td className="p-2 font-bold font-mono text-slate-950">
+                {regNo}
+              </td>
+            </tr>
+
+            <tr className="border-b border-slate-300">
+              <td className="p-2 font-bold text-slate-800 border-r border-slate-300">
+                पंजीकरण दिनांक / Date of Registration:
+              </td>
+              <td className="p-2 font-bold text-slate-900">
+                {regDate}
+              </td>
+            </tr>
+
+            <tr className="border-b border-slate-300 bg-slate-50/60">
+              <td className="p-2 font-bold text-slate-800 border-r border-slate-300">
+                टिप्पणी / Remarks (if any):
+              </td>
+              <td className="p-2 text-slate-800 italic">
+                {record.lastOfficerRemark || 'सत्यापित एवं स्वीकृत (Verified & Approved)'}
+              </td>
+            </tr>
+
             <tr>
-              <td className="p-2.5 font-bold text-slate-700 border-r border-slate-300">सूचनाकर्ता का पूर्ण पता (Informant Address):</td>
-              <td className="p-2.5 text-slate-900">{applicantAddressText || 'N/A'}</td>
+              <td className="p-2 font-bold text-slate-800 border-r border-slate-300">
+                जारी करने की तिथि / Date of Issue:
+              </td>
+              <td className="p-2 font-bold text-slate-900">
+                {issueDate}
+              </td>
             </tr>
           </tbody>
         </table>
 
-        <div className="flex items-end justify-between pt-6 border-t border-amber-900/30">
-          
-          <div className="text-center">
-            <div className="w-24 h-24 border-2 border-slate-800 p-1 mx-auto mb-1 bg-white flex items-center justify-center">
+        {/* FOOTER SIGNATURE & SEAL SECTION */}
+        <div className="pt-4 flex justify-between items-end border-t border-slate-300">
+          {/* QR Code Verification */}
+          <div className="text-center space-y-1">
+            <div className="p-1 bg-white border border-slate-300 rounded inline-block">
               <QRCodeGenerator 
-                value={`https://jhabua-nagarpalika-aapke-dwar.netlify.app/?appNo=${record.applicationNo || record.id}`}
-                size={84}
+                value={`https://jhabua-nagarpalika-aapke-dwar.netlify.app/verify?type=death&regNo=${encodeURIComponent(regNo)}&name=${encodeURIComponent(deceased.fullName || '')}`}
+                size={80}
               />
             </div>
-            <span className="text-[10px] font-mono text-slate-500 block">QR सत्यापित आधिकारिक (QR VERIFIED OFFICIAL)</span>
+            <span className="block text-[8px] font-mono text-slate-500">स्कैन कर डिजिटल सत्यापन करें</span>
           </div>
 
-          <div className="text-center pr-4">
-            <div className="w-20 h-20 rounded-full border-2 border-dashed border-blue-900/40 mx-auto mb-2 flex items-center justify-center text-[10px] text-blue-900 font-bold tracking-tighter">
-              सील नगर पालिका (Seal: Nagar Palika)
+          {/* Issuing Authority Signature & Round Seal */}
+          <div className="text-right space-y-1 text-[10px] sm:text-xs">
+            <div className="inline-block border border-dashed border-emerald-700/60 bg-emerald-50/40 p-2 rounded text-center mb-1">
+              <span className="text-[9px] font-extrabold text-emerald-900 block">डिजिटल हस्ताक्षरित एवं मोहरबंद</span>
+              <span className="text-[8px] text-emerald-700 block">मुख्य नगर पालिका अधिकारी, झाबुआ</span>
             </div>
-            <div className="font-bold text-xs text-slate-900">रजिस्ट्रार (जन्म एवं मृत्यु) (Registrar (Birth & Death))</div>
-            <div className="text-xs text-slate-700 font-semibold">नगर पालिका परिषद झाबुआ</div>
-            <div className="text-[10px] text-slate-500 mt-1">जारी करने की तिथि: (Date of Issue:) {formattedDate(new Date())}</div>
+            <p className="font-bold text-slate-900">प्राधिकारी के हस्ताक्षर / Signature of the issuing authority</p>
+            <p className="text-[10px] text-slate-600">
+              प्राधिकारी का पता / Address of the issuing authority:
+              <br />
+              <strong>मुख्य नगर पालिका अधिकारी, नगर पालिका परिषद झाबुआ (म.प्र.)</strong>
+            </p>
+            <p className="font-bold text-slate-900 text-[10px]">मोहर / Seal</p>
           </div>
+        </div>
 
+        {/* BOTTOM MOTTO SLOGAN */}
+        <div className="text-center pt-2 border-t border-slate-200">
+          <p className="text-[9px] sm:text-[10px] font-black uppercase text-slate-700 tracking-wider">
+            प्रत्येक जन्म एवं मृत्यु का पंजीकरण सुनिश्चित करें | Ensure registration of every birth and death
+          </p>
         </div>
 
       </div>
