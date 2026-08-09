@@ -31,6 +31,17 @@ export default function ServiceHeader() {
 
   useEffect(() => {
     loadNotifications();
+
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const appNoParam = params.get('appNo') || params.get('applicationNo') || params.get('id');
+      if (appNoParam && appNoParam.trim()) {
+        const queryVal = appNoParam.trim();
+        setShowTrackModal(true);
+        setSearchQuery(queryVal);
+        performQuerySearch(queryVal);
+      }
+    }
   }, []);
 
   const loadNotifications = async () => {
@@ -44,15 +55,12 @@ export default function ServiceHeader() {
     loadNotifications();
   };
 
-  const handlePublicSearch = async (e) => {
-    e.preventDefault();
-    if (!searchQuery || !searchQuery.trim()) return;
-
+  const performQuerySearch = async (queryText) => {
     setSearching(true);
     setHasSearched(true);
     setSearchResults([]);
 
-    const cleanQuery = searchQuery.trim().toLowerCase();
+    const cleanQuery = queryText.trim().toLowerCase();
 
     try {
       const [births, deaths, waters] = await Promise.all([
@@ -65,10 +73,12 @@ export default function ServiceHeader() {
 
       const isMatch = (app) => {
         const appNo = (app.applicationNo || '').toLowerCase();
+        const appId = (app.id || '').toLowerCase();
+        const certNo = (app.certificateNo || app.permitNo || '').toLowerCase();
         const mobile = (app.applicantDetails?.mobile || '').replace(/[\s-]/g, '');
         const q = cleanQuery.replace(/[\s-]/g, '');
 
-        return appNo.includes(cleanQuery) || (mobile && mobile.includes(q));
+        return appNo.includes(cleanQuery) || appId.includes(cleanQuery) || certNo.includes(cleanQuery) || (mobile && mobile.includes(q));
       };
 
       births.filter(isMatch).forEach(b => matches.push({ ...b, serviceType: 'birth', serviceName: 'जन्म प्रमाण पत्र' }));
@@ -80,6 +90,12 @@ export default function ServiceHeader() {
       console.error('Search error:', err);
     }
     setSearching(false);
+  };
+
+  const handlePublicSearch = async (e) => {
+    e.preventDefault();
+    if (!searchQuery || !searchQuery.trim()) return;
+    performQuerySearch(searchQuery.trim());
   };
 
   const isCurrentTab = (path) => {
