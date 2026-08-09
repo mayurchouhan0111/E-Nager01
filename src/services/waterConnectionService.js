@@ -259,6 +259,11 @@ export async function updateWaterConnectionStatus({
     timestamp: now
   };
 
+  let existing = {};
+  const localList = getLocalWaterConnections();
+  const localObj = localList.find(r => r.id === id);
+  if (localObj) existing = { ...localObj };
+
   const isLocalId = !id || String(id).startsWith('local-');
 
   if (!isLocalId) {
