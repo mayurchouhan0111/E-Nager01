@@ -230,6 +230,36 @@ export async function submitDeathCertificate(data, existingId = null) {
   return { success: true, id: docId, applicationNo };
 }
 
+const STATUS_PRIORITY = {
+  'Approved': 5,
+  'Certificate Generated': 5,
+  'Completed': 5,
+  'Sanctioned': 5,
+  'Rejected': 4,
+  'Correction Requested': 4,
+  'Under Review': 3,
+  'Submitted': 2,
+  'Draft': 1
+};
+
+function mergeRecords(existing, incoming) {
+  if (!existing) return incoming;
+  if (!incoming) return existing;
+
+  const existingPrio = STATUS_PRIORITY[existing.status] || 0;
+  const incomingPrio = STATUS_PRIORITY[incoming.status] || 0;
+
+  if (incomingPrio > existingPrio) {
+    return { ...existing, ...incoming };
+  } else if (incomingPrio < existingPrio) {
+    return { ...incoming, ...existing };
+  } else {
+    const existingTime = new Date(existing.updatedAt || existing.appliedAt || 0).getTime();
+    const incomingTime = new Date(incoming.updatedAt || incoming.appliedAt || 0).getTime();
+    return incomingTime >= existingTime ? { ...existing, ...incoming } : { ...incoming, ...existing };
+  }
+}
+
 export async function getDeathCertificates() {
   const localItems = getLocalDeathCertificates();
   try {
@@ -242,27 +272,26 @@ export async function getDeathCertificates() {
     const mergedMap = new Map();
     remoteItems.forEach(item => {
       const key = item.applicationNo || item.id;
-      mergedMap.set(key, item);
+      const existing = mergedMap.get(key);
+      mergedMap.set(key, mergeRecords(existing, item));
     });
 
     localItems.forEach(item => {
       const key = item.applicationNo || item.id;
       const existingRemote = mergedMap.get(key) || mergedMap.get(item.id);
-      if (existingRemote) {
-        mergedMap.set(key, { ...item, ...existingRemote });
-      } else {
-        mergedMap.set(key, item);
-        if (item.id && item.status && item.status !== 'Draft') {
-          try {
-            const docRef = doc(db, COLLECTION_NAME, item.id);
-            setDoc(docRef, sanitizeFirestorePayload(item), { merge: true }).catch(() => {});
-          } catch (e) {}
-        }
+      const merged = mergeRecords(existingRemote, item);
+      mergedMap.set(key, merged);
+
+      if (item.id && item.status && item.status !== 'Draft') {
+        try {
+          const docRef = doc(db, COLLECTION_NAME, item.id);
+          setDoc(docRef, sanitizeFirestorePayload(merged), { merge: true }).catch(() => {});
+        } catch (e) {}
       }
     });
 
     const items = Array.from(mergedMap.values());
-    items.sort((a, b) => new Date(b.appliedAt || b.updatedAt || 0) - new Date(a.appliedAt || a.updatedAt || 0));
+    items.sort((a, b) => new Date(b.updatedAt || b.appliedAt || 0) - new Date(a.updatedAt || a.appliedAt || 0));
     saveLocalDeathCertificates(items);
     return items;
   } catch (error) {
