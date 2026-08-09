@@ -1,4 +1,4 @@
-import { auth, db } from '../lib/firebase';
+import { auth } from '../lib/firebase';
 import { GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from 'firebase/auth';
 
 const googleProvider = new GoogleAuthProvider();
@@ -20,20 +20,25 @@ export async function loginWithGoogle() {
     return { success: true, user: citizenData };
   } catch (error) {
     console.error('[Google Auth] Sign in error:', error);
-    return { success: false, error: error.message || 'गूगल लॉगिन में विफलता (Google sign in failed)' };
+    const isDomainError = error.code === 'auth/unauthorized-domain' || error.message?.includes('unauthorized-domain');
+    return { 
+      success: false, 
+      isUnauthorizedDomain: isDomainError,
+      error: isDomainError 
+        ? 'Firebase security alert: Please add jhabua-nagarpalika-aapke-dwar.netlify.app to Firebase Console -> Authentication -> Settings -> Authorized Domains.'
+        : (error.message || 'गूगल साइन-इन में विफलता (Google Sign-In Failed)')
+    };
   }
 }
 
 export async function logoutCitizen() {
   try {
     await signOut(auth);
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('enagar_citizen_user');
-    }
-    return { success: true };
-  } catch (error) {
-    return { success: false, error: error.message };
+  } catch (error) {}
+  if (typeof window !== 'undefined') {
+    localStorage.removeItem('enagar_citizen_user');
   }
+  return { success: true };
 }
 
 export function getCurrentCitizen() {

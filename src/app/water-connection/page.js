@@ -12,7 +12,7 @@ import {
   submitWaterConnection, 
   getWaterConnections 
 } from '@/services/waterConnectionService';
-import { getCurrentCitizen, loginWithGoogle } from '@/services/citizenAuthService';
+import { getCurrentCitizen, loginWithGoogle, loginWithMobileOrEmail } from '@/services/citizenAuthService';
 import toast from 'react-hot-toast';
 import { 
   Droplet, Activity, CheckCircle2, AlertCircle, RefreshCw, Printer, X, History, Plus, 
@@ -216,14 +216,18 @@ export default function WaterConnectionPage() {
       return;
     }
 
-    // Citizen Google Auth requirement for tracking personal data
+    // Strict 100% Fast Google Authentication
     let citizen = getCurrentCitizen();
     if (!citizen) {
       toast.loading('🔐 नागरिक डेटा ट्रैकिंग हेतु गूगल साइन-इन आवश्यक है...', { id: 'g-auth' });
       const authRes = await loginWithGoogle();
       toast.dismiss('g-auth');
       if (!authRes.success) {
-        setMessage({ type: 'error', text: '⚠️ व्यक्तिगत डेटा सुरक्षा एवं आवेदन ट्रैकिंग हेतु गूगल लॉगिन अनिवार्य है।' });
+        if (authRes.isUnauthorizedDomain) {
+          setMessage({ type: 'error', text: '⚠️ Firebase Domain Error: Please add jhabua-nagarpalika-aapke-dwar.netlify.app in Firebase Console -> Authentication -> Settings -> Authorized Domains.' });
+        } else {
+          setMessage({ type: 'error', text: '⚠️ व्यक्तिगत डेटा सुरक्षा एवं आवेदन ट्रैकिंग हेतु गूगल साइन-इन अनिवार्य है।' });
+        }
         return;
       }
       citizen = authRes.user;

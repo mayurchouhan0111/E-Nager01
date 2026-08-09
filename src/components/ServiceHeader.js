@@ -13,7 +13,7 @@ import DeathCertificateTemplate from './DeathCertificateTemplate';
 import WaterConnectionTemplate from './WaterConnectionTemplate';
 import { Layers, ShieldAlert, Bell, X, Search, Printer, FileText, Baby, Droplets, ShieldCheck, Building2, Sparkles, CheckCircle2, Presentation, LogOut, User } from 'lucide-react';
 import { subscribeToMaintenance } from '../services/maintenanceService';
-import { loginWithGoogle, logoutCitizen, getCurrentCitizen, subscribeToCitizenAuth } from '../services/citizenAuthService';
+import { loginWithGoogle, logoutCitizen, getCurrentCitizen, subscribeToCitizenAuth, loginWithMobileOrEmail } from '../services/citizenAuthService';
 import toast from 'react-hot-toast';
 
 export default function ServiceHeader() {
@@ -64,11 +64,15 @@ export default function ServiceHeader() {
   }, []);
 
   const handleGoogleLogin = async () => {
+    const toastId = toast.loading('🔐 गूगल साइन-इन खुल रहा है...');
     const res = await loginWithGoogle();
+    toast.dismiss(toastId);
     if (res.success) {
-      toast.success(`नमस्ते ${res.user.displayName}! गूगल लॉगिन सफल।`);
+      toast.success(`नमस्ते ${res.user.displayName}! गूगल साइन-इन सफल।`);
+    } else if (res.isUnauthorizedDomain) {
+      toast.error('⚠️ Firebase domain setting: Please add jhabua-nagarpalika-aapke-dwar.netlify.app in Firebase Console -> Authentication -> Settings -> Authorized Domains', { duration: 8000 });
     } else {
-      toast.error('गूगल लॉगिन में विफलता: ' + (res.error || ''));
+      toast.error('गूगल साइन-इन में विफलता: ' + (res.error || ''));
     }
   };
 
@@ -460,6 +464,7 @@ export default function ServiceHeader() {
           </div>
         </div>
       )}
+
     </>
   );
 }
