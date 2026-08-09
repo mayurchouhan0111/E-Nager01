@@ -138,13 +138,12 @@ export default function DeathCertificateTemplate({ record }) {
         <div className="flex items-end justify-between pt-6 border-t border-amber-900/30">
           
           <div className="text-center">
-            <div className="w-24 h-24 border-2 border-slate-800 p-1 mx-auto mb-1 bg-white flex flex-col items-center justify-center text-[10px] text-slate-600 font-mono">
-              <div className="grid grid-cols-4 gap-1 w-full h-full bg-slate-900 p-1 rounded">
-                <div className="bg-white"></div>
-                <div className="bg-slate-900"></div>
-                <div className="bg-white"></div>
-                <div className="bg-white"></div>
-              </div>
+            <div className="w-24 h-24 border-2 border-slate-800 p-1 mx-auto mb-1 bg-white flex items-center justify-center">
+              <img 
+                src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(`https://jhabua-nagarpalika-aapke-dwar.netlify.app/?appNo=${record.applicationNo || record.id}`)}`} 
+                alt="QR Verified Official" 
+                className="w-full h-full object-contain" 
+              />
             </div>
             <span className="text-[10px] font-mono text-slate-500 block">QR सत्यापित आधिकारिक (QR VERIFIED OFFICIAL)</span>
           </div>
