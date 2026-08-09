@@ -43,10 +43,16 @@ export async function fetchAdminAccounts() {
       const merged = { ...DEFAULT_ADMIN_ACCOUNTS };
       Object.keys(remoteAccounts).forEach(key => {
         if (merged[key]) {
+          const defaultTabs = DEFAULT_ADMIN_ACCOUNTS[key]?.allowedTabs || [];
+          const remoteTabs = remoteAccounts[key]?.allowedTabs || [];
+          const combinedTabs = Array.from(new Set([...defaultTabs, ...remoteTabs]));
           merged[key] = {
             ...merged[key],
-            ...remoteAccounts[key]
+            ...remoteAccounts[key],
+            allowedTabs: combinedTabs
           };
+        } else {
+          merged[key] = remoteAccounts[key];
         }
       });
       return merged;

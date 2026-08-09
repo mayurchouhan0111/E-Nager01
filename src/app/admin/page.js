@@ -498,7 +498,10 @@ export default function AdminPage() {
   })
 
   const currentAccount = adminAccounts[currentAdminUser]
-  const allowedTabs = currentAccount?.allowedTabs || ['death-certificates', 'birth-certificates', 'water-connections', 'no-dues-certificates', 'audit', 'security-settings']
+  const isSuperAdmin = currentAdminRole === 'super_admin' || currentAdminUser === 'super_admin'
+  const allowedTabs = isSuperAdmin 
+    ? ['death-certificates', 'birth-certificates', 'water-connections', 'no-dues-certificates', 'audit', 'security-settings']
+    : (currentAccount?.allowedTabs || ['death-certificates', 'birth-certificates', 'water-connections', 'no-dues-certificates', 'audit', 'security-settings'])
 
   const allTabDefs = [
     { key: 'death-certificates', label: 'मृत्यु प्रमाण पत्र आवेदन', labelShort: 'मृत्यु', icon: FileText },
