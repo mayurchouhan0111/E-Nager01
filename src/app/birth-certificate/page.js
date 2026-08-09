@@ -12,9 +12,10 @@ import {
   submitBirthCertificate, 
   getBirthCertificates 
 } from '@/services/birthCertificateService';
+import { validateBirthCertificateForm, navigateToFirstErrorField } from '../../utils/formValidationHelper';
 import { 
   Baby, Activity, CheckCircle2, AlertCircle, RefreshCw, Printer, X, History, Plus, 
-  Building2, User, Home, HeartPulse, CheckSquare, FileText, Download, ShieldAlert, ListChecks
+  Building2, User, Home, HeartPulse, CheckSquare, FileText, Download, ShieldAlert, ListChecks, Layers, Sparkles
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -84,6 +85,7 @@ export default function BirthCertificatePage() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState(null);
   const [formErrors, setFormErrors] = useState([]);
+  const [fieldErrors, setFieldErrors] = useState({});
   const [selectedApp, setSelectedApp] = useState(null);
   const [showCertModal, setShowCertModal] = useState(false);
   const [showLetterModal, setShowLetterModal] = useState(false);
@@ -302,14 +304,16 @@ export default function BirthCertificatePage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const errors = validateForm();
-    if (errors.length > 0) {
-      setFormErrors(errors);
-      setMessage({ type: 'error', text: 'कृपया फॉर्म में त्रुटियों को सुधारें (Please resolve validation errors)' });
-      window.scrollTo({ top: 100, behavior: 'smooth' });
+    const { fieldErrors: errs, errorList } = validateBirthCertificateForm(formData, dpdpConsent);
+    if (errorList.length > 0) {
+      setFieldErrors(errs);
+      setFormErrors(errorList);
+      setMessage({ type: 'error', text: `⚠️ फॉर्म में ${errorList.length} आवश्यक जानकारी छूटी है। स्वतः उस स्थान पर ले जाया जा रहा है...` });
+      navigateToFirstErrorField(errs);
       return;
     }
 
+    setFieldErrors({});
     setFormErrors([]);
     setLoading(true);
     setMessage(null);
@@ -596,12 +600,28 @@ export default function BirthCertificatePage() {
                     जन्म की तिथि (Date of Birth) *
                   </label>
                   <input
+                    id="field_child_dateOfBirth"
                     type="date"
                     required
                     value={formData.childDetails.dateOfBirth}
-                    onChange={(e) => handleInputChange('childDetails', 'dateOfBirth', e.target.value)}
-                    className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 font-medium"
+                    onChange={(e) => {
+                      handleInputChange('childDetails', 'dateOfBirth', e.target.value);
+                      if (fieldErrors['childDetails.dateOfBirth']) {
+                        setFieldErrors(prev => ({ ...prev, 'childDetails.dateOfBirth': null }));
+                      }
+                    }}
+                    className={`w-full bg-white border rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-slate-900 focus:outline-none font-medium transition-all ${
+                      fieldErrors['childDetails.dateOfBirth']
+                        ? 'border-red-500 bg-red-50/40 ring-2 ring-red-300'
+                        : 'border-slate-300 focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20'
+                    }`}
                   />
+                  {fieldErrors['childDetails.dateOfBirth'] && (
+                    <p className="mt-1.5 text-[11px] font-bold text-red-600 flex items-center gap-1 animate-pulse">
+                      <AlertCircle className="w-3.5 h-3.5 text-red-600 shrink-0" />
+                      {fieldErrors['childDetails.dateOfBirth'].message}
+                    </p>
+                  )}
                 </div>
 
                 <div>
@@ -895,13 +915,29 @@ export default function BirthCertificatePage() {
                     माता का पूरा नाम (Full Name) *
                   </label>
                   <input
+                    id="field_mother_fullName"
                     type="text"
                     required
                     value={formData.motherDetails.fullName}
-                    onChange={(e) => handleInputChange('motherDetails', 'fullName', e.target.value)}
+                    onChange={(e) => {
+                      handleInputChange('motherDetails', 'fullName', e.target.value);
+                      if (fieldErrors['motherDetails.fullName']) {
+                        setFieldErrors(prev => ({ ...prev, 'motherDetails.fullName': null }));
+                      }
+                    }}
                     placeholder="जैसे: श्रीमती सुनीता शर्मा"
-                    className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 font-medium"
+                    className={`w-full bg-white border rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-slate-900 focus:outline-none font-medium transition-all ${
+                      fieldErrors['motherDetails.fullName']
+                        ? 'border-red-500 bg-red-50/40 ring-2 ring-red-300'
+                        : 'border-slate-300 focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20'
+                    }`}
                   />
+                  {fieldErrors['motherDetails.fullName'] && (
+                    <p className="mt-1.5 text-[11px] font-bold text-red-600 flex items-center gap-1 animate-pulse">
+                      <AlertCircle className="w-3.5 h-3.5 text-red-600 shrink-0" />
+                      {fieldErrors['motherDetails.fullName'].message}
+                    </p>
+                  )}
                 </div>
 
                 <div>
@@ -988,13 +1024,29 @@ export default function BirthCertificatePage() {
                     पिता का पूरा नाम (Full Name) *
                   </label>
                   <input
+                    id="field_father_fullName"
                     type="text"
                     required
                     value={formData.fatherDetails.fullName}
-                    onChange={(e) => handleInputChange('fatherDetails', 'fullName', e.target.value)}
+                    onChange={(e) => {
+                      handleInputChange('fatherDetails', 'fullName', e.target.value);
+                      if (fieldErrors['fatherDetails.fullName']) {
+                        setFieldErrors(prev => ({ ...prev, 'fatherDetails.fullName': null }));
+                      }
+                    }}
                     placeholder="जैसे: श्री राजेश कुमार शर्मा"
-                    className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 font-medium"
+                    className={`w-full bg-white border rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-slate-900 focus:outline-none font-medium transition-all ${
+                      fieldErrors['fatherDetails.fullName']
+                        ? 'border-red-500 bg-red-50/40 ring-2 ring-red-300'
+                        : 'border-slate-300 focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20'
+                    }`}
                   />
+                  {fieldErrors['fatherDetails.fullName'] && (
+                    <p className="mt-1.5 text-[11px] font-bold text-red-600 flex items-center gap-1 animate-pulse">
+                      <AlertCircle className="w-3.5 h-3.5 text-red-600 shrink-0" />
+                      {fieldErrors['fatherDetails.fullName'].message}
+                    </p>
+                  )}
                 </div>
 
                 <div>
@@ -1002,13 +1054,29 @@ export default function BirthCertificatePage() {
                     पिता आधार संख्या (12 Digits)
                   </label>
                   <input
+                    id="field_father_aadhaarNo"
                     type="text"
                     maxLength={14}
                     value={formData.fatherDetails.aadhaarNo}
-                    onChange={(e) => handleInputChange('fatherDetails', 'aadhaarNo', e.target.value)}
+                    onChange={(e) => {
+                      handleInputChange('fatherDetails', 'aadhaarNo', e.target.value);
+                      if (fieldErrors['fatherDetails.aadhaarNo']) {
+                        setFieldErrors(prev => ({ ...prev, 'fatherDetails.aadhaarNo': null }));
+                      }
+                    }}
                     placeholder="XXXX-XXXX-XXXX"
-                    className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 font-medium"
+                    className={`w-full bg-white border rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-slate-900 focus:outline-none font-medium transition-all ${
+                      fieldErrors['fatherDetails.aadhaarNo']
+                        ? 'border-red-500 bg-red-50/40 ring-2 ring-red-300'
+                        : 'border-slate-300 focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20'
+                    }`}
                   />
+                  {fieldErrors['fatherDetails.aadhaarNo'] && (
+                    <p className="mt-1.5 text-[11px] font-bold text-red-600 flex items-center gap-1 animate-pulse">
+                      <AlertCircle className="w-3.5 h-3.5 text-red-600 shrink-0" />
+                      {fieldErrors['fatherDetails.aadhaarNo'].message}
+                    </p>
+                  )}
                 </div>
 
                 <div>
@@ -1055,13 +1123,29 @@ export default function BirthCertificatePage() {
                     आवेदक / सूचनाकर्ता का पूरा नाम *
                   </label>
                   <input
+                    id="field_applicant_fullName"
                     type="text"
                     required
                     value={formData.applicantDetails.fullName}
-                    onChange={(e) => handleInputChange('applicantDetails', 'fullName', e.target.value)}
+                    onChange={(e) => {
+                      handleInputChange('applicantDetails', 'fullName', e.target.value);
+                      if (fieldErrors['applicantDetails.fullName']) {
+                        setFieldErrors(prev => ({ ...prev, 'applicantDetails.fullName': null }));
+                      }
+                    }}
                     placeholder="आपका नाम"
-                    className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 font-medium"
+                    className={`w-full bg-white border rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-slate-900 focus:outline-none font-medium transition-all ${
+                      fieldErrors['applicantDetails.fullName']
+                        ? 'border-red-500 bg-red-50/40 ring-2 ring-red-300'
+                        : 'border-slate-300 focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20'
+                    }`}
                   />
+                  {fieldErrors['applicantDetails.fullName'] && (
+                    <p className="mt-1.5 text-[11px] font-bold text-red-600 flex items-center gap-1 animate-pulse">
+                      <AlertCircle className="w-3.5 h-3.5 text-red-600 shrink-0" />
+                      {fieldErrors['applicantDetails.fullName'].message}
+                    </p>
+                  )}
                 </div>
 
                 <div>
@@ -1085,14 +1169,30 @@ export default function BirthCertificatePage() {
                     मोबाइल नंबर *
                   </label>
                   <input
+                    id="field_applicant_mobile"
                     type="tel"
                     required
                     maxLength={10}
                     value={formData.applicantDetails.mobile}
-                    onChange={(e) => handleInputChange('applicantDetails', 'mobile', e.target.value)}
+                    onChange={(e) => {
+                      handleInputChange('applicantDetails', 'mobile', e.target.value);
+                      if (fieldErrors['applicantDetails.mobile']) {
+                        setFieldErrors(prev => ({ ...prev, 'applicantDetails.mobile': null }));
+                      }
+                    }}
                     placeholder="98XXXXXXXX"
-                    className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 font-medium"
+                    className={`w-full bg-white border rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-slate-900 focus:outline-none font-medium transition-all ${
+                      fieldErrors['applicantDetails.mobile']
+                        ? 'border-red-500 bg-red-50/40 ring-2 ring-red-300'
+                        : 'border-slate-300 focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20'
+                    }`}
                   />
+                  {fieldErrors['applicantDetails.mobile'] && (
+                    <p className="mt-1.5 text-[11px] font-bold text-red-600 flex items-center gap-1 animate-pulse">
+                      <AlertCircle className="w-3.5 h-3.5 text-red-600 shrink-0" />
+                      {fieldErrors['applicantDetails.mobile'].message}
+                    </p>
+                  )}
                 </div>
 
                 <div>
@@ -1227,19 +1327,37 @@ export default function BirthCertificatePage() {
             </div>
 
             {/* DPDP ACT 2023 CONSENT CHECKBOX */}
-            <div className="bg-emerald-50/90 border border-emerald-200 rounded-2xl p-4 space-y-2 shadow-sm">
+            <div 
+              id="field_dpdpConsent"
+              className={`rounded-2xl p-4 space-y-2 shadow-sm transition-all ${
+                fieldErrors['dpdpConsent'] 
+                  ? 'bg-red-50 border border-red-400 ring-2 ring-red-300' 
+                  : 'bg-emerald-50/90 border border-emerald-200'
+              }`}
+            >
               <label className="flex items-start gap-3 cursor-pointer">
                 <input
                   type="checkbox"
                   required
                   checked={dpdpConsent}
-                  onChange={(e) => setDpdpConsent(e.target.checked)}
+                  onChange={(e) => {
+                    setDpdpConsent(e.target.checked);
+                    if (fieldErrors['dpdpConsent']) {
+                      setFieldErrors(prev => ({ ...prev, dpdpConsent: null }));
+                    }
+                  }}
                   className="mt-0.5 h-4 w-4 rounded border-emerald-300 text-emerald-700 focus:ring-emerald-600 shrink-0"
                 />
                 <span className="text-xs text-slate-800 font-medium leading-relaxed">
                   मैं एतद्द्वारा घोषित करता/करती हूँ कि ऊपर दी गई समस्त जानकारी सत्य व सही है। मैं भारत के <strong>डिजिटल व्यक्तिगत डेटा संरक्षण अधिनियम (DPDP Act, 2023)</strong> के तहत मेरे द्वारा प्रदान किए गए डेटा के प्रक्रमण (Processing) हेतु नगर पालिका परिषद झाबुआ को सहमति प्रदान करता/करती हूँ। (<Link href="/privacy-policy" className="text-emerald-700 underline font-bold" target="_blank">प्राइवेसी नीति एवं नियम पढ़ें</Link>)
                 </span>
               </label>
+              {fieldErrors['dpdpConsent'] && (
+                <p className="mt-1 text-[11px] font-bold text-red-600 flex items-center gap-1 animate-pulse pt-1">
+                  <AlertCircle className="w-3.5 h-3.5 text-red-600 shrink-0" />
+                  {fieldErrors['dpdpConsent'].message}
+                </p>
+              )}
             </div>
 
             {/* ACTION BUTTONS */}
@@ -1403,7 +1521,7 @@ export default function BirthCertificatePage() {
               </div>
 
               <h4 className="text-xs uppercase font-extrabold text-slate-500 tracking-wider">आवेदन टाइमलाइन विवरण (Activity Timeline)</h4>
-              <ApplicationTimeline timeline={selectedApp.timeline || []} />
+              <ApplicationTimeline timeline={selectedApp.timeline || []} currentStatus={selectedApp.status} />
             </div>
           </div>
         )}

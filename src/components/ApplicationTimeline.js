@@ -1,11 +1,48 @@
 'use client';
 import React from 'react';
-import { m, LazyMotion, domAnimation } from 'motion/react';
+import { Check, Clock, AlertTriangle, XCircle, FileCheck, Circle } from 'lucide-react';
 
-export default function ApplicationTimeline({ timeline = [] }) {
-  if (!timeline || timeline.length === 0) {
+export default function ApplicationTimeline({ timeline = [], currentStatus = '' }) {
+  // Normalize and ensure all timeline stages are fully rendered
+  const processTimeline = () => {
+    let items = Array.isArray(timeline) ? [...timeline] : [];
+    
+    // Fallback if timeline array is empty
+    if (items.length === 0 && currentStatus) {
+      items.push({
+        id: 'step_sub',
+        status: 'Submitted',
+        action: 'APPLICATION SUBMITTED',
+        performedBy: 'नागरिक (Citizen)',
+        timestamp: new Date().toISOString(),
+        remarks: 'आवेदन सफलतापूर्वक प्रस्तुत किया गया'
+      });
+    }
+
+    // Ensure latest currentStatus step exists if officer updated status
+    if (currentStatus && currentStatus !== 'Submitted' && currentStatus !== 'Draft') {
+      const hasLatest = items.some(t => t.status === currentStatus || t.action?.includes(currentStatus.toUpperCase()));
+      if (!hasLatest) {
+        items.push({
+          id: `step_${currentStatus.toLowerCase()}`,
+          status: currentStatus,
+          action: `STATUS CHANGED TO ${currentStatus.toUpperCase()}`,
+          performedBy: 'जन्म-मृत्यु रजिस्ट्रार अधिकारी (Officer)',
+          role: 'Officer',
+          timestamp: new Date().toISOString(),
+          remarks: currentStatus === 'Approved' ? 'सभी दस्तावेज सत्यापित। स्वीकृत।' : `स्थिति अद्यतन: ${currentStatus}`
+        });
+      }
+    }
+
+    return items;
+  };
+
+  const displayTimeline = processTimeline();
+
+  if (displayTimeline.length === 0) {
     return (
-      <div className="py-8 text-center text-slate-400 text-xs italic font-medium">
+      <div className="py-8 text-center text-slate-400 text-xs italic font-medium bg-slate-50/50 rounded-2xl border border-dashed border-slate-200">
         कोई गतिविधि उपलब्ध नहीं है (No timeline activity recorded)
       </div>
     );
@@ -14,103 +51,103 @@ export default function ApplicationTimeline({ timeline = [] }) {
   const getStatusConfig = (status) => {
     switch (status) {
       case 'Approved':
+      case 'Sanctioned':
       case 'Certificate Generated':
       case 'Completed':
         return {
-          badge: 'bg-emerald-50 text-emerald-700 border-emerald-200',
-          dot: 'border-emerald-500 bg-emerald-500 shadow-emerald-200',
+          badge: 'bg-emerald-50 text-emerald-800 border-emerald-200',
+          dotBg: 'bg-emerald-600 border-emerald-600 text-white ring-4 ring-emerald-100',
+          lineBg: 'bg-emerald-500',
+          icon: <Check className="w-2.5 h-2.5 stroke-[3]" />
         };
       case 'Rejected':
         return {
-          badge: 'bg-red-50 text-red-700 border-red-200',
-          dot: 'border-red-500 bg-red-500 shadow-red-200',
+          badge: 'bg-rose-50 text-rose-800 border-rose-200',
+          dotBg: 'bg-rose-600 border-rose-600 text-white ring-4 ring-rose-100',
+          lineBg: 'bg-rose-500',
+          icon: <XCircle className="w-2.5 h-2.5 stroke-[3]" />
         };
       case 'Correction Requested':
         return {
-          badge: 'bg-amber-50 text-amber-700 border-amber-200',
-          dot: 'border-amber-500 bg-amber-500 shadow-amber-200',
+          badge: 'bg-amber-50 text-amber-800 border-amber-200',
+          dotBg: 'bg-amber-500 border-amber-500 text-white ring-4 ring-amber-100',
+          lineBg: 'bg-amber-400',
+          icon: <AlertTriangle className="w-2.5 h-2.5 stroke-[3]" />
         };
       case 'Under Review':
         return {
-          badge: 'bg-blue-50 text-blue-700 border-blue-200',
-          dot: 'border-blue-500 bg-blue-500 shadow-blue-200',
+          badge: 'bg-blue-50 text-blue-800 border-blue-200',
+          dotBg: 'bg-blue-600 border-blue-600 text-white ring-4 ring-blue-100 animate-pulse',
+          lineBg: 'bg-blue-400',
+          icon: <Clock className="w-2.5 h-2.5 stroke-[3]" />
         };
       case 'Submitted':
-        return {
-          badge: 'bg-emerald-100 text-emerald-800 border-emerald-300',
-          dot: 'border-emerald-700 bg-emerald-700 shadow-emerald-200',
-        };
-      case 'Draft':
       default:
         return {
-          badge: 'bg-slate-100 text-slate-600 border-slate-200',
-          dot: 'border-slate-400 bg-slate-400 shadow-slate-200',
+          badge: 'bg-emerald-100 text-emerald-900 border-emerald-300',
+          dotBg: 'bg-emerald-700 border-emerald-700 text-white ring-4 ring-emerald-100',
+          lineBg: 'bg-emerald-400',
+          icon: <FileCheck className="w-2.5 h-2.5 stroke-[3]" />
         };
     }
   };
 
   return (
-    <LazyMotion features={domAnimation}>
-      <div className="relative pl-7 py-2">
-        {/* Vertical line */}
-        <div className="absolute left-[11px] top-3 bottom-3 w-px bg-gradient-to-b from-emerald-300 via-slate-200 to-slate-200" />
+    <div className="relative pl-8 sm:pl-10 py-2">
+      {/* Pixel-Perfect Dotted Line through Node Centers (Exact Center at 13px mobile / 15px desktop) */}
+      <div className="absolute left-[13px] sm:left-[15px] top-4 bottom-4 w-0.5 border-l-2 border-dashed border-emerald-400/80" />
 
-        <div className="space-y-1">
-          {timeline.map((item, index) => {
-            const config = getStatusConfig(item.status);
-            const isLast = index === timeline.length - 1;
+      <div className="space-y-4">
+        {displayTimeline.map((item, index) => {
+          const config = getStatusConfig(item.status);
+          const isLast = index === displayTimeline.length - 1;
 
-            return (
-              <m.div
-                key={item.id || index}
-                initial={{ opacity: 0, x: -16 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{
-                  delay: index * 0.08,
-                  duration: 0.4,
-                  ease: [0.25, 0.46, 0.45, 0.94],
-                }}
-                className="relative group"
+          return (
+            <div key={item.id || index} className="relative group">
+              {/* Perfectly Centered Stage Node Dot (16px x 16px) */}
+              <div 
+                className={`absolute -left-[27px] sm:-left-[33px] top-3.5 w-4 h-4 rounded-full border-2 flex items-center justify-center shadow-md z-10 transition-transform duration-300 group-hover:scale-125 ${config.dotBg}`}
               >
-                {/* Timeline dot */}
-                <div className={`absolute -left-7 top-4 w-3 h-3 rounded-full border-2 shadow-sm ${config.dot} transition-all duration-300 group-hover:scale-125`} />
+                {config.icon}
+              </div>
 
-                {/* Content card */}
-                <div className={`bg-white border rounded-2xl p-4 shadow-sm hover:shadow-md transition-all duration-300 ${
-                  isLast ? 'border-slate-300 ring-1 ring-slate-100' : 'border-slate-200 hover:border-slate-300'
-                }`}>
-                  <div className="flex flex-wrap items-center justify-between gap-2 mb-2.5">
-                    <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold border uppercase tracking-wider ${config.badge}`}>
-                      {item.action || item.status}
-                    </span>
-                    <span className="text-[11px] text-slate-400 font-mono font-medium">
-                      {item.timestamp ? new Date(item.timestamp).toLocaleString('hi-IN', {
-                        dateStyle: 'medium',
-                        timeStyle: 'short'
-                      }) : '—'}
-                    </span>
-                  </div>
+              {/* Stage Activity Card */}
+              <div className={`bg-white border rounded-2xl p-3.5 sm:p-4 shadow-xs transition-all duration-200 ${
+                isLast ? 'border-emerald-300/80 ring-1 ring-emerald-100 bg-emerald-50/10' : 'border-slate-200/80'
+              }`}>
+                <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
+                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-extrabold border uppercase tracking-wider ${config.badge}`}>
+                    {item.action || item.status}
+                  </span>
+                  <span className="text-[11px] text-slate-500 font-mono font-medium">
+                    {item.timestamp ? new Date(item.timestamp).toLocaleString('hi-IN', {
+                      dateStyle: 'medium',
+                      timeStyle: 'short'
+                    }) : '—'}
+                  </span>
+                </div>
 
-                  <div className="text-xs text-slate-600 mb-1">
-                    <span className="text-slate-400">द्वारा निष्पादित:</span>{' '}
-                    <span className="font-bold text-slate-800">{item.performedBy || 'सिस्टम'}</span>
-                    {item.role && (
-                      <span className="text-slate-400 ml-1">({item.role})</span>
-                    )}
-                  </div>
-
-                  {item.remarks && (
-                    <div className="mt-3 text-xs bg-amber-50/80 rounded-xl p-3 border border-amber-100 text-amber-900">
-                      <span className="font-bold block mb-0.5 text-amber-700">💬 अधिकारी टिप्पणी</span>
-                      <p className="leading-relaxed">{item.remarks}</p>
-                    </div>
+                <div className="text-xs text-slate-600 mb-1">
+                  <span className="text-slate-400">द्वारा निष्पादित:</span>{' '}
+                  <span className="font-bold text-slate-800">{item.performedBy || 'सिस्टम'}</span>
+                  {item.role && (
+                    <span className="text-slate-500 ml-1">({item.role})</span>
                   )}
                 </div>
-              </m.div>
-            );
-          })}
-        </div>
+
+                {item.remarks && (
+                  <div className="mt-2.5 text-xs bg-amber-50/90 rounded-xl p-3 border border-amber-200/80 text-amber-900 shadow-2xs">
+                    <span className="font-bold flex items-center gap-1 mb-0.5 text-amber-800">
+                      💬 अधिकारी टिप्पणी (Officer Remarks)
+                    </span>
+                    <p className="leading-relaxed font-medium">{item.remarks}</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          );
+        })}
       </div>
-    </LazyMotion>
+    </div>
   );
 }

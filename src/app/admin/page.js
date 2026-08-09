@@ -1382,7 +1382,7 @@ function ApplicationDetailModal({ record, serviceType, onClose, onOpenRemark, on
             <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wider border-b border-slate-100 pb-2">
               ⏱️ आवेदन टाइमलाइन इतिहास
             </h4>
-            <ApplicationTimeline timeline={record.timeline || []} />
+            <ApplicationTimeline timeline={record.timeline || []} currentStatus={record.status} />
           </div>
         </div>
 

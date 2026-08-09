@@ -12,6 +12,7 @@ import {
   submitDeathCertificate, 
   getDeathCertificates 
 } from '../../services/deathCertificateService';
+import { validateDeathCertificateForm, navigateToFirstErrorField } from '../../utils/formValidationHelper';
 import { 
   FileText, Activity, CheckCircle2, AlertCircle, RefreshCw, Printer, X, History, Plus, 
   Building2, User, Home, HeartPulse, CheckSquare, Download, ShieldAlert, ListChecks 
@@ -90,6 +91,7 @@ export default function DeathCertificatePage() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState(null);
   const [formErrors, setFormErrors] = useState([]);
+  const [fieldErrors, setFieldErrors] = useState({});
   const [selectedApp, setSelectedApp] = useState(null);
   const [showCertModal, setShowCertModal] = useState(false);
   const [showLetterModal, setShowLetterModal] = useState(false);
@@ -307,14 +309,16 @@ export default function DeathCertificatePage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const errors = validateForm();
-    if (errors.length > 0) {
-      setFormErrors(errors);
-      setMessage({ type: 'error', text: 'कृपया फॉर्म में त्रुटियों को सुधारें (Please resolve validation errors in the form)' });
-      window.scrollTo({ top: 100, behavior: 'smooth' });
+    const { fieldErrors: errs, errorList } = validateDeathCertificateForm(formData, dpdpConsent);
+    if (errorList.length > 0) {
+      setFieldErrors(errs);
+      setFormErrors(errorList);
+      setMessage({ type: 'error', text: `⚠️ फॉर्म में ${errorList.length} आवश्यक जानकारी छूटी है। स्वतः उस स्थान पर ले जाया जा रहा है...` });
+      navigateToFirstErrorField(errs);
       return;
     }
 
+    setFieldErrors({});
     setFormErrors([]);
     setLoading(true);
     setMessage(null);
@@ -583,13 +587,29 @@ export default function DeathCertificatePage() {
                 <div>
                   <label className="block text-[10px] sm:text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">मृतक का पूरा नाम (Full Name) *</label>
                   <input
+                    id="field_deceased_fullName"
                     type="text"
                     required
                     value={formData.deceasedDetails.fullName}
-                    onChange={(e) => handleInputChange('deceasedDetails', 'fullName', e.target.value)}
+                    onChange={(e) => {
+                      handleInputChange('deceasedDetails', 'fullName', e.target.value);
+                      if (fieldErrors['deceasedDetails.fullName']) {
+                        setFieldErrors(prev => ({ ...prev, 'deceasedDetails.fullName': null }));
+                      }
+                    }}
                     placeholder="जैसे: स्व. रामेश्वर प्रसाद शर्मा"
-                    className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-slate-900 focus:outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20 font-medium"
+                    className={`w-full bg-white border rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-slate-900 focus:outline-none font-medium transition-all ${
+                      fieldErrors['deceasedDetails.fullName']
+                        ? 'border-red-500 bg-red-50/40 ring-2 ring-red-300'
+                        : 'border-slate-300 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20'
+                    }`}
                   />
+                  {fieldErrors['deceasedDetails.fullName'] && (
+                    <p className="mt-1.5 text-[11px] font-bold text-red-600 flex items-center gap-1 animate-pulse">
+                      <AlertCircle className="w-3.5 h-3.5 text-red-600 shrink-0" />
+                      {fieldErrors['deceasedDetails.fullName'].message}
+                    </p>
+                  )}
                 </div>
 
                 <div>
@@ -608,25 +628,57 @@ export default function DeathCertificatePage() {
                 <div>
                   <label className="block text-[10px] sm:text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">मृत्यु की तिथि (Date of Death) *</label>
                   <input
+                    id="field_deceased_dateOfDeath"
                     type="date"
                     required
                     value={formData.deceasedDetails.dateOfDeath}
-                    onChange={(e) => handleInputChange('deceasedDetails', 'dateOfDeath', e.target.value)}
-                    className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-slate-900 focus:outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20 font-medium"
+                    onChange={(e) => {
+                      handleInputChange('deceasedDetails', 'dateOfDeath', e.target.value);
+                      if (fieldErrors['deceasedDetails.dateOfDeath']) {
+                        setFieldErrors(prev => ({ ...prev, 'deceasedDetails.dateOfDeath': null }));
+                      }
+                    }}
+                    className={`w-full bg-white border rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-slate-900 focus:outline-none font-medium transition-all ${
+                      fieldErrors['deceasedDetails.dateOfDeath']
+                        ? 'border-red-500 bg-red-50/40 ring-2 ring-red-300'
+                        : 'border-slate-300 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20'
+                    }`}
                   />
+                  {fieldErrors['deceasedDetails.dateOfDeath'] && (
+                    <p className="mt-1.5 text-[11px] font-bold text-red-600 flex items-center gap-1 animate-pulse">
+                      <AlertCircle className="w-3.5 h-3.5 text-red-600 shrink-0" />
+                      {fieldErrors['deceasedDetails.dateOfDeath'].message}
+                    </p>
+                  )}
                 </div>
 
                 <div>
                   <label className="block text-[10px] sm:text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">मृत्यु के समय आयु (वर्षों में)</label>
                   <input
+                    id="field_deceased_age"
                     type="number"
                     min="0"
                     max="120"
                     value={formData.deceasedDetails.age}
-                    onChange={(e) => handleInputChange('deceasedDetails', 'age', e.target.value)}
+                    onChange={(e) => {
+                      handleInputChange('deceasedDetails', 'age', e.target.value);
+                      if (fieldErrors['deceasedDetails.age']) {
+                        setFieldErrors(prev => ({ ...prev, 'deceasedDetails.age': null }));
+                      }
+                    }}
                     placeholder="65"
-                    className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-slate-900 focus:outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20 font-medium"
+                    className={`w-full bg-white border rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-slate-900 focus:outline-none font-medium transition-all ${
+                      fieldErrors['deceasedDetails.age']
+                        ? 'border-red-500 bg-red-50/40 ring-2 ring-red-300'
+                        : 'border-slate-300 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20'
+                    }`}
                   />
+                  {fieldErrors['deceasedDetails.age'] && (
+                    <p className="mt-1.5 text-[11px] font-bold text-red-600 flex items-center gap-1 animate-pulse">
+                      <AlertCircle className="w-3.5 h-3.5 text-red-600 shrink-0" />
+                      {fieldErrors['deceasedDetails.age'].message}
+                    </p>
+                  )}
                 </div>
 
                 <div>
@@ -1329,7 +1381,7 @@ export default function DeathCertificatePage() {
               </div>
 
               <h4 className="text-xs uppercase font-extrabold text-slate-500 tracking-wider">आवेदन टाइमलाइन विवरण (Activity Timeline)</h4>
-              <ApplicationTimeline timeline={selectedApp.timeline || []} />
+              <ApplicationTimeline timeline={selectedApp.timeline || []} currentStatus={selectedApp.status} />
             </div>
           </div>
         )}
