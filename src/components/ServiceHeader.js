@@ -165,15 +165,16 @@ export default function ServiceHeader() {
                   {unreadCount > 0 && <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] rounded-full bg-rose-500 text-white text-[9px] flex items-center justify-center animate-pulse">{unreadCount}</span>}
                 </button>
                 {showNotifications && (
-                  <div className="absolute right-0 mt-2 w-80 bg-white border border-slate-200 rounded-2xl shadow-2xl z-50 overflow-hidden">
+                  <div className="fixed sm:absolute top-16 sm:top-auto left-4 right-4 sm:left-auto sm:right-0 mt-2 sm:w-80 max-w-[calc(100vw-2rem)] bg-white border border-slate-200 rounded-2xl shadow-2xl z-[100] overflow-hidden">
                     <div className="px-4 py-3 border-b bg-slate-50/80 flex items-center justify-between">
-                      <h3 className="text-xs font-extrabold uppercase">सूचनाएँ</h3>
-                      <button onClick={() => setShowNotifications(false)} aria-label="सूचना पैनल बंद करें"><X className="w-4 h-4" /></button>
+                      <h3 className="text-xs font-extrabold uppercase text-slate-800">🔔 सूचनाएँ (Notifications)</h3>
+                      <button onClick={() => setShowNotifications(false)} aria-label="सूचना पैनल बंद करें" className="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100"><X className="w-4 h-4" /></button>
                     </div>
                     <div ref={listRef} className="max-h-80 overflow-y-auto">
-                      {notifications.length === 0 ? <div className="p-8 text-center text-xs text-slate-500">कोई नई सूचना नहीं है</div> : notifications.map((n) => (
-                        <div key={n.id} onClick={() => handleMarkAsRead(n.id)} className={`px-4 py-3.5 border-b cursor-pointer ${!n.isRead ? 'bg-emerald-50/40' : ''}`}>
-                          <p className="text-xs font-semibold text-slate-800">{n.message}</p>
+                      {notifications.length === 0 ? <div className="p-8 text-center text-xs text-slate-500 font-medium">कोई नई सूचना नहीं है</div> : notifications.map((n) => (
+                        <div key={n.id} onClick={() => handleMarkAsRead(n.id)} className={`px-4 py-3.5 border-b border-slate-100 cursor-pointer hover:bg-slate-50 transition-colors ${!n.isRead ? 'bg-emerald-50/60 font-semibold' : ''}`}>
+                          <p className="text-xs text-slate-800 leading-relaxed">{n.message}</p>
+                          <span className="text-[10px] text-slate-400 mt-1 block font-mono">{new Date(n.timestamp || Date.now()).toLocaleDateString('hi-IN')}</span>
                         </div>
                       ))}
                     </div>

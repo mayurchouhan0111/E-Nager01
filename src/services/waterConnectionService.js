@@ -1,4 +1,4 @@
-import { db } from '../lib/firebase';
+import { db, ensureFirebaseAuth, sanitizeFirestorePayload } from '../lib/firebase';
 import { 
   collection, 
   addDoc, 
@@ -320,13 +320,15 @@ export async function updateWaterConnectionStatus({
     updatePayload.permitNo = permitNo || existing.permitNo || `WC-PERMIT-${Date.now().toString().slice(-6)}`;
   }
 
-  const fullRecord = { ...existing, ...updatePayload, id };
+  await ensureFirebaseAuth();
+  const fullRecord = sanitizeFirestorePayload({ ...existing, ...updatePayload, id });
 
   try {
     const docRef = doc(db, COLLECTION_NAME, id);
     await setDoc(docRef, fullRecord, { merge: true });
+    console.log('[WaterConnectionService] Status successfully updated in Firestore backend:', newStatus);
   } catch (error) {
-    console.warn('[WaterConnectionService] Status updated in local storage');
+    console.error('[WaterConnectionService] Firestore setDoc error:', error.message);
   }
 
   syncLocalRecord(fullRecord);

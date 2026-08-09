@@ -1,4 +1,4 @@
-import { db } from '../lib/firebase';
+import { db, ensureFirebaseAuth, sanitizeFirestorePayload } from '../lib/firebase';
 import { 
   collection, 
   addDoc, 
@@ -320,13 +320,15 @@ export async function updateBirthCertificateStatus({
     updatePayload.certificateNo = certificateNo || existing.certificateNo || `BC-CERT-${Date.now().toString().slice(-6)}`;
   }
 
-  const fullRecord = { ...existing, ...updatePayload, id };
+  await ensureFirebaseAuth();
+  const fullRecord = sanitizeFirestorePayload({ ...existing, ...updatePayload, id });
 
   try {
     const docRef = doc(db, COLLECTION_NAME, id);
     await setDoc(docRef, fullRecord, { merge: true });
+    console.log('[BirthCertificateService] Status successfully updated in Firestore backend:', newStatus);
   } catch (error) {
-    console.warn('[BirthCertificateService] Status updated in local storage');
+    console.error('[BirthCertificateService] Firestore setDoc error:', error.message);
   }
 
   syncLocalRecord(fullRecord);

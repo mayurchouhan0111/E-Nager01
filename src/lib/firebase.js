@@ -16,10 +16,37 @@ const app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig)
 export const db = getFirestore(app)
 export const auth = getAuth(app)
 
+export async function ensureFirebaseAuth() {
+  if (typeof window === 'undefined') return;
+  if (!auth.currentUser) {
+    try {
+      await signInAnonymously(auth);
+    } catch (err) {
+      console.warn('[Firebase Auth] Anonymous sign in notice:', err.message);
+    }
+  }
+}
+
+/**
+ * Strips out undefined values recursively so Firestore setDoc / updateDoc never throws invalid data exception
+ */
+export function sanitizeFirestorePayload(obj) {
+  if (obj === undefined) return null;
+  if (obj === null || typeof obj !== 'object') return obj;
+  if (Array.isArray(obj)) {
+    return obj.map(sanitizeFirestorePayload);
+  }
+  const clean = {};
+  for (const [key, value] of Object.entries(obj)) {
+    if (value !== undefined) {
+      clean[key] = sanitizeFirestorePayload(value);
+    }
+  }
+  return clean;
+}
+
 if (typeof window !== 'undefined') {
-  signInAnonymously(auth).catch((err) => {
-    console.log('[Firebase Auth] Notice:', err.message)
-  })
+  ensureFirebaseAuth();
 }
 
 export { signInAnonymously, onAuthStateChanged }
