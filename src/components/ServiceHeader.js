@@ -154,12 +154,12 @@ export default function ServiceHeader() {
           </nav>
 
           <div className="flex items-center gap-2">
-            <button onClick={() => { setShowTrackModal(true); setHasSearched(false); }} className="px-3 py-2 rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 text-xs font-bold flex items-center gap-1.5">
+            <button onClick={() => { setShowTrackModal(true); setHasSearched(false); }} aria-label="आवेदन स्थिति खोजें" className="px-3 py-2 rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 text-xs font-bold flex items-center gap-1.5">
               <Search className="w-3.5 h-3.5" /> <span className="hidden sm:inline">स्थिति खोजें</span>
             </button>
 
             <div className="relative">
-              <button onClick={() => setShowNotifications(!showNotifications)} className="relative p-2.5 rounded-xl bg-white border border-slate-200 text-slate-500 hover:bg-slate-50 shadow-sm transition-all duration-200">
+              <button onClick={() => setShowNotifications(!showNotifications)} aria-label="सूचनाएँ (Notifications)" className="relative p-2.5 rounded-xl bg-white border border-slate-200 text-slate-500 hover:bg-slate-50 shadow-sm transition-all duration-200">
                 <Bell className="w-4 h-4" />
                 {unreadCount > 0 && <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] rounded-full bg-rose-500 text-white text-[9px] flex items-center justify-center animate-pulse">{unreadCount}</span>}
               </button>
@@ -167,10 +167,10 @@ export default function ServiceHeader() {
                 <div className="absolute right-0 mt-2 w-80 bg-white border border-slate-200 rounded-2xl shadow-2xl z-50 overflow-hidden">
                   <div className="px-4 py-3 border-b bg-slate-50/80 flex items-center justify-between">
                     <h3 className="text-xs font-extrabold uppercase">सूचनाएँ</h3>
-                    <button onClick={() => setShowNotifications(false)}><X className="w-4 h-4" /></button>
+                    <button onClick={() => setShowNotifications(false)} aria-label="सूचना पैनल बंद करें"><X className="w-4 h-4" /></button>
                   </div>
                   <div ref={listRef} className="max-h-80 overflow-y-auto">
-                    {notifications.length === 0 ? <div className="p-8 text-center text-xs text-slate-400">कोई नई सूचना नहीं है</div> : notifications.map((n) => (
+                    {notifications.length === 0 ? <div className="p-8 text-center text-xs text-slate-500">कोई नई सूचना नहीं है</div> : notifications.map((n) => (
                       <div key={n.id} onClick={() => handleMarkAsRead(n.id)} className={`px-4 py-3.5 border-b cursor-pointer ${!n.isRead ? 'bg-emerald-50/40' : ''}`}>
                         <p className="text-xs font-semibold text-slate-800">{n.message}</p>
                       </div>
@@ -180,7 +180,7 @@ export default function ServiceHeader() {
               )}
             </div>
 
-            <Link href="/admin" className={`px-3 py-2 rounded-xl text-xs font-bold border transition-all flex items-center gap-1.5 ${isCurrentTab('/admin') ? 'bg-emerald-700 text-white border-emerald-700' : 'bg-emerald-50 text-emerald-800 border-emerald-200'}`}>
+            <Link href="/admin" aria-label="अधिकारी लॉगिन" className={`px-3 py-2 rounded-xl text-xs font-bold border transition-all flex items-center gap-1.5 ${isCurrentTab('/admin') ? 'bg-emerald-700 text-white border-emerald-700' : 'bg-emerald-50 text-emerald-800 border-emerald-200'}`}>
               <ShieldAlert className="w-3.5 h-3.5" /> <span className="hidden sm:inline">अधिकारी लॉगिन</span>
             </Link>
           </div>
@@ -197,6 +197,7 @@ export default function ServiceHeader() {
               </h3>
               <button 
                 onClick={() => setShowTrackModal(false)}
+                aria-label="खोज खिड़की बंद करें"
                 className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
               >
                 <X className="w-5 h-5" />

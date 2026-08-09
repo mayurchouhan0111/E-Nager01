@@ -2,7 +2,7 @@ import { Toaster } from 'react-hot-toast'
 import './globals.css'
 import AuthProvider from '@/components/AuthProvider'
 
-const baseUrl = 'https://e-nagar01.netlify.app'
+const baseUrl = 'https://jhabua-nagarpalika-aapke-dwar.netlify.app'
 
 export const metadata = {
   metadataBase: new URL(baseUrl),
@@ -118,6 +118,9 @@ export default function RootLayout({ children }) {
     <html lang="hi-IN">
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link rel="preload" as="image" href="/mp-logo.png" type="image/png" />
         <link rel="icon" href="/favicon.ico" sizes="any" />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         <link rel="manifest" href="/manifest.json" />
