@@ -1344,7 +1344,9 @@ function ApplicationDetailModal({ record, serviceType, onClose, onOpenRemark, on
 
                       <div className="min-w-0">
                         <p className="text-xs font-bold text-slate-900 truncate">{doc.title}</p>
-                        <p className="text-[10px] text-slate-500 truncate mt-0.5">{doc.fileName} {doc.fileSize ? `(${doc.fileSize})` : ''}</p>
+                        <p className="text-[10px] font-mono text-emerald-800 truncate mt-0.5" title={doc.fullVirtualPath || doc.folderPath}>
+                          📁 {doc.officialFileName || doc.fileName} {doc.fileSize ? `(${doc.fileSize})` : ''}
+                        </p>
                       </div>
                     </div>
 

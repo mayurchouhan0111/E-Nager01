@@ -136,10 +136,19 @@ export async function saveBirthCertificateDraft(data, existingId = null) {
   }
 }
 
+import { formatOfficialDocumentVault } from '../utils/documentVault';
+
 export async function submitBirthCertificate(data, existingId = null) {
   const isResubmission = Boolean(existingId && data.status === 'Correction Requested');
   const applicationNo = data.applicationNo || generateAppNumber();
   const now = new Date().toISOString();
+
+  const formattedDocuments = formatOfficialDocumentVault(data.documents, applicationNo, 'birth_certificate');
+  const processedData = {
+    ...data,
+    documents: formattedDocuments,
+    documentVaultPath: `applications/birth_certificate/${new Date().getFullYear()}/${applicationNo}/documents/`
+  };
 
   const timelineItem = {
     id: `t-${Date.now()}`,
@@ -163,7 +172,7 @@ export async function submitBirthCertificate(data, existingId = null) {
       const updatedTimeline = [...(existingData.timeline || []), timelineItem];
 
       const updateData = {
-        ...data,
+        ...processedData,
         applicationNo,
         status: 'Submitted',
         updatedAt: now,
@@ -174,7 +183,7 @@ export async function submitBirthCertificate(data, existingId = null) {
       syncLocalRecord({ id: existingId, ...updateData });
     } else {
       const newDoc = {
-        ...data,
+        ...processedData,
         applicationNo,
         status: 'Submitted',
         appliedAt: now,
