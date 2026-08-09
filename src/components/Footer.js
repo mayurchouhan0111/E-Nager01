@@ -1,16 +1,7 @@
-'use client';
-
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import Link from 'next/link';
-import { ShieldCheck, Presentation, Building2, Lock, FileText, Baby, Droplets } from 'lucide-react';
 
 export default function Footer() {
-  const [year, setYear] = useState(2025);
-
-  useEffect(() => {
-    setYear(new Date().getFullYear());
-  }, []);
-
   return (
     <footer className="bg-slate-950 text-slate-300 border-t border-slate-800 font-sans mt-auto no-print print:hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -36,22 +27,22 @@ export default function Footer() {
             <ul className="space-y-1.5 font-medium">
               <li>
                 <Link href="/death-certificate" className="hover:text-emerald-400 transition-colors flex items-center gap-1.5">
-                  <FileText className="w-3.5 h-3.5 text-emerald-500" /> मृत्यु प्रमाण पत्र (Form-6)
+                  📋 मृत्यु प्रमाण पत्र (Form-6)
                 </Link>
               </li>
               <li>
                 <Link href="/birth-certificate" className="hover:text-emerald-400 transition-colors flex items-center gap-1.5">
-                  <Baby className="w-3.5 h-3.5 text-blue-400" /> जन्म प्रमाण पत्र (Form-5)
+                  👶 जन्म प्रमाण पत्र (Form-5)
                 </Link>
               </li>
               <li>
                 <Link href="/water-connection" className="hover:text-emerald-400 transition-colors flex items-center gap-1.5">
-                  <Droplets className="w-3.5 h-3.5 text-cyan-400" /> जल प्रदाय कनेक्शन
+                  💧 जल प्रदाय कनेक्शन
                 </Link>
               </li>
               <li>
                 <Link href="/no-dues-certificate" className="hover:text-emerald-400 transition-colors flex items-center gap-1.5">
-                  <Building2 className="w-3.5 h-3.5 text-amber-400" /> नो ड्यूज प्रमाण पत्र (NOC)
+                  🏛️ नो ड्यूज प्रमाण पत्र (NOC)
                 </Link>
               </li>
             </ul>
@@ -63,22 +54,22 @@ export default function Footer() {
             <ul className="space-y-1.5 font-medium">
               <li>
                 <Link href="/privacy-policy" className="hover:text-emerald-400 transition-colors flex items-center gap-1.5">
-                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" /> DPDP प्राइवेसी नीति
+                  🛡️ DPDP प्राइवेसी नीति
                 </Link>
               </li>
               <li>
                 <Link href="/presentation" className="hover:text-emerald-400 transition-colors flex items-center gap-1.5">
-                  <Presentation className="w-3.5 h-3.5 text-purple-400" /> SOP प्रेजेंटेशन
+                  📊 SOP प्रेजेंटेशन
                 </Link>
               </li>
               <li>
                 <Link href="/grievance" className="hover:text-emerald-400 transition-colors flex items-center gap-1.5">
-                  <Building2 className="w-3.5 h-3.5 text-amber-400" /> जन शिकायत निवारण
+                  📢 जन शिकायत निवारण
                 </Link>
               </li>
               <li>
                 <Link href="/admin" className="hover:text-emerald-400 transition-colors flex items-center gap-1.5 text-slate-400 font-bold">
-                  <Lock className="w-3.5 h-3.5 text-slate-400" /> अधिकारी लॉगिन (/admin)
+                  🔑 अधिकारी लॉगिन (/admin)
                 </Link>
               </li>
             </ul>
@@ -86,10 +77,10 @@ export default function Footer() {
 
         </div>
 
-        {/* BOTTOM COPYRIGHT BAR */}
+        {/* BOTTOM COPYRIGHT BAR — Static year, no JS Date() */}
         <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500 font-medium">
           <div>
-            &copy; {year} नगर पालिका परिषद झाबुआ (म.प्र.) | सर्वाधिकार सुरक्षित।
+            &copy; 2025-26 नगर पालिका परिषद झाबुआ (म.प्र.) | सर्वाधिकार सुरक्षित।
           </div>
           <div className="flex items-center gap-4">
             <Link href="/privacy-policy" className="hover:underline">प्राइवेसी पॉलिसी</Link>
