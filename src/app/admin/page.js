@@ -274,7 +274,7 @@ export default function AdminPage() {
 
     const toastId = toast.loading(`स्थिति अपडेट हो रही है: ${remarkModal.targetStatus}... (Updating status...)`)
     let res;
-    const officerName = ADMIN_ACCOUNTS[currentAdminUser]?.name || remarkModal.officerName;
+    const officerName = adminAccounts[currentAdminUser]?.name || remarkModal.officerName;
 
     if (remarkModal.serviceType === 'birth') {
       res = await updateBirthCertificateStatus({
@@ -627,7 +627,7 @@ export default function AdminPage() {
 
                             {record.status === 'Submitted' && (
                               <button
-                                onClick={() => setRemarkModal({ isOpen: true, record, serviceType: 'death', targetStatus: 'Under Review', remarkText: 'समीक्षा हेतु चुना गया', officerName: ADMIN_ACCOUNTS[currentAdminUser]?.name || 'Registrar Officer' })}
+                                onClick={() => setRemarkModal({ isOpen: true, record, serviceType: 'death', targetStatus: 'Under Review', remarkText: 'समीक्षा हेतु चुना गया', officerName: adminAccounts[currentAdminUser]?.name || 'Registrar Officer' })}
                                 className="btn btn-secondary btn-sm bg-blue-50 border-blue-200 text-blue-700 font-bold text-[11px]"
                               >
                                 👁️ समीक्षा करें
@@ -636,7 +636,7 @@ export default function AdminPage() {
 
                             {record.status !== 'Approved' && record.status !== 'Certificate Generated' && record.status !== 'Completed' && (
                               <button
-                                onClick={() => setRemarkModal({ isOpen: true, record, serviceType: 'death', targetStatus: 'Approved', remarkText: 'सभी दस्तावेज सत्यापित। स्वीकृत।', officerName: ADMIN_ACCOUNTS[currentAdminUser]?.name || 'Registrar Officer' })}
+                                onClick={() => setRemarkModal({ isOpen: true, record, serviceType: 'death', targetStatus: 'Approved', remarkText: 'सभी दस्तावेज सत्यापित। स्वीकृत।', officerName: adminAccounts[currentAdminUser]?.name || 'Registrar Officer' })}
                                 className="btn btn-primary btn-sm bg-gradient-to-r from-emerald-600 to-emerald-700 font-bold text-[11px]"
                               >
                                 ✅ स्वीकृत करें
@@ -645,7 +645,7 @@ export default function AdminPage() {
 
                             {record.status !== 'Rejected' && (
                               <button
-                                onClick={() => setRemarkModal({ isOpen: true, record, serviceType: 'death', targetStatus: 'Rejected', remarkText: 'दस्तावेज अपूर्ण', officerName: ADMIN_ACCOUNTS[currentAdminUser]?.name || 'Registrar Officer' })}
+                                onClick={() => setRemarkModal({ isOpen: true, record, serviceType: 'death', targetStatus: 'Rejected', remarkText: 'दस्तावेज अपूर्ण', officerName: adminAccounts[currentAdminUser]?.name || 'Registrar Officer' })}
                                 className="btn btn-danger btn-sm font-bold text-[11px]"
                               >
                                 ❌ निरस्त
@@ -761,7 +761,7 @@ export default function AdminPage() {
 
                             {record.status === 'Submitted' && (
                               <button
-                                onClick={() => setRemarkModal({ isOpen: true, record, serviceType: 'birth', targetStatus: 'Under Review', remarkText: 'समीक्षा हेतु चुना गया', officerName: ADMIN_ACCOUNTS[currentAdminUser]?.name || 'Registrar Officer' })}
+                                onClick={() => setRemarkModal({ isOpen: true, record, serviceType: 'birth', targetStatus: 'Under Review', remarkText: 'समीक्षा हेतु चुना गया', officerName: adminAccounts[currentAdminUser]?.name || 'Registrar Officer' })}
                                 className="btn btn-secondary btn-sm bg-blue-50 border-blue-200 text-blue-700 font-bold text-[11px]"
                               >
                                 👁️ समीक्षा करें
@@ -770,7 +770,7 @@ export default function AdminPage() {
 
                             {record.status !== 'Approved' && record.status !== 'Certificate Generated' && record.status !== 'Completed' && (
                               <button
-                                onClick={() => setRemarkModal({ isOpen: true, record, serviceType: 'birth', targetStatus: 'Approved', remarkText: 'सभी दस्तावेज सत्यापित। स्वीकृत।', officerName: ADMIN_ACCOUNTS[currentAdminUser]?.name || 'Registrar Officer' })}
+                                onClick={() => setRemarkModal({ isOpen: true, record, serviceType: 'birth', targetStatus: 'Approved', remarkText: 'सभी दस्तावेज सत्यापित। स्वीकृत।', officerName: adminAccounts[currentAdminUser]?.name || 'Registrar Officer' })}
                                 className="btn btn-primary btn-sm bg-gradient-to-r from-blue-600 to-blue-700 font-bold text-[11px]"
                               >
                                 ✅ स्वीकृत करें
@@ -779,7 +779,7 @@ export default function AdminPage() {
 
                             {record.status !== 'Rejected' && (
                               <button
-                                onClick={() => setRemarkModal({ isOpen: true, record, serviceType: 'birth', targetStatus: 'Rejected', remarkText: 'दस्तावेज अपूर्ण', officerName: ADMIN_ACCOUNTS[currentAdminUser]?.name || 'Registrar Officer' })}
+                                onClick={() => setRemarkModal({ isOpen: true, record, serviceType: 'birth', targetStatus: 'Rejected', remarkText: 'दस्तावेज अपूर्ण', officerName: adminAccounts[currentAdminUser]?.name || 'Registrar Officer' })}
                                 className="btn btn-danger btn-sm font-bold text-[11px]"
                               >
                                 ❌ निरस्त
@@ -895,7 +895,7 @@ export default function AdminPage() {
 
                             {record.status === 'Submitted' && (
                               <button
-                                onClick={() => setRemarkModal({ isOpen: true, record, serviceType: 'water_connection', targetStatus: 'Under Review', remarkText: 'समीक्षा हेतु चुना गया', officerName: ADMIN_ACCOUNTS[currentAdminUser]?.name || 'Water Supply Officer' })}
+                                onClick={() => setRemarkModal({ isOpen: true, record, serviceType: 'water_connection', targetStatus: 'Under Review', remarkText: 'समीक्षा हेतु चुना गया', officerName: adminAccounts[currentAdminUser]?.name || 'Water Supply Officer' })}
                                 className="btn btn-secondary btn-sm bg-blue-50 border-blue-200 text-blue-700 font-bold text-[11px]"
                               >
                                 👁️ समीक्षा करें
@@ -904,7 +904,7 @@ export default function AdminPage() {
 
                             {record.status !== 'Approved' && record.status !== 'Sanctioned' && record.status !== 'Completed' && (
                               <button
-                                onClick={() => setRemarkModal({ isOpen: true, record, serviceType: 'water_connection', targetStatus: 'Approved', remarkText: 'साइट प्लान एवं चार्जेज सत्यापित। जल कनेक्शन स्वीकृत।', officerName: ADMIN_ACCOUNTS[currentAdminUser]?.name || 'Water Supply Officer' })}
+                                onClick={() => setRemarkModal({ isOpen: true, record, serviceType: 'water_connection', targetStatus: 'Approved', remarkText: 'साइट प्लान एवं चार्जेज सत्यापित। जल कनेक्शन स्वीकृत।', officerName: adminAccounts[currentAdminUser]?.name || 'Water Supply Officer' })}
                                 className="btn btn-primary btn-sm bg-gradient-to-r from-teal-600 to-emerald-700 font-bold text-[11px]"
                               >
                                 ✅ स्वीकृत करें
@@ -913,7 +913,7 @@ export default function AdminPage() {
 
                             {record.status !== 'Rejected' && (
                               <button
-                                onClick={() => setRemarkModal({ isOpen: true, record, serviceType: 'water_connection', targetStatus: 'Rejected', remarkText: 'दस्तावेज अपूर्ण', officerName: ADMIN_ACCOUNTS[currentAdminUser]?.name || 'Water Supply Officer' })}
+                                onClick={() => setRemarkModal({ isOpen: true, record, serviceType: 'water_connection', targetStatus: 'Rejected', remarkText: 'दस्तावेज अपूर्ण', officerName: adminAccounts[currentAdminUser]?.name || 'Water Supply Officer' })}
                                 className="btn btn-danger btn-sm font-bold text-[11px]"
                               >
                                 ❌ निरस्त
@@ -1374,7 +1374,7 @@ export default function AdminPage() {
                 serviceType: effectiveServiceType,
                 targetStatus: status,
                 remarkText: status === 'Approved' ? 'सभी दस्तावेज सत्यापित। स्वीकृत।' : status === 'Rejected' ? 'दस्तावेज अपूर्ण' : 'समीक्षा की जा रही है',
-                officerName: ADMIN_ACCOUNTS[currentAdminUser]?.name || 'Nagar Palika Officer'
+                officerName: adminAccounts[currentAdminUser]?.name || 'Nagar Palika Officer'
               })
             }}
             onOpenLetter={(rec, targetServiceType) => {
