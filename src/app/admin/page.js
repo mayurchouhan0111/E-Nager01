@@ -365,7 +365,7 @@ export default function AdminPage() {
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans">
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-200">
+      <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-200 no-print print:hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 sm:h-16 flex items-center justify-between gap-3">
           <div className="flex items-center gap-2.5 min-w-0">
             <a href="/" className="w-9 h-9 flex items-center justify-center hover:opacity-90 transition shrink-0" title="Home">
@@ -412,7 +412,7 @@ export default function AdminPage() {
       </header>
 
       {/* Main Panel Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full flex flex-col space-y-6">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full flex flex-col space-y-6 no-print print:hidden">
 
         {/* Login Portal Screen */}
         {!isAdmin && (
