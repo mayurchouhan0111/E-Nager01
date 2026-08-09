@@ -245,7 +245,34 @@ export default function AdminPage() {
     }
 
     if (res.success) {
-      toast.success(`स्थिति अपडेट हो गई: ${remarkModal.targetStatus}! (Status updated!)`, { id: toastId })
+      toast.success(`स्थिति अपडेट हो गई: ${remarkModal.targetStatus}!`, { id: toastId })
+      
+      const nowIso = new Date().toISOString()
+      const updatedTimelineItem = {
+        id: `t-${Date.now()}`,
+        action: `Status Changed to ${remarkModal.targetStatus}`,
+        status: remarkModal.targetStatus,
+        performedBy: officerName,
+        role: 'Officer',
+        remarks: remarkModal.remarkText.trim(),
+        timestamp: nowIso
+      }
+
+      const updateLocalDetail = (prev) => {
+        if (!prev || prev.id !== remarkModal.record.id) return prev
+        return {
+          ...prev,
+          status: remarkModal.targetStatus,
+          lastOfficerRemark: remarkModal.remarkText.trim(),
+          lastOfficerName: officerName,
+          timeline: [...(prev.timeline || []), updatedTimelineItem]
+        }
+      }
+
+      setSelectedDeathDetail(prev => updateLocalDetail(prev))
+      setSelectedBirthDetail(prev => updateLocalDetail(prev))
+      setSelectedWaterDetail(prev => updateLocalDetail(prev))
+
       setRemarkModal({ isOpen: false, record: null, serviceType: 'death', targetStatus: '', remarkText: '', officerName: 'Nagar Palika Officer' })
       loadDeathRecords()
       loadBirthRecords()
@@ -1084,33 +1111,29 @@ export default function AdminPage() {
         {(selectedDeathDetail || selectedBirthDetail || selectedWaterDetail) && (
           <ApplicationDetailModal
             record={selectedDeathDetail || selectedBirthDetail || selectedWaterDetail}
-            serviceType={selectedDeathDetail ? 'death' : selectedBirthDetail ? 'birth' : 'water'}
+            serviceType={selectedDeathDetail ? 'death' : selectedBirthDetail ? 'birth' : 'water_connection'}
             onClose={() => {
               setSelectedDeathDetail(null)
               setSelectedBirthDetail(null)
               setSelectedWaterDetail(null)
             }}
-            onOpenRemark={(rec, status) => {
-              setSelectedDeathDetail(null)
-              setSelectedBirthDetail(null)
-              setSelectedWaterDetail(null)
+            onOpenRemark={(rec, status, targetServiceType) => {
+              const effectiveServiceType = targetServiceType || (selectedDeathDetail ? 'death' : selectedBirthDetail ? 'birth' : 'water_connection');
               setRemarkModal({
                 isOpen: true,
                 record: rec,
-                serviceType: selectedDeathDetail ? 'death' : selectedBirthDetail ? 'birth' : 'water_connection',
+                serviceType: effectiveServiceType,
                 targetStatus: status,
-                remarkText: status === 'Approved' ? 'सभी दस्तावेज सत्यापित। स्वीकृत।' : '',
+                remarkText: status === 'Approved' ? 'सभी दस्तावेज सत्यापित। स्वीकृत।' : status === 'Rejected' ? 'दस्तावेज अपूर्ण' : 'समीक्षा की जा रही है',
                 officerName: ADMIN_ACCOUNTS[currentAdminUser]?.name || 'Nagar Palika Officer'
               })
             }}
-            onOpenLetter={(rec) => {
-              setSelectedDeathDetail(null)
-              setSelectedBirthDetail(null)
-              setSelectedWaterDetail(null)
+            onOpenLetter={(rec, targetServiceType) => {
+              const effectiveServiceType = targetServiceType || (selectedDeathDetail ? 'death' : selectedBirthDetail ? 'birth' : 'water_connection');
               setLetterModal({
                 isOpen: true,
                 record: rec,
-                serviceType: selectedDeathDetail ? 'death' : selectedBirthDetail ? 'birth' : 'water_connection'
+                serviceType: effectiveServiceType
               })
             }}
           />
@@ -1126,7 +1149,8 @@ function ApplicationDetailModal({ record, serviceType, onClose, onOpenRemark, on
 
   const isDeath = serviceType === 'death'
   const isBirth = serviceType === 'birth'
-  const isWater = serviceType === 'water'
+  const isWater = serviceType === 'water' || serviceType === 'water_connection'
+  const currentServiceKey = isDeath ? 'death' : isBirth ? 'birth' : 'water_connection'
 
   const applicant = record.applicantDetails || {}
   const deceased = record.deceasedDetails || {}
@@ -1146,7 +1170,12 @@ function ApplicationDetailModal({ record, serviceType, onClose, onOpenRemark, on
               <span className="font-mono text-xs font-bold text-emerald-800 bg-emerald-100 px-2.5 py-0.5 rounded border border-emerald-300">
                 {record.applicationNo || 'DRAFT'}
               </span>
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold border uppercase tracking-wider bg-slate-100 text-slate-700 border-slate-200">
+              <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold border uppercase tracking-wider ${
+                record.status === 'Approved' || record.status === 'Completed' || record.status === 'Sanctioned' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' :
+                record.status === 'Rejected' ? 'bg-red-50 text-red-700 border-red-200' :
+                record.status === 'Under Review' ? 'bg-blue-50 text-blue-700 border-blue-200' :
+                'bg-slate-100 text-slate-700 border-slate-200'
+              }`}>
                 {record.status}
               </span>
             </div>
@@ -1248,7 +1277,7 @@ function ApplicationDetailModal({ record, serviceType, onClose, onOpenRemark, on
         {/* Footer Actions */}
         <div className="border-t border-slate-100 pt-4 mt-2 shrink-0 flex flex-wrap items-center justify-between gap-2">
           <button
-            onClick={() => { onClose(); onOpenLetter(record); }}
+            onClick={() => { onOpenLetter(record, currentServiceKey); }}
             className="btn btn-secondary btn-sm font-bold text-xs flex items-center gap-1"
           >
             <Printer className="w-3.5 h-3.5" /> पावती पत्र (Print Pawati)
@@ -1256,25 +1285,25 @@ function ApplicationDetailModal({ record, serviceType, onClose, onOpenRemark, on
 
           <div className="flex items-center gap-1.5 flex-wrap">
             <button
-              onClick={() => onOpenRemark(record, 'Under Review')}
+              onClick={() => onOpenRemark(record, 'Under Review', currentServiceKey)}
               className="btn btn-secondary btn-sm bg-blue-50 border-blue-200 text-blue-700 font-bold text-xs"
             >
               👁️ समीक्षा में डालें
             </button>
             <button
-              onClick={() => onOpenRemark(record, 'Approved')}
+              onClick={() => onOpenRemark(record, 'Approved', currentServiceKey)}
               className="btn btn-primary btn-sm bg-emerald-700 font-bold text-xs"
             >
               ✅ स्वीकृत करें
             </button>
             <button
-              onClick={() => onOpenRemark(record, 'Correction Requested')}
+              onClick={() => onOpenRemark(record, 'Correction Requested', currentServiceKey)}
               className="btn btn-secondary btn-sm bg-amber-50 border-amber-200 text-amber-700 font-bold text-xs"
             >
               ✏️ सुधार मांगे
             </button>
             <button
-              onClick={() => onOpenRemark(record, 'Rejected')}
+              onClick={() => onOpenRemark(record, 'Rejected', currentServiceKey)}
               className="btn btn-danger btn-sm font-bold text-xs"
             >
               ❌ निरस्त करें
