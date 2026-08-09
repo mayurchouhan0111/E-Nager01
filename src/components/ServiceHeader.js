@@ -136,7 +136,55 @@ export default function ServiceHeader() {
 
   return (
     <>
-      {/* Real-time System Maintenance Banner */}
+      {/* Real-Time Full Screen Maintenance Lockdown Shield (Active when isMaintenanceMode = true for citizens) */}
+      {maintStatus.isMaintenanceMode && pathname !== '/admin' && (
+        <div className="fixed inset-0 z-[99999] bg-slate-950 text-white flex flex-col items-center justify-center p-4 sm:p-8 font-sans overflow-hidden select-none animate-fade-in">
+          {/* Background Watermark */}
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-5">
+            <img src="/mp-logo.png" alt="" className="w-[500px] h-[500px] object-contain" />
+          </div>
+
+          <div className="max-w-xl w-full bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-10 shadow-2xl relative z-10 text-center space-y-6">
+            <div className="w-20 h-20 rounded-3xl bg-rose-600/20 border border-rose-500/30 flex items-center justify-center mx-auto text-rose-500 shadow-inner">
+              <ShieldAlert className="w-10 h-10 animate-pulse" />
+            </div>
+
+            <div className="space-y-2">
+              <span className="inline-flex items-center gap-1.5 bg-rose-500/20 text-rose-400 border border-rose-500/30 text-[10px] font-extrabold uppercase px-3.5 py-1 rounded-full tracking-widest">
+                <span className="w-2 h-2 rounded-full bg-rose-500 animate-ping" />
+                रूटीन सुरक्षा अद्यतन एवं रखरखाव मोड (Maintenance Lockdown Active)
+              </span>
+
+              <h1 className="text-xl sm:text-2xl font-extrabold text-white tracking-tight">
+                कार्यालय नगर पालिका परिषद झाबुआ (म.प्र.)
+              </h1>
+              <p className="text-xs text-slate-400 font-semibold">
+                ई-सेवा पोर्टल सुरक्षा जांच एवं रूटीन सिस्टम अद्यतन हेतु अस्थायी रूप से बंद है
+              </p>
+            </div>
+
+            <div className="bg-slate-950/90 border border-slate-800 rounded-2xl p-4 text-xs text-slate-300 space-y-2 text-left shadow-inner">
+              <div className="font-bold text-rose-400 flex items-center gap-2">
+                <span>⚠️ शासकीय सूचना (Official Alert):</span>
+              </div>
+              <p className="leading-relaxed">
+                {maintStatus.message || 'सुरक्षा एवं तकनीकी सिस्टम अद्यतन के कारण नागरिक ऑनलाइन सेवाएं अस्थायी रूप से स्थगित की गई हैं। असुविधा के लिए खेद है। सेवाएं अतिशीघ्र बहाल की जाएंगी।'}
+              </p>
+            </div>
+
+            <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3 border-t border-slate-800/80 text-xs">
+              <Link 
+                href="/admin" 
+                className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-bold transition-all flex items-center justify-center gap-2"
+              >
+                <span>🔑</span> अधिकारी लॉगिन (Officer Access -> /admin)
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Top Warning Banner for Officers / Quick Alert */}
       {maintStatus.isMaintenanceMode && (
         <div className="bg-rose-600 text-white px-4 py-2.5 text-xs font-bold shadow-md flex items-center justify-between gap-3 animate-pulse no-print border-b border-rose-700 z-[60] relative">
           <div className="max-w-7xl mx-auto flex items-center justify-center gap-2 text-center w-full">
