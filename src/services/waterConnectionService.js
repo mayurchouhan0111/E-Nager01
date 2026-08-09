@@ -319,12 +319,18 @@ export async function getWaterConnections(filterEmail = null, isOfficer = false)
 
     let items = Array.from(mergedMap.values());
 
-    // Filter for citizen personal applications if not an officer and targetEmail exists
-    if (!isOfficer && targetEmail) {
+    // Strict Citizen Isolation: If not officer, filter by current citizen email/uid. If not logged in, return []
+    if (!isOfficer) {
+      const activeEmail = filterEmail || citizen?.email;
+      const activeUid = citizen?.uid;
+
+      if (!activeEmail && !activeUid) {
+        return [];
+      }
+
       items = items.filter(item => 
-        item.userEmail === targetEmail || 
-        item.userUid === citizen?.uid || 
-        item.applicantDetails?.email === targetEmail
+        (activeEmail && (item.userEmail === activeEmail || item.applicantDetails?.email === activeEmail)) ||
+        (activeUid && item.userUid === activeUid)
       );
     }
 
@@ -334,11 +340,17 @@ export async function getWaterConnections(filterEmail = null, isOfficer = false)
   } catch (error) {
     console.warn('[WaterConnectionService] Firestore read fallback to local storage:', error.message);
     let items = localItems;
-    if (!isOfficer && targetEmail) {
+    if (!isOfficer) {
+      const activeEmail = filterEmail || citizen?.email;
+      const activeUid = citizen?.uid;
+
+      if (!activeEmail && !activeUid) {
+        return [];
+      }
+
       items = items.filter(item => 
-        item.userEmail === targetEmail || 
-        item.userUid === citizen?.uid || 
-        item.applicantDetails?.email === targetEmail
+        (activeEmail && (item.userEmail === activeEmail || item.applicantDetails?.email === activeEmail)) ||
+        (activeUid && item.userUid === activeUid)
       );
     }
     return items;

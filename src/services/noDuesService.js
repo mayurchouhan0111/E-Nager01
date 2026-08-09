@@ -185,7 +185,18 @@ export async function submitNoDuesCertificate(data, existingId = null) {
   };
 }
 
-export async function getNoDuesCertificates(isOfficer = false, targetEmail = null) {
+export async function getNoDuesCertificates(param1 = null, param2 = false) {
+  let filterEmail = null;
+  let isOfficer = false;
+
+  if (typeof param1 === 'boolean') {
+    isOfficer = param1;
+    filterEmail = param2;
+  } else {
+    filterEmail = param1;
+    isOfficer = Boolean(param2);
+  }
+
   const citizen = getCurrentCitizen();
   const localItems = getLocalNoDuesCertificates();
 
@@ -207,12 +218,17 @@ export async function getNoDuesCertificates(isOfficer = false, targetEmail = nul
 
     let items = Array.from(mergedMap.values());
 
-    if (!isOfficer && (targetEmail || citizen)) {
-      const searchEmail = targetEmail || citizen?.email;
-      const searchUid = citizen?.uid;
+    if (!isOfficer) {
+      const activeEmail = filterEmail || citizen?.email;
+      const activeUid = citizen?.uid;
+
+      if (!activeEmail && !activeUid) {
+        return [];
+      }
+
       items = items.filter(item => 
-        (searchEmail && (item.userEmail === searchEmail || item.applicantDetails?.email === searchEmail)) || 
-        (searchUid && item.userUid === searchUid)
+        (activeEmail && (item.userEmail === activeEmail || item.applicantDetails?.email === activeEmail)) || 
+        (activeUid && item.userUid === activeUid)
       );
     }
 
@@ -221,12 +237,17 @@ export async function getNoDuesCertificates(isOfficer = false, targetEmail = nul
     return items;
   } catch (error) {
     let items = localItems;
-    if (!isOfficer && (targetEmail || citizen)) {
-      const searchEmail = targetEmail || citizen?.email;
-      const searchUid = citizen?.uid;
+    if (!isOfficer) {
+      const activeEmail = targetEmail || citizen?.email;
+      const activeUid = citizen?.uid;
+
+      if (!activeEmail && !activeUid) {
+        return [];
+      }
+
       items = items.filter(item => 
-        (searchEmail && (item.userEmail === searchEmail || item.applicantDetails?.email === searchEmail)) || 
-        (searchUid && item.userUid === searchUid)
+        (activeEmail && (item.userEmail === activeEmail || item.applicantDetails?.email === activeEmail)) || 
+        (activeUid && item.userUid === activeUid)
       );
     }
     items.sort((a, b) => new Date(b.updatedAt || b.appliedAt || 0) - new Date(a.updatedAt || a.appliedAt || 0));
