@@ -119,7 +119,23 @@ export default function DeathCertificatePage() {
 
   useEffect(() => {
     loadApplications();
+    const handleFocus = () => loadApplications();
+    window.addEventListener('focus', handleFocus);
+    window.addEventListener('visibilitychange', handleFocus);
+    return () => {
+      window.removeEventListener('focus', handleFocus);
+      window.removeEventListener('visibilitychange', handleFocus);
+    };
   }, []);
+
+  useEffect(() => {
+    if (selectedApp) {
+      const updated = applications.find(a => a.id === selectedApp.id || (a.applicationNo && a.applicationNo === selectedApp.applicationNo));
+      if (updated && (updated.status !== selectedApp.status || updated.timeline?.length !== selectedApp.timeline?.length)) {
+        setSelectedApp(updated);
+      }
+    }
+  }, [applications, selectedApp]);
 
   const loadApplications = async () => {
     setLoading(true);
@@ -1346,9 +1362,18 @@ export default function DeathCertificatePage() {
                   <span className="text-xs font-mono font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded border border-emerald-200">{selectedApp.applicationNo}</span>
                   <h3 className="text-slate-900 font-extrabold text-lg mt-1">मृतक: स्व. {selectedApp.deceasedDetails?.fullName}</h3>
                 </div>
-                <button onClick={() => setSelectedApp(null)} className="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100">
-                  <X className="w-5 h-5" />
-                </button>
+                <div className="flex items-center gap-2">
+                  <button 
+                    onClick={() => loadApplications()} 
+                    className="px-2.5 py-1 rounded-xl bg-emerald-50 text-emerald-800 hover:bg-emerald-100 text-xs font-bold border border-emerald-200 flex items-center gap-1 transition-all"
+                    title="लाइव सर्वर स्थिति रीफ्रेश करें"
+                  >
+                    <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} /> ताज़ा करें
+                  </button>
+                  <button onClick={() => setSelectedApp(null)} className="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100">
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
               </div>
 
               {selectedApp.lastOfficerRemark && (

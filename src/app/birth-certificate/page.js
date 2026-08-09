@@ -113,7 +113,23 @@ export default function BirthCertificatePage() {
 
   useEffect(() => {
     loadApplications();
+    const handleFocus = () => loadApplications();
+    window.addEventListener('focus', handleFocus);
+    window.addEventListener('visibilitychange', handleFocus);
+    return () => {
+      window.removeEventListener('focus', handleFocus);
+      window.removeEventListener('visibilitychange', handleFocus);
+    };
   }, []);
+
+  useEffect(() => {
+    if (selectedApp) {
+      const updated = applications.find(a => a.id === selectedApp.id || (a.applicationNo && a.applicationNo === selectedApp.applicationNo));
+      if (updated && (updated.status !== selectedApp.status || updated.timeline?.length !== selectedApp.timeline?.length)) {
+        setSelectedApp(updated);
+      }
+    }
+  }, [applications, selectedApp]);
 
   const loadApplications = async () => {
     setLoading(true);
