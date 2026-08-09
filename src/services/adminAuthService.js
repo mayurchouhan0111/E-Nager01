@@ -16,6 +16,13 @@ export const DEFAULT_ADMIN_ACCOUNTS = {
     defaultTab: 'water-connections',
     allowedTabs: ['water-connections']
   },
+  nodues_admin: {
+    password: 'nodues@jhabua2024',
+    role: 'nodues_admin',
+    name: 'संपत्ति कर व नो ड्यूज अधिकारी (Revenue & No-Dues NOC Officer)',
+    defaultTab: 'no-dues-certificates',
+    allowedTabs: ['no-dues-certificates']
+  },
   super_admin: {
     password: 'jhabua@super2024',
     role: 'super_admin',

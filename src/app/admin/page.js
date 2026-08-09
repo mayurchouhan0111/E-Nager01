@@ -55,6 +55,7 @@ export default function AdminPage() {
   const [credEditState, setCredEditState] = useState({
     admin: { password: '', name: '' },
     water_admin: { password: '', name: '' },
+    nodues_admin: { password: '', name: '' },
     super_admin: { password: '', name: '' }
   })
 
@@ -64,6 +65,7 @@ export default function AdminPage() {
     setCredEditState({
       admin: { password: accs.admin?.password || '', name: accs.admin?.name || '' },
       water_admin: { password: accs.water_admin?.password || '', name: accs.water_admin?.name || '' },
+      nodues_admin: { password: accs.nodues_admin?.password || '', name: accs.nodues_admin?.name || '' },
       super_admin: { password: accs.super_admin?.password || '', name: accs.super_admin?.name || '' }
     })
   }, [])
@@ -538,6 +540,9 @@ export default function AdminPage() {
             </a>
             <a href="/water-connection" className="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-white transition flex items-center gap-1.5">
               <span>💧</span> जल
+            </a>
+            <a href="/no-dues-certificate" className="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-white transition flex items-center gap-1.5">
+              <span>🏢</span> नो ड्यूज NOC
             </a>
           </div>
 
@@ -1320,7 +1325,7 @@ export default function AdminPage() {
                 </button>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {/* 1. Birth & Death Registrar */}
                 <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 space-y-4 relative">
                   <div className="flex items-center gap-2">
@@ -1392,6 +1397,45 @@ export default function AdminPage() {
                     </div>
                     <button
                       onClick={() => handleUpdateCredentials('water_admin')}
+                      className="w-full btn btn-primary btn-sm text-xs font-bold flex items-center justify-center gap-1.5 mt-2"
+                    >
+                      <Save className="w-3.5 h-3.5" /> क्रेडेंशियल सहेजें
+                    </button>
+                  </div>
+                </div>
+
+                {/* 3. No Dues NOC Officer */}
+                <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 space-y-4 relative">
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-xs">3</div>
+                    <div>
+                      <h4 className="font-extrabold text-slate-900 text-sm">संपत्ति कर व नो ड्यूज अधिकारी</h4>
+                      <p className="text-[10px] text-slate-500 font-mono font-bold">यूजर: nodues_admin</p>
+                    </div>
+                  </div>
+
+                  <div className="space-y-3 text-xs">
+                    <div>
+                      <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">अधिकारी नाम (Display Name)</label>
+                      <input
+                        type="text"
+                        value={credEditState.nodues_admin?.name || ''}
+                        onChange={(e) => setCredEditState(prev => ({ ...prev, nodues_admin: { ...prev.nodues_admin, name: e.target.value } }))}
+                        className="w-full border border-slate-300 rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:border-emerald-600 bg-white"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">सुरक्षा पासवर्ड (Password)</label>
+                      <input
+                        type="text"
+                        value={credEditState.nodues_admin?.password || ''}
+                        onChange={(e) => setCredEditState(prev => ({ ...prev, nodues_admin: { ...prev.nodues_admin, password: e.target.value } }))}
+                        className="w-full border border-slate-300 rounded-xl px-3 py-2 text-xs font-mono font-bold focus:outline-none focus:border-emerald-600 bg-white"
+                        placeholder="nodues@jhabua2024"
+                      />
+                    </div>
+                    <button
+                      onClick={() => handleUpdateCredentials('nodues_admin')}
                       className="w-full btn btn-primary btn-sm text-xs font-bold flex items-center justify-center gap-1.5 mt-2"
                     >
                       <Save className="w-3.5 h-3.5" /> क्रेडेंशियल सहेजें
