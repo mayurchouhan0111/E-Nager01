@@ -300,7 +300,7 @@ export default function ServiceHeader() {
               </Link>
               <Link href="/no-dues-certificate" className={`px-2.5 py-1.5 rounded-xl text-xs font-bold transition-all duration-200 flex items-center gap-1.5 whitespace-nowrap icon-hover-bounce ${isCurrentTab('/no-dues-certificate') ? 'bg-emerald-800 text-white shadow-sm' : 'text-slate-600 hover:text-slate-900 hover:bg-white/80'}`}>
                 <Building2 className={`w-3.5 h-3.5 shrink-0 ${isCurrentTab('/no-dues-certificate') ? 'text-amber-300' : 'text-amber-600'}`} />
-                <span>नो ड्यूज NOC</span>
+                <span>नो ड्यूज</span>
               </Link>
             </nav>
 

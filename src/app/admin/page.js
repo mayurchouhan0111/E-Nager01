@@ -531,21 +531,21 @@ export default function AdminPage() {
             </div>
           </div>
 
-          <div className="hidden md:flex items-center space-x-2 bg-slate-100 p-1 rounded-xl border border-slate-200">
-            <a href="/" className="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-white transition flex items-center gap-1.5">
-              <span>📜</span> पोर्टल होम
+          <div className="hidden lg:flex items-center space-x-1.5 bg-slate-100/90 p-1.5 rounded-2xl border border-slate-200/80 shadow-sm">
+            <a href="/" className="px-2.5 py-1.5 rounded-xl text-xs font-bold text-slate-600 hover:text-slate-900 hover:bg-white transition flex items-center gap-1.5 whitespace-nowrap">
+              <span>📜</span> होम
             </a>
-            <a href="/death-certificate" className="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-white transition flex items-center gap-1.5">
+            <a href="/death-certificate" className="px-2.5 py-1.5 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 hover:bg-white transition flex items-center gap-1.5 whitespace-nowrap">
               <span>⚰️</span> मृत्यु
             </a>
-            <a href="/birth-certificate" className="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-white transition flex items-center gap-1.5">
+            <a href="/birth-certificate" className="px-2.5 py-1.5 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 hover:bg-white transition flex items-center gap-1.5 whitespace-nowrap">
               <span>👶</span> जन्म
             </a>
-            <a href="/water-connection" className="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-white transition flex items-center gap-1.5">
+            <a href="/water-connection" className="px-2.5 py-1.5 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 hover:bg-white transition flex items-center gap-1.5 whitespace-nowrap">
               <span>💧</span> जल
             </a>
-            <a href="/no-dues-certificate" className="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-white transition flex items-center gap-1.5">
-              <span>🏢</span> नो ड्यूज NOC
+            <a href="/no-dues-certificate" className="px-2.5 py-1.5 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 hover:bg-white transition flex items-center gap-1.5 whitespace-nowrap">
+              <span>🏢</span> नो ड्यूज
             </a>
           </div>
 
