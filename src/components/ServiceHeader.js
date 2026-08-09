@@ -268,17 +268,6 @@ export default function ServiceHeader() {
             </div>
           </div>
         </div>
-      )}ter gap-1 text-emerald-700"><Printer className="w-3.5 h-3.5" /> पावती</button>
-                      {(rec.status === 'Approved' || rec.status === 'Certificate Generated') && (
-                        <button onClick={() => { setSelectedRecord(rec); setModalType('certificate'); }} className="text-[11px] font-bold text-emerald-800">📜 प्रमाण पत्र</button>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
       )}
 
       {selectedRecord && modalType === 'letter' && (
