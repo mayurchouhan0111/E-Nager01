@@ -187,86 +187,112 @@ export default function NoDuesCertificatePage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-900 text-slate-100 font-sans">
+    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans antialiased">
       <ServiceHeader />
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
         
         {/* HERO BANNER */}
-        <div className="bg-gradient-to-br from-emerald-900 via-slate-900 to-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-10 shadow-2xl relative overflow-hidden">
-          <div className="relative z-10 max-w-3xl space-y-3">
-            <span className="bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 text-[11px] font-bold px-3 py-1 rounded-full uppercase tracking-widest inline-block">
-              मध्य प्रदेश शासन — नगर पालिका परिषद झाबुआ
-            </span>
-            <h1 className="text-2xl sm:text-4xl font-extrabold text-white tracking-tight">
-              नो ड्यूज प्रमाण पत्र (No Dues Certificate / Property Tax NOC)
+        <div className="relative bg-gradient-to-br from-emerald-900 via-emerald-800 to-teal-900 text-white rounded-3xl p-6 sm:p-8 shadow-xl overflow-hidden">
+          <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wMyI+PHBhdGggZD0iTTM2IDM0djItSDI0di0yaDEyek0zNiAyNHYySDI0di0yaDEyeiIvPjwvZz48L2c+PC9zdmc+')] opacity-30" />
+          <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-400/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3" />
+          <div className="relative z-10 space-y-2">
+            <div className="flex items-center gap-3">
+              <img 
+                src="/mp-logo.png" 
+                alt="मध्य प्रदेश शासन" 
+                className="w-14 h-14 object-contain drop-shadow shrink-0" 
+              />
+              <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold bg-white/10 text-emerald-200 border border-white/15 backdrop-blur-md">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                मध्य प्रदेश शासन — नगर पालिका परिषद झाबुआ
+              </span>
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
+              नो ड्यूज प्रमाण पत्र (Property Tax NOC) ऑनलाइन आवेदन
             </h1>
-            <p className="text-slate-300 text-xs sm:text-sm leading-relaxed">
+            <p className="text-slate-200 text-xs sm:text-sm max-w-3xl leading-relaxed">
               ई-नगरपालिका पोर्टल संपत्ति कर नो ड्यूज ऑनलाइन आवेदन करें, वर्तमान वित्तीय वर्ष कर भुगतान रसीद अपलोड करें एवं 1 से 3 दिनों में भौतिक सत्यापन उपरांत हस्ताक्षरित प्रमाण पत्र प्राप्त करें।
             </p>
-          </div>
-          <div className="absolute right-4 bottom-0 opacity-10 pointer-events-none">
-            <Building2 className="w-64 h-64 text-emerald-400" />
           </div>
         </div>
 
         {/* TOP CONTACT CARDS */}
-        <div className="bg-white/5 border border-white/10 rounded-2xl p-4 backdrop-blur-md">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div className="flex items-center gap-3 text-xs">
-              <div className="p-2 bg-emerald-500/20 rounded-xl text-emerald-400">
-                <Phone className="w-5 h-5" />
-              </div>
+        <div className="bg-white border border-emerald-200 rounded-3xl p-5 shadow-sm space-y-3">
+          <div className="flex items-center justify-between flex-wrap gap-2 border-b border-slate-100 pb-2.5">
+            <span className="text-xs sm:text-sm font-extrabold text-slate-900 flex items-center gap-2">
+              <span className="p-1 rounded-lg bg-emerald-100 text-emerald-800 text-xs">📞</span> संपत्ति कर नो ड्यूज विभागीय संपर्क सूत्र (Official Department Contact)
+            </span>
+            <span className="text-[10px] font-mono font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+              नगर पालिका परिषद झाबुआ (म.प्र.)
+            </span>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+            <div className="bg-slate-50/80 p-3.5 rounded-2xl border border-slate-200 flex items-center justify-between">
               <div>
-                <span className="font-bold text-white block">संपत्ति कर विभाग नोडल अधिकारी संपर्क:</span>
-                <span className="text-slate-400">राजस्व निरीक्षक / CMO Office (झाबुआ) — 9713175838</span>
+                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">संपत्ति कर विभाग नोडल अधिकारी</span>
+                <span className="font-extrabold text-slate-900 text-sm">राजस्व निरीक्षक / CMO Office</span>
               </div>
+              <a href="tel:9713175838" className="font-mono font-extrabold text-emerald-800 bg-emerald-100 hover:bg-emerald-200 px-3 py-1.5 rounded-xl border border-emerald-300 text-xs transition">
+                📞 9713175838
+              </a>
             </div>
-            <div className="text-xs text-emerald-400 font-bold bg-emerald-500/10 px-3 py-1.5 rounded-xl border border-emerald-500/20">
-              ⏱️ भौतिक रसीद जमा सीमा: न्यूनतम 1 दिन — अधिकतम 3 दिन
+            <div className="bg-slate-50/80 p-3.5 rounded-2xl border border-slate-200 flex items-center justify-between">
+              <div>
+                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">रसीद सत्यापन समय सीमा</span>
+                <span className="font-extrabold text-slate-900 text-sm">न्यूनतम 1 दिन — अधिकतम 3 दिन</span>
+              </div>
+              <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-3 py-1.5 rounded-xl border border-emerald-200">
+                ⏱️ 1-3 कार्यदिवस
+              </span>
             </div>
           </div>
         </div>
 
         {/* NAVIGATION TABS */}
-        <div className="flex items-center gap-2 border-b border-slate-800 pb-2 overflow-x-auto">
-          <button
-            onClick={() => setActiveTab('apply')}
-            className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 whitespace-nowrap ${
-              activeTab === 'apply' 
-                ? 'bg-emerald-700 text-white shadow-lg' 
-                : 'bg-slate-800/80 text-slate-400 hover:text-white'
-            }`}
-          >
-            <Plus className="w-4 h-4" /> नया नो ड्यूज आवेदन (New NOC Apply)
-          </button>
+        <div className="flex items-center justify-between flex-wrap gap-4 overflow-x-auto pb-1">
+          <div className="flex gap-1.5 bg-slate-100/90 p-1.5 rounded-2xl border border-slate-200/80 shadow-inner max-w-full overflow-x-auto">
+            <button
+              onClick={() => setActiveTab('apply')}
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-extrabold whitespace-nowrap transition-all duration-200 ${
+                activeTab === 'apply'
+                  ? 'bg-white text-emerald-950 shadow-sm border border-emerald-200/80 scale-[1.02]'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-white/50'
+              }`}
+            >
+              <FileText className="w-4 h-4 text-emerald-700" />
+              <span>नया नो ड्यूज आवेदन (New NOC Apply)</span>
+            </button>
 
-          <button
-            onClick={() => { setActiveTab('my-applications'); loadApplications(); }}
-            className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 whitespace-nowrap ${
-              activeTab === 'my-applications' 
-                ? 'bg-emerald-700 text-white shadow-lg' 
-                : 'bg-slate-800/80 text-slate-400 hover:text-white'
-            }`}
-          >
-            <Activity className="w-4 h-4" /> मेरे आवेदन एवं स्थिति ({applications.length})
-          </button>
+            <button
+              onClick={() => { setActiveTab('my-applications'); loadApplications(); }}
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-extrabold whitespace-nowrap transition-all duration-200 ${
+                activeTab === 'my-applications'
+                  ? 'bg-white text-emerald-950 shadow-sm border border-emerald-200/80 scale-[1.02]'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-white/50'
+              }`}
+            >
+              <Activity className="w-4 h-4 text-emerald-700" />
+              <span>मेरे आवेदन एवं स्थिति ({applications.length})</span>
+            </button>
 
-          <button
-            onClick={() => setActiveTab('checklist')}
-            className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 whitespace-nowrap ${
-              activeTab === 'checklist' 
-                ? 'bg-emerald-700 text-white shadow-lg' 
-                : 'bg-slate-800/80 text-slate-400 hover:text-white'
-            }`}
-          >
-            <CheckSquare className="w-4 h-4" /> नियम व चेकलिस्ट (Checklist)
-          </button>
+            <button
+              onClick={() => setActiveTab('checklist')}
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-extrabold whitespace-nowrap transition-all duration-200 ${
+                activeTab === 'checklist'
+                  ? 'bg-white text-emerald-950 shadow-sm border border-emerald-200/80 scale-[1.02]'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-white/50'
+              }`}
+            >
+              <CheckSquare className="w-4 h-4 text-emerald-700" />
+              <span>नियम व चेकलिस्ट (Checklist)</span>
+            </button>
+          </div>
         </div>
 
         {/* TAB 1: APPLICATION FORM */}
         {activeTab === 'apply' && (
-          <div className="bg-slate-50 text-slate-900 rounded-3xl p-6 sm:p-8 shadow-xl border border-slate-200 space-y-6">
+          <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-sm space-y-6">
             
             {message && (
               <div className={`p-4 rounded-2xl border text-xs font-bold ${

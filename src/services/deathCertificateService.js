@@ -51,8 +51,12 @@ function syncLocalRecord(record) {
 }
 
 export async function saveDeathCertificateDraft(data, existingId = null) {
+  const citizen = getCurrentCitizen();
   const payload = {
     ...data,
+    userEmail: citizen?.email || data.userEmail || data.applicantDetails?.email || null,
+    userUid: citizen?.uid || data.userUid || null,
+    userDisplayName: citizen?.displayName || data.userDisplayName || null,
     status: 'Draft',
     updatedAt: new Date().toISOString()
   };
@@ -89,7 +93,9 @@ export async function saveDeathCertificateDraft(data, existingId = null) {
         serviceType: 'death_certificate',
         applicationId: docRef.id,
         applicationNo,
-        recipientId: 'all',
+        userEmail: payload.userEmail,
+        userUid: payload.userUid,
+        recipientId: payload.userEmail || 'citizen',
         event: 'DRAFT_SAVED',
         status: 'Draft',
         message: `📝 मृतक प्रमाण पत्र प्रारूप (${applicationNo}) सहेजा गया। (Death certificate draft saved.)`,
@@ -461,7 +467,9 @@ export async function updateDeathCertificateStatus({
     serviceType: 'death_certificate',
     applicationId: id,
     applicationNo: existing.applicationNo || '',
-    recipientId: existing.applicantDetails?.mobile || 'citizen',
+    userEmail: existing.userEmail || existing.applicantDetails?.email || '',
+    userUid: existing.userUid || '',
+    recipientId: existing.userEmail || existing.applicantDetails?.mobile || 'citizen',
     event: `STATUS_${newStatus.toUpperCase().replace(/\s+/g, '_')}`,
     status: newStatus,
     message: notificationMsg,

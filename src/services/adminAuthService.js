@@ -21,7 +21,7 @@ export const DEFAULT_ADMIN_ACCOUNTS = {
     role: 'super_admin',
     name: 'मुख्य नगर पालिका अधिकारी (Chief Municipal Officer - CMO)',
     defaultTab: 'death-certificates',
-    allowedTabs: ['death-certificates', 'birth-certificates', 'water-connections', 'audit', 'security-settings']
+    allowedTabs: ['death-certificates', 'birth-certificates', 'water-connections', 'no-dues-certificates', 'audit', 'security-settings']
   }
 };
 

@@ -1060,10 +1060,22 @@ export default function AdminPage() {
                         className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-slate-300 text-xs font-medium focus:outline-none focus:border-emerald-600 bg-white"
                       />
                     </div>
-                    <button onClick={loadNoDuesRecords} className="btn btn-secondary btn-sm flex items-center gap-1 font-bold text-xs">
-                      <RefreshCw className={`w-3.5 h-3.5 ${noDuesLoading ? 'animate-spin' : ''}`} /> रिफ्रेश
-                    </button>
-                  </div>
+                </div>
+
+                {/* Stats Cards */}
+                <div className="grid grid-cols-3 sm:grid-cols-5 gap-2 sm:gap-3">
+                  {[
+                    { label: 'कुल NOC', count: noDuesRecords.length, color: 'slate' },
+                    { label: 'जमा', count: noDuesRecords.filter(r => r.status === 'Submitted').length, color: 'blue' },
+                    { label: 'समीक्षा', count: noDuesRecords.filter(r => r.status === 'Under Review').length, color: 'amber' },
+                    { label: 'स्वीकृत', count: noDuesRecords.filter(r => r.status === 'Approved' || r.status === 'Certificate Generated' || r.status === 'Sanctioned' || r.status === 'Completed').length, color: 'emerald' },
+                    { label: 'अस्वीकृत', count: noDuesRecords.filter(r => r.status === 'Rejected').length, color: 'red' },
+                  ].map((stat) => (
+                    <div key={stat.label} className="bg-white border border-slate-200 rounded-xl sm:rounded-2xl p-3 sm:p-4 text-center shadow-sm">
+                      <div className={`text-xl sm:text-2xl font-extrabold text-${stat.color}-700`}>{stat.count}</div>
+                      <div className="text-[9px] sm:text-[10px] font-bold text-slate-500 uppercase tracking-wider mt-0.5 sm:mt-1">{stat.label}</div>
+                    </div>
+                  ))}
                 </div>
 
                 {noDuesLoading ? (
@@ -1665,14 +1677,15 @@ export default function AdminPage() {
         )}
 
         {/* ── APPLICATION DETAILS MODAL (विवरण) ────────────────────────── */}
-        {(selectedDeathDetail || selectedBirthDetail || selectedWaterDetail) && (
+        {(selectedDeathDetail || selectedBirthDetail || selectedWaterDetail || selectedNoDuesDetail) && (
           <ApplicationDetailModal
-            record={selectedDeathDetail || selectedBirthDetail || selectedWaterDetail}
-            serviceType={selectedDeathDetail ? 'death' : selectedBirthDetail ? 'birth' : 'water_connection'}
+            record={selectedDeathDetail || selectedBirthDetail || selectedWaterDetail || selectedNoDuesDetail}
+            serviceType={selectedDeathDetail ? 'death' : selectedBirthDetail ? 'birth' : selectedWaterDetail ? 'water_connection' : 'no_dues'}
             onClose={() => {
               setSelectedDeathDetail(null)
               setSelectedBirthDetail(null)
               setSelectedWaterDetail(null)
+              setSelectedNoDuesDetail(null)
             }}
             onOpenRemark={(rec, status, targetServiceType) => {
               const effectiveServiceType = targetServiceType || (selectedDeathDetail ? 'death' : selectedBirthDetail ? 'birth' : 'water_connection');
@@ -1686,7 +1699,7 @@ export default function AdminPage() {
               })
             }}
             onOpenLetter={(rec, targetServiceType) => {
-              const effectiveServiceType = targetServiceType || (selectedDeathDetail ? 'death' : selectedBirthDetail ? 'birth' : 'water_connection');
+              const effectiveServiceType = targetServiceType || (selectedDeathDetail ? 'death' : selectedBirthDetail ? 'birth' : selectedWaterDetail ? 'water_connection' : 'no_dues');
               setLetterModal({
                 isOpen: true,
                 record: rec,
@@ -1709,7 +1722,8 @@ function ApplicationDetailModal({ record, serviceType, onClose, onOpenRemark, on
   const isDeath = serviceType === 'death'
   const isBirth = serviceType === 'birth'
   const isWater = serviceType === 'water' || serviceType === 'water_connection'
-  const currentServiceKey = isDeath ? 'death' : isBirth ? 'birth' : 'water_connection'
+  const isNoDues = serviceType === 'no_dues'
+  const currentServiceKey = isDeath ? 'death' : isBirth ? 'birth' : isWater ? 'water_connection' : 'no_dues'
 
   const applicant = record.applicantDetails || {}
   const deceased = record.deceasedDetails || {}
@@ -1798,6 +1812,7 @@ function ApplicationDetailModal({ record, serviceType, onClose, onOpenRemark, on
               {isDeath && `मृत्यु प्रमाण पत्र विवरण: स्व. ${deceased.fullName || 'N/A'}`}
               {isBirth && `जन्म प्रमाण पत्र विवरण: शिशु ${child.fullName || 'अनाम'}`}
               {isWater && `जल कनेक्शन विवरण: ${applicant.fullName || 'N/A'}`}
+              {isNoDues && `नो ड्यूज NOC विवरण: ${applicant.fullName || 'N/A'}`}
             </h3>
           </div>
 
@@ -1811,7 +1826,7 @@ function ApplicationDetailModal({ record, serviceType, onClose, onOpenRemark, on
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-2">
               <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wider border-b border-slate-200 pb-1">
-                {isDeath ? 'मृतक विवरण' : isBirth ? 'शिशु एवं जन्म विवरण' : 'भवन एवं संपत्ति विवरण'}
+                {isDeath ? 'मृतक विवरण' : isBirth ? 'शिशु एवं जन्म विवरण' : isNoDues ? 'प्रॉपर्टी व कर भुगतान विवरण' : 'भवन एवं संपत्ति विवरण'}
               </h4>
               <div className="text-xs text-slate-800 space-y-1.5 font-medium">
                 {isDeath && (
@@ -1840,6 +1855,15 @@ function ApplicationDetailModal({ record, serviceType, onClose, onOpenRemark, on
                     <p><span className="text-slate-500">कनेक्शन प्रकार:</span> {property.connectionSize || '1/2 इंच'} | {property.usagePurpose}</p>
                     <p><span className="text-slate-500">भवन स्वामी:</span> {property.houseOwnerName || applicant.fullName}</p>
                     <p><span className="text-slate-500">लाइसेंस प्लम्बर:</span> {record.plumberDetails?.plumberName || '—'}</p>
+                  </>
+                )}
+                {isNoDues && (
+                  <>
+                    <p><span className="text-slate-500">प्रॉपर्टी आईडी:</span> {property.propertyId || '—'}</p>
+                    <p><span className="text-slate-500">वार्ड / ज़ोन:</span> Ward #{property.wardNo || '6'}, Zone #{property.zoneNo || '1'}</p>
+                    <p><span className="text-slate-500">TRI रिफरेंस:</span> {tax.triRefNo || '—'}</p>
+                    <p><span className="text-slate-500">वित्तीय वर्ष:</span> {tax.financialYear || '2026-27'}</p>
+                    <p><span className="text-slate-500">जमा कर राशि:</span> ₹{tax.amountPaid || '0'}</p>
                   </>
                 )}
               </div>

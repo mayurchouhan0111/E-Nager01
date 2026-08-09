@@ -85,6 +85,9 @@ export default function NoDuesCertificateTemplate({ record }) {
           <p className="font-medium">
             आवेदक की मांग एवं SAF अनुसार यह नो ड्यूज प्रमाण पत्र जारी किया जाता है ।
           </p>
+          <p className="font-medium">
+            Applicant Email: {applicant.email || 'N/A'}
+          </p>
 
           <p className="font-medium italic text-slate-700">
             उक्त प्रमाण पत्र स्वामित्व संबंधी अधिकार को सिद्ध नही करता ।

@@ -51,8 +51,12 @@ function syncLocalRecord(record) {
 }
 
 export async function saveWaterConnectionDraft(data, existingId = null) {
+  const citizen = getCurrentCitizen();
   const payload = {
     ...data,
+    userEmail: citizen?.email || data.userEmail || data.applicantDetails?.email || null,
+    userUid: citizen?.uid || data.userUid || null,
+    userDisplayName: citizen?.displayName || data.userDisplayName || null,
     status: 'Draft',
     updatedAt: new Date().toISOString()
   };
@@ -89,7 +93,9 @@ export async function saveWaterConnectionDraft(data, existingId = null) {
         serviceType: 'water_connection',
         applicationId: docRef.id,
         applicationNo,
-        recipientId: 'all',
+        userEmail: payload.userEmail,
+        userUid: payload.userUid,
+        recipientId: payload.userEmail || 'citizen',
         event: 'DRAFT_SAVED',
         status: 'Draft',
         message: `📝 जल कनेक्शन आवेदन प्रारूप (${applicationNo}) सहेजा गया। (Water connection draft saved.)`,
@@ -241,6 +247,7 @@ export async function submitWaterConnection(data, existingId = null) {
     serviceType: 'water_connection',
     applicationId: docId,
     applicationNo,
+    userEmail: processedData.userEmail,
     recipientId: 'all',
     event: isResubmission ? 'APPLICATION_RESUBMITTED' : 'APPLICATION_SUBMITTED',
     status: 'Submitted',
@@ -459,7 +466,9 @@ export async function updateWaterConnectionStatus({
     serviceType: 'water_connection',
     applicationId: id,
     applicationNo: existing.applicationNo || '',
-    recipientId: existing.applicantDetails?.mobile || 'citizen',
+    userEmail: existing.userEmail || existing.applicantDetails?.email || '',
+    userUid: existing.userUid || '',
+    recipientId: existing.userEmail || existing.applicantDetails?.mobile || 'citizen',
     event: `STATUS_${newStatus.toUpperCase().replace(/\s+/g, '_')}`,
     status: newStatus,
     message: notificationMsg,

@@ -51,8 +51,12 @@ function syncLocalRecord(record) {
 }
 
 export async function saveBirthCertificateDraft(data, existingId = null) {
+  const citizen = getCurrentCitizen();
   const payload = {
     ...data,
+    userEmail: citizen?.email || data.userEmail || data.applicantDetails?.email || null,
+    userUid: citizen?.uid || data.userUid || null,
+    userDisplayName: citizen?.displayName || data.userDisplayName || null,
     status: 'Draft',
     updatedAt: new Date().toISOString()
   };
@@ -89,7 +93,9 @@ export async function saveBirthCertificateDraft(data, existingId = null) {
         serviceType: 'birth_certificate',
         applicationId: docRef.id,
         applicationNo,
-        recipientId: 'all',
+        userEmail: payload.userEmail,
+        userUid: payload.userUid,
+        recipientId: payload.userEmail || 'citizen',
         event: 'DRAFT_SAVED',
         status: 'Draft',
         message: `📝 जन्म प्रमाण पत्र प्रारूप (${applicationNo}) सहेजा गया। (Birth certificate draft saved.)`,
@@ -241,6 +247,7 @@ export async function submitBirthCertificate(data, existingId = null) {
     serviceType: 'birth_certificate',
     applicationId: docId,
     applicationNo,
+    userEmail: processedData.userEmail,
     recipientId: 'all',
     event: isResubmission ? 'APPLICATION_RESUBMITTED' : 'APPLICATION_SUBMITTED',
     status: 'Submitted',
@@ -461,7 +468,9 @@ export async function updateBirthCertificateStatus({
     serviceType: 'birth_certificate',
     applicationId: id,
     applicationNo: existing.applicationNo || '',
-    recipientId: existing.applicantDetails?.mobile || 'citizen',
+    userEmail: existing.userEmail || existing.applicantDetails?.email || '',
+    userUid: existing.userUid || '',
+    recipientId: existing.userEmail || existing.applicantDetails?.mobile || 'citizen',
     event: `STATUS_${newStatus.toUpperCase().replace(/\s+/g, '_')}`,
     status: newStatus,
     message: notificationMsg,

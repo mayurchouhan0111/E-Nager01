@@ -51,8 +51,12 @@ function syncLocalRecord(record) {
 }
 
 export async function saveNoDuesDraft(data, existingId = null) {
+  const citizen = getCurrentCitizen();
   const payload = {
     ...data,
+    userEmail: citizen?.email || data.userEmail || data.applicantDetails?.email || null,
+    userUid: citizen?.uid || data.userUid || null,
+    userDisplayName: citizen?.displayName || data.userDisplayName || null,
     status: 'Draft',
     updatedAt: new Date().toISOString()
   };
@@ -88,6 +92,21 @@ export async function saveNoDuesDraft(data, existingId = null) {
       }));
       const resultObj = { id: docRef.id, ...newPayload };
       syncLocalRecord(resultObj);
+
+      await sendNotification({
+        serviceType: 'no_dues',
+        applicationId: docRef.id,
+        applicationNo: appNo,
+        userEmail: payload.userEmail,
+        userUid: payload.userUid,
+        recipientId: payload.userEmail || 'citizen',
+        event: 'DRAFT_SAVED',
+        status: 'Draft',
+        message: `📝 नो ड्यूज प्रमाण पत्र (NOC) प्रारूप (${appNo}) सहेजा गया।`,
+        officerRemark: '',
+        officerName: 'Citizen System'
+      });
+
       return { success: true, id: docRef.id, applicationNo: appNo };
     }
   } catch (error) {
@@ -101,6 +120,21 @@ export async function saveNoDuesDraft(data, existingId = null) {
       appliedAt: payload.appliedAt || new Date().toISOString()
     };
     syncLocalRecord(resultObj);
+
+    await sendNotification({
+      serviceType: 'no_dues',
+      applicationId: localId,
+      applicationNo: appNo,
+      userEmail: payload.userEmail,
+      userUid: payload.userUid,
+      recipientId: payload.userEmail || 'citizen',
+      event: 'DRAFT_SAVED',
+      status: 'Draft',
+      message: `📝 नो ड्यूज प्रमाण पत्र (NOC) प्रारूप (${appNo}) सहेजा गया।`,
+      officerRemark: '',
+      officerName: 'Citizen System'
+    });
+
     return { success: true, id: localId, applicationNo: appNo };
   }
 }
@@ -169,7 +203,7 @@ export async function submitNoDuesCertificate(data, existingId = null) {
       applicationNo: appNo,
       userEmail,
       userUid,
-      recipientId: data.applicantDetails?.mobile || 'citizen',
+      recipientId: userEmail || data.applicantDetails?.mobile || 'citizen',
       event: 'APPLICATION_SUBMITTED',
       status: 'Submitted',
       message: `आपका नो ड्यूज प्रमाण पत्र (NOC) आवेदन (${appNo}) सफलतापूर्वक जमा हो गया है। 1 से 3 दिनों में भौतिक रसीद जमा करें।`,
@@ -328,7 +362,7 @@ export async function updateNoDuesCertificateStatus({
       applicationNo: existing.applicationNo || '',
       userEmail: existing.userEmail || existing.applicantDetails?.email || '',
       userUid: existing.userUid || '',
-      recipientId: existing.applicantDetails?.mobile || 'citizen',
+      recipientId: existing.userEmail || existing.applicantDetails?.email || existing.applicantDetails?.mobile || 'citizen',
       event: `STATUS_${newStatus.toUpperCase().replace(/\s+/g, '_')}`,
       status: newStatus,
       message: `आपके नो ड्यूज प्रमाण पत्र (NOC) आवेदन (${existing.applicationNo || id}) की स्थिति बदलकर '${newStatus}' कर दी गई है।`,
