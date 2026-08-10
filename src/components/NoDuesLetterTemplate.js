@@ -89,16 +89,6 @@ export default function NoDuesLetterTemplate({ record }) {
           </p>
         </div>
 
-        {/* DOCUMENTS ATTACHMENT CHECKLIST */}
-        <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 text-xs space-y-2">
-          <h4 className="font-bold text-slate-950 uppercase border-b border-slate-300 pb-1">संलग्न दस्तावेज सूची (Attached Mandatory Documents):</h4>
-          <ul className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 font-medium text-slate-800">
-            <li className="flex items-center gap-1.5">✅ 1. अद्यतन संपत्ति कर भुगतान रसीद (Tax Receipt FY {financialYear})</li>
-            <li className="flex items-center gap-1.5">✅ 2. आवेदक आधार कार्ड (Applicant Aadhaar)</li>
-            <li className="flex items-center gap-1.5">✅ 3. संपत्ति स्व-आकलन पत्र (SAF Property Form)</li>
-            <li className="flex items-center gap-1.5">✅ 4. गूगल ऑथराइजेशन एवं आवेदक डिजिटल सत्यापन</li>
-          </ul>
-        </div>
 
         {/* FOOTER & APPLICANT SIGNATURE */}
         <div className="pt-6 flex justify-between items-end border-t border-slate-300">
