@@ -195,7 +195,7 @@ export default function NoDuesCertificatePage() {
       toast.success(`सफलतापूर्वक जमा! आवेदन क्र: ${res.applicationNo}`);
       setMessage({
         type: 'success',
-        text: `आपका नो ड्यूज प्रमाण पत्र (No Dues NOC) आवेदन सफलतापूर्वक जमा हो गया है! आवेदन क्रमांक: ${res.applicationNo}। भौतिक सत्यापन रसीद जमा करें।`
+        text: `आपका नो ड्यूज प्रमाण पत्र (No Dues NOC) आवेदन सफलतापूर्वक जमा हो गया है! आवेदन क्रमांक: ${res.applicationNo}। यह 100% डिजिटल सेवा है — कार्यालय में भौतिक प्रति (Hard Copy) जमा करना अनिवार्य नहीं है।`
       });
       setFormData(INITIAL_FORM);
       loadApplications();
@@ -249,7 +249,7 @@ export default function NoDuesCertificatePage() {
               नो ड्यूज प्रमाण पत्र (Property Tax NOC) ऑनलाइन आवेदन
             </h1>
             <p className="text-slate-200 text-xs sm:text-sm max-w-3xl leading-relaxed">
-              ई-सेवा पोर्टल संपत्ति कर नो ड्यूज ऑनलाइन आवेदन करें, वर्तमान वित्तीय वर्ष कर भुगतान रसीद अपलोड करें एवं 1 से 3 दिनों में भौतिक सत्यापन उपरांत हस्ताक्षरित प्रमाण पत्र प्राप्त करें।
+              ई-सेवा पोर्टल संपत्ति कर नो ड्यूज ऑनलाइन आवेदन करें, वर्तमान वित्तीय वर्ष कर भुगतान रसीद अपलोड करें एवं 1 से 3 दिनों में डिजिटल सत्यापन उपरांत हस्ताक्षरित प्रमाण पत्र प्राप्त करें। <strong className="text-emerald-300 font-extrabold">(नोट: नगर पालिका कार्यालय में भौतिक प्रति / Hard Copy जमा करना अनिवार्य नहीं है)।</strong>
             </p>
           </div>
         </div>
@@ -283,6 +283,11 @@ export default function NoDuesCertificatePage() {
                 ⏱️ 1-3 कार्यदिवस
               </span>
             </div>
+          </div>
+
+          <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-3 text-xs text-emerald-950 font-bold flex items-center gap-2">
+            <span className="text-base">⚡</span>
+            <span>100% ऑनलाइन/डिजिटल सेवा: नो ड्यूज (Property Tax NOC) हेतु नगर पालिका कार्यालय में भौतिक आवेदन (Hard Copy) जमा करना अनिवार्य नहीं है।</span>
           </div>
         </div>
 

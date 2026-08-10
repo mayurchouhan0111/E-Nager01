@@ -345,7 +345,7 @@ export default function DocumentChecklist({ defaultCategory = 'all', compact = f
             💡 महत्वपूर्ण निर्देश (Important Note):
           </p>
           <p className="text-[11px] text-amber-900 leading-relaxed">
-            ऑनलाइन फॉर्म भरने के पश्चात्, जनरेटेड <strong>भौतिक आवेदन पत्र (Hard Copy Letter)</strong> के साथ ऊपर सूचीबद्ध सभी मूल दस्तावेजों की स्व-प्रमाणित फोटोकॉपी संलग्न करके नगर पालिका कार्यालय में जमा करना अनिवार्य है। नीचे दिए गए टिक-बॉक्स पर क्लिक करके आप अपने पास उपलब्ध दस्तावेजों की जांच कर सकते हैं।
+            ऑनलाइन फॉर्म भरने के पश्चात्, जन्म/मृत्यु एवं जल कनेक्शन हेतु <strong>भौतिक आवेदन पत्र (Hard Copy Letter)</strong> कार्यालय में जमा करें। <strong className="text-emerald-800 underline">(विशेष नोट - नो ड्यूज NOC): नो ड्यूज प्रमाण पत्र सेवा 100% डिजिटल है, इसके लिए कार्यालय में भौतिक प्रति (Hard Copy) जमा करना अनिवार्य नहीं है।</strong>
           </p>
         </div>
       </div>

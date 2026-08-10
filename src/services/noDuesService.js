@@ -216,7 +216,7 @@ export async function submitNoDuesCertificate(data, existingId = null) {
       recipientId: userEmail || data.applicantDetails?.mobile || 'citizen',
       event: 'APPLICATION_SUBMITTED',
       status: 'Submitted',
-      message: `आपका नो ड्यूज प्रमाण पत्र (NOC) आवेदन (${appNo}) सफलतापूर्वक जमा हो गया है। 1 से 3 दिनों में भौतिक रसीद जमा करें।`,
+      message: `आपका नो ड्यूज प्रमाण पत्र (NOC) आवेदन (${appNo}) सफलतापूर्वक जमा हो गया है। यह 100% ऑनलाइन सेवा है — कार्यालय में भौतिक कॉपी (Hard Copy) जमा करना अनिवार्य नहीं है।`,
       officerRemark: 'आवेदन समीक्षा हेतु लंबित है।'
     });
   } catch (e) {}
