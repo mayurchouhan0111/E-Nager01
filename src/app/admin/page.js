@@ -1839,13 +1839,51 @@ export default function AdminPage() {
 
                 {/* Upload Official Signed Certificate / Sanction Order */}
                 {(remarkModal.targetStatus === 'Approved' || remarkModal.targetStatus === 'Certificate Generated' || remarkModal.targetStatus === 'Completed' || remarkModal.targetStatus === 'Sanctioned') && (
-                  <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-2">
+                  <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-3">
                     <label className="block text-[11px] font-extrabold text-slate-900 mb-1">
                       📤 आधिकारिक हस्ताक्षरित प्रमाण पत्र / स्वीकृति आदेश संलग्न करें (Upload Official Signed Certificate PDF/Image)
                     </label>
                     <p className="text-[10px] text-slate-500">
                       नगर पालिका द्वारा तैयार भौतिक हस्ताक्षरित PDF या स्कैन कॉपी संलग्न करें। यह फ़ाइल नागरिक अपने पोर्टल से सीधे डाउनलोड कर सकेगा।
                     </p>
+
+                    {/* Previously Uploaded Document Preview */}
+                    {(remarkModal.officialCertFile || remarkModal.record?.officialUploadedCertificate) && (
+                      <div className="bg-emerald-50/80 border border-emerald-200 rounded-2xl p-3 space-y-2">
+                        <div className="flex items-center justify-between">
+                          <span className="text-[11px] font-extrabold text-emerald-950 flex items-center gap-1.5">
+                            <span>📄</span> पूर्व में अपलोड अधिकारी हस्ताक्षरित दस्तावेज (Current Official Upload):
+                          </span>
+                          <a
+                            href={(remarkModal.officialCertFile || remarkModal.record?.officialUploadedCertificate)?.fileData}
+                            download={(remarkModal.officialCertFile || remarkModal.record?.officialUploadedCertificate)?.fileName || 'Official_Document.pdf'}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-[10px] font-bold text-emerald-800 underline hover:text-emerald-950 flex items-center gap-1 bg-white px-2 py-0.5 rounded border border-emerald-300"
+                          >
+                            <Eye className="w-3 h-3 text-emerald-700" /> देखें / डाउनलोड
+                          </a>
+                        </div>
+                        
+                        <div className="flex items-center gap-3">
+                          {((remarkModal.officialCertFile || remarkModal.record?.officialUploadedCertificate)?.fileType?.includes('image') || ((remarkModal.officialCertFile || remarkModal.record?.officialUploadedCertificate)?.fileData?.startsWith('data:image'))) ? (
+                            <div className="w-16 h-16 rounded-xl bg-white border border-emerald-300 overflow-hidden shrink-0 shadow-2xs">
+                              <img src={(remarkModal.officialCertFile || remarkModal.record?.officialUploadedCertificate)?.fileData} alt="Official Document" className="w-full h-full object-cover" />
+                            </div>
+                          ) : (
+                            <div className="w-16 h-16 rounded-xl bg-emerald-100 text-emerald-900 border border-emerald-300 flex items-center justify-center font-bold text-xs shrink-0">
+                              📄 PDF
+                            </div>
+                          )}
+                          <div className="min-w-0 text-xs">
+                            <p className="font-extrabold text-slate-900 truncate">{(remarkModal.officialCertFile || remarkModal.record?.officialUploadedCertificate)?.fileName || 'Official_Signed_Document.pdf'}</p>
+                            {(remarkModal.officialCertFile || remarkModal.record?.officialUploadedCertificate)?.uploadedBy && (
+                              <p className="text-[10px] text-slate-500 font-medium mt-0.5">अपलोडकर्ता: {(remarkModal.officialCertFile || remarkModal.record?.officialUploadedCertificate)?.uploadedBy}</p>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    )}
                     <input
                       type="file"
                       accept="application/pdf,image/*"
@@ -1952,29 +1990,54 @@ export default function AdminPage() {
                 </div>
               </div>
 
-              <div className="overflow-y-auto flex-1 pr-1 pt-3">
-                <DeathCertificateTemplate record={deathCertPreview} />
-              </div>
-            </div>
-          </div>
-        )}
+         const getNormalizedDocs = () => {
+    let list = [];
 
-        {/* Birth Certificate Preview Modal */}
-        {birthCertPreview && (
-          <div className="fixed inset-0 bg-slate-900/75 backdrop-blur-md z-[70] overflow-y-auto p-3 sm:p-6 flex items-start justify-center pt-4 sm:pt-8">
-            <div className="bg-white border border-slate-200 rounded-3xl max-w-4xl w-full p-4 sm:p-6 shadow-2xl flex flex-col max-h-[84vh] sm:max-h-[86vh]">
-              <div className="flex items-center justify-between border-b border-slate-100 pb-3 shrink-0">
-                <h3 className="text-slate-900 font-extrabold text-base flex items-center gap-2">
-                  📜 आधिकारिक जन्म प्रमाण पत्र पूर्वावलोकन (Birth Certificate Preview)
-                </h3>
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => window.print()}
-                    className="btn btn-primary btn-sm flex items-center gap-1 font-bold text-xs"
-                  >
-                    <Printer className="w-3.5 h-3.5" /> प्रिंट / PDF डाउनलोड
-                  </button>
-                  <button onClick={() => setBirthCertPreview(null)} className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors">
+    if (record.officialUploadedCertificate && record.officialUploadedCertificate.fileData) {
+      list.push({
+        key: 'officialUploadedCertificate',
+        title: '📜 अधिकारी द्वारा अपलोड हस्ताक्षरित प्रमाण पत्र / आदेश (Official Signed Document)',
+        fileName: record.officialUploadedCertificate.fileName || 'Official_Signed_Document.pdf',
+        fileType: record.officialUploadedCertificate.fileType || (record.officialUploadedCertificate.fileData?.startsWith('data:image') ? 'image/jpeg' : 'application/pdf'),
+        fileSize: record.officialUploadedCertificate.fileSize || '',
+        fileData: record.officialUploadedCertificate.fileData,
+        uploadedAt: record.officialUploadedCertificate.uploadedAt,
+        officialFileName: record.officialUploadedCertificate.fileName
+      });
+    }
+
+    const rawDocs = record.documents || record.uploadedDocs;
+    if (rawDocs) {
+      if (typeof rawDocs === 'object' && !Array.isArray(rawDocs)) {
+        const objDocs = Object.entries(rawDocs)
+          .filter(([_, val]) => val && typeof val === 'object' && (val.fileData || val.fileUrl || val.url))
+          .map(([key, val]) => ({
+            key,
+            title: val.title || docTitleMap[key] || val.fileName || key,
+            fileName: val.fileName || `${key}.jpg`,
+            fileType: val.fileType || (val.fileData?.includes('image') ? 'image/jpeg' : 'application/pdf'),
+            fileSize: val.fileSize || '',
+            fileData: val.fileData || val.fileUrl || val.url,
+            uploadedAt: val.uploadedAt
+          }));
+        list = [...list, ...objDocs];
+      } else if (Array.isArray(rawDocs)) {
+        const arrDocs = rawDocs
+          .filter(val => val && typeof val === 'object' && (val.fileData || val.fileUrl || val.url))
+          .map((val, idx) => ({
+            key: val.key || `doc_${idx}`,
+            title: val.title || docTitleMap[val.key] || val.fileName || val.name || `संलग्न दस्तावेज #${idx + 1}`,
+            fileName: val.fileName || val.name || `Document_${idx + 1}`,
+            fileType: val.fileType || val.type || 'image/jpeg',
+            fileSize: val.fileSize || val.size || '',
+            fileData: val.fileData || val.fileUrl || val.url,
+            uploadedAt: val.uploadedAt
+          }));
+        list = [...list, ...arrDocs];
+      }
+    }
+    return list;
+  };ame="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors">
                     <X className="w-5 h-5" />
                   </button>
                 </div>
@@ -2120,38 +2183,53 @@ function ApplicationDetailModal({ record, serviceType, onClose, onOpenRemark, on
   };
 
   const getNormalizedDocs = () => {
+    let list = [];
+
+    if (record.officialUploadedCertificate && record.officialUploadedCertificate.fileData) {
+      list.push({
+        key: 'officialUploadedCertificate',
+        title: '📜 अधिकारी द्वारा अपलोड हस्ताक्षरित प्रमाण पत्र / आदेश (Official Signed Document)',
+        fileName: record.officialUploadedCertificate.fileName || 'Official_Signed_Document.pdf',
+        fileType: record.officialUploadedCertificate.fileType || (record.officialUploadedCertificate.fileData?.startsWith('data:image') ? 'image/jpeg' : 'application/pdf'),
+        fileSize: record.officialUploadedCertificate.fileSize || '',
+        fileData: record.officialUploadedCertificate.fileData,
+        uploadedAt: record.officialUploadedCertificate.uploadedAt,
+        officialFileName: record.officialUploadedCertificate.fileName
+      });
+    }
+
     const rawDocs = record.documents || record.uploadedDocs;
-    if (!rawDocs) return [];
-
-    if (typeof rawDocs === 'object' && !Array.isArray(rawDocs)) {
-      return Object.entries(rawDocs)
-        .filter(([_, val]) => val && typeof val === 'object' && (val.fileData || val.fileUrl || val.url))
-        .map(([key, val]) => ({
-          key,
-          title: val.title || docTitleMap[key] || val.fileName || key,
-          fileName: val.fileName || `${key}.jpg`,
-          fileType: val.fileType || (val.fileData?.includes('image') ? 'image/jpeg' : 'application/pdf'),
-          fileSize: val.fileSize || '',
-          fileData: val.fileData || val.fileUrl || val.url,
-          uploadedAt: val.uploadedAt
-        }));
+    if (rawDocs) {
+      if (typeof rawDocs === 'object' && !Array.isArray(rawDocs)) {
+        const objDocs = Object.entries(rawDocs)
+          .filter(([_, val]) => val && typeof val === 'object' && (val.fileData || val.fileUrl || val.url))
+          .map(([key, val]) => ({
+            key,
+            title: val.title || docTitleMap[key] || val.fileName || key,
+            fileName: val.fileName || `${key}.jpg`,
+            fileType: val.fileType || (val.fileData?.includes('image') ? 'image/jpeg' : 'application/pdf'),
+            fileSize: val.fileSize || '',
+            fileData: val.fileData || val.fileUrl || val.url,
+            uploadedAt: val.uploadedAt
+          }));
+        list = [...list, ...objDocs];
+      } else if (Array.isArray(rawDocs)) {
+        const arrDocs = rawDocs
+          .filter(val => val && typeof val === 'object' && (val.fileData || val.fileUrl || val.url))
+          .map((val, idx) => ({
+            key: val.key || `doc_${idx}`,
+            title: val.title || docTitleMap[val.key] || val.fileName || val.name || `संलग्न दस्तावेज #${idx + 1}`,
+            fileName: val.fileName || val.name || `Document_${idx + 1}`,
+            fileType: val.fileType || val.type || 'image/jpeg',
+            fileSize: val.fileSize || val.size || '',
+            fileData: val.fileData || val.fileUrl || val.url,
+            uploadedAt: val.uploadedAt
+          }));
+        list = [...list, ...arrDocs];
+      }
     }
 
-    if (Array.isArray(rawDocs)) {
-      return rawDocs
-        .filter(val => val && typeof val === 'object' && (val.fileData || val.fileUrl || val.url))
-        .map((val, idx) => ({
-          key: val.key || `doc_${idx}`,
-          title: val.title || docTitleMap[val.key] || val.fileName || val.name || `संलग्न दस्तावेज #${idx + 1}`,
-          fileName: val.fileName || val.name || `Document_${idx + 1}`,
-          fileType: val.fileType || val.type || 'image/jpeg',
-          fileSize: val.fileSize || val.size || '',
-          fileData: val.fileData || val.fileUrl || val.url,
-          uploadedAt: val.uploadedAt
-        }));
-    }
-
-    return [];
+    return list;
   };
 
   const docEntries = getNormalizedDocs();
