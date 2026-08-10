@@ -1190,24 +1190,8 @@ export default function AdminPage() {
                             <h3 className="font-extrabold text-slate-900 text-sm sm:text-base">
                               {record.applicantDetails?.fullName} (पिता: {record.applicantDetails?.fatherHusbandName})
                             </h3>
-                            <p className="text-xs text-slate-600 font-medium flex items-center gap-2 flex-wrap">
-                              <span>संपत्ति आईडी: <strong className="text-slate-900 font-mono">{record.propertyDetails?.propertyId}</strong></span>
-                              <span>| टी.आर.आई. रिफरेंस: <strong className="text-slate-900 font-mono">{record.taxDetails?.triRefNo}</strong></span>
-                              <span>| जमा कर: <strong>₹{record.taxDetails?.amountPaid}</strong></span>
-                              {record.paymentStatus === 'Paid' || record.status === 'Approved' || record.status === 'Certificate Generated' || record.status === 'Sanctioned' || record.status === 'Completed' ? (
-                                <span className="text-[11px] font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 inline-flex items-center gap-1">
-                                  💳 शुल्क: ₹{record.paymentAmount || 1} सत्यापित (Paid)
-                                </span>
-                              ) : (
-                                <span className="text-[11px] font-bold text-amber-800 bg-amber-50 px-2 py-0.5 rounded border border-amber-200 inline-flex items-center gap-1">
-                                  ⏳ शुल्क: ₹{record.paymentAmount || 1} सत्यापन लंबित (Verification Pending)
-                                </span>
-                              )}
-                              {record.utrNumber && (
-                                <span className="text-[11px] font-mono font-bold text-slate-800 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
-                                  UTR: {record.utrNumber}
-                                </span>
-                              )}
+                            <p className="text-xs text-slate-600 font-medium">
+                              संपत्ति आईडी: <strong className="text-slate-900 font-mono">{record.propertyDetails?.propertyId}</strong> | टी.आर.आई. रिफरेंस: <strong className="text-slate-900 font-mono">{record.taxDetails?.triRefNo}</strong> | जमा कर: <strong>₹{record.taxDetails?.amountPaid}</strong>
                             </p>
                           </div>
 
@@ -2044,8 +2028,6 @@ function ApplicationDetailModal({ record, serviceType, onClose, onOpenRemark, on
                     <p><span className="text-slate-500">TRI रिफरेंस:</span> {tax.triRefNo || '—'}</p>
                     <p><span className="text-slate-500">वित्तीय वर्ष:</span> {tax.financialYear || '2026-27'}</p>
                     <p><span className="text-slate-500">जमा कर राशि:</span> ₹{tax.amountPaid || '0'}</p>
-                    <p><span className="text-slate-500">फॉर्म शुल्क:</span> <strong className={`font-bold ${record.paymentStatus === 'Paid' || record.status === 'Approved' ? 'text-emerald-700' : 'text-amber-700'}`}>₹{record.paymentAmount || 1} ({record.paymentStatus === 'Paid' || record.status === 'Approved' ? 'Paid / सत्यापित' : 'सत्यापन लंबित / Verification Pending'})</strong></p>
-                    <p><span className="text-slate-500">UPI Ref / UTR:</span> <strong className="font-mono text-slate-900 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">{record.utrNumber || '—'}</strong></p>
                   </>
                 )}
               </div>

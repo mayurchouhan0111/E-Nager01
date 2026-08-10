@@ -51,11 +51,6 @@ const INITIAL_FORM = {
     paymentDate: new Date().toISOString().split('T')[0],
     amountPaid: '7098.00'
   },
-  paymentDetails: {
-    amount: 1,
-    utrNumber: '',
-    isVerified: false
-  },
   documents: {
     taxReceipt: null,
     aadhaarCard: null,
@@ -156,7 +151,6 @@ export default function NoDuesCertificatePage() {
     const app = formData.applicantDetails;
     const prop = formData.propertyDetails;
     const tax = formData.taxDetails;
-    const pay = formData.paymentDetails;
 
     if (!app.fullName?.trim()) errors.push('आवेदक का नाम आवश्यक है');
     if (!app.fatherHusbandName?.trim()) errors.push('पिता/पति का नाम आवश्यक है');
@@ -167,10 +161,6 @@ export default function NoDuesCertificatePage() {
     
     if (!formData.documents.taxReceipt) {
       errors.push('अद्यतन संपत्ति कर भुगतान रसीद अपलोड करना अनिवार्य है (Current Tax Receipt Upload Mandatory)');
-    }
-
-    if (!isValidUtr(pay?.utrNumber)) {
-      errors.push('₹1 आवेदन शुल्क का 12 अंकों का वैध UPI UTR / Transaction Ref No. दर्ज करें');
     }
 
     return errors;
@@ -186,16 +176,7 @@ export default function NoDuesCertificatePage() {
       return;
     }
 
-    // Anti-duplicate UTR validation
     setLoading(true);
-    const utrUsed = await isUtrAlreadyUsed(formData.paymentDetails?.utrNumber);
-    if (utrUsed) {
-      setLoading(false);
-      toast.error('यह UTR / Transaction Reference Number पहले ही प्रयोग किया जा चुका है!');
-      setMessage({ type: 'error', text: 'यह UTR / Transaction Reference Number पहले ही प्रयोग किया जा चुका है!' });
-      return;
-    }
-
     let citizen = getCurrentCitizen();
     if (!citizen) {
       toast.loading('🔐 नागरिक डेटा ट्रैकिंग हेतु गूगल साइन-इन प्रारम्भ किया जा रहा है...', { id: 'g-auth' });
@@ -212,11 +193,7 @@ export default function NoDuesCertificatePage() {
 
     setMessage(null);
     const payloadToSubmit = {
-      ...formData,
-      paymentStatus: 'Payment Verification Pending',
-      paymentAmount: 1,
-      utrNumber: formData.paymentDetails?.utrNumber,
-      paymentVerifiedAt: null
+      ...formData
     };
     const res = await submitNoDuesCertificate(payloadToSubmit, formData.id);
     setLoading(false);
@@ -658,109 +635,6 @@ export default function NoDuesCertificatePage() {
                 </div>
               </div>
 
-              {/* SECTION 5: ₹1 FORM FEE PAYMENT & UPI QR CODE */}
-              <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-emerald-950 text-white rounded-2xl p-6 space-y-5 shadow-xl border border-emerald-500/30">
-                <div className="flex items-center justify-between border-b border-slate-700/80 pb-3 flex-wrap gap-2">
-                  <h3 className="font-extrabold text-sm text-emerald-300 uppercase tracking-wider flex items-center gap-2">
-                    <QrCode className="w-5 h-5 text-emerald-400" />
-                    <span>5. आवेदन शुल्क भुगतान (No Dues Form Processing Fee — ₹1) *</span>
-                  </h3>
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
-                    <Lock className="w-3.5 h-3.5 text-emerald-400" /> 0% Transaction Fee Secure UPI
-                  </span>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
-                  
-                  {/* QR CODE DISPLAY */}
-                  <div className="md:col-span-5 flex flex-col items-center bg-white text-slate-900 rounded-2xl p-4 shadow-lg border border-emerald-200 space-y-3">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 bg-slate-100 px-2.5 py-1 rounded-full">
-                      नगर पालिका परिषद झाबुआ — official upi qr
-                    </span>
-                    <img 
-                      src={generateQrImageUrl(generateUpiUri({ applicationNo: 'ND-2026-NOC' }))} 
-                      alt="₹1 UPI QR Code" 
-                      className="w-48 h-48 rounded-xl border border-slate-200 shadow-inner p-1 bg-white"
-                    />
-                    <div className="text-center space-y-1">
-                      <span className="text-xl font-black text-emerald-700 block">
-                        ₹1.00 <span className="text-xs text-slate-500 font-bold">(प्रसंस्करण शुल्क / Fee)</span>
-                      </span>
-                      <span className="text-[11px] font-mono font-bold text-slate-600 bg-slate-100 px-2 py-0.5 rounded border border-slate-200 block">
-                        UPI ID: 6263850508@pthdfc
-                      </span>
-                    </div>
-
-                    {/* MOBILE QUICK PAY DEEP LINKS */}
-                    <div className="w-full pt-1 space-y-1">
-                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block text-center">मोबाइल ऐप से डायरेक्ट पे करें:</span>
-                      <div className="grid grid-cols-3 gap-1 text-[11px] font-bold">
-                        <a 
-                          href={generateUpiUri({ applicationNo: 'ND-2026-NOC' })}
-                          className="bg-emerald-50 hover:bg-emerald-100 text-emerald-900 border border-emerald-200 py-1.5 px-2 rounded-xl text-center transition"
-                        >
-                          🟢 GPay / PhonePe
-                        </a>
-                        <a 
-                          href={generateUpiUri({ applicationNo: 'ND-2026-NOC' })}
-                          className="bg-blue-50 hover:bg-blue-100 text-blue-900 border border-blue-200 py-1.5 px-2 rounded-xl text-center transition"
-                        >
-                          🔵 Paytm
-                        </a>
-                        <a 
-                          href={generateUpiUri({ applicationNo: 'ND-2026-NOC' })}
-                          className="bg-orange-50 hover:bg-orange-100 text-orange-900 border border-orange-200 py-1.5 px-2 rounded-xl text-center transition"
-                        >
-                          🇮🇳 BHIM
-                        </a>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* UTR ENTRY & AUTO VERIFICATION INSTRUCTIONS */}
-                  <div className="md:col-span-7 space-y-4 text-xs">
-                    <div className="bg-slate-800/80 p-4 rounded-2xl border border-slate-700 space-y-2">
-                      <h4 className="font-extrabold text-emerald-400 text-xs flex items-center gap-1.5">
-                        <Info className="w-4 h-4" /> भुगतान सत्यापन निर्देश (Payment Instructions):
-                      </h4>
-                      <ol className="list-decimal list-inside space-y-1 text-slate-300 font-medium">
-                        <li>क्यूआर कोड स्कैन करके <strong>₹1.00</strong> का भुगतान संपन्न करें।</li>
-                        <li>भुगतान के उपरांत प्राप्त <strong>12-अंकों का UPI Transaction ID / UTR Number</strong> (जैसे: <code>423456789012</code>) यहाँ दर्ज करें।</li>
-                        <li>सिस्टम स्वतः UTR की प्रामाणिकता एवं डुप्लिकेट जाँच कर आवेदन जमा करेगा।</li>
-                      </ol>
-                    </div>
-
-                    {/* UTR INPUT FIELD */}
-                    <div className="space-y-1.5">
-                      <label className="block font-extrabold text-slate-200 text-xs">
-                        12-अंकों का UPI Transaction ID / UTR Number *
-                      </label>
-                      <div className="relative">
-                        <input
-                          type="text"
-                          required
-                          maxLength={12}
-                          value={formData.paymentDetails?.utrNumber || ''}
-                          onChange={e => handleInputChange('paymentDetails', 'utrNumber', e.target.value.replace(/\D/g, ''))}
-                          placeholder="उदा: 423456789012"
-                          className="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 font-mono font-bold text-sm text-emerald-400 placeholder:text-slate-600 focus:outline-none focus:border-emerald-500"
-                        />
-                        {formData.paymentDetails?.utrNumber?.length === 12 && (
-                          <span className="absolute right-3 top-3 text-emerald-400 font-extrabold text-xs flex items-center gap-1">
-                            <CheckCircle2 className="w-4 h-4 text-emerald-400" /> वैध (Valid UTR)
-                          </span>
-                        )}
-                      </div>
-                      <span className="text-[11px] text-slate-400 block">
-                        * GPay/PhonePe/Paytm की भुगतान रसीद पर 12 अंकों का "UPI Ref No" दर्ज करें।
-                      </span>
-                    </div>
-
-                  </div>
-
-                </div>
-              </div>
-
               {/* SUBMIT BUTTON */}
               <div className="flex justify-end gap-3 pt-4 border-t border-slate-200">
                 <button
@@ -812,22 +686,6 @@ export default function NoDuesCertificatePage() {
                         <p className="text-xs text-slate-500">
                           टी.आर.आई. रिफरेंस: {app.taxDetails?.triRefNo} | संपत्ति कर: ₹{app.taxDetails?.amountPaid}
                         </p>
-                        <div className="flex items-center gap-2 mt-1">
-                          {app.paymentStatus === 'Paid' || app.status === 'Approved' || app.status === 'Certificate Generated' || app.status === 'Sanctioned' || app.status === 'Completed' ? (
-                            <span className="text-[11px] font-bold text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded-md border border-emerald-200 inline-flex items-center gap-1">
-                              <CheckCircle2 className="w-3 h-3 text-emerald-600" /> ✅ ₹1 शुल्क सत्यापित (Paid)
-                            </span>
-                          ) : (
-                            <span className="text-[11px] font-bold text-amber-800 bg-amber-50 px-2.5 py-0.5 rounded-md border border-amber-200 inline-flex items-center gap-1">
-                              <AlertCircle className="w-3 h-3 text-amber-600 animate-pulse" /> ⏳ ₹1 शुल्क सत्यापन लंबित (Payment Verification Pending)
-                            </span>
-                          )}
-                          {app.utrNumber && (
-                            <span className="text-[11px] font-mono font-bold text-slate-700 bg-slate-100 px-2.5 py-0.5 rounded-md border border-slate-200">
-                              UTR: {app.utrNumber}
-                            </span>
-                          )}
-                        </div>
                       </div>
                       <span className={`px-3 py-1 rounded-full text-xs font-extrabold border ${getStatusChip(app.status)}`}>
                         {app.status}
