@@ -26,7 +26,7 @@ import NoDuesCertificateTemplate from '@/components/NoDuesCertificateTemplate'
 import NoDuesLetterTemplate from '@/components/NoDuesLetterTemplate'
 import ApplicationLetterTemplate from '@/components/ApplicationLetterTemplate'
 import ApplicationTimeline from '@/components/ApplicationTimeline'
-import { DEFAULT_ADMIN_ACCOUNTS, fetchAdminAccounts, updateAdminAccountCredential } from '@/services/adminAuthService'
+import { DEFAULT_ADMIN_ACCOUNTS, fetchAdminAccounts, updateAdminAccountCredential, ADMIN_USERNAME_ALIASES } from '@/services/adminAuthService'
 import { subscribeToMaintenance, toggleMaintenanceMode } from '@/services/maintenanceService'
 import {
   ShieldAlert, Search, Trash2, Download, Edit, Printer, Eye, Activity, FileText, CheckCircle2,
@@ -248,7 +248,10 @@ export default function AdminPage() {
 
   async function handleLogin(e) {
     e.preventDefault()
-    const cleanUser = username.trim().toLowerCase()
+    let cleanUser = username.trim().toLowerCase()
+    if (ADMIN_USERNAME_ALIASES && ADMIN_USERNAME_ALIASES[cleanUser]) {
+      cleanUser = ADMIN_USERNAME_ALIASES[cleanUser]
+    }
     const latestAccounts = await fetchAdminAccounts()
     setAdminAccounts(latestAccounts)
     const account = latestAccounts[cleanUser]

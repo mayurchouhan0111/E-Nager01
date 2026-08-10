@@ -1,6 +1,17 @@
 import { db, sanitizeFirestorePayload } from '../lib/firebase';
 import { doc, getDoc, setDoc, addDoc, collection, serverTimestamp } from 'firebase/firestore';
 
+export const ADMIN_USERNAME_ALIASES = {
+  'nodues': 'nodues_admin',
+  'noduesadmin': 'nodues_admin',
+  'revenue_admin': 'nodues_admin',
+  'revenue': 'nodues_admin',
+  'water': 'water_admin',
+  'wateradmin': 'water_admin',
+  'superadmin': 'super_admin',
+  'super': 'super_admin'
+};
+
 export const DEFAULT_ADMIN_ACCOUNTS = {
   admin: {
     password: 'jhabua@2024',
@@ -45,6 +56,13 @@ export async function fetchAdminAccounts() {
       const remoteAccounts = snap.data();
       // Merge remote accounts with default fallback structural fields
       const merged = { ...DEFAULT_ADMIN_ACCOUNTS };
+      let missingKeys = false;
+      Object.keys(DEFAULT_ADMIN_ACCOUNTS).forEach(key => {
+        if (!remoteAccounts[key]) {
+          missingKeys = true;
+        }
+      });
+
       Object.keys(remoteAccounts).forEach(key => {
         if (merged[key]) {
           const defaultTabs = DEFAULT_ADMIN_ACCOUNTS[key]?.allowedTabs || [];
@@ -59,6 +77,14 @@ export async function fetchAdminAccounts() {
           merged[key] = remoteAccounts[key];
         }
       });
+
+      // Sync missing default accounts (e.g. nodues_admin) into Firestore
+      if (missingKeys) {
+        try {
+          await setDoc(SETTINGS_DOC_REF, sanitizeFirestorePayload(merged), { merge: true });
+        } catch (e) {}
+      }
+
       return merged;
     } else {
       // Seed default accounts into Firestore

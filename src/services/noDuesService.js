@@ -397,6 +397,21 @@ export async function updateNoDuesCertificateStatus({
   syncLocalRecord(fullRecord);
 
   try {
+    await addDoc(collection(db, AUDIT_LOGS_COLLECTION), {
+      serviceType: 'no_dues',
+      applicationId: id,
+      applicationNo: existing.applicationNo || 'N/A',
+      user: officerName,
+      role: 'nodues_admin',
+      action: `STATUS_CHANGE_${newStatus.toUpperCase().replace(/\s+/g, '_')}`,
+      oldStatus: existing.status || 'Submitted',
+      newStatus,
+      remarks: remarks.trim(),
+      timestamp: now
+    });
+  } catch (e) {}
+
+  try {
     await sendNotification({
       serviceType: 'no_dues',
       applicationId: id,

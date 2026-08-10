@@ -2,6 +2,7 @@ import { Toaster } from 'react-hot-toast'
 import './globals.css'
 import AuthProvider from '@/components/AuthProvider'
 import Footer from '@/components/Footer'
+import MaintenanceGuard from '@/components/MaintenanceGuard'
 
 const baseUrl = 'https://jhabua-nagarpalika-aapke-dwar.netlify.app'
 
@@ -147,6 +148,7 @@ export default function RootLayout({ children }) {
               } 
             }} 
           />
+          <MaintenanceGuard />
           {children}
           <Footer />
         </AuthProvider>
