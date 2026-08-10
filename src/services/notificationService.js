@@ -8,6 +8,8 @@ import {
   serverTimestamp 
 } from 'firebase/firestore';
 
+import { cleanHindiText } from '../utils/textSanitizer';
+
 const NOTIFICATIONS_COLLECTION = 'notifications';
 
 function getLocalNotifications() {
@@ -150,12 +152,12 @@ export async function notifyDepartmentHeadOnNewSubmission({
     applicationNo,
     recipientId: 'officer',
     isOfficerNotification: true,
-    applicantName,
+    applicantName: cleanHindiText(applicantName),
     applicantMobile,
     applicantEmail,
     event: 'NEW_SUBMISSION',
     status: 'Submitted',
-    message: `🚨 नया आवेदन प्राप्त! [${serviceTitle}] — आवेदक: ${applicantName} (फोन: ${applicantMobile}) | आवेदन क्र: ${applicationNo}`,
+    message: `🚨 नया आवेदन प्राप्त! [${serviceTitle}] — आवेदक: ${cleanHindiText(applicantName)} (फोन: ${applicantMobile}) | आवेदन क्र: ${applicationNo}`,
     timestamp: new Date().toISOString()
   };
 

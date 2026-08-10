@@ -19,6 +19,8 @@ import {
   getNoDuesCertificates,
   updateNoDuesCertificateStatus
 } from '@/services/noDuesService'
+import { markNotificationAsRead } from '@/services/notificationService'
+import { cleanHindiText } from '@/utils/textSanitizer'
 import DeathCertificateTemplate from '@/components/DeathCertificateTemplate'
 import BirthCertificateTemplate from '@/components/BirthCertificateTemplate'
 import WaterConnectionTemplate from '@/components/WaterConnectionTemplate'
@@ -148,6 +150,32 @@ export default function AdminPage() {
       console.warn('Failed to load officer notifications:', e)
     }
   }, [])
+
+  const handleNotificationClick = async (notif) => {
+    setOfficerNotifications(prev =>
+      prev.map(n => n.id === notif.id ? { ...n, isRead: true } : n)
+    );
+    markNotificationAsRead(notif.id).catch(e => console.warn('Mark read error:', e));
+
+    if (notif.serviceType) {
+      if (notif.serviceType.includes('no_dues') || notif.serviceType.includes('no-dues')) {
+        setActiveTab('no-dues-certificates');
+      } else if (notif.serviceType.includes('birth')) {
+        setActiveTab('birth-certificates');
+      } else if (notif.serviceType.includes('death')) {
+        setActiveTab('death-certificates');
+      } else if (notif.serviceType.includes('water')) {
+        setActiveTab('water-connections');
+      }
+    }
+  };
+
+  const handleMarkAllNotificationsRead = async () => {
+    setOfficerNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
+    officerNotifications.forEach(n => {
+      if (!n.isRead) markNotificationAsRead(n.id).catch(() => {});
+    });
+  };
 
   // Remark Modal State
   const [remarkModal, setRemarkModal] = useState({
@@ -603,9 +631,9 @@ export default function AdminPage() {
                 >
                   <Bell className="w-4 h-4 text-amber-700 animate-pulse" />
                   <span className="text-[11px] font-bold hidden sm:inline">नोटिफिकेशन</span>
-                  {officerNotifications.length > 0 && (
+                  {officerNotifications.filter(n => !n.isRead).length > 0 && (
                     <span className="min-w-[18px] h-[18px] px-1 rounded-full bg-rose-600 text-white text-[10px] font-extrabold flex items-center justify-center">
-                      {officerNotifications.length}
+                      {officerNotifications.filter(n => !n.isRead).length}
                     </span>
                   )}
                 </button>
@@ -615,11 +643,21 @@ export default function AdminPage() {
                     <div className="px-4 py-3 bg-amber-50/80 border-b border-amber-100 flex items-center justify-between">
                       <div className="flex items-center gap-2">
                         <Bell className="w-4 h-4 text-amber-700" />
-                        <h3 className="text-xs font-extrabold text-slate-900">नये आवेदक फॉर्म नोटिफिकेशन (New Forms Alert)</h3>
+                        <h3 className="text-xs font-extrabold text-slate-900">नये आवेदक फॉर्म नोटिफिकेशन</h3>
                       </div>
-                      <button onClick={() => setShowOfficerNotifs(false)} className="p-1 text-slate-400 hover:text-slate-700">
-                        <X className="w-4 h-4" />
-                      </button>
+                      <div className="flex items-center gap-2">
+                        {officerNotifications.some(n => !n.isRead) && (
+                          <button 
+                            onClick={handleMarkAllNotificationsRead}
+                            className="text-[10px] text-amber-800 font-extrabold hover:underline bg-amber-100 px-2 py-0.5 rounded border border-amber-200"
+                          >
+                            सब पढ़े चिह्नित करें
+                          </button>
+                        )}
+                        <button onClick={() => setShowOfficerNotifs(false)} className="p-1 text-slate-400 hover:text-slate-700">
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
                     </div>
 
                     <div className="max-h-80 overflow-y-auto divide-y divide-slate-100">
@@ -627,21 +665,26 @@ export default function AdminPage() {
                         <div className="p-6 text-center text-xs text-slate-500 font-medium">कोई नया फॉर्म सबमिशन नोटिफिकेशन नहीं है</div>
                       ) : (
                         officerNotifications.map(n => (
-                          <div key={n.id} className="p-3.5 hover:bg-slate-50 transition-colors space-y-1">
+                          <div 
+                            key={n.id} 
+                            onClick={() => handleNotificationClick(n)}
+                            className={`p-3.5 hover:bg-amber-50/40 transition-colors cursor-pointer space-y-1 relative ${!n.isRead ? 'bg-amber-50/30 font-semibold' : 'opacity-75'}`}
+                          >
                             <div className="flex items-center justify-between text-[11px] font-bold">
-                              <span className="text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded font-mono">
+                              <span className="text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded font-mono flex items-center gap-1.5">
+                                {!n.isRead && <span className="w-2 h-2 rounded-full bg-rose-500 animate-pulse" />}
                                 {n.applicationNo || 'Form'}
                               </span>
                               <span className="text-slate-400 font-mono text-[10px]">
                                 {formatTimestamp(n.timestamp || n.createdAt)}
                               </span>
                             </div>
-                            <p className="text-xs font-semibold text-slate-800 leading-snug">
-                              {n.message}
+                            <p className="text-xs text-slate-800 leading-snug">
+                              {cleanHindiText(n.message)}
                             </p>
                             {n.applicantName && (
                               <div className="text-[10px] text-slate-500 font-medium flex items-center gap-2 pt-0.5 flex-wrap">
-                                <span>👤 आवेदक: <strong>{n.applicantName}</strong></span>
+                                <span>👤 आवेदक: <strong>{cleanHindiText(n.applicantName)}</strong></span>
                                 <span>📞 फोन: <strong>{n.applicantMobile}</strong></span>
                               </div>
                             )}
@@ -1235,7 +1278,7 @@ export default function AdminPage() {
                               </span>
                             </div>
                             <h3 className="font-extrabold text-slate-900 text-sm sm:text-base">
-                              {record.applicantDetails?.fullName} (पिता: {record.applicantDetails?.fatherHusbandName})
+                              {cleanHindiText(record.applicantDetails?.fullName)} {cleanHindiText(record.applicantDetails?.fatherHusbandName) ? `(पिता/पति: ${cleanHindiText(record.applicantDetails?.fatherHusbandName)})` : ''}
                             </h3>
                             <p className="text-xs text-slate-600 font-medium">
                               संपत्ति आईडी: <strong className="text-slate-900 font-mono">{record.propertyDetails?.propertyId}</strong> | टी.आर.आई. रिफरेंस: <strong className="text-slate-900 font-mono">{record.taxDetails?.triRefNo}</strong> | जमा कर: <strong>₹{record.taxDetails?.amountPaid}</strong>
