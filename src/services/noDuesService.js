@@ -179,6 +179,10 @@ export async function submitNoDuesCertificate(data, existingId = null) {
     userMobile,
     userDisplayName,
     status: 'Submitted',
+    paymentStatus: data.paymentStatus || 'Paid',
+    paymentAmount: data.paymentAmount || 100,
+    utrNumber: data.utrNumber || null,
+    paymentVerifiedAt: data.paymentVerifiedAt || now,
     appliedAt: data.appliedAt || now,
     updatedAt: now,
     timeline: [...existingTimeline, timelineEntry]
