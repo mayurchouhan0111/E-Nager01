@@ -311,8 +311,10 @@ function mergeRecords(existing, incoming) {
 
 export async function getBirthCertificates(filterEmail = null, isOfficer = false) {
   const citizen = getCurrentCitizen();
-  const targetEmail = isOfficer ? null : (filterEmail || citizen?.email);
   const localItems = getLocalBirthCertificates();
+
+  const cleanEmail = (str) => (str || '').toString().trim().toLowerCase();
+  const cleanMobile = (str) => (str || '').toString().replace(/[\s-]/g, '');
 
   try {
     const snap = await getDocs(collection(db, COLLECTION_NAME));
@@ -344,11 +346,10 @@ export async function getBirthCertificates(filterEmail = null, isOfficer = false
 
     let items = Array.from(mergedMap.values());
 
-    // Strict Citizen Isolation: If not officer, filter by current citizen email/uid/mobile or local items.
     if (!isOfficer) {
-      const activeEmail = filterEmail || citizen?.email;
+      const activeEmail = cleanEmail(filterEmail || citizen?.email);
       const activeUid = citizen?.uid;
-      const activeMobile = citizen?.mobile;
+      const activeMobile = cleanMobile(citizen?.mobile);
 
       if (!activeEmail && !activeUid && !activeMobile) {
         return localItems;
@@ -358,14 +359,14 @@ export async function getBirthCertificates(filterEmail = null, isOfficer = false
         const isLocal = localItems.some(loc => loc.id === item.id || (item.applicationNo && loc.applicationNo === item.applicationNo));
         if (isLocal) return true;
 
-        const itemEmail = item.userEmail || item.applicantDetails?.email;
+        const itemEmail = cleanEmail(item.userEmail || item.applicantDetails?.email);
         const itemUid = item.userUid;
-        const itemMobile = item.userMobile || item.applicantDetails?.mobile;
+        const itemMobile = cleanMobile(item.userMobile || item.applicantDetails?.mobile);
 
         return (
-          (activeEmail && itemEmail === activeEmail) ||
-          (activeUid && itemUid === activeUid) ||
-          (activeMobile && itemMobile === activeMobile)
+          (activeEmail && itemEmail && itemEmail === activeEmail) ||
+          (activeUid && itemUid && itemUid === activeUid) ||
+          (activeMobile && itemMobile && itemMobile === activeMobile)
         );
       });
     }
@@ -377,9 +378,9 @@ export async function getBirthCertificates(filterEmail = null, isOfficer = false
     console.warn('[BirthCertificateService] Firestore read fallback to local storage:', error.message);
     let items = localItems;
     if (!isOfficer) {
-      const activeEmail = filterEmail || citizen?.email;
+      const activeEmail = cleanEmail(filterEmail || citizen?.email);
       const activeUid = citizen?.uid;
-      const activeMobile = citizen?.mobile;
+      const activeMobile = cleanMobile(citizen?.mobile);
 
       if (!activeEmail && !activeUid && !activeMobile) {
         return localItems;
@@ -389,14 +390,14 @@ export async function getBirthCertificates(filterEmail = null, isOfficer = false
         const isLocal = localItems.some(loc => loc.id === item.id || (item.applicationNo && loc.applicationNo === item.applicationNo));
         if (isLocal) return true;
 
-        const itemEmail = item.userEmail || item.applicantDetails?.email;
+        const itemEmail = cleanEmail(item.userEmail || item.applicantDetails?.email);
         const itemUid = item.userUid;
-        const itemMobile = item.userMobile || item.applicantDetails?.mobile;
+        const itemMobile = cleanMobile(item.userMobile || item.applicantDetails?.mobile);
 
         return (
-          (activeEmail && itemEmail === activeEmail) ||
-          (activeUid && itemUid === activeUid) ||
-          (activeMobile && itemMobile === activeMobile)
+          (activeEmail && itemEmail && itemEmail === activeEmail) ||
+          (activeUid && itemUid && itemUid === activeUid) ||
+          (activeMobile && itemMobile && itemMobile === activeMobile)
         );
       });
     }

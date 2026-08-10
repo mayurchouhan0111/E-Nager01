@@ -120,11 +120,29 @@ export default function DeathCertificatePage() {
   });
 
   useEffect(() => {
-    loadApplications();
+    const unsubAuth = subscribeToCitizenAuth((user) => {
+      if (user) {
+        setFormData(prev => ({
+          ...prev,
+          applicantDetails: {
+            ...prev.applicantDetails,
+            fullName: prev.applicantDetails.fullName || user.displayName || '',
+            email: prev.applicantDetails.email || (user.email?.includes('@jhabuanagarpalika.local') ? '' : (user.email || '')),
+            mobile: prev.applicantDetails.mobile || user.mobile || ''
+          }
+        }));
+        loadApplications(user.email);
+      } else {
+        loadApplications();
+      }
+    });
+
     const handleFocus = () => loadApplications();
     window.addEventListener('focus', handleFocus);
     window.addEventListener('visibilitychange', handleFocus);
+
     return () => {
+      unsubAuth();
       window.removeEventListener('focus', handleFocus);
       window.removeEventListener('visibilitychange', handleFocus);
     };
@@ -139,9 +157,11 @@ export default function DeathCertificatePage() {
     }
   }, [applications, selectedApp]);
 
-  const loadApplications = async () => {
+  const loadApplications = async (overrideEmail = null) => {
     setLoading(true);
-    const data = await getDeathCertificates();
+    const citizen = getCurrentCitizen();
+    const target = overrideEmail || citizen?.email;
+    const data = await getDeathCertificates(target);
     setApplications(data);
     setLoading(false);
   };

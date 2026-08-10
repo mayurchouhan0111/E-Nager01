@@ -62,13 +62,32 @@ export default function NoDuesCertificatePage() {
   const [showLetterModal, setShowLetterModal] = useState(false);
 
   useEffect(() => {
-    loadApplications();
+    const unsubAuth = subscribeToCitizenAuth((user) => {
+      if (user) {
+        setFormData(prev => ({
+          ...prev,
+          applicantDetails: {
+            ...prev.applicantDetails,
+            fullName: prev.applicantDetails.fullName || user.displayName || '',
+            email: prev.applicantDetails.email || (user.email?.includes('@jhabuanagarpalika.local') ? '' : (user.email || '')),
+            mobile: prev.applicantDetails.mobile || user.mobile || ''
+          }
+        }));
+        loadApplications(user.email);
+      } else {
+        loadApplications();
+      }
+    });
+
+    return () => unsubAuth();
   }, []);
 
-  const loadApplications = async () => {
+  const loadApplications = async (overrideEmail = null) => {
     setLoading(true);
     try {
-      const data = await getNoDuesCertificates(false);
+      const citizen = getCurrentCitizen();
+      const target = overrideEmail || citizen?.email;
+      const data = await getNoDuesCertificates(target, false);
       setApplications(data);
     } catch (e) {
       console.warn('Error loading applications:', e);

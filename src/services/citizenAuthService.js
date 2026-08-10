@@ -3,6 +3,12 @@ import { GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from
 
 const googleProvider = new GoogleAuthProvider();
 
+function broadcastAuthChange(user) {
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new CustomEvent('enagar_citizen_auth_changed', { detail: user }));
+  }
+}
+
 export async function loginWithGoogle() {
   try {
     const result = await signInWithPopup(auth, googleProvider);
@@ -10,12 +16,14 @@ export async function loginWithGoogle() {
     const citizenData = {
       uid: user.uid,
       email: user.email,
+      mobile: user.phoneNumber || null,
       displayName: user.displayName || user.email?.split('@')[0] || 'नागरिक (Citizen)',
       photoURL: user.photoURL || null,
       loggedInAt: new Date().toISOString()
     };
     if (typeof window !== 'undefined') {
       localStorage.setItem('enagar_citizen_user', JSON.stringify(citizenData));
+      broadcastAuthChange(citizenData);
     }
     return { success: true, user: citizenData };
   } catch (error) {
@@ -31,12 +39,53 @@ export async function loginWithGoogle() {
   }
 }
 
+export function loginWithMobileOrEmail(identifier, fullName = '') {
+  if (typeof window === 'undefined') return { success: false };
+  if (!identifier || !identifier.trim()) {
+    return { success: false, error: 'कृपया ईमेल या 10 अंकों का मोबाइल नंबर दर्ज करें' };
+  }
+
+  const clean = identifier.trim().toLowerCase();
+  const isEmail = clean.includes('@');
+  const isMobile = /^[6-9]\d{9}$/.test(clean.replace(/[\s-]/g, ''));
+
+  let email = isEmail ? clean : null;
+  let mobile = isMobile ? clean.replace(/[\s-]/g, '') : null;
+
+  if (!email && !mobile) {
+    // If user provided a numeric string or generic string
+    if (/^\d{10}$/.test(clean)) {
+      mobile = clean;
+    } else {
+      email = clean;
+    }
+  }
+
+  const name = fullName.trim() || (email ? email.split('@')[0] : `नागरिक (${mobile})`);
+  const citizenData = {
+    uid: `citizen-${mobile || email || Date.now()}`,
+    email: email || (mobile ? `${mobile}@jhabuanagarpalika.local` : null),
+    mobile: mobile || null,
+    displayName: name,
+    photoURL: null,
+    loggedInAt: new Date().toISOString()
+  };
+
+  try {
+    localStorage.setItem('enagar_citizen_user', JSON.stringify(citizenData));
+    broadcastAuthChange(citizenData);
+  } catch (e) {}
+
+  return { success: true, user: citizenData };
+}
+
 export async function logoutCitizen() {
   try {
     await signOut(auth);
   } catch (error) {}
   if (typeof window !== 'undefined') {
     localStorage.removeItem('enagar_citizen_user');
+    broadcastAuthChange(null);
   }
   return { success: true };
 }
@@ -54,6 +103,7 @@ export function getCurrentCitizen() {
     return {
       uid: auth.currentUser.uid,
       email: auth.currentUser.email,
+      mobile: auth.currentUser.phoneNumber || null,
       displayName: auth.currentUser.displayName || auth.currentUser.email?.split('@')[0] || 'नागरिक',
       photoURL: auth.currentUser.photoURL
     };
@@ -79,6 +129,7 @@ export function createOrUpdateLocalCitizenProfile(details = {}) {
 
   try {
     localStorage.setItem('enagar_citizen_user', JSON.stringify(citizenData));
+    broadcastAuthChange(citizenData);
   } catch (e) {}
   return citizenData;
 }
@@ -86,11 +137,26 @@ export function createOrUpdateLocalCitizenProfile(details = {}) {
 export function subscribeToCitizenAuth(callback) {
   if (typeof window === 'undefined') return () => {};
   
-  return onAuthStateChanged(auth, (user) => {
+  const handleCustomEvent = (e) => {
+    callback(e.detail || null);
+  };
+
+  const handleStorageEvent = (e) => {
+    if (e.key === 'enagar_citizen_user') {
+      const stored = getCurrentCitizen();
+      callback(stored);
+    }
+  };
+
+  window.addEventListener('enagar_citizen_auth_changed', handleCustomEvent);
+  window.addEventListener('storage', handleStorageEvent);
+
+  const unsubFirebase = onAuthStateChanged(auth, (user) => {
     if (user && !user.isAnonymous) {
       const citizenData = {
         uid: user.uid,
         email: user.email,
+        mobile: user.phoneNumber || null,
         displayName: user.displayName || user.email?.split('@')[0] || 'नागरिक',
         photoURL: user.photoURL || null
       };
@@ -101,5 +167,12 @@ export function subscribeToCitizenAuth(callback) {
       callback(stored);
     }
   });
+
+  return () => {
+    window.removeEventListener('enagar_citizen_auth_changed', handleCustomEvent);
+    window.removeEventListener('storage', handleStorageEvent);
+    unsubFirebase();
+  };
 }
+
 

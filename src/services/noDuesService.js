@@ -253,6 +253,9 @@ export async function getNoDuesCertificates(param1 = null, param2 = false) {
   const citizen = getCurrentCitizen();
   const localItems = getLocalNoDuesCertificates();
 
+  const cleanEmail = (str) => (str || '').toString().trim().toLowerCase();
+  const cleanMobile = (str) => (str || '').toString().replace(/[\s-]/g, '');
+
   try {
     const colRef = collection(db, COLLECTION_NAME);
     const snap = await getDocs(colRef);
@@ -272,9 +275,9 @@ export async function getNoDuesCertificates(param1 = null, param2 = false) {
     let items = Array.from(mergedMap.values());
 
     if (!isOfficer) {
-      const activeEmail = filterEmail || citizen?.email;
+      const activeEmail = cleanEmail(filterEmail || citizen?.email);
       const activeUid = citizen?.uid;
-      const activeMobile = citizen?.mobile;
+      const activeMobile = cleanMobile(citizen?.mobile);
 
       if (!activeEmail && !activeUid && !activeMobile) {
         return localItems;
@@ -284,14 +287,14 @@ export async function getNoDuesCertificates(param1 = null, param2 = false) {
         const isLocal = localItems.some(loc => loc.id === item.id || (item.applicationNo && loc.applicationNo === item.applicationNo));
         if (isLocal) return true;
 
-        const itemEmail = item.userEmail || item.applicantDetails?.email;
+        const itemEmail = cleanEmail(item.userEmail || item.applicantDetails?.email);
         const itemUid = item.userUid;
-        const itemMobile = item.userMobile || item.applicantDetails?.mobile;
+        const itemMobile = cleanMobile(item.userMobile || item.applicantDetails?.mobile);
 
         return (
-          (activeEmail && itemEmail === activeEmail) ||
-          (activeUid && itemUid === activeUid) ||
-          (activeMobile && itemMobile === activeMobile)
+          (activeEmail && itemEmail && itemEmail === activeEmail) ||
+          (activeUid && itemUid && itemUid === activeUid) ||
+          (activeMobile && itemMobile && itemMobile === activeMobile)
         );
       });
     }
@@ -302,9 +305,9 @@ export async function getNoDuesCertificates(param1 = null, param2 = false) {
   } catch (error) {
     let items = localItems;
     if (!isOfficer) {
-      const activeEmail = filterEmail || citizen?.email;
+      const activeEmail = cleanEmail(filterEmail || citizen?.email);
       const activeUid = citizen?.uid;
-      const activeMobile = citizen?.mobile;
+      const activeMobile = cleanMobile(citizen?.mobile);
 
       if (!activeEmail && !activeUid && !activeMobile) {
         return localItems;
@@ -314,14 +317,14 @@ export async function getNoDuesCertificates(param1 = null, param2 = false) {
         const isLocal = localItems.some(loc => loc.id === item.id || (item.applicationNo && loc.applicationNo === item.applicationNo));
         if (isLocal) return true;
 
-        const itemEmail = item.userEmail || item.applicantDetails?.email;
+        const itemEmail = cleanEmail(item.userEmail || item.applicantDetails?.email);
         const itemUid = item.userUid;
-        const itemMobile = item.userMobile || item.applicantDetails?.mobile;
+        const itemMobile = cleanMobile(item.userMobile || item.applicantDetails?.mobile);
 
         return (
-          (activeEmail && itemEmail === activeEmail) ||
-          (activeUid && itemUid === activeUid) ||
-          (activeMobile && itemMobile === activeMobile)
+          (activeEmail && itemEmail && itemEmail === activeEmail) ||
+          (activeUid && itemUid && itemUid === activeUid) ||
+          (activeMobile && itemMobile && itemMobile === activeMobile)
         );
       });
     }
