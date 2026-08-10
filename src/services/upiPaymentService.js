@@ -87,12 +87,11 @@ export async function verifyAndSubmitPayment({
 
   const now = new Date().toISOString();
   const paymentPayload = {
-    paymentStatus: 'Paid',
+    paymentStatus: 'Payment Verification Pending',
     paymentAmount: FORM_FEE_AMOUNT,
     paymentMethod: 'Direct UPI QR',
     utrNumber: cleanUtr,
     status: 'Submitted',
-    paymentVerifiedAt: now,
     updatedAt: now
   };
 
@@ -114,6 +113,6 @@ export async function verifyAndSubmitPayment({
     applicationNo,
     utrNumber: cleanUtr,
     amount: FORM_FEE_AMOUNT,
-    message: '₹1 शुल्क भुगतान सफलतापूर्वक सत्यापित हो गया है! आपका नो ड्यूज आवेदन स्वीकृत एवं प्रस्तुत कर दिया गया है।'
+    message: '₹1 शुल्क भुगतान UTR दर्ज हो गया है! आपका आवेदन अधिकारी सत्यापन हेतु जमा कर दिया गया है।'
   };
 }

@@ -213,10 +213,10 @@ export default function NoDuesCertificatePage() {
     setMessage(null);
     const payloadToSubmit = {
       ...formData,
-      paymentStatus: 'Paid',
+      paymentStatus: 'Payment Verification Pending',
       paymentAmount: 1,
       utrNumber: formData.paymentDetails?.utrNumber,
-      paymentVerifiedAt: new Date().toISOString()
+      paymentVerifiedAt: null
     };
     const res = await submitNoDuesCertificate(payloadToSubmit, formData.id);
     setLoading(false);
@@ -813,9 +813,15 @@ export default function NoDuesCertificatePage() {
                           टी.आर.आई. रिफरेंस: {app.taxDetails?.triRefNo} | संपत्ति कर: ₹{app.taxDetails?.amountPaid}
                         </p>
                         <div className="flex items-center gap-2 mt-1">
-                          <span className="text-[11px] font-bold text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded-md border border-emerald-200 inline-flex items-center gap-1">
-                            <CheckCircle2 className="w-3 h-3 text-emerald-600" /> ₹1 फॉर्म शुल्क चुकता
-                          </span>
+                          {app.paymentStatus === 'Paid' || app.status === 'Approved' || app.status === 'Certificate Generated' || app.status === 'Sanctioned' || app.status === 'Completed' ? (
+                            <span className="text-[11px] font-bold text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded-md border border-emerald-200 inline-flex items-center gap-1">
+                              <CheckCircle2 className="w-3 h-3 text-emerald-600" /> ✅ ₹1 शुल्क सत्यापित (Paid)
+                            </span>
+                          ) : (
+                            <span className="text-[11px] font-bold text-amber-800 bg-amber-50 px-2.5 py-0.5 rounded-md border border-amber-200 inline-flex items-center gap-1">
+                              <AlertCircle className="w-3 h-3 text-amber-600 animate-pulse" /> ⏳ ₹1 शुल्क सत्यापन लंबित (Payment Verification Pending)
+                            </span>
+                          )}
                           {app.utrNumber && (
                             <span className="text-[11px] font-mono font-bold text-slate-700 bg-slate-100 px-2.5 py-0.5 rounded-md border border-slate-200">
                               UTR: {app.utrNumber}

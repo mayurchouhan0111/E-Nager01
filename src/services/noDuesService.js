@@ -179,10 +179,10 @@ export async function submitNoDuesCertificate(data, existingId = null) {
     userMobile,
     userDisplayName,
     status: 'Submitted',
-    paymentStatus: data.paymentStatus || 'Paid',
-    paymentAmount: data.paymentAmount || 100,
+    paymentStatus: data.paymentStatus || 'Payment Verification Pending',
+    paymentAmount: data.paymentAmount || 1,
     utrNumber: data.utrNumber || null,
-    paymentVerifiedAt: data.paymentVerifiedAt || now,
+    paymentVerifiedAt: data.paymentStatus === 'Paid' ? (data.paymentVerifiedAt || now) : null,
     appliedAt: data.appliedAt || now,
     updatedAt: now,
     timeline: [...existingTimeline, timelineEntry]
@@ -387,6 +387,8 @@ export async function updateNoDuesCertificateStatus({
   if (newStatus === 'Approved' || newStatus === 'Certificate Generated' || newStatus === 'Sanctioned' || newStatus === 'Completed') {
     updatePayload.approvedAt = existing.approvedAt || now;
     updatePayload.approvedBy = officerName;
+    updatePayload.paymentStatus = 'Paid';
+    updatePayload.paymentVerifiedAt = existing.paymentVerifiedAt || now;
     updatePayload.certificateNo = certificateNo || existing.certificateNo || `PT-NOC-0179-${Date.now().toString().slice(-5)}`;
   }
 
