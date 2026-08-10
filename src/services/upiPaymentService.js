@@ -4,7 +4,7 @@ import { collection, query, where, getDocs, updateDoc, doc } from 'firebase/fire
 const COLLECTION_NAME = 'noDuesCertificates';
 const DEFAULT_UPI_ID = '6263850508@pthdfc';
 const PAYEE_NAME = 'Nagar Palika Council Jhabua';
-const FORM_FEE_AMOUNT = 100;
+const FORM_FEE_AMOUNT = 1;
 
 /**
  * Generate a dynamic UPI URI string for QR code generation
@@ -114,6 +114,6 @@ export async function verifyAndSubmitPayment({
     applicationNo,
     utrNumber: cleanUtr,
     amount: FORM_FEE_AMOUNT,
-    message: '₹100 शुल्क भुगतान सफलतापूर्वक सत्यापित हो गया है! आपका नो ड्यूज आवेदन स्वीकृत एवं प्रस्तुत कर दिया गया है।'
+    message: '₹1 शुल्क भुगतान सफलतापूर्वक सत्यापित हो गया है! आपका नो ड्यूज आवेदन स्वीकृत एवं प्रस्तुत कर दिया गया है।'
   };
 }

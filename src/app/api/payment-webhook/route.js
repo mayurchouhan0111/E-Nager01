@@ -22,11 +22,11 @@ export async function POST(req) {
       return NextResponse.json({ success: false, error: 'Empty payload' }, { status: 400 });
     }
 
-    // Check if notification indicates a credit of 100 INR
-    const isCredit100 = notificationText.includes('100') || notificationText.includes('Rs 100') || notificationText.includes('INR 100');
+    // Check if notification indicates a credit of 1 INR
+    const isCredit1 = notificationText.includes('1') || notificationText.includes('Rs 1') || notificationText.includes('INR 1');
 
-    if (!isCredit100) {
-      return NextResponse.json({ success: false, message: 'Notification ignored: Not a ₹100 payment' });
+    if (!isCredit1) {
+      return NextResponse.json({ success: false, message: 'Notification ignored: Not a ₹1 payment' });
     }
 
     // Extract 12-digit UTR using regex
@@ -54,7 +54,7 @@ export async function POST(req) {
 
       await updateDoc(doc(db, 'noDuesCertificates', appDoc.id), sanitizeFirestorePayload({
         paymentStatus: 'Paid',
-        paymentAmount: 100,
+        paymentAmount: 1,
         utrNumber: utr || appDoc.data().utrNumber || 'AUTO_SMS_VERIFIED',
         status: 'Submitted', // Auto-accept form upon verified payment
         paymentMethod: 'Automated Notification Listener',
