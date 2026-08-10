@@ -470,53 +470,61 @@ export default function AdminPage() {
     }
   }
 
-  const filteredDeathRecords = deathRecords.filter(r => {
-    if (!deathSearch) return true
-    const search = deathSearch.toLowerCase()
-    return (
-      r.applicationNo?.toLowerCase().includes(search) ||
-      r.deceasedDetails?.fullName?.toLowerCase().includes(search) ||
-      r.applicantDetails?.fullName?.toLowerCase().includes(search) ||
-      r.status?.toLowerCase().includes(search)
-    )
-  })
+  const filteredDeathRecords = deathRecords
+    .filter(r => {
+      if (!deathSearch) return true
+      const search = deathSearch.toLowerCase()
+      return (
+        r.applicationNo?.toLowerCase().includes(search) ||
+        r.deceasedDetails?.fullName?.toLowerCase().includes(search) ||
+        r.applicantDetails?.fullName?.toLowerCase().includes(search) ||
+        r.status?.toLowerCase().includes(search)
+      )
+    })
+    .sort((a, b) => new Date(b.appliedAt || b.createdAt || 0) - new Date(a.appliedAt || a.createdAt || 0))
 
-  const filteredBirthRecords = birthRecords.filter(r => {
-    if (!birthSearch) return true
-    const search = birthSearch.toLowerCase()
-    return (
-      r.applicationNo?.toLowerCase().includes(search) ||
-      r.childDetails?.fullName?.toLowerCase().includes(search) ||
-      r.motherDetails?.fullName?.toLowerCase().includes(search) ||
-      r.fatherDetails?.fullName?.toLowerCase().includes(search) ||
-      r.applicantDetails?.fullName?.toLowerCase().includes(search) ||
-      r.status?.toLowerCase().includes(search)
-    )
-  })
+  const filteredBirthRecords = birthRecords
+    .filter(r => {
+      if (!birthSearch) return true
+      const search = birthSearch.toLowerCase()
+      return (
+        r.applicationNo?.toLowerCase().includes(search) ||
+        r.childDetails?.fullName?.toLowerCase().includes(search) ||
+        r.motherDetails?.fullName?.toLowerCase().includes(search) ||
+        r.fatherDetails?.fullName?.toLowerCase().includes(search) ||
+        r.applicantDetails?.fullName?.toLowerCase().includes(search) ||
+        r.status?.toLowerCase().includes(search)
+      )
+    })
+    .sort((a, b) => new Date(b.appliedAt || b.createdAt || 0) - new Date(a.appliedAt || a.createdAt || 0))
 
-  const filteredWaterRecords = waterRecords.filter(r => {
-    if (!waterSearch) return true
-    const search = waterSearch.toLowerCase()
-    return (
-      r.applicationNo?.toLowerCase().includes(search) ||
-      r.applicantDetails?.fullName?.toLowerCase().includes(search) ||
-      r.propertyDetails?.houseNo?.toLowerCase().includes(search) ||
-      r.applicantDetails?.wardNo?.toLowerCase().includes(search) ||
-      r.status?.toLowerCase().includes(search)
-    )
-  })
+  const filteredWaterRecords = waterRecords
+    .filter(r => {
+      if (!waterSearch) return true
+      const search = waterSearch.toLowerCase()
+      return (
+        r.applicationNo?.toLowerCase().includes(search) ||
+        r.applicantDetails?.fullName?.toLowerCase().includes(search) ||
+        r.propertyDetails?.houseNo?.toLowerCase().includes(search) ||
+        r.applicantDetails?.wardNo?.toLowerCase().includes(search) ||
+        r.status?.toLowerCase().includes(search)
+      )
+    })
+    .sort((a, b) => new Date(b.appliedAt || b.createdAt || 0) - new Date(a.appliedAt || a.createdAt || 0))
 
-  const filteredNoDuesRecords = noDuesRecords.filter(r => {
-    if (!noDuesSearch) return true
-    const search = noDuesSearch.toLowerCase()
-    return (
-      r.applicationNo?.toLowerCase().includes(search) ||
-      r.applicantDetails?.fullName?.toLowerCase().includes(search) ||
-      r.propertyDetails?.propertyId?.toLowerCase().includes(search) ||
-      r.applicantDetails?.wardNo?.toLowerCase().includes(search) ||
-      r.status?.toLowerCase().includes(search)
-    )
-  })
+  const filteredNoDuesRecords = noDuesRecords
+    .filter(r => {
+      if (!noDuesSearch) return true
+      const search = noDuesSearch.toLowerCase()
+      return (
+        r.applicationNo?.toLowerCase().includes(search) ||
+        r.applicantDetails?.fullName?.toLowerCase().includes(search) ||
+        r.propertyDetails?.propertyId?.toLowerCase().includes(search) ||
+        r.applicantDetails?.wardNo?.toLowerCase().includes(search) ||
+        r.status?.toLowerCase().includes(search)
+      )
+    })
+    .sort((a, b) => new Date(b.appliedAt || b.createdAt || 0) - new Date(a.appliedAt || a.createdAt || 0))
 
   const currentAccount = adminAccounts[currentAdminUser]
   const isSuperAdmin = currentAdminRole === 'super_admin' || currentAdminUser === 'super_admin'
@@ -784,6 +792,9 @@ export default function AdminPage() {
                               <span className="text-[11px] font-mono font-extrabold text-slate-900 bg-slate-100 border border-slate-300 px-2 py-0.5 rounded shadow-2xs">
                                 #{index + 1}
                               </span>
+                              <span className="text-[11px] font-mono font-bold text-slate-700 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
+                                📅 {formatDate(record.appliedAt || record.createdAt)}
+                              </span>
                               <span className="text-[11px] font-mono font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded border border-emerald-200">
                                 {record.applicationNo || 'DRAFT'}
                               </span>
@@ -920,6 +931,9 @@ export default function AdminPage() {
                             <div className="flex items-center gap-2 mb-1 flex-wrap">
                               <span className="text-[11px] font-mono font-extrabold text-slate-900 bg-slate-100 border border-slate-300 px-2 py-0.5 rounded shadow-2xs">
                                 #{index + 1}
+                              </span>
+                              <span className="text-[11px] font-mono font-bold text-slate-700 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
+                                📅 {formatDate(record.appliedAt || record.createdAt)}
                               </span>
                               <span className="text-[11px] font-mono font-bold text-blue-800 bg-blue-100 px-2 py-0.5 rounded border border-blue-200">
                                 {record.applicationNo || 'DRAFT'}
@@ -1058,6 +1072,9 @@ export default function AdminPage() {
                               <span className="text-[11px] font-mono font-extrabold text-slate-900 bg-slate-100 border border-slate-300 px-2 py-0.5 rounded shadow-2xs">
                                 #{index + 1}
                               </span>
+                              <span className="text-[11px] font-mono font-bold text-slate-700 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
+                                📅 {formatDate(record.appliedAt || record.createdAt)}
+                              </span>
                               <span className="text-[11px] font-mono font-bold text-teal-800 bg-teal-100 px-2 py-0.5 rounded border border-teal-200">
                                 {record.applicationNo || 'DRAFT'}
                               </span>
@@ -1185,11 +1202,17 @@ export default function AdminPage() {
                   </div>
                 ) : (
                   <div className="space-y-4">
-                    {filteredNoDuesRecords.map(record => (
+                    {filteredNoDuesRecords.map((record, index) => (
                       <div key={record.id} className="bg-white border border-slate-200 rounded-3xl p-5 sm:p-6 shadow-sm hover:shadow-md transition-shadow space-y-4">
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-3">
                           <div className="space-y-1">
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <span className="text-[11px] font-mono font-extrabold text-slate-900 bg-slate-100 border border-slate-300 px-2 py-0.5 rounded shadow-2xs">
+                                #{index + 1}
+                              </span>
+                              <span className="text-[11px] font-mono font-bold text-slate-700 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
+                                📅 {formatDate(record.appliedAt || record.createdAt)}
+                              </span>
                               <span className="font-mono text-xs font-extrabold text-emerald-900 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-full">
                                 {record.applicationNo}
                               </span>
