@@ -2,7 +2,7 @@ import { db, sanitizeFirestorePayload } from '../lib/firebase';
 import { collection, query, where, getDocs, updateDoc, doc } from 'firebase/firestore';
 
 const COLLECTION_NAME = 'noDuesCertificates';
-const DEFAULT_UPI_ID = '9713175838@ybl';
+const DEFAULT_UPI_ID = '6263850508@pthdfc';
 const PAYEE_NAME = 'Nagar Palika Council Jhabua';
 const FORM_FEE_AMOUNT = 100;
 

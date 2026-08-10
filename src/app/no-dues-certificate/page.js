@@ -687,7 +687,7 @@ export default function NoDuesCertificatePage() {
                         ₹100.00 <span className="text-xs text-slate-500 font-bold">(प्रसंस्करण शुल्क / Fee)</span>
                       </span>
                       <span className="text-[11px] font-mono font-bold text-slate-600 bg-slate-100 px-2 py-0.5 rounded border border-slate-200 block">
-                        UPI ID: 9713175838@ybl
+                        UPI ID: 6263850508@pthdfc
                       </span>
                     </div>
 
