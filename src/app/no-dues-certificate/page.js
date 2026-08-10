@@ -754,7 +754,7 @@ export default function NoDuesCertificatePage() {
           <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-md z-50 overflow-y-auto p-4 flex items-center justify-center pt-8">
             <div className="bg-white rounded-3xl max-w-4xl w-full p-6 shadow-2xl space-y-4 max-h-[85vh] flex flex-col">
               <div className="flex items-center justify-between border-b border-slate-200 pb-3 shrink-0">
-                <h3 className="font-extrabold text-slate-900 text-sm">📄 नो ड्यूज भौतिक आवेदन पत्र (Application Submission Letter)</h3>
+                <h3 className="font-extrabold text-slate-900 text-sm">📄 नो ड्यूज आवेदन पत्र (Application Submission Letter)</h3>
                 <div className="flex items-center gap-2">
                   <button onClick={() => window.print()} className="btn btn-primary btn-sm text-xs font-bold"><Printer className="w-3.5 h-3.5" /> प्रिंट / PDF</button>
                   <button onClick={() => { setShowLetterModal(false); setSelectedApp(null); }} className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100"><X className="w-5 h-5" /></button>

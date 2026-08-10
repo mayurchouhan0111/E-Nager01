@@ -1,5 +1,6 @@
 import React from 'react';
 import QRCodeGenerator from './QRCodeGenerator';
+import { cleanHindiText } from '../utils/textSanitizer';
 
 export default function NoDuesLetterTemplate({ record }) {
   if (!record) return null;
@@ -25,18 +26,19 @@ export default function NoDuesLetterTemplate({ record }) {
   const appNo = record.applicationNo || 'ND-DRAFT';
   const appliedDate = formatDateStr(record.appliedAt || record.createdAt || Date.now());
 
-  const applicantName = applicant.fullName || 'अनिल कुमार';
-  const fatherName = applicant.fatherHusbandName || 'बाबू लाल';
-  const propertyId = property.propertyId || property.propertyNo || '7001662737';
+  const applicantName = cleanHindiText(applicant.fullName) || 'अनिल कुमार';
+  const fatherName = cleanHindiText(applicant.fatherHusbandName) || 'बाबू लाल';
+  const propertyId = cleanHindiText(property.propertyId || property.propertyNo) || '7001662737';
   
-  const addressText = property.address || `11, चन्द्रशेखर आजाद मार्ग/TTOGB-Ward-${property.wardNo || '6'}, Ward-${property.wardNo || '6'}, Zone-${property.zoneNo || '1'}, झाबुआ, ${property.pincode || '457661'}`;
+  const rawAddress = property.address || `137, महावीर कॉलोनी जेल के पीछे चैतन्य मार्ग, Ward-${property.wardNo || '16'}, Zone-${property.zoneNo || '1'}, झाबुआ, ${property.pincode || '457661'}`;
+  const addressText = cleanHindiText(rawAddress);
   
-  const plotArea = property.plotArea || '900';
-  const builtupArea = property.builtupArea || '900.0';
+  const plotArea = property.plotArea || '600';
+  const builtupArea = property.builtupArea || '600.0';
   const financialYear = tax.financialYear || '2026-27';
-  const triRefNo = tax.triRefNo || 'PC-0179-03-6-1-00117';
+  const triRefNo = tax.triRefNo || 'PC-0179-03-16-1-00473';
   const paymentDate = formatDateStr(tax.paymentDate || record.createdAt || Date.now());
-  const amountPaid = tax.amountPaid ? parseFloat(tax.amountPaid).toFixed(2) : '7098.00';
+  const amountPaid = tax.amountPaid ? parseFloat(tax.amountPaid).toFixed(2) : '10913.00';
 
   return (
     <div className="print-page-a4 print-container bg-white text-slate-900 p-8 sm:p-12 max-w-4xl mx-auto border-2 border-slate-900 shadow-2xl relative font-serif text-xs sm:text-sm leading-relaxed print:p-6 print:max-h-none print:shadow-none">
@@ -99,7 +101,7 @@ export default function NoDuesLetterTemplate({ record }) {
                 size={75}
               />
             </div>
-            <span className="block text-[8px] font-mono text-slate-500">भौतिक सत्यापन क्यूआर कोड</span>
+            <span className="block text-[8px] font-mono text-slate-500">डिजिटल सत्यापन क्यूआर कोड</span>
           </div>
 
           <div className="text-right space-y-1 font-semibold text-slate-900">

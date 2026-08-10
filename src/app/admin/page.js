@@ -1702,7 +1702,7 @@ export default function AdminPage() {
             <div className="bg-white border border-slate-200 rounded-3xl max-w-4xl w-full p-4 sm:p-6 shadow-2xl flex flex-col max-h-[84vh] sm:max-h-[86vh]">
               <div className="flex items-center justify-between border-b border-slate-100 pb-3 shrink-0">
                 <h3 className="text-slate-900 font-extrabold text-base flex items-center gap-2">
-                  📄 भौतिक पावती पत्र (Official Physical Submission Letter)
+                  📄 ऑनलाइन आवेदन पत्र (Official Application Letter)
                 </h3>
                 <div className="flex items-center gap-2">
                   <button

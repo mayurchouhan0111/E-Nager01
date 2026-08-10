@@ -3,6 +3,8 @@
  * Designed for production real-time extraction from PDF and Image files (PNG, JPG, WEBP).
  */
 
+import { cleanHindiText } from './textSanitizer';
+
 // Sample dataset corresponding to the Jhabua Nagar Palika Property Tax Receipt
 export const JHABUA_SAMPLE_RECEIPT = {
   applicantDetails: {
@@ -260,6 +262,12 @@ export function parseReceiptText(text) {
   if (!result.applicantDetails.fatherHusbandName) result.applicantDetails.fatherHusbandName = JHABUA_SAMPLE_RECEIPT.applicantDetails.fatherHusbandName;
   if (!result.applicantDetails.mobile) result.applicantDetails.mobile = JHABUA_SAMPLE_RECEIPT.applicantDetails.mobile;
   if (!result.taxDetails.amountPaid) result.taxDetails.amountPaid = JHABUA_SAMPLE_RECEIPT.taxDetails.amountPaid;
+
+  // Sanitize broken legacy font characters and OCR text dumps
+  result.applicantDetails.fullName = cleanHindiText(result.applicantDetails.fullName);
+  result.applicantDetails.fatherHusbandName = cleanHindiText(result.applicantDetails.fatherHusbandName);
+  result.applicantDetails.address = cleanHindiText(result.applicantDetails.address);
+  result.propertyDetails.address = cleanHindiText(result.propertyDetails.address);
 
   result.metadata.fieldsExtractedCount = matchCount;
   result.metadata.confidence = matchCount >= 4 ? '100% (High Precision)' : '85% (Standard Match)';
