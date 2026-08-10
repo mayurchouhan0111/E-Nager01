@@ -306,21 +306,21 @@ export default function ServiceHeader() {
 
               {/* Google Citizen Auth Badge / Direct Google Sign In Button */}
               {citizenUser ? (
-                <div className="flex items-center gap-1.5 bg-emerald-50 p-1 pl-2 rounded-xl border border-emerald-200 shadow-inner">
+                <div className="flex items-center gap-1 bg-emerald-50 p-1 rounded-xl border border-emerald-200 shadow-sm">
                   {citizenUser.photoURL ? (
-                    <img src={citizenUser.photoURL} alt="" className="w-6 h-6 rounded-full border border-emerald-300 object-cover shrink-0" />
+                    <img src={citizenUser.photoURL} alt={citizenUser.displayName || 'Profile'} className="w-7 h-7 rounded-full border border-emerald-400 object-cover shrink-0" />
                   ) : (
-                    <div className="w-6 h-6 rounded-full bg-emerald-700 text-white font-extrabold text-[10px] flex items-center justify-center shrink-0">
+                    <div className="w-7 h-7 rounded-full bg-emerald-700 text-white font-extrabold text-xs flex items-center justify-center shrink-0 shadow-xs">
                       {citizenUser.displayName?.[0]?.toUpperCase() || 'C'}
                     </div>
                   )}
-                  <span className="text-[11px] font-bold text-emerald-950 truncate max-w-[80px] sm:max-w-[120px]">
+                  <span className="hidden md:inline text-[11px] font-bold text-emerald-950 truncate max-w-[120px] px-1">
                     {citizenUser.displayName}
                   </span>
                   <button
                     onClick={handleCitizenLogout}
                     title="नागरिक साइन आउट (Sign Out)"
-                    className="p-1 text-slate-400 hover:text-rose-600 rounded-lg hover:bg-slate-200 transition-colors"
+                    className="p-1 text-slate-400 hover:text-rose-600 rounded-lg hover:bg-slate-200/80 transition-colors shrink-0"
                   >
                     <LogOut className="w-3.5 h-3.5" />
                   </button>
