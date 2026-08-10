@@ -10,18 +10,11 @@ import {
   submitNoDuesCertificate, 
   getNoDuesCertificates 
 } from '../../services/noDuesService';
-import { 
-  generateUpiUri, 
-  generateQrImageUrl, 
-  isValidUtr, 
-  isUtrAlreadyUsed, 
-  verifyAndSubmitPayment 
-} from '../../services/upiPaymentService';
 import { getCurrentCitizen, loginWithGoogle, createOrUpdateLocalCitizenProfile } from '../../services/citizenAuthService';
 import toast from 'react-hot-toast';
 import { 
   FileText, Activity, CheckCircle2, AlertCircle, RefreshCw, Printer, X, History, Plus, 
-  Download, Building2, UploadCloud, Info, ShieldCheck, CheckSquare, Search, Phone, QrCode, CreditCard, Lock
+  Download, Building2, UploadCloud, Info, ShieldCheck, CheckSquare, Search, Phone
 } from 'lucide-react';
 
 const INITIAL_FORM = {
