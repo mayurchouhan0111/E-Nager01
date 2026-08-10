@@ -1990,54 +1990,29 @@ export default function AdminPage() {
                 </div>
               </div>
 
-         const getNormalizedDocs = () => {
-    let list = [];
+              <div className="overflow-y-auto flex-1 pr-1 pt-3">
+                <DeathCertificateTemplate record={deathCertPreview} />
+              </div>
+            </div>
+          </div>
+        )}
 
-    if (record.officialUploadedCertificate && record.officialUploadedCertificate.fileData) {
-      list.push({
-        key: 'officialUploadedCertificate',
-        title: '📜 अधिकारी द्वारा अपलोड हस्ताक्षरित प्रमाण पत्र / आदेश (Official Signed Document)',
-        fileName: record.officialUploadedCertificate.fileName || 'Official_Signed_Document.pdf',
-        fileType: record.officialUploadedCertificate.fileType || (record.officialUploadedCertificate.fileData?.startsWith('data:image') ? 'image/jpeg' : 'application/pdf'),
-        fileSize: record.officialUploadedCertificate.fileSize || '',
-        fileData: record.officialUploadedCertificate.fileData,
-        uploadedAt: record.officialUploadedCertificate.uploadedAt,
-        officialFileName: record.officialUploadedCertificate.fileName
-      });
-    }
-
-    const rawDocs = record.documents || record.uploadedDocs;
-    if (rawDocs) {
-      if (typeof rawDocs === 'object' && !Array.isArray(rawDocs)) {
-        const objDocs = Object.entries(rawDocs)
-          .filter(([_, val]) => val && typeof val === 'object' && (val.fileData || val.fileUrl || val.url))
-          .map(([key, val]) => ({
-            key,
-            title: val.title || docTitleMap[key] || val.fileName || key,
-            fileName: val.fileName || `${key}.jpg`,
-            fileType: val.fileType || (val.fileData?.includes('image') ? 'image/jpeg' : 'application/pdf'),
-            fileSize: val.fileSize || '',
-            fileData: val.fileData || val.fileUrl || val.url,
-            uploadedAt: val.uploadedAt
-          }));
-        list = [...list, ...objDocs];
-      } else if (Array.isArray(rawDocs)) {
-        const arrDocs = rawDocs
-          .filter(val => val && typeof val === 'object' && (val.fileData || val.fileUrl || val.url))
-          .map((val, idx) => ({
-            key: val.key || `doc_${idx}`,
-            title: val.title || docTitleMap[val.key] || val.fileName || val.name || `संलग्न दस्तावेज #${idx + 1}`,
-            fileName: val.fileName || val.name || `Document_${idx + 1}`,
-            fileType: val.fileType || val.type || 'image/jpeg',
-            fileSize: val.fileSize || val.size || '',
-            fileData: val.fileData || val.fileUrl || val.url,
-            uploadedAt: val.uploadedAt
-          }));
-        list = [...list, ...arrDocs];
-      }
-    }
-    return list;
-  };ame="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors">
+        {/* Birth Certificate Preview Modal */}
+        {birthCertPreview && (
+          <div className="fixed inset-0 bg-slate-900/75 backdrop-blur-md z-[70] overflow-y-auto p-3 sm:p-6 flex items-start justify-center pt-4 sm:pt-8">
+            <div className="bg-white border border-slate-200 rounded-3xl max-w-4xl w-full p-4 sm:p-6 shadow-2xl flex flex-col max-h-[84vh] sm:max-h-[86vh]">
+              <div className="flex items-center justify-between border-b border-slate-100 pb-3 shrink-0">
+                <h3 className="text-slate-900 font-extrabold text-base flex items-center gap-2">
+                  📜 आधिकारिक जन्म प्रमाण पत्र पूर्वावलोकन (Birth Certificate Preview)
+                </h3>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => window.print()}
+                    className="btn btn-primary btn-sm flex items-center gap-1 font-bold text-xs"
+                  >
+                    <Printer className="w-3.5 h-3.5" /> प्रिंट / PDF डाउनलोड
+                  </button>
+                  <button onClick={() => setBirthCertPreview(null)} className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors">
                     <X className="w-5 h-5" />
                   </button>
                 </div>
