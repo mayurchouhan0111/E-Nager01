@@ -12,7 +12,7 @@ import {
   submitDeathCertificate, 
   getDeathCertificates 
 } from '../../services/deathCertificateService';
-import { getCurrentCitizen, loginWithGoogle, createOrUpdateLocalCitizenProfile } from '../../services/citizenAuthService';
+import { getCurrentCitizen, loginWithGoogle, createOrUpdateLocalCitizenProfile, subscribeToCitizenAuth } from '../../services/citizenAuthService';
 import toast from 'react-hot-toast';
 import { validateDeathCertificateForm, navigateToFirstErrorField } from '../../utils/formValidationHelper';
 import { 

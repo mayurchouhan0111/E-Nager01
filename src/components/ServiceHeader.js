@@ -304,7 +304,7 @@ export default function ServiceHeader() {
                 )}
               </div>
 
-              {/* Citizen Auth Badge / Sign In Button */}
+              {/* Google Citizen Auth Badge / Direct Google Sign In Button */}
               {citizenUser ? (
                 <div className="flex items-center gap-1.5 bg-emerald-50 p-1 pl-2 rounded-xl border border-emerald-200 shadow-inner">
                   {citizenUser.photoURL ? (
@@ -318,15 +318,8 @@ export default function ServiceHeader() {
                     {citizenUser.displayName}
                   </span>
                   <button
-                    onClick={() => setShowAuthModal(true)}
-                    title="खाता विवरण / ईमेल बदलें"
-                    className="p-1 text-emerald-700 hover:text-emerald-900 rounded-lg hover:bg-emerald-100 transition-colors"
-                  >
-                    <User className="w-3.5 h-3.5" />
-                  </button>
-                  <button
                     onClick={handleCitizenLogout}
-                    title="नागरिक लॉग आउट (Sign Out)"
+                    title="नागरिक साइन आउट (Sign Out)"
                     className="p-1 text-slate-400 hover:text-rose-600 rounded-lg hover:bg-slate-200 transition-colors"
                   >
                     <LogOut className="w-3.5 h-3.5" />
@@ -334,11 +327,11 @@ export default function ServiceHeader() {
                 </div>
               ) : (
                 <button
-                  onClick={() => setShowAuthModal(true)}
+                  onClick={handleGoogleLogin}
                   className="px-3 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold flex items-center gap-1.5 transition-all shadow-sm icon-hover-bounce shrink-0"
                 >
-                  <User className="w-3.5 h-3.5 text-emerald-400" />
-                  <span>नागरिक लॉग इन</span>
+                  <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="" className="w-3.5 h-3.5 shrink-0" />
+                  <span className="hidden sm:inline">गूगल साइन इन</span>
                 </button>
               )}
 
@@ -349,104 +342,6 @@ export default function ServiceHeader() {
           </div>
         </div>
       </header>
-
-      {/* QUICK CITIZEN AUTH MODAL (EMAIL / MOBILE / GOOGLE) */}
-      {showAuthModal && (
-        <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-md z-[9999] overflow-y-auto p-4 flex items-center justify-center">
-          <div className="bg-white border border-slate-200 rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-5 my-auto">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-xs">
-                  🔐
-                </div>
-                <div>
-                  <h3 className="font-extrabold text-sm text-slate-900">नागरिक साइन-इन (Citizen Login)</h3>
-                  <p className="text-[10px] text-slate-500 font-medium">फॉर्म एवं आवेदन स्थिति ऑटो-लोड हेतु ईमेल या मोबाइल दर्ज करें</p>
-                </div>
-              </div>
-              <button 
-                onClick={() => setShowAuthModal(false)}
-                className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            {citizenUser ? (
-              <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 space-y-3 text-xs">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-emerald-700 text-white font-black text-sm flex items-center justify-center">
-                    {citizenUser.displayName?.[0]?.toUpperCase() || 'C'}
-                  </div>
-                  <div>
-                    <h4 className="font-extrabold text-emerald-950 text-sm">{citizenUser.displayName}</h4>
-                    <p className="text-[11px] text-emerald-800 font-mono">{citizenUser.email || citizenUser.mobile}</p>
-                  </div>
-                </div>
-                <div className="pt-2 border-t border-emerald-200/80 flex items-center justify-between">
-                  <span className="text-[11px] text-emerald-900 font-semibold">लॉग इन स्थिति: सक्रिय</span>
-                  <button 
-                    onClick={handleCitizenLogout}
-                    className="btn btn-sm bg-rose-600 hover:bg-rose-700 text-white font-bold text-[11px] px-3 py-1 rounded-xl"
-                  >
-                    लॉग आउट (Sign Out)
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <form onSubmit={handleEmailOrMobileSubmit} className="space-y-4 text-xs">
-                <div>
-                  <label className="block font-bold text-slate-700 mb-1">ईमेल पता या 10 अंकों का मोबाइल नंबर (Email / Mobile) *</label>
-                  <input
-                    type="text"
-                    required
-                    value={authInput}
-                    onChange={(e) => setAuthInput(e.target.value)}
-                    placeholder="उदा. citizen@gmail.com या 98260XXXXX"
-                    className="w-full border border-slate-300 rounded-xl p-3 font-medium text-slate-900 focus:outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20"
-                  />
-                </div>
-
-                <div>
-                  <label className="block font-bold text-slate-700 mb-1">आपका पूरा नाम (Full Name) (वैकल्पिक)</label>
-                  <input
-                    type="text"
-                    value={authName}
-                    onChange={(e) => setAuthName(e.target.value)}
-                    placeholder="उदा. अमित शर्मा"
-                    className="w-full border border-slate-300 rounded-xl p-3 font-medium text-slate-900 focus:outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20"
-                  />
-                </div>
-
-                <button
-                  type="submit"
-                  className="w-full bg-emerald-700 hover:bg-emerald-800 text-white font-extrabold py-3 rounded-xl shadow-md text-xs transition-all"
-                >
-                  🚀 ईमेल / मोबाइल द्वारा साइन-इन करें
-                </button>
-
-                <div className="relative py-1 flex items-center justify-center">
-                  <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-slate-200"></div></div>
-                  <span className="relative bg-white px-3 text-[10px] font-bold text-slate-400 uppercase">या (OR)</span>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={handleGoogleLogin}
-                  className="w-full bg-slate-900 hover:bg-slate-800 text-white font-extrabold py-3 rounded-xl shadow-sm text-xs flex items-center justify-center gap-2 transition-all"
-                >
-                  <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="" className="w-4 h-4" />
-                  <span>गूगल अकाउंट से साइन-इन (Google Sign-In)</span>
-                </button>
-              </form>
-            )}
-
-            <p className="text-[10px] text-slate-400 text-center font-medium leading-relaxed">
-              * लॉगिन करने से मोबाइल एवं लैपटॉप दोनों डिवाइसेस पर आपके सभी आवेदन (Birth, Death, Water, No Dues) स्वतः सिंक एवं फ़ॉर्म ऑटो-लोड हो जाएंगे।
-            </p>
-          </div>
-        </div>
-      )}
 
       {/* MODALS RENDERED OUTSIDE HEADER STACKING CONTEXT AT TOP VIEWPORT LEVEL */}
       {showTrackModal && (

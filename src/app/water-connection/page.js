@@ -12,7 +12,7 @@ import {
   submitWaterConnection, 
   getWaterConnections 
 } from '@/services/waterConnectionService';
-import { getCurrentCitizen, loginWithGoogle, createOrUpdateLocalCitizenProfile } from '@/services/citizenAuthService';
+import { getCurrentCitizen, loginWithGoogle, createOrUpdateLocalCitizenProfile, subscribeToCitizenAuth } from '@/services/citizenAuthService';
 import toast from 'react-hot-toast';
 import { 
   Droplet, Activity, CheckCircle2, AlertCircle, RefreshCw, Printer, X, History, Plus, 

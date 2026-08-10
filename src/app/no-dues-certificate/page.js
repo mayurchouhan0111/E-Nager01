@@ -10,7 +10,7 @@ import {
   submitNoDuesCertificate, 
   getNoDuesCertificates 
 } from '../../services/noDuesService';
-import { getCurrentCitizen, loginWithGoogle, createOrUpdateLocalCitizenProfile } from '../../services/citizenAuthService';
+import { getCurrentCitizen, loginWithGoogle, createOrUpdateLocalCitizenProfile, subscribeToCitizenAuth } from '../../services/citizenAuthService';
 import toast from 'react-hot-toast';
 import { 
   FileText, Activity, CheckCircle2, AlertCircle, RefreshCw, Printer, X, History, Plus, 

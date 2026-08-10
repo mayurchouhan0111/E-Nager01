@@ -12,7 +12,7 @@ import {
   submitBirthCertificate, 
   getBirthCertificates 
 } from '@/services/birthCertificateService';
-import { getCurrentCitizen, loginWithGoogle, createOrUpdateLocalCitizenProfile } from '@/services/citizenAuthService';
+import { getCurrentCitizen, loginWithGoogle, createOrUpdateLocalCitizenProfile, subscribeToCitizenAuth } from '@/services/citizenAuthService';
 import toast from 'react-hot-toast';
 import { validateBirthCertificateForm, navigateToFirstErrorField } from '../../utils/formValidationHelper';
 import { 
