@@ -124,6 +124,11 @@ export default function AdminPage() {
   const [selectedNoDuesDetail, setSelectedNoDuesDetail] = useState(null)
   const [noDuesCertPreview, setNoDuesCertPreview] = useState(null)
 
+  // Audit Logs State
+  const [auditLogs, setAuditLogs] = useState([])
+  const [auditLoading, setAuditLoading] = useState(false)
+  const [auditSearch, setAuditSearch] = useState('')
+
   // Application Letter Modal State
   const [letterModal, setLetterModal] = useState({ isOpen: false, record: null, serviceType: 'death' })
 
@@ -205,9 +210,29 @@ export default function AdminPage() {
   const loadAuditLogs = useCallback(async () => {
     setAuditLoading(true)
     try {
-      const q = query(collection(db, 'auditLogs'), orderBy('timestamp', 'desc'), limit(100))
-      const snap = await getDocs(q)
-      setAuditLogs(snap.docs.map(d => ({ id: d.id, ...d.data() })))
+      let logs = []
+      try {
+        const q1 = query(collection(db, 'auditLogs'), limit(100))
+        const snap1 = await getDocs(q1)
+        logs = snap1.docs.map(d => ({ id: d.id, ...d.data() }))
+      } catch (e) {}
+
+      try {
+        const q2 = query(collection(db, 'audit_logs'), limit(100))
+        const snap2 = await getDocs(q2)
+        const logs2 = snap2.docs.map(d => ({ id: d.id, ...d.data() }))
+        logs = [...logs, ...logs2]
+      } catch (e) {}
+
+      const map = new Map()
+      logs.forEach(item => map.set(item.id, item))
+      const combined = Array.from(map.values())
+      combined.sort((a, b) => {
+        const tA = new Date(a.timestamp || a.createdAt || Date.now()).getTime()
+        const tB = new Date(b.timestamp || b.createdAt || Date.now()).getTime()
+        return tB - tA
+      })
+      setAuditLogs(combined)
     } catch (e) {
       console.error('Failed to load audit logs:', e)
     }
@@ -1338,8 +1363,6 @@ export default function AdminPage() {
                 </div>
               </div>
             )}
-          </div>
-        )}
 
         {/* Security & Accounts Settings Tab (Super Admin Only) */}
         {activeTab === 'security-settings' && (
@@ -1599,6 +1622,8 @@ export default function AdminPage() {
             </div>
           </div>
         )}
+      </div>
+    )}
 
         {/* Status Update Remark Modal */}
         {remarkModal.isOpen && (
