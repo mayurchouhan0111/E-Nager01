@@ -79,7 +79,7 @@ export default function NoDuesCertificateTemplate({ record }) {
         {/* MAIN OFFICIAL CERTIFICATE BODY PARAGRAPH */}
         <div className="text-slate-900 text-xs sm:text-sm leading-loose space-y-4 text-justify">
           <p>
-            यह प्रमाणित किया जाता है कि <strong>MR. {applicantName} , S/O {fatherName}</strong> , S/O . का नाम ई -नगरपालिका पोर्टल पर पता <strong>{addressText}</strong> प्रॉपर्टी आईडी क्रमांक <strong>{propertyId}</strong> कुल प्लाट क्षेत्रफल <strong>{plotArea}</strong> वर्ग फुट, बिल्टअप एरिया क्षेत्रफल <strong>{builtupArea}</strong> वर्ग फुट, ओपन एरिया क्षेत्रफल <strong>{openArea}</strong> वर्ग फुट पर दर्ज होकर वर्ष <strong>{financialYear}</strong> तक बकाया व वर्तमान कर टी०आर०आई०/रिफरेंस <strong>{triRefNo}</strong> दिनांक <strong>{paymentDate}</strong> से <strong>{amountPaid}</strong> जमा है व ई-नगरपालिका पोर्टल पर दर्ज उक्त सम्पत्ति पर कोई भी कर एवं अन्य कर बकाया नही है ।
+            यह प्रमाणित किया जाता है कि <strong>MR. {applicantName} , S/O {fatherName}</strong> , S/O . का नाम ई-सेवा पोर्टल पर पता <strong>{addressText}</strong> प्रॉपर्टी आईडी क्रमांक <strong>{propertyId}</strong> कुल प्लाट क्षेत्रफल <strong>{plotArea}</strong> वर्ग फुट, बिल्टअप एरिया क्षेत्रफल <strong>{builtupArea}</strong> वर्ग फुट, ओपन एरिया क्षेत्रफल <strong>{openArea}</strong> वर्ग फुट पर दर्ज होकर वर्ष <strong>{financialYear}</strong> तक बकाया व वर्तमान कर टी०आर०आई०/रिफरेंस <strong>{triRefNo}</strong> दिनांक <strong>{paymentDate}</strong> से <strong>{amountPaid}</strong> जमा है व ई-सेवा पोर्टल पर दर्ज उक्त सम्पत्ति पर कोई भी कर एवं अन्य कर बकाया नही है ।
           </p>
 
           <p className="font-medium">

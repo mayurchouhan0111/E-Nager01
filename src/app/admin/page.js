@@ -537,8 +537,8 @@ export default function AdminPage() {
             </a>
             <div className="min-w-0">
               <h1 className="font-extrabold text-slate-900 text-sm tracking-tight truncate">
-                <span className="hidden sm:inline">ई-नगर अधिकारी प्रशासन पैनल (Nagar Palika Officer Portal)</span>
-                <span className="sm:hidden">ई-नगर पैनल</span>
+                <span className="hidden sm:inline">ई-सेवा अधिकारी प्रशासन पैनल (Nagar Palika Officer Portal)</span>
+                <span className="sm:hidden">ई-सेवा पैनल</span>
               </h1>
             </div>
           </div>
@@ -654,7 +654,7 @@ export default function AdminPage() {
               <div className="text-center space-y-3">
                 <img src="/mp-logo.png" alt="मध्य प्रदेश शासन" className="w-16 h-16 object-contain drop-shadow-md mx-auto" />
                 <h2 className="text-xl font-extrabold text-slate-900">नगरपालिका अधिकारी लॉगिन (Officer Login)</h2>
-                <p className="text-xs text-slate-500 max-w-xs mx-auto">नगर पालिका परिषद झाबुआ अधिकारी प्रशासन पोर्टल (e-Nagar Palika Parishad Jhabua Officer Administration Portal)</p>
+                <p className="text-xs text-slate-500 max-w-xs mx-auto">नगर पालिका परिषद झाबुआ अधिकारी प्रशासन पोर्टल (e-Seva Parishad Jhabua Officer Administration Portal)</p>
               </div>
 
               {loginError && (

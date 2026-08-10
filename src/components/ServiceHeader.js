@@ -279,7 +279,7 @@ export default function ServiceHeader() {
               <div className="hidden sm:block">
                 <div className="text-slate-900 font-extrabold text-sm leading-tight flex items-center gap-2">
                   नगर पालिका ई-सेवा पोर्टल
-                  <span className="text-[9px] bg-emerald-100 text-emerald-800 border border-emerald-200 px-2 py-0.5 rounded-full uppercase tracking-wider font-bold">MP e-Nagar</span>
+                  <span className="text-[9px] bg-emerald-100 text-emerald-800 border border-emerald-200 px-2 py-0.5 rounded-full uppercase tracking-wider font-bold">MP e-Seva</span>
                 </div>
                 <p className="text-[11px] text-slate-400 font-medium">झाबुआ — मध्य प्रदेश शासन</p>
               </div>

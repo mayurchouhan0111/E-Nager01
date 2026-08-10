@@ -77,11 +77,11 @@ export default function NoDuesLetterTemplate({ record }) {
           <p className="font-bold">महोदय,</p>
           
           <p className="pl-4">
-            सविनय निवेदन है कि प्रार्थी/आवेदक <strong>{applicantName}</strong> पिता <strong>{fatherName}</strong> का नाम ई-नगरपालिका पोर्टल पर संपत्ति क्रमांक <strong>{propertyId}</strong> (पता: {addressText}) दर्ज है।
+            सविनय निवेदन है कि प्रार्थी/आवेदक <strong>{applicantName}</strong> पिता <strong>{fatherName}</strong> का नाम ई-सेवा पोर्टल पर संपत्ति क्रमांक <strong>{propertyId}</strong> (पता: {addressText}) दर्ज है।
           </p>
 
           <p className="pl-4">
-            उक्त संपत्ति का कुल प्लॉट क्षेत्रफल <strong>{plotArea} वर्ग फुट</strong> एवं बिल्ट-अप एरिया <strong>{builtupArea} वर्ग फुट</strong> है। इस संपत्ति पर वर्ष <strong>{financialYear}</strong> तक का समस्त बकाया एवं वर्तमान कर (T.R.I./रिफरेंस <strong>{triRefNo}</strong> दिनांक <strong>{paymentDate}</strong> के अंतर्गत <strong>₹{amountPaid}</strong>) पूर्ण रूप से जमा किया जा चुका है। ई-नगरपालिका पोर्टल के अनुसार इस संपत्ति पर वर्तमान में किसी भी प्रकार का कर या अन्य राशि बकाया नहीं है।
+            उक्त संपत्ति का कुल प्लॉट क्षेत्रफल <strong>{plotArea} वर्ग फुट</strong> एवं बिल्ट-अप एरिया <strong>{builtupArea} वर्ग फुट</strong> है। इस संपत्ति पर वर्ष <strong>{financialYear}</strong> तक का समस्त बकाया एवं वर्तमान कर (T.R.I./रिफरेंस <strong>{triRefNo}</strong> दिनांक <strong>{paymentDate}</strong> के अंतर्गत <strong>₹{amountPaid}</strong>) पूर्ण रूप से जमा किया जा चुका है। ई-सेवा पोर्टल के अनुसार इस संपत्ति पर वर्तमान में किसी भी प्रकार का कर या अन्य राशि बकाया नहीं है।
           </p>
 
           <p className="pl-4 font-semibold">
