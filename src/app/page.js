@@ -263,53 +263,6 @@ export default function HomePage() {
         </div>
 
       </div>
-
-      {/* Footer */}
-      <footer className="bg-gradient-to-b from-slate-900 to-slate-950 text-white border-t border-slate-800 mt-auto">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 pb-8 border-b border-slate-800 text-xs">
-            <div className="space-y-3">
-              <div className="flex items-center gap-3">
-                <img src="/mp-logo.png" alt="मध्य प्रदेश शासन" className="w-10 h-10 object-contain drop-shadow" />
-                <div>
-                  <p className="text-sm font-extrabold text-white">नगर पालिका परिषद झाबुआ (म.प्र.)</p>
-                  <p className="text-[10px] text-emerald-400 font-semibold">Nagar Palika Parishad Jhabua, MP</p>
-                </div>
-              </div>
-              <p className="text-slate-400 leading-relaxed text-[11px]">
-                जन्म-मृत्यु पंजीकरण अधिनियम 1969 एवं मध्य प्रदेश नगर पालिका अधिनियम के अंतर्गत प्राधिकृत डिजिटल नागरिक सेवा पोर्टल।
-              </p>
-            </div>
-
-            <div className="space-y-2">
-              <p className="font-extrabold text-slate-200 uppercase tracking-wider text-[11px]">कानूनी व प्राइवेसी अनुपालन (Legal & DPDP)</p>
-              <ul className="space-y-2 text-slate-300">
-                <li><Link href="/privacy-policy" className="hover:text-emerald-400 transition">🛡️ डेटा प्राइवेसी नीति (DPDP Act 2023 Policy)</Link></li>
-                <li><Link href="/terms" className="hover:text-emerald-400 transition">📜 सेवा की शर्तें व वैधानिक घोषणा (Terms of Service)</Link></li>
-                <li><Link href="/grievance" className="hover:text-emerald-400 transition">🏢 शिकायत निवारण व नोडल अधिकारी (Grievance Cell)</Link></li>
-              </ul>
-            </div>
-
-            <div className="space-y-2">
-              <p className="font-extrabold text-slate-200 uppercase tracking-wider text-[11px]">संपर्क व हेल्पलाइन (Helpdesk)</p>
-              <p className="text-slate-300 text-[11px]">नगर पालिका परिषद कार्यालय, झाबुआ (म.प्र.) - 457661</p>
-              <p className="text-slate-300 text-[11px]">हेल्पलाइन: +91-7392-243201 | ई-मेल: cmomjhabua@mp.gov.in</p>
-              <p className="text-slate-400 text-[10px] pt-1">समय: सोमवार से शनिवार (10:30 AM - 05:30 PM)</p>
-            </div>
-          </div>
-
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 text-[11px] text-slate-400">
-            <p>© {new Date().getFullYear()} नगर पालिका परिषद झाबुआ (म.प्र.) | Digital Citizen Service Portal</p>
-            <div className="flex items-center gap-4 text-[10px]">
-              <Link href="/privacy-policy" className="hover:underline">DPDP Act Compliant</Link>
-              <span>•</span>
-              <Link href="/terms" className="hover:underline">IT Act 2000</Link>
-              <span>•</span>
-              <Link href="/admin" className="hover:underline text-slate-500">अधिकारी लॉगिन</Link>
-            </div>
-          </div>
-        </div>
-      </footer>
     </div>
   )
 }

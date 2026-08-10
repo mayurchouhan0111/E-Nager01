@@ -180,13 +180,6 @@ export default function PrivacyPolicyPage() {
         </div>
 
       </div>
-
-      {/* Footer */}
-      <footer className="bg-white border-t border-slate-200 py-6 mt-auto">
-        <div className="max-w-5xl mx-auto px-4 text-center text-slate-500 text-xs">
-          © {new Date().getFullYear()} नगर पालिका परिषद झाबुआ (म.प्र.) | सर्वाधिकार सुरक्षित | DPDP Act 2023 Compliant
-        </div>
-      </footer>
     </div>
   )
 }
