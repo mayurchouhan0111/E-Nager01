@@ -406,18 +406,36 @@ export default function AdminPage() {
     }
 
     if (res.success) {
-      toast.success(`स्थिति अपडेट हो गई: ${remarkModal.targetStatus}!`, { id: toastId })
+      toast.success(`स्थिति/दस्तावेज अपडेट हो गए: ${remarkModal.targetStatus}!`, { id: toastId })
       
       const nowIso = new Date().toISOString()
       const updatedTimelineItem = {
         id: `t-${Date.now()}`,
-        action: `Status Changed to ${remarkModal.targetStatus}`,
+        action: remarkModal.officialCertFile ? `Official Signed Document Uploaded/Updated (${remarkModal.targetStatus})` : `Status Changed to ${remarkModal.targetStatus}`,
         status: remarkModal.targetStatus,
         performedBy: officerName,
         role: 'Officer',
         remarks: remarkModal.remarkText.trim(),
+        officialUploadedCertificate: remarkModal.officialCertFile || null,
         timestamp: nowIso
       }
+
+      // Audit Trail Logging in Firestore audit_logs collection
+      try {
+        addDoc(collection(db, 'audit_logs'), {
+          action: remarkModal.officialCertFile ? 'OFFICIAL_CERTIFICATE_UPLOADED_OR_UPDATED' : `STATUS_CHANGE_TO_${remarkModal.targetStatus.toUpperCase().replace(/\s+/g, '_')}`,
+          status: remarkModal.targetStatus,
+          serviceType: remarkModal.serviceType,
+          applicationId: remarkModal.record.id,
+          applicationNo: remarkModal.record.applicationNo || 'N/A',
+          performedBy: officerName,
+          officerName: officerName,
+          remarks: remarkModal.remarkText.trim(),
+          officialCertFileName: remarkModal.officialCertFile?.fileName || null,
+          timestamp: nowIso,
+          createdAt: serverTimestamp()
+        }).catch(err => console.warn('[Admin Audit Log Error]:', err));
+      } catch (auditErr) {}
 
       const updateLocalDetail = (prev) => {
         if (!prev || prev.id !== remarkModal.record.id) return prev
@@ -426,6 +444,7 @@ export default function AdminPage() {
           status: remarkModal.targetStatus,
           lastOfficerRemark: remarkModal.remarkText.trim(),
           lastOfficerName: officerName,
+          officialUploadedCertificate: remarkModal.officialCertFile || prev.officialUploadedCertificate || null,
           timeline: [...(prev.timeline || []), updatedTimelineItem]
         }
       }
@@ -441,6 +460,7 @@ export default function AdminPage() {
         status: remarkModal.targetStatus,
         lastOfficerRemark: remarkModal.remarkText.trim(),
         lastOfficerName: officerName,
+        officialUploadedCertificate: remarkModal.officialCertFile || r.officialUploadedCertificate || null,
         timeline: [...(r.timeline || []), updatedTimelineItem]
       } : r)
 
@@ -876,6 +896,46 @@ export default function AdminPage() {
                               <Printer className="w-3.5 h-3.5 text-emerald-700" /> पावती पत्र
                             </button>
 
+                            {(record.status === 'Approved' || record.status === 'Certificate Generated' || record.status === 'Completed') && (
+                              <button
+                                onClick={() => setDeathCertPreview(record)}
+                                className="btn btn-primary btn-sm bg-gradient-to-r from-emerald-600 to-emerald-700 font-bold text-[11px]"
+                              >
+                                📜 प्रमाण पत्र
+                              </button>
+                            )}
+
+                            {record.officialUploadedCertificate && (
+                              <a
+                                href={record.officialUploadedCertificate.fileData}
+                                download={record.officialUploadedCertificate.fileName || 'Official_Signed_Death_Certificate.pdf'}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="btn btn-primary btn-sm bg-gradient-to-r from-emerald-800 to-teal-800 text-white font-bold text-[11px] flex items-center gap-1 shadow-sm"
+                                title="अधिकारी द्वारा अपलोड हस्ताक्षरित मूल दस्तावेज देखें/डाउनलोड करें"
+                              >
+                                <Download className="w-3.5 h-3.5" /> 📜 अपलोड हस्ताक्षरित आदेश
+                              </a>
+                            )}
+
+                            {(record.status === 'Approved' || record.status === 'Certificate Generated' || record.status === 'Completed' || record.status === 'Sanctioned') && (
+                              <button
+                                onClick={() => setRemarkModal({
+                                  isOpen: true,
+                                  record,
+                                  serviceType: 'death',
+                                  targetStatus: record.status,
+                                  remarkText: 'अधिकारी हस्ताक्षरित दस्तावेज अपडेट किया गया',
+                                  officerName: adminAccounts[currentAdminUser]?.name || 'Registrar Officer',
+                                  officialCertFile: record.officialUploadedCertificate || null
+                                })}
+                                className="btn btn-secondary btn-sm flex items-center gap-1 font-bold text-amber-900 bg-amber-50 hover:bg-amber-100 border-amber-200 text-[11px]"
+                                title="अधिकारी हस्ताक्षरित दस्तावेज री-अपलोड करें या बदलें"
+                              >
+                                <Edit className="w-3.5 h-3.5 text-amber-700" /> 🔄 दस्तावेज अपडेट करें
+                              </button>
+                            )}
+
                             {record.status === 'Submitted' && (
                               <button
                                 onClick={() => setRemarkModal({ isOpen: true, record, serviceType: 'death', targetStatus: 'Under Review', remarkText: 'समीक्षा हेतु चुना गया', officerName: adminAccounts[currentAdminUser]?.name || 'Registrar Officer' })}
@@ -900,15 +960,6 @@ export default function AdminPage() {
                                 className="btn btn-danger btn-sm font-bold text-[11px]"
                               >
                                 ❌ निरस्त
-                              </button>
-                            )}
-
-                            {(record.status === 'Approved' || record.status === 'Certificate Generated' || record.status === 'Completed') && (
-                              <button
-                                onClick={() => setDeathCertPreview(record)}
-                                className="btn btn-primary btn-sm bg-gradient-to-r from-emerald-600 to-emerald-700 font-bold text-[11px]"
-                              >
-                                📜 प्रमाण पत्र
                               </button>
                             )}
 
@@ -1016,6 +1067,46 @@ export default function AdminPage() {
                               <Printer className="w-3.5 h-3.5 text-blue-700" /> पावती पत्र
                             </button>
 
+                            {(record.status === 'Approved' || record.status === 'Certificate Generated' || record.status === 'Completed') && (
+                              <button
+                                onClick={() => setBirthCertPreview(record)}
+                                className="btn btn-primary btn-sm bg-gradient-to-r from-blue-600 to-blue-700 font-bold text-[11px]"
+                              >
+                                📜 प्रमाण पत्र
+                              </button>
+                            )}
+
+                            {record.officialUploadedCertificate && (
+                              <a
+                                href={record.officialUploadedCertificate.fileData}
+                                download={record.officialUploadedCertificate.fileName || 'Official_Signed_Birth_Certificate.pdf'}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="btn btn-primary btn-sm bg-gradient-to-r from-blue-800 to-indigo-800 text-white font-bold text-[11px] flex items-center gap-1 shadow-sm"
+                                title="अधिकारी द्वारा अपलोड हस्ताक्षरित मूल दस्तावेज देखें/डाउनलोड करें"
+                              >
+                                <Download className="w-3.5 h-3.5" /> 📜 अपलोड हस्ताक्षरित आदेश
+                              </a>
+                            )}
+
+                            {(record.status === 'Approved' || record.status === 'Certificate Generated' || record.status === 'Completed' || record.status === 'Sanctioned') && (
+                              <button
+                                onClick={() => setRemarkModal({
+                                  isOpen: true,
+                                  record,
+                                  serviceType: 'birth',
+                                  targetStatus: record.status,
+                                  remarkText: 'अधिकारी हस्ताक्षरित दस्तावेज अपडेट किया गया',
+                                  officerName: adminAccounts[currentAdminUser]?.name || 'Registrar Officer',
+                                  officialCertFile: record.officialUploadedCertificate || null
+                                })}
+                                className="btn btn-secondary btn-sm flex items-center gap-1 font-bold text-amber-900 bg-amber-50 hover:bg-amber-100 border-amber-200 text-[11px]"
+                                title="अधिकारी हस्ताक्षरित दस्तावेज री-अपलोड करें या बदलें"
+                              >
+                                <Edit className="w-3.5 h-3.5 text-amber-700" /> 🔄 दस्तावेज अपडेट करें
+                              </button>
+                            )}
+
                             {record.status === 'Submitted' && (
                               <button
                                 onClick={() => setRemarkModal({ isOpen: true, record, serviceType: 'birth', targetStatus: 'Under Review', remarkText: 'समीक्षा हेतु चुना गया', officerName: adminAccounts[currentAdminUser]?.name || 'Registrar Officer' })}
@@ -1040,15 +1131,6 @@ export default function AdminPage() {
                                 className="btn btn-danger btn-sm font-bold text-[11px]"
                               >
                                 ❌ निरस्त
-                              </button>
-                            )}
-
-                            {(record.status === 'Approved' || record.status === 'Certificate Generated' || record.status === 'Completed') && (
-                              <button
-                                onClick={() => setBirthCertPreview(record)}
-                                className="btn btn-primary btn-sm bg-gradient-to-r from-blue-600 to-blue-700 font-bold text-[11px]"
-                              >
-                                📜 प्रमाण पत्र
                               </button>
                             )}
 
@@ -1189,6 +1271,37 @@ export default function AdminPage() {
                                 className="btn btn-primary btn-sm bg-gradient-to-r from-teal-600 to-teal-700 font-bold text-[11px]"
                               >
                                 📜 स्वीकृति पत्र
+                              </button>
+                            )}
+
+                            {record.officialUploadedCertificate && (
+                              <a
+                                href={record.officialUploadedCertificate.fileData}
+                                download={record.officialUploadedCertificate.fileName || 'Official_Signed_Water_Sanction_Permit.pdf'}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="btn btn-primary btn-sm bg-gradient-to-r from-teal-800 to-emerald-800 text-white font-bold text-[11px] flex items-center gap-1 shadow-sm"
+                                title="अधिकारी द्वारा अपलोड हस्ताक्षरित मूल दस्तावेज देखें/डाउनलोड करें"
+                              >
+                                <Download className="w-3.5 h-3.5" /> 📜 अपलोड हस्ताक्षरित आदेश
+                              </a>
+                            )}
+
+                            {(record.status === 'Approved' || record.status === 'Certificate Generated' || record.status === 'Completed' || record.status === 'Sanctioned') && (
+                              <button
+                                onClick={() => setRemarkModal({
+                                  isOpen: true,
+                                  record,
+                                  serviceType: 'water_connection',
+                                  targetStatus: record.status,
+                                  remarkText: 'अधिकारी हस्ताक्षरित दस्तावेज अपडेट किया गया',
+                                  officerName: adminAccounts[currentAdminUser]?.name || 'Water Supply Officer',
+                                  officialCertFile: record.officialUploadedCertificate || null
+                                })}
+                                className="btn btn-secondary btn-sm flex items-center gap-1 font-bold text-amber-900 bg-amber-50 hover:bg-amber-100 border-amber-200 text-[11px]"
+                                title="अधिकारी हस्ताक्षरित दस्तावेज री-अपलोड करें या बदलें"
+                              >
+                                <Edit className="w-3.5 h-3.5 text-amber-700" /> 🔄 दस्तावेज अपडेट करें
                               </button>
                             )}
 
