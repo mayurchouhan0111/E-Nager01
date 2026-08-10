@@ -27,12 +27,12 @@ export default function Footer() {
             <ul className="space-y-1.5 font-medium">
               <li>
                 <Link href="/death-certificate" className="hover:text-emerald-400 transition-colors flex items-center gap-1.5">
-                  📋 मृत्यु प्रमाण पत्र (Form-6)
+                  📋 मृत्यु प्रमाण पत्र
                 </Link>
               </li>
               <li>
                 <Link href="/birth-certificate" className="hover:text-emerald-400 transition-colors flex items-center gap-1.5">
-                  👶 जन्म प्रमाण पत्र (Form-5)
+                  👶 जन्म प्रमाण पत्र
                 </Link>
               </li>
               <li>

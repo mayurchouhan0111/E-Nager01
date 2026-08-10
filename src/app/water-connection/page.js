@@ -290,19 +290,20 @@ export default function WaterConnectionPage() {
   const getStatusChip = (status) => {
     switch (status) {
       case 'Approved':
-      case 'Sanctioned':
+      case 'Certificate Generated':
       case 'Completed':
-        return 'bg-emerald-50 text-emerald-700 border-emerald-200';
+      case 'Sanctioned':
+        return 'bg-emerald-600 text-white font-extrabold shadow-2xs border border-emerald-700';
       case 'Rejected':
-        return 'bg-red-50 text-red-700 border-red-200';
+        return 'bg-rose-600 text-white font-extrabold shadow-2xs border border-rose-700';
       case 'Correction Requested':
-        return 'bg-amber-50 text-amber-700 border-amber-200';
+        return 'bg-amber-500 text-slate-950 font-extrabold shadow-2xs border border-amber-600';
       case 'Under Review':
-        return 'bg-blue-50 text-blue-700 border-blue-200';
+        return 'bg-purple-600 text-white font-extrabold shadow-2xs border border-purple-700';
       case 'Submitted':
-        return 'bg-teal-100 text-teal-800 border-teal-300';
+        return 'bg-sky-600 text-white font-extrabold shadow-2xs border border-sky-700';
       default:
-        return 'bg-slate-100 text-slate-600 border-slate-200';
+        return 'bg-slate-700 text-white font-extrabold shadow-2xs border border-slate-800';
     }
   };
 
@@ -908,11 +909,14 @@ export default function WaterConnectionPage() {
               </div>
             ) : (
               <div className="space-y-4">
-                {applications.map((app) => (
+                {applications.map((app, index) => (
                   <div key={app.id} className="bg-white border border-slate-200 rounded-3xl p-5 sm:p-6 shadow-sm space-y-4 hover:border-teal-200 transition-all">
                     <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                       <div>
                         <div className="flex items-center gap-2 mb-1 flex-wrap">
+                          <span className="text-xs font-mono font-extrabold text-slate-900 bg-slate-100 border border-slate-300 px-2.5 py-0.5 rounded-full shadow-2xs">
+                            #{index + 1}
+                          </span>
                           <span className="font-mono text-xs font-bold text-teal-900 bg-teal-50 border border-teal-200 px-2.5 py-0.5 rounded-full">
                             {app.applicationNo || 'DRAFT'}
                           </span>

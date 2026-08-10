@@ -425,17 +425,18 @@ export default function DeathCertificatePage() {
       case 'Approved':
       case 'Certificate Generated':
       case 'Completed':
-        return 'bg-emerald-50 text-emerald-700 border-emerald-200';
+      case 'Sanctioned':
+        return 'bg-emerald-600 text-white font-extrabold shadow-2xs border border-emerald-700';
       case 'Rejected':
-        return 'bg-red-50 text-red-700 border-red-200';
+        return 'bg-rose-600 text-white font-extrabold shadow-2xs border border-rose-700';
       case 'Correction Requested':
-        return 'bg-amber-50 text-amber-700 border-amber-200';
+        return 'bg-amber-500 text-slate-950 font-extrabold shadow-2xs border border-amber-600';
       case 'Under Review':
-        return 'bg-blue-50 text-blue-700 border-blue-200';
+        return 'bg-purple-600 text-white font-extrabold shadow-2xs border border-purple-700';
       case 'Submitted':
-        return 'bg-emerald-100 text-emerald-800 border-emerald-300';
+        return 'bg-sky-600 text-white font-extrabold shadow-2xs border border-sky-700';
       default:
-        return 'bg-slate-100 text-slate-600 border-slate-200';
+        return 'bg-slate-700 text-white font-extrabold shadow-2xs border border-slate-800';
     }
   };
 
@@ -1304,10 +1305,13 @@ export default function DeathCertificatePage() {
               </div>
             ) : (
               <div className="grid grid-cols-1 gap-4">
-                {applications.map((app) => (
+                {applications.map((app, index) => (
                   <div key={app.id} className="bg-white border border-slate-200 rounded-2xl p-5 hover:border-slate-300 transition-all flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-sm">
                     <div>
-                      <div className="flex items-center gap-2 mb-1">
+                      <div className="flex items-center gap-2 mb-1 flex-wrap">
+                        <span className="text-xs font-mono font-extrabold text-slate-900 bg-slate-100 border border-slate-300 px-2.5 py-0.5 rounded-full shadow-2xs">
+                          #{index + 1}
+                        </span>
                         <span className="text-xs font-mono font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded border border-emerald-200">{app.applicationNo || 'DRAFT'}</span>
                         <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold border uppercase tracking-wider ${getStatusChip(app.status)}`}>
                           {app.status}

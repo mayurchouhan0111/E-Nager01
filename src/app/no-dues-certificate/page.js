@@ -212,14 +212,17 @@ export default function NoDuesCertificatePage() {
       case 'Certificate Generated':
       case 'Completed':
       case 'Sanctioned':
-        return 'bg-emerald-100 text-emerald-800 border-emerald-300';
-      case 'Correction Requested':
-      case 'Pending Review':
-        return 'bg-amber-100 text-amber-800 border-amber-300';
+        return 'bg-emerald-600 text-white font-extrabold shadow-2xs border border-emerald-700';
       case 'Rejected':
-        return 'bg-rose-100 text-rose-800 border-rose-300';
+        return 'bg-rose-600 text-white font-extrabold shadow-2xs border border-rose-700';
+      case 'Correction Requested':
+        return 'bg-amber-500 text-slate-950 font-extrabold shadow-2xs border border-amber-600';
+      case 'Under Review':
+        return 'bg-purple-600 text-white font-extrabold shadow-2xs border border-purple-700';
+      case 'Submitted':
+        return 'bg-sky-600 text-white font-extrabold shadow-2xs border border-sky-700';
       default:
-        return 'bg-blue-100 text-blue-800 border-blue-300';
+        return 'bg-slate-700 text-white font-extrabold shadow-2xs border border-slate-800';
     }
   };
 
@@ -671,13 +674,18 @@ export default function NoDuesCertificatePage() {
               </div>
             ) : (
               <div className="space-y-4">
-                {applications.map(app => (
+                {applications.map((app, index) => (
                   <div key={app.id} className="bg-white text-slate-900 rounded-3xl p-5 sm:p-6 shadow-xl space-y-4 border border-slate-200">
                     <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-slate-100 pb-3">
                       <div>
-                        <span className="font-mono text-xs font-bold text-emerald-900 bg-emerald-100 border border-emerald-300 px-3 py-1 rounded-full">
-                          {app.applicationNo}
-                        </span>
+                        <div className="flex items-center gap-2 flex-wrap mb-1">
+                          <span className="text-xs font-mono font-extrabold text-slate-900 bg-slate-100 border border-slate-300 px-2.5 py-0.5 rounded-full shadow-2xs">
+                            #{index + 1}
+                          </span>
+                          <span className="font-mono text-xs font-bold text-emerald-900 bg-emerald-100 border border-emerald-300 px-3 py-1 rounded-full">
+                            {app.applicationNo}
+                          </span>
+                        </div>
                         <h3 className="font-black text-slate-950 text-base mt-1">
                           {app.applicantDetails?.fullName} (संपत्ति क्र: {app.propertyDetails?.propertyId})
                         </h3>
