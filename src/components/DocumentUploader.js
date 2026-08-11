@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { Upload, FileText, CheckCircle2, Trash2, Eye, AlertCircle, X, Image as ImageIcon } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 export default function DocumentUploader({
   title,
@@ -22,7 +23,9 @@ export default function DocumentUploader({
 
     // Validate size (max 1MB)
     if (file.size > 1 * 1024 * 1024) {
-      setError('फ़ाइल का आकार 1 MB से कम होना अनिवार्य है (File size must be under 1MB)');
+      toast.error('❌ फ़ाइल का आकार 1 MB (1024 KB) से अधिक है! कृपया 1 MB से कम साइज की PDF या Photo चुनें।', { duration: 5000 });
+      setError('❌ फ़ाइल का आकार 1 MB (1024 KB) से कम होना अनिवार्य है (Max 1MB allowed)');
+      e.target.value = '';
       return;
     }
 
@@ -183,8 +186,8 @@ export default function DocumentUploader({
           <span className="text-xs font-bold text-slate-700 group-hover:text-emerald-800">
             फ़ाइल / फोटो चुनें या यहाँ खींचकर छोड़ें
           </span>
-          <span className="text-[10px] text-slate-400 mt-0.5">
-            JPG, PNG या PDF (अधिकतम 5 MB)
+          <span className="text-[10px] text-emerald-800 font-extrabold mt-0.5 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+            ⚠️ JPG, PNG या PDF (अधिकतम 1 MB / 1024 KB)
           </span>
           <input
             type="file"

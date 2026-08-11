@@ -110,6 +110,10 @@ export default function NoDuesCertificatePage() {
 
   const handleFileUpload = (docKey, file) => {
     if (!file) return;
+    if (file.size > 1 * 1024 * 1024) {
+      toast.error('❌ फ़ाइल का आकार 1 MB (1024 KB) से अधिक है! कृपया 1 MB से कम साइज की PDF या Photo चुनें।', { duration: 5000 });
+      return;
+    }
     const reader = new FileReader();
     reader.onload = (e) => {
       setFormData(prev => ({
