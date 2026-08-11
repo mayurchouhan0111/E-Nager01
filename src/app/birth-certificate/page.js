@@ -92,6 +92,7 @@ export default function BirthCertificatePage() {
   const [selectedApp, setSelectedApp] = useState(null);
   const [showCertModal, setShowCertModal] = useState(false);
   const [showLetterModal, setShowLetterModal] = useState(false);
+  const [showOfficialDocModal, setShowOfficialDocModal] = useState(false);
   const [dpdpConsent, setDpdpConsent] = useState(false);
 
   // Form State
@@ -1511,17 +1512,13 @@ export default function BirthCertificatePage() {
                       {app.officialUploadedCertificate ? (
                         <button
                           type="button"
-                          onClick={async () => {
-                            const success = await downloadBlobFile(app.officialUploadedCertificate, 'Official_Signed_Birth_Certificate.pdf');
-                            if (!success) {
-                              toast.success('प्रमाण पत्र डिजिटल स्वरूप में प्रदर्शित किया जा रहा है...');
-                              setSelectedApp(app);
-                              setShowCertModal(true);
-                            }
+                          onClick={() => {
+                            setSelectedApp(app);
+                            setShowOfficialDocModal(true);
                           }}
                           className="btn btn-primary btn-sm bg-gradient-to-r from-emerald-700 to-emerald-800 text-white font-bold flex items-center gap-1 shadow-md cursor-pointer transition-all"
                         >
-                          <Download className="w-3.5 h-3.5" /> 📜 अधिकारी हस्ताक्षरित प्रमाण पत्र
+                          <Download className="w-3.5 h-3.5" /> 📜 अधिकारी हस्ताक्षरित प्रमाण पत्र देखें व डाउनलोड
                         </button>
                       ) : (
                         (app.status === 'Approved' || app.status === 'Certificate Generated' || app.status === 'Completed') && (
@@ -1655,6 +1652,67 @@ export default function BirthCertificatePage() {
 
               <div className="overflow-y-auto flex-1 pr-1 pt-3">
                 <BirthCertificateTemplate record={selectedApp} />
+              </div>
+            </div>
+        {/* OFFICIAL UPLOADED CERTIFICATE VIEWER & DOWNLOAD MODAL */}
+        {selectedApp && showOfficialDocModal && (
+          <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-md z-50 overflow-y-auto p-4 flex items-center justify-center pt-8">
+            <div className="bg-white rounded-3xl max-w-4xl w-full p-6 shadow-2xl space-y-4 max-h-[90vh] flex flex-col">
+              <div className="flex items-center justify-between border-b border-slate-200 pb-3 shrink-0">
+                <div>
+                  <h3 className="font-extrabold text-slate-900 text-sm flex items-center gap-2">
+                    <span>📜</span> अधिकारी द्वारा जारी एवं हस्ताक्षरित जन्म प्रमाण पत्र (Official Signed Certificate)
+                  </h3>
+                  <p className="text-xs text-slate-500 font-mono mt-0.5">
+                    {selectedApp.officialUploadedCertificate?.fileName || 'Official_Signed_Birth_Certificate.pdf'}
+                  </p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={async () => {
+                      const success = await downloadBlobFile(selectedApp.officialUploadedCertificate, selectedApp.officialUploadedCertificate?.fileName || 'Official_Signed_Birth_Certificate.pdf');
+                      if (!success) {
+                        toast.success('प्रमाण पत्र डिजिटल टेम्पलेट में खोला जा रहा है...');
+                        setShowOfficialDocModal(false);
+                        setShowCertModal(true);
+                      }
+                    }}
+                    className="btn btn-primary btn-sm bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs flex items-center gap-1 shadow-md"
+                  >
+                    <Download className="w-3.5 h-3.5" /> 📥 फ़ाइल डाउनलोड करें
+                  </button>
+                  <button onClick={() => { setShowOfficialDocModal(false); setSelectedApp(null); }} className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100">
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+              </div>
+
+              <div className="overflow-y-auto flex-1 bg-slate-100 rounded-2xl p-4 flex justify-center items-center min-h-[350px]">
+                {selectedApp.officialUploadedCertificate?.fileType?.includes('image') || selectedApp.officialUploadedCertificate?.fileData?.startsWith('data:image') ? (
+                  <img
+                    src={selectedApp.officialUploadedCertificate.fileData}
+                    alt="Official Signed Document"
+                    className="max-h-[65vh] w-auto object-contain rounded-xl shadow-md"
+                  />
+                ) : (
+                  <iframe
+                    src={selectedApp.officialUploadedCertificate?.fileData}
+                    title="Official Signed Document"
+                    className="w-full h-[65vh] rounded-xl border-0 shadow-sm"
+                  />
+                )}
+              </div>
+
+              <div className="flex items-center justify-between pt-2 border-t border-slate-100 text-xs">
+                <span className="text-slate-500 font-medium">
+                  अपलोडकर्ता: {selectedApp.officialUploadedCertificate?.uploadedBy || 'Nagar Palika Officer'}
+                </span>
+                <button
+                  onClick={() => { setShowOfficialDocModal(false); setShowCertModal(true); }}
+                  className="text-emerald-800 font-bold hover:underline flex items-center gap-1"
+                >
+                  🖨️ डिजिटल टेम्पलेट (Digital Template View) देखें
+                </button>
               </div>
             </div>
           </div>

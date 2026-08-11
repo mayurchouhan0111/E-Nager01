@@ -413,17 +413,13 @@ export default function ServiceHeader() {
                           {rec.officialUploadedCertificate ? (
                             <button
                               type="button"
-                              onClick={async () => {
-                                const success = await downloadBlobFile(rec.officialUploadedCertificate, 'Official_Signed_Certificate.pdf');
-                                if (!success) {
-                                  toast.success('प्रमाण पत्र डिजिटल स्वरूप में प्रदर्शित किया जा रहा है...');
-                                  setSelectedRecord(rec);
-                                  setModalType('certificate');
-                                }
+                              onClick={() => {
+                                setSelectedRecord(rec);
+                                setModalType('official_doc');
                               }}
                               className="btn btn-primary btn-sm text-[11px] font-bold flex items-center gap-1 bg-emerald-700 hover:bg-emerald-800 text-white shadow-md cursor-pointer transition-all"
                             >
-                              <Download className="w-3.5 h-3.5" /> 📜 अधिकारी हस्ताक्षरित प्रमाण पत्र
+                              <Download className="w-3.5 h-3.5" /> 📜 अधिकारी हस्ताक्षरित प्रमाण पत्र देखें व डाउनलोड
                             </button>
                           ) : (
                             (rec.status === 'Approved' || rec.status === 'Sanctioned' || rec.status === 'Certificate Generated' || rec.status === 'Completed') && (
@@ -471,6 +467,66 @@ export default function ServiceHeader() {
               {selectedRecord.serviceType === 'birth' && <BirthCertificateTemplate record={selectedRecord} />}
               {selectedRecord.serviceType === 'death' && <DeathCertificateTemplate record={selectedRecord} />}
               {selectedRecord.serviceType === 'water_connection' && <WaterConnectionTemplate record={selectedRecord} />}
+            </div>
+          </div>
+        </div>
+      {selectedRecord && modalType === 'official_doc' && (
+        <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-md z-[9999] overflow-y-auto p-3 sm:p-6 flex items-start sm:items-center justify-center pt-14 sm:pt-6">
+          <div className="bg-white rounded-3xl max-w-4xl w-full p-4 sm:p-6 shadow-2xl flex flex-col max-h-[80vh] sm:max-h-[85vh] my-auto space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3 shrink-0">
+              <div>
+                <h3 className="font-extrabold text-slate-900 text-sm flex items-center gap-2">
+                  <span>📜</span> अधिकारी द्वारा जारी एवं हस्ताक्षरित प्रमाण पत्र (Official Signed Document)
+                </h3>
+                <p className="text-xs text-slate-500 font-mono mt-0.5">
+                  {selectedRecord.officialUploadedCertificate?.fileName || 'Official_Signed_Certificate.pdf'}
+                </p>
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={async () => {
+                    const success = await downloadBlobFile(selectedRecord.officialUploadedCertificate, selectedRecord.officialUploadedCertificate?.fileName || 'Official_Signed_Certificate.pdf');
+                    if (!success) {
+                      toast.success('प्रमाण पत्र डिजिटल टेम्पलेट में खोला जा रहा है...');
+                      setModalType('certificate');
+                    }
+                  }}
+                  className="btn btn-primary btn-sm bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs flex items-center gap-1 shadow-md"
+                >
+                  <Download className="w-3.5 h-3.5" /> 📥 फ़ाइल डाउनलोड करें
+                </button>
+                <button onClick={() => { setSelectedRecord(null); setModalType(null); }} className="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100">
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+
+            <div className="overflow-y-auto flex-1 bg-slate-100 rounded-2xl p-4 flex justify-center items-center min-h-[350px]">
+              {selectedRecord.officialUploadedCertificate?.fileType?.includes('image') || selectedRecord.officialUploadedCertificate?.fileData?.startsWith('data:image') ? (
+                <img
+                  src={selectedRecord.officialUploadedCertificate.fileData}
+                  alt="Official Signed Document"
+                  className="max-h-[65vh] w-auto object-contain rounded-xl shadow-md"
+                />
+              ) : (
+                <iframe
+                  src={selectedRecord.officialUploadedCertificate?.fileData}
+                  title="Official Signed Document"
+                  className="w-full h-[65vh] rounded-xl border-0 shadow-sm"
+                />
+              )}
+            </div>
+
+            <div className="flex items-center justify-between pt-2 border-t border-slate-100 text-xs">
+              <span className="text-slate-500 font-medium">
+                अपलोडकर्ता: {selectedRecord.officialUploadedCertificate?.uploadedBy || 'Nagar Palika Officer'}
+              </span>
+              <button
+                onClick={() => setModalType('certificate')}
+                className="text-emerald-800 font-bold hover:underline flex items-center gap-1"
+              >
+                🖨️ डिजिटल टेम्पलेट (Digital Template View) देखें
+              </button>
             </div>
           </div>
         </div>
