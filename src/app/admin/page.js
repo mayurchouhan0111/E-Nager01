@@ -247,13 +247,6 @@ export default function AdminPage() {
         logs = snap1.docs.map(d => ({ id: d.id, ...d.data() }))
       } catch (e) {}
 
-      try {
-        const q2 = query(collection(db, 'audit_logs'), limit(100))
-        const snap2 = await getDocs(q2)
-        const logs2 = snap2.docs.map(d => ({ id: d.id, ...d.data() }))
-        logs = [...logs, ...logs2]
-      } catch (e) {}
-
       const map = new Map()
       logs.forEach(item => map.set(item.id, item))
       const combined = Array.from(map.values())
@@ -426,9 +419,9 @@ export default function AdminPage() {
         timestamp: nowIso
       }
 
-      // Audit Trail Logging in Firestore audit_logs collection
+      // Audit Trail Logging in Firestore auditLogs collection
       try {
-        addDoc(collection(db, 'audit_logs'), {
+        addDoc(collection(db, 'auditLogs'), {
           action: remarkModal.officialCertFile ? 'OFFICIAL_CERTIFICATE_UPLOADED_OR_UPDATED' : `STATUS_CHANGE_TO_${remarkModal.targetStatus.toUpperCase().replace(/\s+/g, '_')}`,
           status: remarkModal.targetStatus,
           serviceType: remarkModal.serviceType,

@@ -5,12 +5,12 @@ import { collection, query, where, getDocs, updateDoc, doc } from 'firebase/fire
 export async function POST(req) {
   try {
     const authHeader = req.headers.get('x-webhook-secret') || req.headers.get('authorization');
-    const expectedSecret = process.env.WEBHOOK_SECRET || 'jhabua_noc_payment_secret_2026';
+    const expectedSecret = process.env.WEBHOOK_SECRET;
 
-    // Verify Secret Token
-    if (authHeader !== expectedSecret && authHeader !== `Bearer ${expectedSecret}`) {
+    // Verify Secret Token (Strict env variable check - No hardcoded fallback)
+    if (!expectedSecret || (authHeader !== expectedSecret && authHeader !== `Bearer ${expectedSecret}`)) {
       return NextResponse.json(
-        { success: false, error: 'Unauthorized: Invalid Webhook Secret Token' },
+        { success: false, error: 'Unauthorized: Invalid or Unconfigured Webhook Secret Token' },
         { status: 401 }
       );
     }
@@ -22,11 +22,11 @@ export async function POST(req) {
       return NextResponse.json({ success: false, error: 'Empty payload' }, { status: 400 });
     }
 
-    // Check if notification indicates a credit of 1 INR
-    const isCredit1 = notificationText.includes('1') || notificationText.includes('Rs 1') || notificationText.includes('INR 1');
+    // Check if notification indicates a credit payment
+    const isCredit = notificationText.includes('credited') || notificationText.includes('received') || notificationText.includes('Rs') || notificationText.includes('INR');
 
-    if (!isCredit1) {
-      return NextResponse.json({ success: false, message: 'Notification ignored: Not a ₹1 payment' });
+    if (!isCredit) {
+      return NextResponse.json({ success: false, message: 'Notification ignored: Not a valid credit payment notification' });
     }
 
     // Extract 12-digit UTR using regex
@@ -37,14 +37,15 @@ export async function POST(req) {
     const appNoMatch = notificationText.match(/ND-\d{4}-\d{5}/i);
     const applicationNo = appNoMatch ? appNoMatch[0] : null;
 
-    const colRef = collection(db, 'noDuesCertificates');
-    let q;
-
-    if (applicationNo) {
-      q = query(colRef, where('applicationNo', '==', applicationNo));
-    } else {
-      q = query(colRef, where('paymentStatus', '==', 'Pending'));
+    if (!applicationNo) {
+      return NextResponse.json(
+        { success: false, error: 'Missing explicit application number (e.g. ND-2026-XXXXX) in notification payload' },
+        { status: 400 }
+      );
     }
+
+    const colRef = collection(db, 'noDuesCertificates');
+    const q = query(colRef, where('applicationNo', '==', applicationNo));
 
     const snap = await getDocs(q);
 

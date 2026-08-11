@@ -3,7 +3,11 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Helper functions for data validation
+    // Helper functions for security validation
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
     function hasRequiredFields(requiredFields) {
       return request.resource.data.keys().hasAll(requiredFields);
     }
@@ -18,14 +22,14 @@ service cloud.firestore {
       allow create: if hasRequiredFields(['applicationNo', 'deceasedDetails', 'applicantDetails', 'status'])
                     && request.resource.data.status == 'Submitted';
       
-      // Allow reading for status tracking and admin processing
-      allow read: if true;
+      // Allow reading for application status tracking or authenticated users
+      allow read: if isAuthenticated() || resource.data.applicationNo != null;
 
-      // Allow status updates by authenticated admin users
-      allow update: if isValidStatus(request.resource.data.status);
+      // Allow status updates by authenticated admin users only
+      allow update: if isAuthenticated() && isValidStatus(request.resource.data.status);
       
-      // Restrict deletion
-      allow delete: if request.auth != null;
+      // Disallow unauthorized deletion
+      allow delete: if false;
     }
 
     // Birth Certificates Collection
@@ -34,14 +38,14 @@ service cloud.firestore {
       allow create: if hasRequiredFields(['applicationNo', 'childDetails', 'applicantDetails', 'status'])
                     && request.resource.data.status == 'Submitted';
       
-      // Allow reading for status tracking and admin processing
-      allow read: if true;
+      // Allow reading for application status tracking or authenticated users
+      allow read: if isAuthenticated() || resource.data.applicationNo != null;
 
-      // Allow status updates by authenticated admin users
-      allow update: if isValidStatus(request.resource.data.status);
+      // Allow status updates by authenticated admin users only
+      allow update: if isAuthenticated() && isValidStatus(request.resource.data.status);
       
-      // Restrict deletion
-      allow delete: if request.auth != null;
+      // Disallow unauthorized deletion
+      allow delete: if false;
     }
 
     // Water Connections Collection
@@ -50,21 +54,55 @@ service cloud.firestore {
       allow create: if hasRequiredFields(['applicationNo', 'applicantDetails', 'propertyDetails', 'status'])
                     && request.resource.data.status == 'Submitted';
       
-      // Allow reading for status tracking and admin processing
-      allow read: if true;
+      // Allow reading for application status tracking or authenticated users
+      allow read: if isAuthenticated() || resource.data.applicationNo != null;
 
-      // Allow status updates by authenticated admin users
+      // Allow status updates by authenticated admin users only
+      allow update: if isAuthenticated() && isValidStatus(request.resource.data.status);
+      
+      // Disallow unauthorized deletion
+      allow delete: if false;
+    }
+
+    // Property Tax No Dues NOC Collection
+    match /noDuesCertificates/{docId} {
+      // Citizens can submit new applications with required fields
+      allow create: if hasRequiredFields(['applicationNo', 'applicantDetails', 'propertyDetails', 'status'])
+                    && request.resource.data.status == 'Submitted';
+      
+      // Allow reading for status tracking or authenticated users
+      allow read: if isAuthenticated() || resource.data.applicationNo != null;
+
+      // Allow status updates by authenticated users or payment webhook
       allow update: if isValidStatus(request.resource.data.status);
       
-      // Restrict deletion
-      allow delete: if request.auth != null;
+      // Disallow unauthorized deletion
+      allow delete: if false;
     }
 
     // Audit Logs Collection (Compliance & Security Audit Trail)
     match /auditLogs/{docId} {
       allow create: if request.resource.data.keys().hasAll(['action', 'timestamp']);
-      allow read: if true;
+      allow read: if isAuthenticated();
       allow update, delete: if false; // Audit logs are immutable
+    }
+
+    match /audit_logs/{docId} {
+      allow create: if request.resource.data.keys().hasAll(['action', 'timestamp']);
+      allow read: if isAuthenticated();
+      allow update, delete: if false; // Audit logs are immutable
+    }
+
+    // Notifications Collection
+    match /notifications/{docId} {
+      allow create: if true;
+      allow read, update: if true;
+      allow delete: if false;
+    }
+
+    // Admin Settings Collection
+    match /admin_settings/{docId} {
+      allow read, write: if isAuthenticated();
     }
 
     // Default deny all other collections

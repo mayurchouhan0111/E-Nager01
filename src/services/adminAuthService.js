@@ -14,7 +14,7 @@ export const ADMIN_USERNAME_ALIASES = {
 
 export const DEFAULT_ADMIN_ACCOUNTS = {
   admin: {
-    password: 'jhabua@2024',
+    password: process.env.NEXT_PUBLIC_ADMIN_PASSWORD_BIRTH_DEATH || process.env.ADMIN_PASSWORD_BIRTH_DEATH || 'jhabua@2024',
     role: 'birth_death_admin',
     name: 'जन्म-मृत्यु रजिस्ट्रार अधिकारी (Birth & Death Registrar)',
     email: 'birthdeath.jhabua@mp.gov.in',
@@ -22,7 +22,7 @@ export const DEFAULT_ADMIN_ACCOUNTS = {
     allowedTabs: ['death-certificates', 'birth-certificates']
   },
   water_admin: {
-    password: 'water@jhabua2024',
+    password: process.env.NEXT_PUBLIC_ADMIN_PASSWORD_WATER || process.env.ADMIN_PASSWORD_WATER || 'water@jhabua2024',
     role: 'water_admin',
     name: 'जल प्रदाय विभाग अधिकारी (Water Supply Officer)',
     email: 'water.jhabua@mp.gov.in',
@@ -30,7 +30,7 @@ export const DEFAULT_ADMIN_ACCOUNTS = {
     allowedTabs: ['water-connections']
   },
   nodues_admin: {
-    password: 'nodues@jhabua2024',
+    password: process.env.NEXT_PUBLIC_ADMIN_PASSWORD_NODUES || process.env.ADMIN_PASSWORD_NODUES || 'nodues@jhabua2024',
     role: 'nodues_admin',
     name: 'संपत्ति कर व नो ड्यूज अधिकारी (Revenue & No-Dues NOC Officer)',
     email: 'revenue.jhabua@mp.gov.in',
@@ -38,7 +38,7 @@ export const DEFAULT_ADMIN_ACCOUNTS = {
     allowedTabs: ['no-dues-certificates']
   },
   super_admin: {
-    password: 'jhabua@super2024',
+    password: process.env.NEXT_PUBLIC_ADMIN_PASSWORD_SUPER || process.env.ADMIN_PASSWORD_SUPER || 'jhabua@super2024',
     role: 'super_admin',
     name: 'मुख्य नगर पालिका अधिकारी (Chief Municipal Officer - CMO)',
     email: 'cmo.jhabua@mp.gov.in',
@@ -122,7 +122,7 @@ export async function updateAdminAccountCredential({ targetUsername, newPassword
 
     // Audit Log Entry
     try {
-      await addDoc(collection(db, 'audit_logs'), {
+      await addDoc(collection(db, 'auditLogs'), {
         action: 'SECURITY_CREDENTIAL_UPDATED',
         details: `सुरक्षा अद्यतन: सुपर एडमिन (${updatedBy}) द्वारा '${targetUsername}' का क्रेडेंशियल अद्यतन किया गया।`,
         performedBy: updatedBy || 'super_admin',
