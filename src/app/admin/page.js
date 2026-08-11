@@ -2162,141 +2162,201 @@ export default function AdminPage() {
       </div>
     )}
 
-        {/* Status Update Remark Modal */}
+        {/* Status Update Remark Modal (Redesigned Modern UI) */}
         {remarkModal.isOpen && (
-          <div className="fixed inset-0 bg-slate-900/75 backdrop-blur-md z-[80] flex items-center justify-center p-4">
-            <div className="bg-white border border-slate-200 rounded-3xl max-w-lg w-full p-6 shadow-2xl space-y-4">
-              <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-                <h3 className="text-slate-900 font-extrabold text-base">
-                  स्थिति अपडेट: <span className="text-emerald-700">{remarkModal.targetStatus}</span>
-                </h3>
-                <button onClick={() => setRemarkModal({ isOpen: false, record: null, serviceType: 'death', targetStatus: '', remarkText: '', officerName: 'Nagar Palika Officer' })} className="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100">
+          <div className="fixed inset-0 bg-slate-950/75 backdrop-blur-md z-[9999] overflow-y-auto p-4 sm:p-6 flex items-center justify-center animate-in fade-in duration-200">
+            <div className="bg-white border border-slate-200 rounded-3xl max-w-xl w-full shadow-2xl overflow-hidden space-y-0 my-auto">
+              
+              {/* Top Modal Header */}
+              <div className="bg-slate-900 text-white px-6 py-4 flex items-center justify-between border-b border-slate-800">
+                <div className="flex items-center gap-2.5">
+                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                  <h3 className="font-black text-white text-base tracking-tight">
+                    स्थिति अद्यतन (Status Update)
+                  </h3>
+                  <span className={`px-3 py-0.5 rounded-full text-[10px] font-extrabold border uppercase tracking-wider ${getStatusChip(remarkModal.targetStatus)}`}>
+                    {remarkModal.targetStatus}
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setRemarkModal({ isOpen: false, record: null, serviceType: 'death', targetStatus: '', remarkText: '', officerName: 'Nagar Palika Officer', officialCertFile: null })}
+                  className="p-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white transition-all cursor-pointer"
+                >
                   <X className="w-5 h-5" />
                 </button>
               </div>
 
-              <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 text-xs text-amber-900">
-                <span className="font-bold block mb-1">⚠️ आवेदन: {remarkModal.record?.applicationNo}</span>
-                <p>नाम: {remarkModal.record?.deceasedDetails?.fullName || remarkModal.record?.childDetails?.fullName || remarkModal.record?.applicantDetails?.fullName || 'N/A'}</p>
-              </div>
+              {/* Modal Inner Body */}
+              <div className="p-6 space-y-4 max-h-[80vh] overflow-y-auto">
 
-              <form onSubmit={handleConfirmStatusUpdate} className="space-y-4">
-                <div>
-                  <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">
-                    अधिकारी टिप्पणी (Officer Remark) *
-                  </label>
-                  <textarea
-                    value={remarkModal.remarkText}
-                    onChange={(e) => setRemarkModal(prev => ({ ...prev, remarkText: e.target.value }))}
-                    className="w-full border border-slate-300 rounded-xl p-3 text-xs min-h-[80px] focus:outline-none focus:border-emerald-600"
-                    placeholder="यहाँ अपनी टिप्पणी दर्ज करें..."
-                    required
-                  />
+                {/* Application Context Summary Banner */}
+                <div className="bg-slate-50 border border-slate-200/90 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div className="space-y-0.5">
+                    <div className="flex items-center gap-2">
+                      <span className="text-[11px] font-mono font-black text-emerald-900 bg-emerald-100 border border-emerald-300 px-2.5 py-0.5 rounded-lg shadow-2xs">
+                        {remarkModal.record?.applicationNo || 'APP-REF'}
+                      </span>
+                      <span className="text-[10px] font-bold text-slate-500">
+                        📅 {formatDate(remarkModal.record?.appliedAt || remarkModal.record?.createdAt)}
+                      </span>
+                    </div>
+                    <p className="font-black text-slate-900 text-sm mt-1">
+                      {cleanHindiText(remarkModal.record?.deceasedDetails?.fullName) || cleanHindiText(remarkModal.record?.childDetails?.fullName) || cleanHindiText(remarkModal.record?.applicantDetails?.fullName) || 'आवेदनकर्ता'}
+                    </p>
+                  </div>
+
+                  <div className="shrink-0 text-right">
+                    <span className="text-[10px] font-extrabold text-slate-500 uppercase tracking-wide block">सेवा श्रेणी</span>
+                    <span className="text-xs font-bold text-slate-800">
+                      {remarkModal.serviceType === 'death' ? 'मृत्यु प्रमाण पत्र' : remarkModal.serviceType === 'birth' ? 'जन्म प्रमाण पत्र' : remarkModal.serviceType === 'water_connection' ? 'जल कनेक्शन' : 'नो ड्यूज NOC'}
+                    </span>
+                  </div>
                 </div>
 
-                {/* Upload Official Signed Certificate / Sanction Order */}
-                {(remarkModal.targetStatus === 'Approved' || remarkModal.targetStatus === 'Certificate Generated' || remarkModal.targetStatus === 'Completed' || remarkModal.targetStatus === 'Sanctioned') && (
-                  <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-3">
-                    <label className="block text-[11px] font-extrabold text-slate-900 mb-1">
-                      📤 आधिकारिक हस्ताक्षरित प्रमाण पत्र / स्वीकृति आदेश संलग्न करें (Upload Official Signed Certificate PDF/Image)
+                <form onSubmit={handleConfirmStatusUpdate} className="space-y-4">
+                  {/* Officer Remark Textarea */}
+                  <div>
+                    <label className="block text-xs font-bold text-slate-900 mb-1.5 flex items-center gap-1.5">
+                      <span>📝</span>
+                      <span>अधिकारी टिप्पणी (Officer Remark) <span className="text-rose-600">*</span></span>
                     </label>
-                    <p className="text-xs text-slate-500">
-                      नगर पालिका द्वारा तैयार भौतिक हस्ताक्षरित PDF या स्कैन कॉपी संलग्न करें। यह फ़ाइल नागरिक अपने पोर्टल से सीधे डाउनलोड कर सकेगा।
-                    </p>
+                    <textarea
+                      value={remarkModal.remarkText}
+                      onChange={(e) => setRemarkModal(prev => ({ ...prev, remarkText: e.target.value }))}
+                      className="w-full border border-slate-200 rounded-2xl p-3.5 text-xs font-semibold text-slate-900 placeholder-slate-400 focus:outline-none focus:border-emerald-600 focus:ring-4 focus:ring-emerald-500/10 min-h-[85px] shadow-2xs transition-all"
+                      placeholder="यहाँ आधिकारिक टिप्पणी या निर्देश दर्ज करें..."
+                      required
+                    />
+                  </div>
 
-                    {/* Prominent 1 MB Limit Badge */}
-                    <div className="flex items-center gap-1.5 bg-amber-50 border border-amber-200/90 text-amber-900 text-xs font-bold px-3 py-1.5 rounded-xl">
-                      <span>⚠️</span>
-                      <span>अनिवार्य नियम: फ़ाइल का आकार <strong>1 MB (1024 KB) से कम</strong> होना चाहिए। 1 MB से बड़ी फ़ाइल स्वीकार नहीं होगी।</span>
-                    </div>
+                  {/* Upload Official Signed Certificate / Sanction Order Section */}
+                  {(remarkModal.targetStatus === 'Approved' || remarkModal.targetStatus === 'Certificate Generated' || remarkModal.targetStatus === 'Completed' || remarkModal.targetStatus === 'Sanctioned') && (
+                    <div className="bg-slate-50/90 border border-slate-200/90 rounded-2xl p-4 sm:p-5 space-y-3.5">
+                      <div>
+                        <h4 className="text-xs font-black text-slate-900 flex items-center gap-1.5">
+                          <span>📤</span>
+                          <span>अधिकारी हस्ताक्षरित आदेश / प्रमाण पत्र (Official Signed Document)</span>
+                        </h4>
+                        <p className="text-[11px] text-slate-500 font-medium mt-0.5">
+                          नगर पालिका द्वारा भौतिक रूप से हस्ताक्षरित PDF या स्कैन कॉपी संलग्न करें।
+                        </p>
+                      </div>
 
-                    {/* Previously Uploaded Document Preview */}
-                    {(remarkModal.officialCertFile || remarkModal.record?.officialUploadedCertificate) && (
-                      <div className="bg-emerald-50/80 border border-emerald-200 rounded-2xl p-3 space-y-2">
-                        <div className="flex items-center justify-between">
-                          <span className="text-[11px] font-extrabold text-emerald-950 flex items-center gap-1.5">
-                            <span>📄</span> पूर्व में अपलोड अधिकारी हस्ताक्षरित दस्तावेज (Current Official Upload):
-                          </span>
-                          <button
-                            type="button"
-                            onClick={() => downloadBlobFile(remarkModal.officialCertFile || remarkModal.record?.officialUploadedCertificate, 'Official_Document.pdf')}
-                            className="text-[10px] font-bold text-emerald-800 underline hover:text-emerald-950 flex items-center gap-1 bg-white px-2 py-0.5 rounded border border-emerald-300 cursor-pointer"
-                          >
-                            <Eye className="w-3 h-3 text-emerald-700" /> देखें / डाउनलोड
-                          </button>
-                        </div>
-                        
-                        <div className="flex items-center gap-3">
-                          {((remarkModal.officialCertFile || remarkModal.record?.officialUploadedCertificate)?.fileType?.includes('image') || ((remarkModal.officialCertFile || remarkModal.record?.officialUploadedCertificate)?.fileData?.startsWith('data:image'))) ? (
-                            <div className="w-16 h-16 rounded-xl bg-white border border-emerald-300 overflow-hidden shrink-0 shadow-2xs">
-                              <img src={(remarkModal.officialCertFile || remarkModal.record?.officialUploadedCertificate)?.fileData} alt="Official Document" className="w-full h-full object-cover" />
-                            </div>
-                          ) : (
-                            <div className="w-16 h-16 rounded-xl bg-emerald-100 text-emerald-900 border border-emerald-300 flex items-center justify-center font-bold text-xs shrink-0">
-                              📄 PDF
-                            </div>
-                          )}
-                          <div className="min-w-0 text-xs">
-                            <p className="font-extrabold text-slate-900 truncate">{(remarkModal.officialCertFile || remarkModal.record?.officialUploadedCertificate)?.fileName || 'Official_Signed_Document.pdf'}</p>
-                            {(remarkModal.officialCertFile || remarkModal.record?.officialUploadedCertificate)?.uploadedBy && (
-                              <p className="text-[10px] text-slate-500 font-medium mt-0.5">अपलोडकर्ता: {(remarkModal.officialCertFile || remarkModal.record?.officialUploadedCertificate)?.uploadedBy}</p>
+                      {/* Prominent 1 MB Limit Badge */}
+                      <div className="flex items-center gap-2 bg-amber-50/90 border border-amber-200 text-amber-900 text-xs font-bold p-3 rounded-xl shadow-2xs">
+                        <span className="text-sm">⚠️</span>
+                        <span>अनिवार्य नियम: फ़ाइल का आकार <strong>1 MB (1024 KB) से कम</strong> होना अनिवार्य है। 1 MB से बड़ी फ़ाइल स्वीकार नहीं होगी।</span>
+                      </div>
+
+                      {/* Previously Uploaded Document Card */}
+                      {(remarkModal.officialCertFile || remarkModal.record?.officialUploadedCertificate) && (
+                        <div className="bg-white border border-emerald-200 rounded-2xl p-3.5 shadow-2xs space-y-2">
+                          <div className="flex items-center justify-between border-b border-slate-100 pb-2">
+                            <span className="text-[11px] font-extrabold text-emerald-950 flex items-center gap-1.5">
+                              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" /> वर्तमान अपलोड फ़ाइल:
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => downloadBlobFile(remarkModal.officialCertFile || remarkModal.record?.officialUploadedCertificate, 'Official_Document.pdf')}
+                              className="text-xs font-bold text-emerald-800 hover:text-emerald-950 flex items-center gap-1 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200 cursor-pointer transition-all"
+                            >
+                              <Eye className="w-3.5 h-3.5 text-emerald-700" /> देखें / डाउनलोड
+                            </button>
+                          </div>
+                          
+                          <div className="flex items-center gap-3 pt-1">
+                            {((remarkModal.officialCertFile || remarkModal.record?.officialUploadedCertificate)?.fileType?.includes('image') || ((remarkModal.officialCertFile || remarkModal.record?.officialUploadedCertificate)?.fileData?.startsWith('data:image'))) ? (
+                              <div className="w-12 h-12 rounded-xl bg-slate-100 border border-emerald-200 overflow-hidden shrink-0 shadow-2xs">
+                                <img src={(remarkModal.officialCertFile || remarkModal.record?.officialUploadedCertificate)?.fileData} alt="Official Document" className="w-full h-full object-cover" />
+                              </div>
+                            ) : (
+                              <div className="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-900 border border-emerald-300 flex items-center justify-center font-bold text-xs shrink-0">
+                                📄 PDF
+                              </div>
                             )}
+                            <div className="min-w-0 text-xs">
+                              <p className="font-extrabold text-slate-900 truncate">{(remarkModal.officialCertFile || remarkModal.record?.officialUploadedCertificate)?.fileName || 'Official_Signed_Document.pdf'}</p>
+                              <p className="text-[10px] text-slate-500 font-medium mt-0.5">
+                                आकार: <strong className="font-mono text-slate-700">{(remarkModal.officialCertFile || remarkModal.record?.officialUploadedCertificate)?.fileSize || 'N/A'}</strong> | अपलोडकर्ता: {(remarkModal.officialCertFile || remarkModal.record?.officialUploadedCertificate)?.uploadedBy || 'Officer'}
+                              </p>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    )}
-                    <input
-                      type="file"
-                      accept="application/pdf,image/*"
-                      onChange={async (e) => {
-                        const file = e.target.files?.[0];
-                        if (file) {
-                          if (file.size > 1 * 1024 * 1024) {
-                            toast.error('❌ फ़ाइल का आकार 1 MB (1024 KB) से अधिक है! कृपया 1 MB से कम साइज की PDF या Photo चुनें।', { duration: 5000 });
-                            e.target.value = '';
-                            return;
-                          }
-                          const loadingToast = toast.loading(`फ़ाइल '${file.name}' संसाधित की जा रही है...`);
-                          try {
-                            const docKey = `doc_cert_${remarkModal.record?.applicationNo || remarkModal.record?.id || Date.now()}`;
-                            const fileObj = await processOfficialFile(file, docKey);
-                            fileObj.uploadedBy = adminAccounts[currentAdminUser]?.name || 'Municipal Officer';
-                            setRemarkModal(prev => ({
-                              ...prev,
-                              officialCertFile: fileObj
-                            }));
-                            toast.success(`फ़ाइल '${file.name}' संलग्न की गई!`, { id: loadingToast });
-                          } catch (err) {
-                            toast.error('फ़ाइल अपलोड में त्रुटि: ' + err.message, { id: loadingToast });
-                          }
-                        }
-                      }}
-                      className="w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-emerald-100 file:text-emerald-800 hover:file:bg-emerald-200 cursor-pointer border border-slate-300 rounded-xl p-1.5 bg-white"
-                    />
-                    {remarkModal.officialCertFile && (
-                      <div className="flex items-center justify-between text-xs bg-emerald-50 border border-emerald-200 p-2.5 rounded-xl text-emerald-900 font-bold mt-1">
-                        <span>✅ संलग्न फ़ाइल: {remarkModal.officialCertFile.fileName}</span>
-                        <button
-                          type="button"
-                          onClick={() => setRemarkModal(prev => ({ ...prev, officialCertFile: null }))}
-                          className="text-rose-600 hover:underline text-[10px]"
-                        >
-                          हटाएं
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                )}
+                      )}
 
-                <div className="flex justify-end gap-2">
-                  <button type="button" onClick={() => setRemarkModal({ isOpen: false, record: null, serviceType: 'death', targetStatus: '', remarkText: '', officerName: 'Nagar Palika Officer', officialCertFile: null })} className="btn btn-secondary">
-                    रद्द करें
-                  </button>
-                  <button type="submit" className="btn btn-primary">
-                    पुष्टि करें और स्थिति बदलें
-                  </button>
-                </div>
-              </form>
+                      {/* Styled File Input Button */}
+                      <label className="border-2 border-dashed border-slate-300 hover:border-emerald-500 bg-white hover:bg-emerald-50/40 rounded-2xl p-4 flex flex-col items-center justify-center cursor-pointer transition-all group">
+                        <Upload className="w-6 h-6 text-slate-400 group-hover:text-emerald-600 mb-1 transition-colors" />
+                        <span className="text-xs font-bold text-slate-700 group-hover:text-emerald-800">
+                          नवीनीकरण फ़ाइल चुनें (Choose New File)
+                        </span>
+                        <span className="text-[10px] text-slate-500 mt-0.5">
+                          केवल PDF या Photo (अधिकतम आकार 1 MB)
+                        </span>
+                        <input
+                          type="file"
+                          accept="application/pdf,image/*"
+                          onChange={async (e) => {
+                            const file = e.target.files?.[0];
+                            if (file) {
+                              if (file.size > 1 * 1024 * 1024) {
+                                toast.error('❌ फ़ाइल का आकार 1 MB (1024 KB) से अधिक है! कृपया 1 MB से कम साइज की PDF या Photo चुनें।', { duration: 5000 });
+                                e.target.value = '';
+                                return;
+                              }
+                              const loadingToast = toast.loading(`फ़ाइल '${file.name}' संसाधित की जा रही है...`);
+                              try {
+                                const docKey = `doc_cert_${remarkModal.record?.applicationNo || remarkModal.record?.id || Date.now()}`;
+                                const fileObj = await processOfficialFile(file, docKey);
+                                fileObj.uploadedBy = adminAccounts[currentAdminUser]?.name || 'Municipal Officer';
+                                setRemarkModal(prev => ({
+                                  ...prev,
+                                  officialCertFile: fileObj
+                                }));
+                                toast.success(`फ़ाइल '${file.name}' संलग्न की गई!`, { id: loadingToast });
+                              } catch (err) {
+                                toast.error('फ़ाइल अपलोड में त्रुटि: ' + err.message, { id: loadingToast });
+                              }
+                            }
+                          }}
+                          className="hidden"
+                        />
+                      </label>
+
+                      {remarkModal.officialCertFile && (
+                        <div className="flex items-center justify-between text-xs bg-emerald-50 border border-emerald-200 p-3 rounded-xl text-emerald-900 font-bold">
+                          <span>✅ नयी संलग्न फ़ाइल: {remarkModal.officialCertFile.fileName} ({remarkModal.officialCertFile.fileSize})</span>
+                          <button
+                            type="button"
+                            onClick={() => setRemarkModal(prev => ({ ...prev, officialCertFile: null }))}
+                            className="text-rose-600 hover:underline text-xs font-extrabold cursor-pointer"
+                          >
+                            हटाएं
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Footer Buttons */}
+                  <div className="border-t border-slate-100 pt-4 flex items-center justify-end gap-2.5">
+                    <button
+                      type="button"
+                      onClick={() => setRemarkModal({ isOpen: false, record: null, serviceType: 'death', targetStatus: '', remarkText: '', officerName: 'Nagar Palika Officer', officialCertFile: null })}
+                      className="bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 text-xs font-bold px-4 py-2.5 rounded-xl cursor-pointer transition-all"
+                    >
+                      रद्द करें
+                    </button>
+                    <button
+                      type="submit"
+                      className="bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-extrabold px-5 py-2.5 rounded-xl shadow-md cursor-pointer transition-all"
+                    >
+                      पुष्टि करें और स्थिति अद्यतन करें
+                    </button>
+                  </div>
+                </form>
+              </div>
             </div>
           </div>
         )}
