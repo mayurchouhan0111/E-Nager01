@@ -298,15 +298,21 @@ function mergeRecords(existing, incoming) {
   const existingPrio = STATUS_PRIORITY[existing.status] || 0;
   const incomingPrio = STATUS_PRIORITY[incoming.status] || 0;
 
+  let merged;
   if (incomingPrio > existingPrio) {
-    return { ...existing, ...incoming };
+    merged = { ...existing, ...incoming };
   } else if (incomingPrio < existingPrio) {
-    return { ...incoming, ...existing };
+    merged = { ...incoming, ...existing };
   } else {
     const existingTime = new Date(existing.updatedAt || existing.appliedAt || 0).getTime();
     const incomingTime = new Date(incoming.updatedAt || incoming.appliedAt || 0).getTime();
-    return incomingTime >= existingTime ? { ...existing, ...incoming } : { ...incoming, ...existing };
+    merged = incomingTime >= existingTime ? { ...existing, ...incoming } : { ...incoming, ...existing };
   }
+
+  return {
+    ...merged,
+    officialUploadedCertificate: incoming.officialUploadedCertificate || existing.officialUploadedCertificate || null
+  };
 }
 
 export async function getDeathCertificates(filterEmail = null, isOfficer = false) {
@@ -430,13 +436,13 @@ export async function updateDeathCertificateStatus({
 
   let existing = {};
   const localList = getLocalDeathCertificates();
-  const localObj = localList.find(r => r.id === id);
+  const localObj = localList.find(r => r.id === id || (r.applicationNo && r.applicationNo === id));
   if (localObj) existing = { ...localObj };
 
-  const isLocalId = !id || String(id).startsWith('local-');
+  const targetId = existing.id || id;
 
   try {
-    const docRef = doc(db, COLLECTION_NAME, id);
+    const docRef = doc(db, COLLECTION_NAME, targetId);
     const snap = await getDoc(docRef);
     if (snap && snap.exists()) {
       existing = { ...existing, ...snap.data() };
@@ -465,10 +471,10 @@ export async function updateDeathCertificateStatus({
   }
 
   await ensureFirebaseAuth();
-  const fullRecord = sanitizeFirestorePayload({ ...existing, ...updatePayload, id });
+  const fullRecord = sanitizeFirestorePayload({ ...existing, ...updatePayload, id: targetId });
 
   try {
-    const docRef = doc(db, COLLECTION_NAME, id);
+    const docRef = doc(db, COLLECTION_NAME, targetId);
     await setDoc(docRef, fullRecord, { merge: true });
     console.log('[DeathCertificateService] Status successfully updated in Firestore backend:', newStatus);
   } catch (error) {
