@@ -33,7 +33,7 @@ import { DEFAULT_ADMIN_ACCOUNTS, fetchAdminAccounts, updateAdminAccountCredentia
 import { subscribeToMaintenance, toggleMaintenanceMode } from '@/services/maintenanceService'
 import {
   ShieldAlert, Search, Trash2, Download, Edit, Printer, Eye, Activity, FileText, CheckCircle2,
-  AlertCircle, Calendar, UserCheck, History, Info, Lock, LogOut, RefreshCw, X, Settings2, Baby, Eye as EyeIcon, Droplet, Key, Save, Building2, Bell, Mail
+  AlertCircle, Calendar, UserCheck, History, Info, Lock, LogOut, RefreshCw, X, Settings2, Baby, Eye as EyeIcon, Droplet, Key, Save, Building2, Bell, Mail, Clock, ChevronDown, ChevronRight, User
 } from 'lucide-react'
 
 function formatTimestamp(ts) {
@@ -127,6 +127,11 @@ export default function AdminPage() {
   const [auditLogs, setAuditLogs] = useState([])
   const [auditLoading, setAuditLoading] = useState(false)
   const [auditSearch, setAuditSearch] = useState('')
+  const [auditServiceFilter, setAuditServiceFilter] = useState('all')
+  const [auditOfficerFilter, setAuditOfficerFilter] = useState('all')
+  const [auditPage, setAuditPage] = useState(1)
+  const [auditRowsPerPage, setAuditRowsPerPage] = useState(10)
+  const [expandedAuditId, setExpandedAuditId] = useState(null)
 
   // Application Letter Modal State
   const [letterModal, setLetterModal] = useState({ isOpen: false, record: null, serviceType: 'death' })
@@ -863,112 +868,146 @@ export default function AdminPage() {
                 ) : (
                   <div className="space-y-3">
                     {filteredDeathRecords.map((record, index) => (
-                      <div key={record.id} className="bg-white border border-slate-200 rounded-2xl p-4 sm:p-5 hover:border-slate-300 transition-all shadow-sm space-y-3">
-                        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2 mb-1 flex-wrap">
-                              <span className="text-[11px] font-mono font-extrabold text-slate-900 bg-slate-100 border border-slate-300 px-2 py-0.5 rounded shadow-2xs">
-                                #{index + 1}
-                              </span>
-                              <span className="text-[11px] font-mono font-bold text-slate-700 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
-                                📅 {formatDate(record.appliedAt || record.createdAt)}
-                              </span>
-                              <span className="text-[11px] font-mono font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded border border-emerald-200">
-                                {record.applicationNo || 'DRAFT'}
-                              </span>
-                              <span className={`px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-bold border uppercase tracking-wider ${getStatusChip(record.status)}`}>
-                                {record.status}
-                              </span>
-                            </div>
-                            <h3 className="text-slate-900 font-extrabold text-sm sm:text-base">
+                      <div key={record.id} className="bg-white border border-slate-200/90 rounded-3xl p-5 hover:border-emerald-300 transition-all shadow-xs hover:shadow-md space-y-4">
+                        {/* Top Header Badge Bar */}
+                        <div className="flex items-center justify-between gap-2 flex-wrap border-b border-slate-100 pb-3">
+                          <div className="flex items-center gap-2 flex-wrap text-xs">
+                            <span className="bg-emerald-100/80 text-emerald-900 font-extrabold px-2.5 py-0.5 rounded-md text-xs">
+                              #{index + 1}
+                            </span>
+                            <span className="text-slate-300 font-light">|</span>
+                            <span className="text-slate-600 font-semibold flex items-center gap-1">
+                              📅 {formatDate(record.appliedAt || record.createdAt)}
+                            </span>
+                            <span className="text-slate-300 font-light">|</span>
+                            <span className="text-emerald-800 font-extrabold font-mono tracking-tight">
+                              {record.applicationNo || 'DRAFT'}
+                            </span>
+                          </div>
+                          <div>
+                            <span className={`px-3 py-1 rounded-full text-[10px] font-extrabold border uppercase tracking-wider ${getStatusChip(record.status)}`}>
+                              {record.status}
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Middle Info Row with Vertical Divider */}
+                        <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
+                          {/* Left Column: Applicant & Deceased Info */}
+                          <div className="md:col-span-8 space-y-2">
+                            <h3 className="text-slate-900 font-black text-lg sm:text-xl tracking-tight">
                               स्व. {record.deceasedDetails?.fullName || 'N/A'}
                             </h3>
-                            <p className="text-[11px] sm:text-xs text-slate-500 mt-0.5 font-medium">
-                              आवेदक: {record.applicantDetails?.fullName} ({record.applicantDetails?.relationWithDeceased}) | फोन: {record.applicantDetails?.mobile} | मृत्यु तिथि: {record.deceasedDetails?.dateOfDeath}
-                            </p>
+                            <div className="space-y-1 text-xs text-slate-600 font-medium">
+                              <p className="flex items-center gap-2">
+                                <span className="text-slate-400">👤</span>
+                                <span>आवेदक: <strong className="text-slate-800">{record.applicantDetails?.fullName || 'N/A'}</strong> ({record.applicantDetails?.relationWithDeceased || 'संबंध'})</span>
+                              </p>
+                              <p className="flex items-center gap-2">
+                                <span className="text-slate-400">📞</span>
+                                <span>फोन: <strong className="text-slate-800 font-mono">{record.applicantDetails?.mobile || 'N/A'}</strong></span>
+                              </p>
+                              <p className="flex items-center gap-2">
+                                <span className="text-slate-400">📅</span>
+                                <span>मृत्यु तिथि: <strong className="text-slate-800 font-mono">{record.deceasedDetails?.dateOfDeath || 'N/A'}</strong></span>
+                              </p>
+                            </div>
                           </div>
 
-                          <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 w-full sm:w-auto">
-                            {/* Letter Modal */}
-                            <button
-                              onClick={() => setLetterModal({ isOpen: true, record, serviceType: 'death' })}
-                              className="btn btn-secondary btn-sm flex items-center gap-1 font-bold text-emerald-900 bg-emerald-50 hover:bg-emerald-100 border-emerald-200 text-[11px]"
-                            >
-                              <Printer className="w-3.5 h-3.5 text-emerald-700" /> पावती पत्र
-                            </button>
-
-                            {(record.status === 'Approved' || record.status === 'Certificate Generated' || record.status === 'Completed') && (
-                              <button
-                                onClick={() => setDeathCertPreview(record)}
-                                className="btn btn-primary btn-sm bg-gradient-to-r from-emerald-600 to-emerald-700 font-bold text-[11px]"
-                              >
-                                📜 प्रमाण पत्र
-                              </button>
-                            )}
-
-                            {record.officialUploadedCertificate && (
-                              <button
-                                type="button"
-                                onClick={() => downloadBlobFile(record.officialUploadedCertificate, 'Official_Signed_Death_Certificate.pdf')}
-                                className="btn btn-primary btn-sm bg-gradient-to-r from-emerald-800 to-teal-800 hover:from-emerald-900 hover:to-teal-900 text-white font-bold text-[11px] flex items-center gap-1 shadow-sm cursor-pointer transition-all"
-                                title="अधिकारी द्वारा अपलोड हस्ताक्षरित मूल दस्तावेज देखें/डाउनलोड करें"
-                              >
-                                <Download className="w-3.5 h-3.5" /> 📜 अपलोड हस्ताक्षरित आदेश
-                              </button>
-                            )}
-
-                            {(record.status === 'Approved' || record.status === 'Certificate Generated' || record.status === 'Completed' || record.status === 'Sanctioned') && (
-                              <button
-                                onClick={() => setRemarkModal({
-                                  isOpen: true,
-                                  record,
-                                  serviceType: 'death',
-                                  targetStatus: record.status,
-                                  remarkText: 'अधिकारी हस्ताक्षरित दस्तावेज अपडेट किया गया',
-                                  officerName: adminAccounts[currentAdminUser]?.name || 'Registrar Officer',
-                                  officialCertFile: record.officialUploadedCertificate || null
-                                })}
-                                className="btn btn-secondary btn-sm flex items-center gap-1 font-bold text-amber-900 bg-amber-50 hover:bg-amber-100 border-amber-200 text-[11px]"
-                                title="अधिकारी हस्ताक्षरित दस्तावेज री-अपलोड करें या बदलें"
-                              >
-                                <Edit className="w-3.5 h-3.5 text-amber-700" /> 🔄 दस्तावेज अपडेट करें
-                              </button>
-                            )}
-
-                            {record.status === 'Submitted' && (
-                              <button
-                                onClick={() => setRemarkModal({ isOpen: true, record, serviceType: 'death', targetStatus: 'Under Review', remarkText: 'समीक्षा हेतु चुना गया', officerName: adminAccounts[currentAdminUser]?.name || 'Registrar Officer' })}
-                                className="btn btn-secondary btn-sm bg-blue-50 border-blue-200 text-blue-700 font-bold text-[11px]"
-                              >
-                                👁️ समीक्षा करें
-                              </button>
-                            )}
-
-                            {record.status !== 'Approved' && record.status !== 'Certificate Generated' && record.status !== 'Completed' && (
-                              <button
-                                onClick={() => setRemarkModal({ isOpen: true, record, serviceType: 'death', targetStatus: 'Approved', remarkText: 'सभी दस्तावेज सत्यापित। स्वीकृत।', officerName: adminAccounts[currentAdminUser]?.name || 'Registrar Officer' })}
-                                className="btn btn-primary btn-sm bg-gradient-to-r from-emerald-600 to-emerald-700 font-bold text-[11px]"
-                              >
-                                ✅ स्वीकृत करें
-                              </button>
-                            )}
-
-                            {record.status !== 'Rejected' && (
-                              <button
-                                onClick={() => setRemarkModal({ isOpen: true, record, serviceType: 'death', targetStatus: 'Rejected', remarkText: 'दस्तावेज अपूर्ण', officerName: adminAccounts[currentAdminUser]?.name || 'Registrar Officer' })}
-                                className="btn btn-danger btn-sm font-bold text-[11px]"
-                              >
-                                ❌ निरस्त
-                              </button>
-                            )}
-
-                            <button
-                              onClick={() => setSelectedDeathDetail(record)}
-                              className="btn btn-secondary btn-sm flex items-center gap-1 font-bold text-slate-700 text-[11px]"
-                            >
-                              <History className="w-3.5 h-3.5 text-slate-500" /> विवरण
-                            </button>
+                          {/* Right Column: Service Type Badge */}
+                          <div className="hidden md:flex md:col-span-4 items-center justify-end border-l border-slate-100 pl-6 my-0.5">
+                            <div className="flex items-center gap-3">
+                              <div className="w-12 h-12 rounded-2xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-700 shrink-0 shadow-2xs">
+                                <FileText className="w-6 h-6" />
+                              </div>
+                              <div>
+                                <p className="text-[11px] font-extrabold text-slate-900 uppercase tracking-wide">प्रमाण पत्र का प्रकार</p>
+                                <p className="text-xs font-semibold text-slate-500 mt-0.5">मृत्यु प्रमाण पत्र</p>
+                              </div>
+                            </div>
                           </div>
+                        </div>
+
+                        {/* Bottom Action Bar */}
+                        <div className="border-t border-slate-100 pt-3.5 flex flex-wrap items-center gap-2">
+                          <button
+                            onClick={() => setLetterModal({ isOpen: true, record, serviceType: 'death' })}
+                            className="btn btn-secondary btn-sm bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 text-xs font-bold px-3 py-2 rounded-xl flex items-center gap-1.5 shadow-2xs"
+                          >
+                            <Printer className="w-3.5 h-3.5 text-slate-600" /> पावती पत्र
+                          </button>
+
+                          {(record.status === 'Approved' || record.status === 'Certificate Generated' || record.status === 'Completed') && (
+                            <button
+                              onClick={() => setDeathCertPreview(record)}
+                              className="btn btn-primary btn-sm bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold px-3.5 py-2 rounded-xl flex items-center gap-1.5 shadow-sm"
+                            >
+                              📜 प्रमाण पत्र
+                            </button>
+                          )}
+
+                          {record.officialUploadedCertificate && (
+                            <button
+                              type="button"
+                              onClick={() => downloadBlobFile(record.officialUploadedCertificate, 'Official_Signed_Death_Certificate.pdf')}
+                              className="btn btn-primary btn-sm bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold px-3.5 py-2 rounded-xl flex items-center gap-1.5 shadow-sm cursor-pointer transition-all"
+                              title="अधिकारी द्वारा अपलोड हस्ताक्षरित मूल दस्तावेज देखें/डाउनलोड करें"
+                            >
+                              <Download className="w-3.5 h-3.5" /> 📥 अपलोड हस्ताक्षरित आदेश
+                            </button>
+                          )}
+
+                          {(record.status === 'Approved' || record.status === 'Certificate Generated' || record.status === 'Completed' || record.status === 'Sanctioned') && (
+                            <button
+                              onClick={() => setRemarkModal({
+                                isOpen: true,
+                                record,
+                                serviceType: 'death',
+                                targetStatus: record.status,
+                                remarkText: 'अधिकारी हस्ताक्षरित दस्तावेज अपडेट किया गया',
+                                officerName: adminAccounts[currentAdminUser]?.name || 'Registrar Officer',
+                                officialCertFile: record.officialUploadedCertificate || null
+                              })}
+                              className="btn btn-secondary btn-sm bg-white hover:bg-slate-50 border border-slate-200 text-amber-800 text-xs font-bold px-3 py-2 rounded-xl flex items-center gap-1.5 shadow-2xs"
+                              title="अधिकारी हस्ताक्षरित दस्तावेज री-अपलोड करें या बदलें"
+                            >
+                              <Edit className="w-3.5 h-3.5 text-amber-600" /> 📝 दस्तावेज अपडेट करें
+                            </button>
+                          )}
+
+                          {record.status === 'Submitted' && (
+                            <button
+                              onClick={() => setRemarkModal({ isOpen: true, record, serviceType: 'death', targetStatus: 'Under Review', remarkText: 'समीक्षा हेतु चुना गया', officerName: adminAccounts[currentAdminUser]?.name || 'Registrar Officer' })}
+                              className="btn btn-secondary btn-sm bg-blue-50 hover:bg-blue-100 border border-blue-200 text-blue-700 text-xs font-bold px-3 py-2 rounded-xl flex items-center gap-1.5 shadow-2xs"
+                            >
+                              👁️ समीक्षा करें
+                            </button>
+                          )}
+
+                          {record.status !== 'Approved' && record.status !== 'Certificate Generated' && record.status !== 'Completed' && (
+                            <button
+                              onClick={() => setRemarkModal({ isOpen: true, record, serviceType: 'death', targetStatus: 'Approved', remarkText: 'सभी दस्तावेज सत्यापित। स्वीकृत।', officerName: adminAccounts[currentAdminUser]?.name || 'Registrar Officer' })}
+                              className="btn btn-primary btn-sm bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold px-3.5 py-2 rounded-xl flex items-center gap-1.5 shadow-sm"
+                            >
+                              ✅ स्वीकृत करें
+                            </button>
+                          )}
+
+                          {record.status !== 'Rejected' && (
+                            <button
+                              onClick={() => setRemarkModal({ isOpen: true, record, serviceType: 'death', targetStatus: 'Rejected', remarkText: 'दस्तावेज अपूर्ण', officerName: adminAccounts[currentAdminUser]?.name || 'Registrar Officer' })}
+                              className="btn btn-danger btn-sm bg-rose-100/80 hover:bg-rose-100 text-rose-700 border border-rose-200/60 text-xs font-bold px-3 py-2 rounded-xl flex items-center gap-1.5"
+                            >
+                              ❌ निरस्त
+                            </button>
+                          )}
+
+                          <button
+                            onClick={() => setSelectedDeathDetail(record)}
+                            className="btn btn-secondary btn-sm bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 text-xs font-bold px-3 py-2 rounded-xl flex items-center gap-1.5 shadow-2xs"
+                          >
+                            <History className="w-3.5 h-3.5 text-slate-500" /> ⏱️ विवरण
+                          </button>
                         </div>
                       </div>
                     ))}
@@ -1032,112 +1071,146 @@ export default function AdminPage() {
                 ) : (
                   <div className="space-y-3">
                     {filteredBirthRecords.map((record, index) => (
-                      <div key={record.id} className="bg-white border border-slate-200 rounded-2xl p-4 sm:p-5 hover:border-slate-300 transition-all shadow-sm space-y-3">
-                        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2 mb-1 flex-wrap">
-                              <span className="text-[11px] font-mono font-extrabold text-slate-900 bg-slate-100 border border-slate-300 px-2 py-0.5 rounded shadow-2xs">
-                                #{index + 1}
-                              </span>
-                              <span className="text-[11px] font-mono font-bold text-slate-700 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
-                                📅 {formatDate(record.appliedAt || record.createdAt)}
-                              </span>
-                              <span className="text-[11px] font-mono font-bold text-blue-800 bg-blue-100 px-2 py-0.5 rounded border border-blue-200">
-                                {record.applicationNo || 'DRAFT'}
-                              </span>
-                              <span className={`px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-bold border uppercase tracking-wider ${getStatusChip(record.status)}`}>
-                                {record.status}
-                              </span>
-                            </div>
-                            <h3 className="text-slate-900 font-extrabold text-sm sm:text-base">
-                              👶 शिशु: {record.childDetails?.fullName || 'अनाम'} (जन्म तिथि: {record.childDetails?.dateOfBirth})
+                      <div key={record.id} className="bg-white border border-slate-200/90 rounded-3xl p-5 hover:border-blue-300 transition-all shadow-xs hover:shadow-md space-y-4">
+                        {/* Top Header Badge Bar */}
+                        <div className="flex items-center justify-between gap-2 flex-wrap border-b border-slate-100 pb-3">
+                          <div className="flex items-center gap-2 flex-wrap text-xs">
+                            <span className="bg-blue-100/80 text-blue-900 font-extrabold px-2.5 py-0.5 rounded-md text-xs">
+                              #{index + 1}
+                            </span>
+                            <span className="text-slate-300 font-light">|</span>
+                            <span className="text-slate-600 font-semibold flex items-center gap-1">
+                              📅 {formatDate(record.appliedAt || record.createdAt)}
+                            </span>
+                            <span className="text-slate-300 font-light">|</span>
+                            <span className="text-blue-800 font-extrabold font-mono tracking-tight">
+                              {record.applicationNo || 'DRAFT'}
+                            </span>
+                          </div>
+                          <div>
+                            <span className={`px-3 py-1 rounded-full text-[10px] font-extrabold border uppercase tracking-wider ${getStatusChip(record.status)}`}>
+                              {record.status}
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Middle Info Row with Vertical Divider */}
+                        <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
+                          {/* Left Column */}
+                          <div className="md:col-span-8 space-y-2">
+                            <h3 className="text-slate-900 font-black text-lg sm:text-xl tracking-tight">
+                              👶 शिशु: {record.childDetails?.fullName || 'अनाम'}
                             </h3>
-                            <p className="text-[11px] sm:text-xs text-slate-500 mt-0.5 font-medium">
-                              माता: {record.motherDetails?.fullName} | पिता: {record.fatherDetails?.fullName} | आवेदक: {record.applicantDetails?.fullName} ({record.applicantDetails?.mobile})
-                            </p>
+                            <div className="space-y-1 text-xs text-slate-600 font-medium">
+                              <p className="flex items-center gap-2">
+                                <span className="text-slate-400">👤</span>
+                                <span>माता: <strong className="text-slate-800">{record.motherDetails?.fullName || 'N/A'}</strong> | पिता: <strong className="text-slate-800">{record.fatherDetails?.fullName || 'N/A'}</strong></span>
+                              </p>
+                              <p className="flex items-center gap-2">
+                                <span className="text-slate-400">📞</span>
+                                <span>आवेदक: <strong className="text-slate-800">{record.applicantDetails?.fullName}</strong> (<span className="font-mono">{record.applicantDetails?.mobile}</span>)</span>
+                              </p>
+                              <p className="flex items-center gap-2">
+                                <span className="text-slate-400">📅</span>
+                                <span>जन्म तिथि: <strong className="text-slate-800 font-mono">{record.childDetails?.dateOfBirth || 'N/A'}</strong></span>
+                              </p>
+                            </div>
                           </div>
 
-                          <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 w-full sm:w-auto">
-                            {/* Letter Modal */}
-                            <button
-                              onClick={() => setLetterModal({ isOpen: true, record, serviceType: 'birth' })}
-                              className="btn btn-secondary btn-sm flex items-center gap-1 font-bold text-blue-900 bg-blue-50 hover:bg-blue-100 border-blue-200 text-[11px]"
-                            >
-                              <Printer className="w-3.5 h-3.5 text-blue-700" /> पावती पत्र
-                            </button>
-
-                            {(record.status === 'Approved' || record.status === 'Certificate Generated' || record.status === 'Completed') && (
-                              <button
-                                onClick={() => setBirthCertPreview(record)}
-                                className="btn btn-primary btn-sm bg-gradient-to-r from-blue-600 to-blue-700 font-bold text-[11px]"
-                              >
-                                📜 प्रमाण पत्र
-                              </button>
-                            )}
-
-                            {record.officialUploadedCertificate && (
-                              <button
-                                type="button"
-                                onClick={() => downloadBlobFile(record.officialUploadedCertificate, 'Official_Signed_Birth_Certificate.pdf')}
-                                className="btn btn-primary btn-sm bg-gradient-to-r from-blue-800 to-indigo-800 hover:from-blue-900 hover:to-indigo-900 text-white font-bold text-[11px] flex items-center gap-1 shadow-sm cursor-pointer transition-all"
-                                title="अधिकारी द्वारा अपलोड हस्ताक्षरित मूल दस्तावेज देखें/डाउनलोड करें"
-                              >
-                                <Download className="w-3.5 h-3.5" /> 📜 अपलोड हस्ताक्षरित आदेश
-                              </button>
-                            )}
-
-                            {(record.status === 'Approved' || record.status === 'Certificate Generated' || record.status === 'Completed' || record.status === 'Sanctioned') && (
-                              <button
-                                onClick={() => setRemarkModal({
-                                  isOpen: true,
-                                  record,
-                                  serviceType: 'birth',
-                                  targetStatus: record.status,
-                                  remarkText: 'अधिकारी हस्ताक्षरित दस्तावेज अपडेट किया गया',
-                                  officerName: adminAccounts[currentAdminUser]?.name || 'Registrar Officer',
-                                  officialCertFile: record.officialUploadedCertificate || null
-                                })}
-                                className="btn btn-secondary btn-sm flex items-center gap-1 font-bold text-amber-900 bg-amber-50 hover:bg-amber-100 border-amber-200 text-[11px]"
-                                title="अधिकारी हस्ताक्षरित दस्तावेज री-अपलोड करें या बदलें"
-                              >
-                                <Edit className="w-3.5 h-3.5 text-amber-700" /> 🔄 दस्तावेज अपडेट करें
-                              </button>
-                            )}
-
-                            {record.status === 'Submitted' && (
-                              <button
-                                onClick={() => setRemarkModal({ isOpen: true, record, serviceType: 'birth', targetStatus: 'Under Review', remarkText: 'समीक्षा हेतु चुना गया', officerName: adminAccounts[currentAdminUser]?.name || 'Registrar Officer' })}
-                                className="btn btn-secondary btn-sm bg-blue-50 border-blue-200 text-blue-700 font-bold text-[11px]"
-                              >
-                                👁️ समीक्षा करें
-                              </button>
-                            )}
-
-                            {record.status !== 'Approved' && record.status !== 'Certificate Generated' && record.status !== 'Completed' && (
-                              <button
-                                onClick={() => setRemarkModal({ isOpen: true, record, serviceType: 'birth', targetStatus: 'Approved', remarkText: 'सभी दस्तावेज सत्यापित। स्वीकृत।', officerName: adminAccounts[currentAdminUser]?.name || 'Registrar Officer' })}
-                                className="btn btn-primary btn-sm bg-gradient-to-r from-blue-600 to-blue-700 font-bold text-[11px]"
-                              >
-                                ✅ स्वीकृत करें
-                              </button>
-                            )}
-
-                            {record.status !== 'Rejected' && (
-                              <button
-                                onClick={() => setRemarkModal({ isOpen: true, record, serviceType: 'birth', targetStatus: 'Rejected', remarkText: 'दस्तावेज अपूर्ण', officerName: adminAccounts[currentAdminUser]?.name || 'Registrar Officer' })}
-                                className="btn btn-danger btn-sm font-bold text-[11px]"
-                              >
-                                ❌ निरस्त
-                              </button>
-                            )}
-
-                            <button
-                              onClick={() => setSelectedBirthDetail(record)}
-                              className="btn btn-secondary btn-sm flex items-center gap-1 font-bold text-slate-700 text-[11px]"
-                            >
-                              <History className="w-3.5 h-3.5 text-slate-500" /> विवरण
-                            </button>
+                          {/* Right Column: Service Type Badge */}
+                          <div className="hidden md:flex md:col-span-4 items-center justify-end border-l border-slate-100 pl-6 my-0.5">
+                            <div className="flex items-center gap-3">
+                              <div className="w-12 h-12 rounded-2xl bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-700 shrink-0 shadow-2xs">
+                                <Baby className="w-6 h-6" />
+                              </div>
+                              <div>
+                                <p className="text-[11px] font-extrabold text-slate-900 uppercase tracking-wide">प्रमाण पत्र का प्रकार</p>
+                                <p className="text-xs font-semibold text-slate-500 mt-0.5">जन्म प्रमाण पत्र</p>
+                              </div>
+                            </div>
                           </div>
+                        </div>
+
+                        {/* Bottom Action Bar */}
+                        <div className="border-t border-slate-100 pt-3.5 flex flex-wrap items-center gap-2">
+                          <button
+                            onClick={() => setLetterModal({ isOpen: true, record, serviceType: 'birth' })}
+                            className="btn btn-secondary btn-sm bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 text-xs font-bold px-3 py-2 rounded-xl flex items-center gap-1.5 shadow-2xs"
+                          >
+                            <Printer className="w-3.5 h-3.5 text-slate-600" /> पावती पत्र
+                          </button>
+
+                          {(record.status === 'Approved' || record.status === 'Certificate Generated' || record.status === 'Completed') && (
+                            <button
+                              onClick={() => setBirthCertPreview(record)}
+                              className="btn btn-primary btn-sm bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold px-3.5 py-2 rounded-xl flex items-center gap-1.5 shadow-sm"
+                            >
+                              📜 प्रमाण पत्र
+                            </button>
+                          )}
+
+                          {record.officialUploadedCertificate && (
+                            <button
+                              type="button"
+                              onClick={() => downloadBlobFile(record.officialUploadedCertificate, 'Official_Signed_Birth_Certificate.pdf')}
+                              className="btn btn-primary btn-sm bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold px-3.5 py-2 rounded-xl flex items-center gap-1.5 shadow-sm cursor-pointer transition-all"
+                              title="अधिकारी द्वारा अपलोड हस्ताक्षरित मूल दस्तावेज देखें/डाउनलोड करें"
+                            >
+                              <Download className="w-3.5 h-3.5" /> 📥 अपलोड हस्ताक्षरित आदेश
+                            </button>
+                          )}
+
+                          {(record.status === 'Approved' || record.status === 'Certificate Generated' || record.status === 'Completed' || record.status === 'Sanctioned') && (
+                            <button
+                              onClick={() => setRemarkModal({
+                                isOpen: true,
+                                record,
+                                serviceType: 'birth',
+                                targetStatus: record.status,
+                                remarkText: 'अधिकारी हस्ताक्षरित दस्तावेज अपडेट किया गया',
+                                officerName: adminAccounts[currentAdminUser]?.name || 'Registrar Officer',
+                                officialCertFile: record.officialUploadedCertificate || null
+                              })}
+                              className="btn btn-secondary btn-sm bg-white hover:bg-slate-50 border border-slate-200 text-amber-800 text-xs font-bold px-3 py-2 rounded-xl flex items-center gap-1.5 shadow-2xs"
+                              title="अधिकारी हस्ताक्षरित दस्तावेज री-अपलोड करें या बदलें"
+                            >
+                              <Edit className="w-3.5 h-3.5 text-amber-600" /> 📝 दस्तावेज अपडेट करें
+                            </button>
+                          )}
+
+                          {record.status === 'Submitted' && (
+                            <button
+                              onClick={() => setRemarkModal({ isOpen: true, record, serviceType: 'birth', targetStatus: 'Under Review', remarkText: 'समीक्षा हेतु चुना गया', officerName: adminAccounts[currentAdminUser]?.name || 'Registrar Officer' })}
+                              className="btn btn-secondary btn-sm bg-blue-50 hover:bg-blue-100 border border-blue-200 text-blue-700 text-xs font-bold px-3 py-2 rounded-xl flex items-center gap-1.5 shadow-2xs"
+                            >
+                              👁️ समीक्षा करें
+                            </button>
+                          )}
+
+                          {record.status !== 'Approved' && record.status !== 'Certificate Generated' && record.status !== 'Completed' && (
+                            <button
+                              onClick={() => setRemarkModal({ isOpen: true, record, serviceType: 'birth', targetStatus: 'Approved', remarkText: 'सभी दस्तावेज सत्यापित। स्वीकृत।', officerName: adminAccounts[currentAdminUser]?.name || 'Registrar Officer' })}
+                              className="btn btn-primary btn-sm bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold px-3.5 py-2 rounded-xl flex items-center gap-1.5 shadow-sm"
+                            >
+                              ✅ स्वीकृत करें
+                            </button>
+                          )}
+
+                          {record.status !== 'Rejected' && (
+                            <button
+                              onClick={() => setRemarkModal({ isOpen: true, record, serviceType: 'birth', targetStatus: 'Rejected', remarkText: 'दस्तावेज अपूर्ण', officerName: adminAccounts[currentAdminUser]?.name || 'Registrar Officer' })}
+                              className="btn btn-danger btn-sm bg-rose-100/80 hover:bg-rose-100 text-rose-700 border border-rose-200/60 text-xs font-bold px-3 py-2 rounded-xl flex items-center gap-1.5"
+                            >
+                              ❌ निरस्त
+                            </button>
+                          )}
+
+                          <button
+                            onClick={() => setSelectedBirthDetail(record)}
+                            className="btn btn-secondary btn-sm bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 text-xs font-bold px-3 py-2 rounded-xl flex items-center gap-1.5 shadow-2xs"
+                          >
+                            <History className="w-3.5 h-3.5 text-slate-500" /> ⏱️ विवरण
+                          </button>
                         </div>
                       </div>
                     ))}
@@ -1201,112 +1274,146 @@ export default function AdminPage() {
                 ) : (
                   <div className="space-y-3">
                     {filteredWaterRecords.map((record, index) => (
-                      <div key={record.id} className="bg-white border border-slate-200 rounded-2xl p-4 sm:p-5 hover:border-slate-300 transition-all shadow-sm space-y-3">
-                        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2 mb-1 flex-wrap">
-                              <span className="text-[11px] font-mono font-extrabold text-slate-900 bg-slate-100 border border-slate-300 px-2 py-0.5 rounded shadow-2xs">
-                                #{index + 1}
-                              </span>
-                              <span className="text-[11px] font-mono font-bold text-slate-700 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
-                                📅 {formatDate(record.appliedAt || record.createdAt)}
-                              </span>
-                              <span className="text-[11px] font-mono font-bold text-teal-800 bg-teal-100 px-2 py-0.5 rounded border border-teal-200">
-                                {record.applicationNo || 'DRAFT'}
-                              </span>
-                              <span className={`px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-bold border uppercase tracking-wider ${getStatusChip(record.status)}`}>
-                                {record.status}
-                              </span>
-                            </div>
-                            <h3 className="text-slate-900 font-extrabold text-sm sm:text-base">
-                              💧 आवेदक: {record.applicantDetails?.fullName || 'N/A'} (भवन क्र. {record.propertyDetails?.houseNo || 'N/A'}, वार्ड क्र. {record.applicantDetails?.wardNo || 'N/A'})
+                      <div key={record.id} className="bg-white border border-slate-200/90 rounded-3xl p-5 hover:border-teal-300 transition-all shadow-xs hover:shadow-md space-y-4">
+                        {/* Top Header Badge Bar */}
+                        <div className="flex items-center justify-between gap-2 flex-wrap border-b border-slate-100 pb-3">
+                          <div className="flex items-center gap-2 flex-wrap text-xs">
+                            <span className="bg-teal-100/80 text-teal-900 font-extrabold px-2.5 py-0.5 rounded-md text-xs">
+                              #{index + 1}
+                            </span>
+                            <span className="text-slate-300 font-light">|</span>
+                            <span className="text-slate-600 font-semibold flex items-center gap-1">
+                              📅 {formatDate(record.appliedAt || record.createdAt)}
+                            </span>
+                            <span className="text-slate-300 font-light">|</span>
+                            <span className="text-teal-800 font-extrabold font-mono tracking-tight">
+                              {record.applicationNo || 'DRAFT'}
+                            </span>
+                          </div>
+                          <div>
+                            <span className={`px-3 py-1 rounded-full text-[10px] font-extrabold border uppercase tracking-wider ${getStatusChip(record.status)}`}>
+                              {record.status}
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Middle Info Row with Vertical Divider */}
+                        <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
+                          {/* Left Column */}
+                          <div className="md:col-span-8 space-y-2">
+                            <h3 className="text-slate-900 font-black text-lg sm:text-xl tracking-tight">
+                              💧 आवेदक: {record.applicantDetails?.fullName || 'N/A'}
                             </h3>
-                            <p className="text-[11px] sm:text-xs text-slate-500 mt-0.5 font-medium">
-                              पिता/पति: {record.applicantDetails?.fatherHusbandName} | फोन: {record.applicantDetails?.mobile} | साइज: {record.propertyDetails?.connectionSize} | प्रयोजन: {record.propertyDetails?.usagePurpose}
-                            </p>
+                            <div className="space-y-1 text-xs text-slate-600 font-medium">
+                              <p className="flex items-center gap-2">
+                                <span className="text-slate-400">🏠</span>
+                                <span>भवन क्र. <strong className="text-slate-800">{record.propertyDetails?.houseNo || 'N/A'}</strong>, वार्ड क्र. <strong className="text-slate-800">{record.applicantDetails?.wardNo || 'N/A'}</strong></span>
+                              </p>
+                              <p className="flex items-center gap-2">
+                                <span className="text-slate-400">📞</span>
+                                <span>फोन: <strong className="text-slate-800 font-mono">{record.applicantDetails?.mobile || 'N/A'}</strong> | पिता/पति: <span className="text-slate-800 font-semibold">{record.applicantDetails?.fatherHusbandName || '—'}</span></span>
+                              </p>
+                              <p className="flex items-center gap-2">
+                                <span className="text-slate-400">💧</span>
+                                <span>कनेक्शन साइज: <strong className="text-slate-800">{record.propertyDetails?.connectionSize || '1/2 इंच'}</strong> | प्रयोजन: <strong className="text-slate-800">{record.propertyDetails?.usagePurpose || 'घरेलू'}</strong></span>
+                              </p>
+                            </div>
                           </div>
 
-                          <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 w-full sm:w-auto">
-                            {/* Letter Modal */}
-                            <button
-                              onClick={() => setLetterModal({ isOpen: true, record, serviceType: 'water_connection' })}
-                              className="btn btn-secondary btn-sm flex items-center gap-1 font-bold text-teal-900 bg-teal-50 hover:bg-teal-100 border-teal-200 text-[11px]"
-                            >
-                              <Printer className="w-3.5 h-3.5 text-teal-700" /> पावती पत्र
-                            </button>
-
-                            {record.status === 'Submitted' && (
-                              <button
-                                onClick={() => setRemarkModal({ isOpen: true, record, serviceType: 'water_connection', targetStatus: 'Under Review', remarkText: 'समीक्षा हेतु चुना गया', officerName: adminAccounts[currentAdminUser]?.name || 'Water Supply Officer' })}
-                                className="btn btn-secondary btn-sm bg-blue-50 border-blue-200 text-blue-700 font-bold text-[11px]"
-                              >
-                                👁️ समीक्षा करें
-                              </button>
-                            )}
-
-                            {record.status !== 'Approved' && record.status !== 'Sanctioned' && record.status !== 'Completed' && (
-                              <button
-                                onClick={() => setRemarkModal({ isOpen: true, record, serviceType: 'water_connection', targetStatus: 'Approved', remarkText: 'साइट प्लान एवं चार्जेज सत्यापित। जल कनेक्शन स्वीकृत।', officerName: adminAccounts[currentAdminUser]?.name || 'Water Supply Officer' })}
-                                className="btn btn-primary btn-sm bg-gradient-to-r from-teal-600 to-emerald-700 font-bold text-[11px]"
-                              >
-                                ✅ स्वीकृत करें
-                              </button>
-                            )}
-
-                            {record.status !== 'Rejected' && (
-                              <button
-                                onClick={() => setRemarkModal({ isOpen: true, record, serviceType: 'water_connection', targetStatus: 'Rejected', remarkText: 'दस्तावेज अपूर्ण', officerName: adminAccounts[currentAdminUser]?.name || 'Water Supply Officer' })}
-                                className="btn btn-danger btn-sm font-bold text-[11px]"
-                              >
-                                ❌ निरस्त
-                              </button>
-                            )}
-
-                            {(record.status === 'Approved' || record.status === 'Sanctioned' || record.status === 'Completed') && (
-                              <button
-                                onClick={() => setWaterCertPreview(record)}
-                                className="btn btn-primary btn-sm bg-gradient-to-r from-teal-600 to-teal-700 font-bold text-[11px]"
-                              >
-                                📜 स्वीकृति पत्र
-                              </button>
-                            )}
-
-                            {record.officialUploadedCertificate && (
-                              <button
-                                type="button"
-                                onClick={() => downloadBlobFile(record.officialUploadedCertificate, 'Official_Signed_Water_Sanction_Permit.pdf')}
-                                className="btn btn-primary btn-sm bg-gradient-to-r from-teal-800 to-emerald-800 hover:from-teal-900 hover:to-emerald-900 text-white font-bold text-[11px] flex items-center gap-1 shadow-sm cursor-pointer transition-all"
-                                title="अधिकारी द्वारा अपलोड हस्ताक्षरित मूल दस्तावेज देखें/डाउनलोड करें"
-                              >
-                                <Download className="w-3.5 h-3.5" /> 📜 अपलोड हस्ताक्षरित आदेश
-                              </button>
-                            )}
-
-                            {(record.status === 'Approved' || record.status === 'Certificate Generated' || record.status === 'Completed' || record.status === 'Sanctioned') && (
-                              <button
-                                onClick={() => setRemarkModal({
-                                  isOpen: true,
-                                  record,
-                                  serviceType: 'water_connection',
-                                  targetStatus: record.status,
-                                  remarkText: 'अधिकारी हस्ताक्षरित दस्तावेज अपडेट किया गया',
-                                  officerName: adminAccounts[currentAdminUser]?.name || 'Water Supply Officer',
-                                  officialCertFile: record.officialUploadedCertificate || null
-                                })}
-                                className="btn btn-secondary btn-sm flex items-center gap-1 font-bold text-amber-900 bg-amber-50 hover:bg-amber-100 border-amber-200 text-[11px]"
-                                title="अधिकारी हस्ताक्षरित दस्तावेज री-अपलोड करें या बदलें"
-                              >
-                                <Edit className="w-3.5 h-3.5 text-amber-700" /> 🔄 दस्तावेज अपडेट करें
-                              </button>
-                            )}
-
-                            <button
-                              onClick={() => setSelectedWaterDetail(record)}
-                              className="btn btn-secondary btn-sm flex items-center gap-1 font-bold text-slate-700 text-[11px]"
-                            >
-                              <History className="w-3.5 h-3.5 text-slate-500" /> विवरण
-                            </button>
+                          {/* Right Column: Service Type Badge */}
+                          <div className="hidden md:flex md:col-span-4 items-center justify-end border-l border-slate-100 pl-6 my-0.5">
+                            <div className="flex items-center gap-3">
+                              <div className="w-12 h-12 rounded-2xl bg-teal-50 border border-teal-100 flex items-center justify-center text-teal-700 shrink-0 shadow-2xs">
+                                <Droplet className="w-6 h-6" />
+                              </div>
+                              <div>
+                                <p className="text-[11px] font-extrabold text-slate-900 uppercase tracking-wide">प्रमाण पत्र का प्रकार</p>
+                                <p className="text-xs font-semibold text-slate-500 mt-0.5">जल कनेक्शन स्वीकृति</p>
+                              </div>
+                            </div>
                           </div>
+                        </div>
+
+                        {/* Bottom Action Bar */}
+                        <div className="border-t border-slate-100 pt-3.5 flex flex-wrap items-center gap-2">
+                          <button
+                            onClick={() => setLetterModal({ isOpen: true, record, serviceType: 'water_connection' })}
+                            className="btn btn-secondary btn-sm bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 text-xs font-bold px-3 py-2 rounded-xl flex items-center gap-1.5 shadow-2xs"
+                          >
+                            <Printer className="w-3.5 h-3.5 text-slate-600" /> पावती पत्र
+                          </button>
+
+                          {(record.status === 'Approved' || record.status === 'Sanctioned' || record.status === 'Completed') && (
+                            <button
+                              onClick={() => setWaterCertPreview(record)}
+                              className="btn btn-primary btn-sm bg-teal-700 hover:bg-teal-800 text-white text-xs font-bold px-3.5 py-2 rounded-xl flex items-center gap-1.5 shadow-sm"
+                            >
+                              📜 स्वीकृति पत्र
+                            </button>
+                          )}
+
+                          {record.officialUploadedCertificate && (
+                            <button
+                              type="button"
+                              onClick={() => downloadBlobFile(record.officialUploadedCertificate, 'Official_Signed_Water_Sanction_Permit.pdf')}
+                              className="btn btn-primary btn-sm bg-teal-700 hover:bg-teal-800 text-white text-xs font-bold px-3.5 py-2 rounded-xl flex items-center gap-1.5 shadow-sm cursor-pointer transition-all"
+                              title="अधिकारी द्वारा अपलोड हस्ताक्षरित मूल दस्तावेज देखें/डाउनलोड करें"
+                            >
+                              <Download className="w-3.5 h-3.5" /> 📥 अपलोड हस्ताक्षरित आदेश
+                            </button>
+                          )}
+
+                          {(record.status === 'Approved' || record.status === 'Certificate Generated' || record.status === 'Completed' || record.status === 'Sanctioned') && (
+                            <button
+                              onClick={() => setRemarkModal({
+                                isOpen: true,
+                                record,
+                                serviceType: 'water_connection',
+                                targetStatus: record.status,
+                                remarkText: 'अधिकारी हस्ताक्षरित दस्तावेज अपडेट किया गया',
+                                officerName: adminAccounts[currentAdminUser]?.name || 'Water Supply Officer',
+                                officialCertFile: record.officialUploadedCertificate || null
+                              })}
+                              className="btn btn-secondary btn-sm bg-white hover:bg-slate-50 border border-slate-200 text-amber-800 text-xs font-bold px-3 py-2 rounded-xl flex items-center gap-1.5 shadow-2xs"
+                              title="अधिकारी हस्ताक्षरित दस्तावेज री-अपलोड करें या बदलें"
+                            >
+                              <Edit className="w-3.5 h-3.5 text-amber-600" /> 📝 दस्तावेज अपडेट करें
+                            </button>
+                          )}
+
+                          {record.status === 'Submitted' && (
+                            <button
+                              onClick={() => setRemarkModal({ isOpen: true, record, serviceType: 'water_connection', targetStatus: 'Under Review', remarkText: 'समीक्षा हेतु चुना गया', officerName: adminAccounts[currentAdminUser]?.name || 'Water Supply Officer' })}
+                              className="btn btn-secondary btn-sm bg-blue-50 hover:bg-blue-100 border border-blue-200 text-blue-700 text-xs font-bold px-3 py-2 rounded-xl flex items-center gap-1.5 shadow-2xs"
+                            >
+                              👁️ समीक्षा करें
+                            </button>
+                          )}
+
+                          {record.status !== 'Approved' && record.status !== 'Sanctioned' && record.status !== 'Completed' && (
+                            <button
+                              onClick={() => setRemarkModal({ isOpen: true, record, serviceType: 'water_connection', targetStatus: 'Approved', remarkText: 'साइट प्लान एवं चार्जेज सत्यापित। जल कनेक्शन स्वीकृत।', officerName: adminAccounts[currentAdminUser]?.name || 'Water Supply Officer' })}
+                              className="btn btn-primary btn-sm bg-teal-700 hover:bg-teal-800 text-white text-xs font-bold px-3.5 py-2 rounded-xl flex items-center gap-1.5 shadow-sm"
+                            >
+                              ✅ स्वीकृत करें
+                            </button>
+                          )}
+
+                          {record.status !== 'Rejected' && (
+                            <button
+                              onClick={() => setRemarkModal({ isOpen: true, record, serviceType: 'water_connection', targetStatus: 'Rejected', remarkText: 'दस्तावेज अपूर्ण', officerName: adminAccounts[currentAdminUser]?.name || 'Water Supply Officer' })}
+                              className="btn btn-danger btn-sm bg-rose-100/80 hover:bg-rose-100 text-rose-700 border border-rose-200/60 text-xs font-bold px-3 py-2 rounded-xl flex items-center gap-1.5"
+                            >
+                              ❌ निरस्त
+                            </button>
+                          )}
+
+                          <button
+                            onClick={() => setSelectedWaterDetail(record)}
+                            className="btn btn-secondary btn-sm bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 text-xs font-bold px-3 py-2 rounded-xl flex items-center gap-1.5 shadow-2xs"
+                          >
+                            <History className="w-3.5 h-3.5 text-slate-500" /> ⏱️ विवरण
+                          </button>
                         </div>
                       </div>
                     ))}
@@ -1466,76 +1573,230 @@ export default function AdminPage() {
               </div>
             )}
 
-            {/* ── AUDIT LOGS TAB ──────────────────────────────────────────── */}
+            {/* ── AUDIT LOGS TAB (गतिविधि लॉग) ──────────────────────────────────────────── */}
             {activeTab === 'audit' && (
-              <div className="space-y-4">
-                <div className="flex items-center gap-2 flex-wrap bg-white p-3 sm:p-4 border border-slate-200 rounded-2xl shadow-sm">
-                  <div className="relative flex-1 min-w-0">
-                    <input 
-                      value={auditSearch} 
-                      onChange={e => setAuditSearch(e.target.value)}
-                      placeholder="ऑडिट लॉग खोजें..."
-                      className="w-full pl-9 pr-3 py-2 rounded-xl bg-white border border-slate-300 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-emerald-600"
-                    />
-                    <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+              <div className="space-y-5 animate-fade-in">
+                {/* Header & Filter Controls Bar */}
+                <div className="bg-white p-5 rounded-3xl border border-slate-200/90 shadow-xs flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                  <div>
+                    <h3 className="font-black text-slate-900 text-xl tracking-tight flex items-center gap-2">
+                      <Activity className="w-5 h-5 text-emerald-600" />
+                      <span>गतिविधि लॉग (Activity Log)</span>
+                    </h3>
+                    <p className="text-xs text-slate-500 font-medium mt-0.5">
+                      सिस्टम में किए गए सभी कार्यों का विवरण नीचे दर्शाया गया है।
+                    </p>
                   </div>
-                  <button onClick={loadAuditLogs} className="btn btn-secondary btn-sm flex items-center gap-1 shrink-0">
-                    <RefreshCw className={`w-3.5 h-3.5 ${auditLoading ? 'animate-spin' : ''}`} /> रिफ्रेश
-                  </button>
+
+                  <div className="flex items-center gap-2 flex-wrap">
+                    {/* Search Input */}
+                    <div className="relative">
+                      <input 
+                        value={auditSearch} 
+                        onChange={e => { setAuditSearch(e.target.value); setAuditPage(1); }}
+                        placeholder="खोजें..."
+                        className="w-40 pl-8 pr-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-xs font-semibold text-slate-900 focus:outline-none focus:border-emerald-600"
+                      />
+                      <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2" />
+                    </div>
+
+                    {/* Date Range Badge */}
+                    <div className="flex items-center gap-1.5 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold text-slate-700">
+                      <Calendar className="w-3.5 h-3.5 text-slate-500" />
+                      <span>01/08/2026 - 11/08/2026</span>
+                    </div>
+
+                    {/* Service Filter */}
+                    <select
+                      value={auditServiceFilter}
+                      onChange={(e) => { setAuditServiceFilter(e.target.value); setAuditPage(1); }}
+                      className="bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 px-3 py-2 focus:outline-none focus:border-emerald-600 cursor-pointer"
+                    >
+                      <option value="all">🎛️ सभी सेवाएं</option>
+                      <option value="no_dues">नो ड्यूज NOC (no_dues)</option>
+                      <option value="birth">जन्म प्रमाण पत्र (birth)</option>
+                      <option value="death">मृत्यु प्रमाण पत्र (death)</option>
+                      <option value="water_connection">जल कनेक्शन (water_connection)</option>
+                    </select>
+
+                    {/* Officer Filter */}
+                    <select
+                      value={auditOfficerFilter}
+                      onChange={(e) => { setAuditOfficerFilter(e.target.value); setAuditPage(1); }}
+                      className="bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 px-3 py-2 focus:outline-none focus:border-emerald-600 cursor-pointer"
+                    >
+                      <option value="all">👤 सभी अधिकारी</option>
+                      <option value="cmo">मुख्य नगर पालिका अधिकारी (CMO)</option>
+                      <option value="registrar">जन्म व मृत्यु रजिस्ट्रार</option>
+                      <option value="water">जल आपूर्ति अधिकारी</option>
+                      <option value="nodues">जोनल राजस्व अधिकारी</option>
+                      <option value="system">System (N/A)</option>
+                    </select>
+
+                    {/* Export CSV Button */}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const csvHeader = 'Timestamp,Officer,Action,Service,AppNo\n';
+                        const csvRows = auditLogs.map(l => `"${formatTimestamp(l.timestamp)}","${l.user || 'N/A'}","${l.action || ''}","${l.serviceType || ''}","${l.applicationNo || ''}"`).join('\n');
+                        const blob = new Blob([csvHeader + csvRows], { type: 'text/csv;charset=utf-8;' });
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = `Activity_Logs_${Date.now()}.csv`;
+                        a.click();
+                        toast.success('गतिविधि लॉग CSV सफलतापूर्वक डाउनलोड हुआ!');
+                      }}
+                      className="btn btn-secondary btn-sm bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 text-xs font-bold px-3 py-2 rounded-xl flex items-center gap-1.5 shadow-2xs cursor-pointer"
+                    >
+                      <Download className="w-3.5 h-3.5 text-slate-600" /> एक्सपोर्ट करें
+                    </button>
+
+                    <button onClick={loadAuditLogs} className="p-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-600">
+                      <RefreshCw className={`w-4 h-4 ${auditLoading ? 'animate-spin' : ''}`} />
+                    </button>
+                  </div>
                 </div>
 
-                <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
-                  {auditLoading ? (
-                    <div className="p-12 text-center text-slate-500">
-                      <RefreshCw className="animate-spin w-6 h-6 text-emerald-600 mx-auto mb-2" />
-                      ऑडिट लॉग लोड हो रहे हैं...
-                    </div>
-                  ) : auditLogs.length === 0 ? (
-                    <div className="p-12 text-center text-slate-400 text-xs">
-                      कोई ऑडिट लॉग नहीं मिला
-                    </div>
-                  ) : (
-                    <div className="overflow-x-auto">
-                      <table className="w-full text-xs text-left border-collapse">
-                        <thead>
-                          <tr className="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase tracking-wider text-[10px] font-bold">
-                            <th className="p-4">समय (Timestamp)</th>
-                            <th className="p-4">अधिकारी (Officer)</th>
-                            <th className="p-4">कार्यवाही (Action)</th>
-                            <th className="p-4">सेवा प्रकार (Service)</th>
-                            <th className="p-4">आवेदन क्रमांक (App No)</th>
-                          </tr>
-                        </thead>
-                        <tbody className="divide-y divide-slate-200">
-                          {auditLogs
-                            .filter(log => !auditSearch || 
-                              log.user?.toLowerCase().includes(auditSearch.toLowerCase()) ||
-                              log.action?.toLowerCase().includes(auditSearch.toLowerCase()) ||
-                              log.applicationNo?.toLowerCase().includes(auditSearch.toLowerCase())
-                            )
-                            .map((log) => (
-                              <tr key={log.id} className="hover:bg-slate-50/80 transition-colors">
-                                <td className="p-4 font-mono text-slate-600">{formatTimestamp(log.timestamp)}</td>
-                                <td className="p-4 font-bold text-slate-900">{log.user || 'N/A'}</td>
-                                <td className="p-4">
-                                  <span className={`px-2.5 py-1 rounded-full text-[11px] font-bold border ${
-                                    log.action?.includes('APPROVED') ? 'bg-emerald-50 text-emerald-700 border-emerald-200' :
-                                    log.action?.includes('REJECTED') ? 'bg-red-50 text-red-700 border-red-200' :
-                                    log.action?.includes('CORRECTION') ? 'bg-amber-50 text-amber-700 border-amber-200' :
-                                    'bg-blue-50 text-blue-700 border-blue-200'
-                                  }`}>
-                                    {log.action || 'N/A'}
-                                  </span>
-                                </td>
-                                <td className="p-4 text-slate-600 font-semibold">{log.serviceType || 'N/A'}</td>
-                                <td className="p-4 font-mono text-slate-800 font-bold">{log.applicationNo || '—'}</td>
+                {/* Table Section */}
+                {(() => {
+                  const filtered = auditLogs.filter(log => {
+                    const matchesSearch = !auditSearch || 
+                      log.user?.toLowerCase().includes(auditSearch.toLowerCase()) ||
+                      log.action?.toLowerCase().includes(auditSearch.toLowerCase()) ||
+                      log.applicationNo?.toLowerCase().includes(auditSearch.toLowerCase());
+
+                    const matchesService = auditServiceFilter === 'all' || log.serviceType === auditServiceFilter;
+                    const matchesOfficer = auditOfficerFilter === 'all' || (
+                      auditOfficerFilter === 'cmo' ? (log.user?.includes('CMO') || log.user?.includes('मुख्य')) :
+                      auditOfficerFilter === 'system' ? (!log.user || log.user === 'N/A' || log.user === 'System') :
+                      log.user?.toLowerCase().includes(auditOfficerFilter)
+                    );
+
+                    return matchesSearch && matchesService && matchesOfficer;
+                  });
+
+                  const totalCount = filtered.length;
+                  const totalPages = Math.max(1, Math.ceil(totalCount / auditRowsPerPage));
+                  const currentPage = Math.min(auditPage, totalPages);
+                  const startIndex = (currentPage - 1) * auditRowsPerPage;
+                  const paginated = filtered.slice(startIndex, startIndex + auditRowsPerPage);
+
+                  return (
+                    <div className="bg-white border border-slate-200/90 rounded-3xl overflow-hidden shadow-xs">
+                      {auditLoading ? (
+                        <div className="p-12 text-center text-slate-500">
+                          <RefreshCw className="animate-spin w-6 h-6 text-emerald-600 mx-auto mb-2" />
+                          गतिविधि लॉग लोड हो रहे हैं...
+                        </div>
+                      ) : filtered.length === 0 ? (
+                        <div className="p-12 text-center text-slate-400 text-xs font-bold">
+                          ⚠️ कोई गतिविधि रिकॉर्ड नहीं मिला
+                        </div>
+                      ) : (
+                        <div className="overflow-x-auto">
+                          <table className="w-full text-xs text-left border-collapse">
+                            <thead>
+                              <tr className="bg-slate-50/80 border-b border-slate-100 text-slate-500 uppercase tracking-wider text-[10px] font-extrabold">
+                                <th className="p-4">⏳ समय (TIMESTAMP)</th>
+                                <th className="p-4">👤 अधिकारी (OFFICER)</th>
+                                <th className="p-4">⚡ कार्य (ACTION)</th>
+                                <th className="p-4">🏢 सेवा (SERVICE)</th>
+                                <th className="p-4">📄 संदर्भ संख्या (APP NO.)</th>
+                                <th className="p-4 w-10"></th>
                               </tr>
+                            </thead>
+                            <tbody className="divide-y divide-slate-100">
+                              {paginated.map((log) => (
+                                <tr key={log.id} className="hover:bg-slate-50/80 transition-colors">
+                                  <td className="p-4 font-mono text-slate-600 text-xs font-medium whitespace-nowrap">
+                                    <div className="flex items-center gap-2">
+                                      <Clock className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                                      <span>{formatTimestamp(log.timestamp)}</span>
+                                    </div>
+                                  </td>
+                                  <td className="p-4 whitespace-nowrap">
+                                    <div className="flex items-center gap-2.5">
+                                      <div className="w-7 h-7 rounded-full bg-emerald-50 text-emerald-800 flex items-center justify-center font-bold text-xs shrink-0 border border-emerald-100">
+                                        <User className="w-3.5 h-3.5" />
+                                      </div>
+                                      <div>
+                                        <p className="font-extrabold text-slate-900 text-xs">{log.user || 'N/A'}</p>
+                                        <p className="text-[10px] text-slate-400 font-semibold">{(!log.user || log.user === 'N/A') ? 'System' : 'Chief Municipal Officer - CMO'}</p>
+                                      </div>
+                                    </div>
+                                  </td>
+                                  <td className="p-4 whitespace-nowrap">
+                                    <span className={`px-3 py-1 rounded-full text-[11px] font-extrabold border inline-flex items-center gap-1.5 ${
+                                      log.action?.includes('APPROVED') ? 'bg-emerald-50 text-emerald-800 border-emerald-200' :
+                                      log.action?.includes('REJECTED') ? 'bg-rose-50 text-rose-700 border-rose-200' :
+                                      log.action?.includes('UPLOADED') || log.action?.includes('CERTIFICATE') ? 'bg-purple-50 text-purple-800 border-purple-200' :
+                                      'bg-blue-50 text-blue-800 border-blue-200'
+                                    }`}>
+                                      {log.action?.includes('APPROVED') && <span>✅</span>}
+                                      {log.action?.includes('REJECTED') && <span>❌</span>}
+                                      {(log.action?.includes('UPLOADED') || log.action?.includes('CERTIFICATE')) && <span>📤</span>}
+                                      {log.action?.includes('REVIEW') && <span>👁️</span>}
+                                      <span>{log.action || 'N/A'}</span>
+                                    </span>
+                                  </td>
+                                  <td className="p-4 font-mono text-slate-600 font-semibold text-xs whitespace-nowrap">
+                                    {log.serviceType || 'no_dues'}
+                                  </td>
+                                  <td className="p-4 font-mono text-slate-900 font-black text-xs whitespace-nowrap">
+                                    {log.applicationNo || '—'}
+                                  </td>
+                                  <td className="p-4 text-slate-400 hover:text-slate-700 cursor-pointer text-center">
+                                    <ChevronDown className="w-4 h-4 mx-auto" />
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      )}
+
+                      {/* Footer Pagination Bar */}
+                      <div className="border-t border-slate-100 p-4 bg-slate-50/50 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs font-bold text-slate-600">
+                        <div>
+                          <span>कुल परिणाम: <strong>{totalCount}</strong></span>
+                        </div>
+                        <div className="flex items-center gap-3 flex-wrap">
+                          <div className="flex items-center gap-1.5">
+                            <span>प्रति पृष्ठ दिखाएं:</span>
+                            <select
+                              value={auditRowsPerPage}
+                              onChange={(e) => { setAuditRowsPerPage(Number(e.target.value)); setAuditPage(1); }}
+                              className="bg-white border border-slate-200 rounded-xl text-xs font-bold px-2 py-1 focus:outline-none"
+                            >
+                              <option value={10}>10</option>
+                              <option value={20}>20</option>
+                              <option value={50}>50</option>
+                            </select>
+                          </div>
+
+                          <div className="flex items-center gap-1">
+                            <button onClick={() => setAuditPage(1)} disabled={currentPage === 1} className="px-2 py-1 rounded-lg border border-slate-200 bg-white disabled:opacity-40 font-bold">«</button>
+                            <button onClick={() => setAuditPage(p => Math.max(1, p - 1))} disabled={currentPage === 1} className="px-2.5 py-1 rounded-lg border border-slate-200 bg-white disabled:opacity-40 font-bold">‹</button>
+                            {[...Array(totalPages)].map((_, i) => (
+                              <button
+                                key={i}
+                                onClick={() => setAuditPage(i + 1)}
+                                className={`px-3 py-1 rounded-lg border text-xs font-bold ${
+                                  currentPage === i + 1 ? 'bg-emerald-600 text-white border-emerald-600 shadow-2xs' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
+                                }`}
+                              >
+                                {i + 1}
+                              </button>
                             ))}
-                        </tbody>
-                      </table>
+                            <button onClick={() => setAuditPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages} className="px-2.5 py-1 rounded-lg border border-slate-200 bg-white disabled:opacity-40 font-bold">›</button>
+                            <button onClick={() => setAuditPage(totalPages)} disabled={currentPage === totalPages} className="px-2 py-1 rounded-lg border border-slate-200 bg-white disabled:opacity-40 font-bold">»</button>
+                          </div>
+                        </div>
+                      </div>
                     </div>
-                  )}
-                </div>
+                  );
+                })()}
               </div>
             )}
 
@@ -2203,24 +2464,28 @@ function ApplicationDetailModal({ record, serviceType, onClose, onOpenRemark, on
 
   return (
     <div className="fixed inset-0 bg-slate-900/75 backdrop-blur-md z-50 overflow-y-auto p-3 sm:p-6 flex items-start justify-center pt-4 sm:pt-8">
-      <div className="bg-white border border-slate-200 rounded-3xl max-w-4xl w-full p-4 sm:p-6 shadow-2xl flex flex-col max-h-[84vh] sm:max-h-[86vh]">
+      <div className="bg-white border border-slate-200 rounded-3xl max-w-4xl w-full p-6 shadow-2xl flex flex-col max-h-[90vh]">
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-slate-100 pb-3 shrink-0">
-          <div>
-            <div className="flex items-center gap-2 mb-1">
-              <span className="font-mono text-xs font-bold text-emerald-800 bg-emerald-100 px-2.5 py-0.5 rounded border border-emerald-300">
+        <div className="flex items-start justify-between border-b border-slate-100 pb-4 shrink-0">
+          <div className="space-y-2">
+            <div className="flex items-center gap-2 flex-wrap">
+              <div className="w-8 h-8 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-600 shrink-0">
+                <FileText className="w-4 h-4" />
+              </div>
+              <span className="font-mono text-xs font-extrabold text-emerald-800 bg-emerald-50 border border-emerald-200/80 px-3 py-1 rounded-full">
                 {record.applicationNo || 'DRAFT'}
               </span>
-              <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold border uppercase tracking-wider ${
-                record.status === 'Approved' || record.status === 'Completed' || record.status === 'Sanctioned' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' :
-                record.status === 'Rejected' ? 'bg-red-50 text-red-700 border-red-200' :
+              <span className={`px-3 py-1 rounded-full text-[10px] font-extrabold border uppercase tracking-wider flex items-center gap-1 ${
+                record.status === 'Approved' || record.status === 'Completed' || record.status === 'Sanctioned' ? 'bg-emerald-50 text-emerald-800 border-emerald-200' :
+                record.status === 'Rejected' ? 'bg-rose-50 text-rose-700 border-rose-200' :
                 record.status === 'Under Review' ? 'bg-blue-50 text-blue-700 border-blue-200' :
                 'bg-slate-100 text-slate-700 border-slate-200'
               }`}>
+                {record.status === 'Approved' && <CheckCircle2 className="w-3 h-3 text-emerald-700" />}
                 {record.status}
               </span>
             </div>
-            <h3 className="text-slate-900 font-extrabold text-base">
+            <h3 className="text-slate-900 font-black text-xl tracking-tight">
               {isDeath && `मृत्यु प्रमाण पत्र विवरण: स्व. ${deceased.fullName || 'N/A'}`}
               {isBirth && `जन्म प्रमाण पत्र विवरण: शिशु ${child.fullName || 'अनाम'}`}
               {isWater && `जल कनेक्शन विवरण: ${applicant.fullName || 'N/A'}`}
@@ -2228,88 +2493,135 @@ function ApplicationDetailModal({ record, serviceType, onClose, onOpenRemark, on
             </h3>
           </div>
 
-          <button onClick={onClose} className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors">
+          <button onClick={onClose} className="p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors">
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Content */}
-        <div className="overflow-y-auto flex-1 pr-1 pt-4 space-y-6">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-2">
-              <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wider border-b border-slate-200 pb-1">
-                {isDeath ? 'मृतक विवरण' : isBirth ? 'शिशु एवं जन्म विवरण' : isNoDues ? 'प्रॉपर्टी व कर भुगतान विवरण' : 'भवन एवं संपत्ति विवरण'}
+        <div className="overflow-y-auto flex-1 pr-1 pt-5 space-y-5">
+          {/* 2 Main Info Cards Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Card 1: Subject Details */}
+            <div className="bg-slate-50/70 border border-slate-200/70 rounded-3xl p-5 space-y-3">
+              <h4 className="text-xs font-extrabold text-slate-900 uppercase tracking-wide border-b border-slate-200/70 pb-2.5 flex items-center gap-2">
+                <div className="w-7 h-7 rounded-lg bg-emerald-100/70 text-emerald-800 flex items-center justify-center">
+                  <User className="w-4 h-4" />
+                </div>
+                <span>{isDeath ? 'मृतक विवरण' : isBirth ? 'शिशु एवं जन्म विवरण' : isNoDues ? 'प्रॉपर्टी व कर विवरण' : 'भवन एवं संपत्ति विवरण'}</span>
               </h4>
-              <div className="text-xs text-slate-800 space-y-1.5 font-medium">
+              <div className="text-xs text-slate-700 space-y-2.5 font-medium">
                 {isDeath && (
-                  <>
-                    <p><span className="text-slate-500">नाम:</span> स्व. {deceased.fullName}</p>
-                    <p><span className="text-slate-500">आयु / लिंग:</span> {deceased.age || '—'} वर्ष | {deceased.gender}</p>
-                    <p><span className="text-slate-500">मृत्यु तिथि:</span> {deceased.dateOfDeath}</p>
-                    <p><span className="text-slate-500">मृत्यु स्थान:</span> {deceased.placeOfDeath}</p>
-                    <p><span className="text-slate-500">पिता/पति नाम:</span> {deceased.fatherHusbandName || '—'}</p>
-                  </>
+                  <div className="grid grid-cols-12 gap-1">
+                    <span className="col-span-5 text-slate-500 font-semibold">नाम:</span>
+                    <span className="col-span-7 font-extrabold text-slate-900">स्व. {deceased.fullName}</span>
+                    <span className="col-span-5 text-slate-500 font-semibold">आयु / लिंग:</span>
+                    <span className="col-span-7 font-bold text-slate-800">{deceased.age || '—'} वर्ष | {deceased.gender}</span>
+                    <span className="col-span-5 text-slate-500 font-semibold">मृत्यु तिथि:</span>
+                    <span className="col-span-7 font-mono font-bold text-slate-800">{deceased.dateOfDeath}</span>
+                    <span className="col-span-5 text-slate-500 font-semibold">मृत्यु स्थान:</span>
+                    <span className="col-span-7 font-bold text-slate-800">{deceased.placeOfDeath}</span>
+                    <span className="col-span-5 text-slate-500 font-semibold">पिता/पति नाम:</span>
+                    <span className="col-span-7 font-bold text-slate-800">{deceased.fatherHusbandName || '—'}</span>
+                  </div>
                 )}
                 {isBirth && (
-                  <>
-                    <p><span className="text-slate-500">शिशु नाम:</span> {child.fullName || 'अनाम'}</p>
-                    <p><span className="text-slate-500">लिंग / वजन:</span> {child.gender} | {child.birthWeight ? `${child.birthWeight} kg` : '—'}</p>
-                    <p><span className="text-slate-500">जन्म तिथि:</span> {child.dateOfBirth}</p>
-                    <p><span className="text-slate-500">जन्म स्थान:</span> {child.placeOfBirth || child.hospitalName || child.homeAddress || '—'}</p>
-                    <p><span className="text-slate-500">माता नाम:</span> {mother.fullName}</p>
-                    <p><span className="text-slate-500">पिता नाम:</span> {father.fullName}</p>
-                  </>
+                  <div className="grid grid-cols-12 gap-1">
+                    <span className="col-span-5 text-slate-500 font-semibold">शिशु नाम:</span>
+                    <span className="col-span-7 font-extrabold text-slate-900">{child.fullName || 'अनाम'}</span>
+                    <span className="col-span-5 text-slate-500 font-semibold">लिंग / वजन:</span>
+                    <span className="col-span-7 font-bold text-slate-800">{child.gender} | {child.birthWeight ? `${child.birthWeight} kg` : '—'}</span>
+                    <span className="col-span-5 text-slate-500 font-semibold">जन्म तिथि:</span>
+                    <span className="col-span-7 font-mono font-bold text-slate-800">{child.dateOfBirth}</span>
+                    <span className="col-span-5 text-slate-500 font-semibold">जन्म स्थान:</span>
+                    <span className="col-span-7 font-bold text-slate-800">{child.placeOfBirth || child.hospitalName || child.homeAddress || '—'}</span>
+                    <span className="col-span-5 text-slate-500 font-semibold">माता नाम:</span>
+                    <span className="col-span-7 font-bold text-slate-800">{mother.fullName}</span>
+                    <span className="col-span-5 text-slate-500 font-semibold">पिता नाम:</span>
+                    <span className="col-span-7 font-bold text-slate-800">{father.fullName}</span>
+                  </div>
                 )}
                 {isWater && (
-                  <>
-                    <p><span className="text-slate-500">मकान क्र.:</span> {property.houseNo || '—'}</p>
-                    <p><span className="text-slate-500">वार्ड क्र.:</span> Ward #{applicant.wardNo || '—'}</p>
-                    <p><span className="text-slate-500">कनेक्शन प्रकार:</span> {property.connectionSize || '1/2 इंच'} | {property.usagePurpose}</p>
-                    <p><span className="text-slate-500">भवन स्वामी:</span> {property.houseOwnerName || applicant.fullName}</p>
-                    <p><span className="text-slate-500">लाइसेंस प्लम्बर:</span> {record.plumberDetails?.plumberName || '—'}</p>
-                  </>
+                  <div className="grid grid-cols-12 gap-1">
+                    <span className="col-span-5 text-slate-500 font-semibold">मकान क्र.:</span>
+                    <span className="col-span-7 font-bold text-slate-900">{property.houseNo || '—'}</span>
+                    <span className="col-span-5 text-slate-500 font-semibold">वार्ड क्र.:</span>
+                    <span className="col-span-7 font-bold text-slate-800">Ward #{applicant.wardNo || '—'}</span>
+                    <span className="col-span-5 text-slate-500 font-semibold">कनेक्शन प्रकार:</span>
+                    <span className="col-span-7 font-bold text-slate-800">{property.connectionSize || '1/2 इंच'} | {property.usagePurpose}</span>
+                    <span className="col-span-5 text-slate-500 font-semibold">भवन स्वामी:</span>
+                    <span className="col-span-7 font-bold text-slate-800">{property.houseOwnerName || applicant.fullName}</span>
+                    <span className="col-span-5 text-slate-500 font-semibold">लाइसेंस प्लम्बर:</span>
+                    <span className="col-span-7 font-bold text-slate-800">{record.plumberDetails?.plumberName || '—'}</span>
+                  </div>
                 )}
                 {isNoDues && (
-                  <>
-                    <p><span className="text-slate-500">प्रॉपर्टी आईडी:</span> {property.propertyId || '—'}</p>
-                    <p><span className="text-slate-500">वार्ड / ज़ोन:</span> Ward #{property.wardNo || '6'}, Zone #{property.zoneNo || '1'}</p>
-                    <p><span className="text-slate-500">TRI रिफरेंस:</span> {tax.triRefNo || '—'}</p>
-                    <p><span className="text-slate-500">वित्तीय वर्ष:</span> {tax.financialYear || '2026-27'}</p>
-                    <p><span className="text-slate-500">जमा कर राशि:</span> ₹{tax.amountPaid || '0'}</p>
-                  </>
+                  <div className="grid grid-cols-12 gap-1">
+                    <span className="col-span-5 text-slate-500 font-semibold">प्रॉपर्टी आईडी:</span>
+                    <span className="col-span-7 font-mono font-extrabold text-slate-900">{property.propertyId || '—'}</span>
+                    <span className="col-span-5 text-slate-500 font-semibold">वार्ड / ज़ोन:</span>
+                    <span className="col-span-7 font-bold text-slate-800">Ward #{property.wardNo || '6'}, Zone #{property.zoneNo || '1'}</span>
+                    <span className="col-span-5 text-slate-500 font-semibold">TRI रिफरेंस:</span>
+                    <span className="col-span-7 font-mono font-bold text-slate-800">{tax.triRefNo || '—'}</span>
+                    <span className="col-span-5 text-slate-500 font-semibold">वित्तीय वर्ष:</span>
+                    <span className="col-span-7 font-bold text-slate-800">{tax.financialYear || '2026-27'}</span>
+                    <span className="col-span-5 text-slate-500 font-semibold">जमा कर राशि:</span>
+                    <span className="col-span-7 font-extrabold text-emerald-800">₹{tax.amountPaid || '0'}</span>
+                  </div>
                 )}
               </div>
             </div>
 
-            <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-2">
-              <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wider border-b border-slate-200 pb-1">आवेदक / संपर्क विवरण</h4>
-              <div className="text-xs text-slate-800 space-y-1.5 font-medium">
-                <p><span className="text-slate-500">आवेदक नाम:</span> {applicant.fullName || '—'}</p>
-                <p><span className="text-slate-500">संबंध:</span> {applicant.relationWithDeceased || applicant.relationWithChild || (applicant.isTenant ? 'किराएदार' : 'मकान मालिक')}</p>
-                <p><span className="text-slate-500">मोबाइल:</span> <a href={`tel:${applicant.mobile}`} className="font-mono font-bold text-emerald-700 underline">{applicant.mobile || '—'}</a></p>
-                <p><span className="text-slate-500">ईमेल:</span> {applicant.email || '—'}</p>
-                <p><span className="text-slate-500">आधार:</span> {applicant.aadhaarNo || applicant.aadhaar || '—'}</p>
-                <p><span className="text-slate-500">पता:</span> {applicant.address || applicant.villageCity || 'झाबुआ (म.प्र.)'}</p>
+            {/* Card 2: Applicant Details */}
+            <div className="bg-slate-50/70 border border-slate-200/70 rounded-3xl p-5 space-y-3">
+              <h4 className="text-xs font-extrabold text-slate-900 uppercase tracking-wide border-b border-slate-200/70 pb-2.5 flex items-center gap-2">
+                <div className="w-7 h-7 rounded-lg bg-emerald-100/70 text-emerald-800 flex items-center justify-center">
+                  <Phone className="w-4 h-4" />
+                </div>
+                <span>आवेदक / संपर्क विवरण</span>
+              </h4>
+              <div className="text-xs text-slate-700 space-y-2.5 font-medium">
+                <div className="grid grid-cols-12 gap-1">
+                  <span className="col-span-5 text-slate-500 font-semibold">आवेदक नाम:</span>
+                  <span className="col-span-7 font-extrabold text-slate-900">{applicant.fullName || '—'}</span>
+                  <span className="col-span-5 text-slate-500 font-semibold">संबंध:</span>
+                  <span className="col-span-7 font-bold text-slate-800">{applicant.relationWithDeceased || applicant.relationWithChild || (applicant.isTenant ? 'किराएदार' : 'मकान मालिक')}</span>
+                  <span className="col-span-5 text-slate-500 font-semibold">मोबाइल:</span>
+                  <span className="col-span-7">
+                    <a href={`tel:${applicant.mobile}`} className="font-mono font-extrabold text-emerald-800 underline hover:text-emerald-950">{applicant.mobile || '—'}</a>
+                  </span>
+                  <span className="col-span-5 text-slate-500 font-semibold">ईमेल:</span>
+                  <span className="col-span-7 font-semibold text-slate-700">{applicant.email || '—'}</span>
+                  <span className="col-span-5 text-slate-500 font-semibold">आधार:</span>
+                  <span className="col-span-7 font-mono font-bold text-slate-800">{applicant.aadhaarNo || applicant.aadhaar || '—'}</span>
+                  <span className="col-span-5 text-slate-500 font-semibold">पता:</span>
+                  <span className="col-span-7 font-semibold text-slate-800">{applicant.address || applicant.villageCity || 'झाबुआ (म.प्र.)'}</span>
+                </div>
               </div>
             </div>
           </div>
 
-          <div className="bg-white border border-slate-200 rounded-2xl p-4 space-y-3 shadow-xs">
-            <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider border-b border-slate-100 pb-2 flex items-center justify-between">
-              <span>📎 आवेदक द्वारा अपलोड संलग्न फोटो व दस्तावेज ({docEntries.length})</span>
-              <span className="text-[10px] text-emerald-800 font-semibold bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
-                अधिकारी सत्यापन केंद्र (Inspector Verification)
+          {/* Attached Documents Card Section */}
+          <div className="bg-slate-50/70 border border-slate-200/70 rounded-3xl p-5 space-y-4">
+            <h4 className="text-xs font-extrabold text-slate-900 uppercase tracking-wide border-b border-slate-200/70 pb-3 flex items-center justify-between">
+              <span className="flex items-center gap-2">
+                <Paperclip className="w-4 h-4 text-slate-500" />
+                <span>आवेदक द्वारा अपलोड संलग्न फोटो व दस्तावेज ({docEntries.length})</span>
+              </span>
+              <span className="text-[10px] text-emerald-800 font-extrabold bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200/80 flex items-center gap-1 uppercase tracking-wider">
+                <ShieldAlert className="w-3 h-3 text-emerald-700" />
+                अधिकारी सत्यापन केंद्र (INSPECTOR VERIFICATION)
               </span>
             </h4>
             {docEntries.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {docEntries.map((doc, idx) => (
-                  <div key={idx} className="flex items-center justify-between bg-slate-50 hover:bg-emerald-50/40 p-3 rounded-2xl border border-slate-200 transition-all">
-                    <div className="flex items-center gap-3 overflow-hidden">
+                  <div key={idx} className="flex items-center justify-between bg-white hover:bg-slate-50/80 p-3 rounded-2xl border border-slate-200/80 transition-all shadow-2xs hover:shadow-xs">
+                    <div className="flex items-center gap-3 overflow-hidden min-w-0">
                       {doc.fileType?.includes('image') || (doc.fileData && doc.fileData.startsWith('data:image')) ? (
                         <div 
                           onClick={() => setPreviewDoc(doc)}
-                          className="w-12 h-12 rounded-xl bg-slate-200 border border-slate-300 overflow-hidden cursor-pointer shrink-0 relative group"
+                          className="w-12 h-12 rounded-xl bg-slate-100 border border-slate-200 overflow-hidden cursor-pointer shrink-0 relative group shadow-2xs"
                         >
                           <img src={doc.fileData} alt={doc.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform" />
                           <div className="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
@@ -2317,50 +2629,51 @@ function ApplicationDetailModal({ record, serviceType, onClose, onOpenRemark, on
                           </div>
                         </div>
                       ) : (
-                        <div className="w-12 h-12 rounded-xl bg-blue-100 text-blue-800 flex items-center justify-center shrink-0 border border-blue-200 font-bold text-xs">
-                          📄 PDF
+                        <div className="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-800 flex items-center justify-center shrink-0 border border-emerald-200 font-bold text-xs shadow-2xs">
+                          <FileText className="w-5 h-5 text-emerald-700" />
                         </div>
                       )}
 
-                      <div className="min-w-0">
-                        <p className="text-xs font-bold text-slate-900 truncate">{doc.title}</p>
-                        <p className="text-[10px] font-mono text-emerald-800 truncate mt-0.5" title={doc.fullVirtualPath || doc.folderPath}>
-                          📁 {doc.officialFileName || doc.fileName} {doc.fileSize ? `(${doc.fileSize})` : ''}
+                      <div className="min-w-0 space-y-0.5">
+                        <p className="text-xs font-extrabold text-slate-900 truncate" title={doc.title}>{doc.title}</p>
+                        <p className="text-[11px] font-medium text-slate-500 truncate" title={doc.fileName}>
+                          📂 {doc.officialFileName || doc.fileName} {doc.fileSize ? `(${doc.fileSize})` : ''}
                         </p>
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-1 shrink-0 ml-2">
+                    <div className="flex items-center gap-1.5 shrink-0 ml-2">
                       <button
                         type="button"
                         onClick={() => setPreviewDoc(doc)}
-                        className="btn btn-secondary btn-sm text-[11px] font-bold text-emerald-800 bg-white hover:bg-emerald-100 px-2.5 py-1.5 flex items-center gap-1 border border-slate-200 shadow-xs"
+                        className="btn btn-secondary btn-sm text-xs font-bold text-slate-700 bg-white hover:bg-slate-50 px-2.5 py-1.5 flex items-center gap-1 border border-slate-200 rounded-xl shadow-2xs"
                       >
-                        <Eye className="w-3.5 h-3.5 text-emerald-700" /> देखें
+                        <Eye className="w-3.5 h-3.5 text-slate-600" /> देखें
                       </button>
                       <a
                         href={doc.fileData}
                         download={doc.fileName || 'document.jpg'}
-                        className="p-1.5 text-slate-500 hover:text-slate-800 hover:bg-slate-200 rounded-lg transition"
+                        className="p-1.5 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-xl border border-slate-200 bg-white shadow-2xs transition"
                         title="डाउनलोड करें"
                       >
-                        <Download className="w-4 h-4" />
+                        <Download className="w-3.5 h-3.5" />
                       </a>
                     </div>
                   </div>
                 ))}
               </div>
             ) : (
-              <div className="p-4 bg-amber-50 border border-amber-200 rounded-xl text-center space-y-1">
+              <div className="p-4 bg-amber-50 border border-amber-200 rounded-2xl text-center space-y-1">
                 <p className="text-xs font-bold text-amber-900">⚠️ कोई इलेक्ट्रॉनिक दस्तावेज संलग्न नहीं है</p>
-                <p className="text-[11px] text-amber-800">आवेदक ने केवल फॉर्म ऑनलाइन दर्ज किया है। भौतिक पावती पत्र (Hard Copy Application) प्राप्त कर कार्यालय में मूल दस्तावेजों का सत्यापन करें।</p>
+                <p className="text-[11px] text-amber-800 font-medium">आवेदक ने केवल फॉर्म ऑनलाइन दर्ज किया है। भौतिक पावती पत्र (Hard Copy Application) प्राप्त कर कार्यालय में मूल दस्तावेजों का सत्यापन करें।</p>
               </div>
             )}
           </div>
 
-          <div className="bg-white border border-slate-200 rounded-2xl p-4 space-y-3">
-            <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wider border-b border-slate-100 pb-2">
-              ⏱️ आवेदन टाइमलाइन इतिहास
+          <div className="bg-slate-50/70 border border-slate-200/70 rounded-3xl p-5 space-y-3">
+            <h4 className="text-xs font-extrabold text-slate-900 uppercase tracking-wide border-b border-slate-200/70 pb-2.5 flex items-center gap-2">
+              <History className="w-4 h-4 text-slate-500" />
+              <span>आवेदन टाइमलाइन इतिहास</span>
             </h4>
             <ApplicationTimeline timeline={record.timeline || []} currentStatus={record.status} />
           </div>
@@ -2420,39 +2733,39 @@ function ApplicationDetailModal({ record, serviceType, onClose, onOpenRemark, on
           </div>
         )}
 
-        {/* Footer Actions */}
-        <div className="border-t border-slate-100 pt-4 mt-2 shrink-0 flex flex-wrap items-center justify-between gap-2">
+        {/* Footer Actions matching 2nd screenshot */}
+        <div className="border-t border-slate-100 pt-4 mt-2 shrink-0 flex flex-wrap items-center justify-between gap-3">
           <button
             onClick={() => { onOpenLetter(record, currentServiceKey); }}
-            className="btn btn-secondary btn-sm font-bold text-xs flex items-center gap-1"
+            className="btn btn-secondary btn-sm bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 font-bold text-xs px-4 py-2.5 rounded-2xl flex items-center gap-2 shadow-2xs"
           >
-            <Printer className="w-3.5 h-3.5" /> पावती पत्र (Print Pawati)
+            <Printer className="w-4 h-4 text-slate-600" /> पावती पत्र (Print Pawati)
           </button>
 
-          <div className="flex items-center gap-1.5 flex-wrap">
+          <div className="flex items-center gap-2 flex-wrap">
             <button
               onClick={() => onOpenRemark(record, 'Under Review', currentServiceKey)}
-              className="btn btn-secondary btn-sm bg-blue-50 border-blue-200 text-blue-700 font-bold text-xs"
+              className="btn btn-secondary btn-sm bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 font-bold text-xs px-4 py-2.5 rounded-2xl flex items-center gap-2 shadow-2xs"
             >
               👁️ समीक्षा में डालें
             </button>
             <button
               onClick={() => onOpenRemark(record, 'Approved', currentServiceKey)}
-              className="btn btn-primary btn-sm bg-emerald-700 font-bold text-xs"
+              className="btn btn-primary btn-sm bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-5 py-2.5 rounded-2xl flex items-center gap-2 shadow-md"
             >
               ✅ स्वीकृत करें
             </button>
             <button
               onClick={() => onOpenRemark(record, 'Correction Requested', currentServiceKey)}
-              className="btn btn-secondary btn-sm bg-amber-50 border-amber-200 text-amber-700 font-bold text-xs"
+              className="btn btn-secondary btn-sm bg-amber-50 hover:bg-amber-100 border border-amber-300 text-amber-900 font-bold text-xs px-4 py-2.5 rounded-2xl flex items-center gap-2"
             >
-              ✏️ सुधार मांगे
+              ✏️ सुधार मांगें
             </button>
             <button
               onClick={() => onOpenRemark(record, 'Rejected', currentServiceKey)}
-              className="btn btn-danger btn-sm font-bold text-xs"
+              className="btn btn-danger btn-sm bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs px-4 py-2.5 rounded-2xl flex items-center gap-2 shadow-md"
             >
-              ❌ निरस्त करें
+              🗑️ निरस्त करें
             </button>
           </div>
         </div>

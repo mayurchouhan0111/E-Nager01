@@ -5,6 +5,7 @@ import {
   getDocs, 
   doc, 
   updateDoc, 
+  onSnapshot,
   serverTimestamp 
 } from 'firebase/firestore';
 
@@ -48,6 +49,15 @@ export async function sendNotification({
   officerRemark = '',
   officerName = 'Nagar Palika Officer'
 }) {
+  const serviceTitleMap = {
+    birth: 'जन्म प्रमाण पत्र (Birth Certificate)',
+    death: 'मृत्यु प्रमाण पत्र (Death Certificate)',
+    water_connection: 'जल (नल) कनेक्शन (Water Connection)',
+    water: 'जल (नल) कनेक्शन (Water Connection)',
+    no_dues: 'संपत्ति कर नो ड्यूज NOC (Property Tax NOC)'
+  };
+  const serviceTitle = serviceTitleMap[serviceType] || serviceType;
+
   const payload = {
     serviceType,
     applicationId,
@@ -57,7 +67,8 @@ export async function sendNotification({
     userUid: userUid || '',
     event,
     status,
-    message: message || `Status changed to ${status} (स्थिति बदली: ${status})`,
+    title: `📢 आवेदन स्थिति अद्यतन: ${applicationNo || 'N/A'}`,
+    message: message || `आपके ${serviceTitle} आवेदन (${applicationNo || ''}) की स्थिति '${status}' कर दी गई है।`,
     officerRemark: officerRemark || '',
     officerName: officerName || 'Nagar Palika Officer',
     isRead: false,
@@ -79,6 +90,48 @@ export async function sendNotification({
   }
 }
 
+export function subscribeNotifications({ targetEmail = null, targetUid = null, recipientId = null, maxResults = 50 } = {}, callback) {
+  if (!callback || typeof callback !== 'function') return () => {};
+
+  try {
+    const notifRef = collection(db, NOTIFICATIONS_COLLECTION);
+    const unsubscribe = onSnapshot(notifRef, (snap) => {
+      let notifications = snap.docs.map(d => ({
+        id: d.id,
+        ...d.data()
+      }));
+
+      // Email & UID Filtered Citizen / Officer Notifications
+      if (targetEmail || targetUid) {
+        notifications = notifications.filter(n => {
+          if (n.recipientId === 'all' || n.recipientId === 'public') return true;
+          if (targetEmail && (n.userEmail === targetEmail || n.recipientId === targetEmail)) return true;
+          if (targetUid && (n.userUid === targetUid || n.recipientId === targetUid)) return true;
+          return false;
+        });
+      } else if (recipientId) {
+        notifications = notifications.filter(n => n.recipientId === recipientId || n.recipientId === 'all');
+      }
+
+      notifications.sort((a, b) => new Date(b.timestamp || 0) - new Date(a.timestamp || 0));
+      const finalNotifs = notifications.slice(0, maxResults);
+      saveLocalNotifications(finalNotifs);
+      callback(finalNotifs);
+    }, (error) => {
+      console.warn('[Notification] Firestore snapshot error, using local storage fallback:', error.message);
+      const local = getLocalNotifications();
+      callback(local);
+    });
+
+    return unsubscribe;
+  } catch (err) {
+    console.warn('[Notification] Subscribe error:', err.message);
+    const local = getLocalNotifications();
+    callback(local);
+    return () => {};
+  }
+}
+
 export async function getNotifications({ serviceType = null, targetEmail = null, targetUid = null, recipientId = null, maxResults = 50 } = {}) {
   try {
     const notifRef = collection(db, NOTIFICATIONS_COLLECTION);
@@ -93,7 +146,6 @@ export async function getNotifications({ serviceType = null, targetEmail = null,
       notifications = notifications.filter(n => n.serviceType === serviceType);
     }
 
-    // Email & UID Filtered Citizen Notifications
     if (targetEmail || targetUid) {
       notifications = notifications.filter(n => {
         if (n.recipientId === 'all' || n.recipientId === 'public') return true;
@@ -157,7 +209,8 @@ export async function notifyDepartmentHeadOnNewSubmission({
     applicantEmail,
     event: 'NEW_SUBMISSION',
     status: 'Submitted',
-    message: `🚨 नया आवेदन प्राप्त! [${serviceTitle}] — आवेदक: ${cleanHindiText(applicantName)} (फोन: ${applicantMobile}) | आवेदन क्र: ${applicationNo}`,
+    title: `🚨 नया ऑनलाइन आवेदन प्राप्त: ${applicationNo}`,
+    message: `[${serviceTitle}] हेतु नया आवेदन (${applicationNo}) नागरिक ${cleanHindiText(applicantName)} (मोबाइल: ${applicantMobile}) द्वारा जमा किया गया।`,
     timestamp: new Date().toISOString()
   };
 
@@ -172,25 +225,16 @@ export async function notifyDepartmentHeadOnNewSubmission({
     addLocalNotification({ id: localId, ...officerNotifPayload });
   }
 
-  // Automated Email Dispatch Logger (Triggers to official department email)
-  console.log(`[DEPARTMENT OFFICER EMAIL DISPATCH] 📧 Automated email notification dispatched for ${serviceTitle} (${applicationNo}) to Department Officer:`, {
-    serviceType,
-    applicationNo,
-    applicantName,
-    applicantMobile,
-    applicantEmail,
-    timestamp: new Date().toISOString()
-  });
-
   return { success: true };
 }
 
 export async function markNotificationAsRead(notificationId) {
+  if (!notificationId) return true;
   try {
     const docRef = doc(db, NOTIFICATIONS_COLLECTION, notificationId);
     await updateDoc(docRef, { isRead: true });
   } catch (error) {
-    console.warn('[Notification] Error marking notification as read (updating local storage):', error.message);
+    console.warn('[Notification] Error marking notification as read (local update fallback):', error.message);
   }
 
   const list = getLocalNotifications();

@@ -51,7 +51,14 @@ export default function ServiceHeader() {
   }, []);
 
   useEffect(() => {
-    loadNotifications();
+    const unsubNotif = subscribeNotifications({
+      targetEmail: citizenUser?.email || null,
+      targetUid: citizenUser?.uid || null,
+      maxResults: 20
+    }, (data) => {
+      setNotifications(data);
+      setUnreadCount(data.filter(n => !n.isRead).length);
+    });
 
     if (typeof window !== 'undefined') {
       const SYSTEM_VERSION = 'v2.1_clean_sync';
@@ -66,7 +73,9 @@ export default function ServiceHeader() {
         performQuerySearch(queryVal);
       }
     }
-  }, []);
+
+    return () => unsubNotif();
+  }, [citizenUser]);
 
   useEffect(() => {
     const unsubAuth = subscribeToCitizenAuth((user) => {
@@ -112,19 +121,12 @@ export default function ServiceHeader() {
     toast.success('नागरिक लॉग आउट सफल');
   };
 
-  const loadNotifications = async () => {
-    const data = await getNotifications({
-      targetEmail: citizenUser?.email || null,
-      targetUid: citizenUser?.uid || null,
-      maxResults: 20
-    });
-    setNotifications(data);
-    setUnreadCount(data.filter(n => !n.isRead).length);
-  };
-
-  const handleMarkAsRead = async (id) => {
-    await markNotificationAsRead(id);
-    loadNotifications();
+  const handleMarkAsRead = async (notif) => {
+    if (!notif) return;
+    const notifId = typeof notif === 'string' ? notif : notif.id;
+    setNotifications(prev => prev.map(n => n.id === notifId ? { ...n, isRead: true } : n));
+    setUnreadCount(prev => Math.max(0, prev - 1));
+    await markNotificationAsRead(notifId);
   };
 
   const performQuerySearch = async (queryText) => {
