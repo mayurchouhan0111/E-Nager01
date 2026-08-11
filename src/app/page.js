@@ -2,7 +2,7 @@
 import Link from 'next/link'
 import ServiceHeader from '@/components/ServiceHeader'
 import DocumentChecklist from '@/components/DocumentChecklist'
-import { FileText, Baby, Droplet, ArrowRight, Shield, Clock, CheckCircle2, AlertTriangle, ShieldAlert, ListChecks } from 'lucide-react'
+import { FileText, Baby, Droplet, ShieldCheck, ArrowRight, Shield, Clock, CheckCircle2, AlertTriangle, ShieldAlert, ListChecks } from 'lucide-react'
 
 export default function HomePage() {
   return (
@@ -46,6 +46,9 @@ export default function HomePage() {
               <a href="/water-connection" className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-teal-600 text-white font-bold text-xs hover:bg-teal-700 transition-all shadow-md">
                 जल कनेक्शन आवेदन <span className="text-teal-200">→</span>
               </a>
+              <a href="/no-dues-certificate" className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-violet-600 text-white font-bold text-xs hover:bg-violet-700 transition-all shadow-md">
+                नो ड्यूज प्रमाण पत्र <span className="text-violet-200">→</span>
+              </a>
             </div>
           </div>
         </div>
@@ -71,7 +74,7 @@ export default function HomePage() {
           <p className="text-sm text-slate-500 mt-2">अपनी आवश्यकता अनुसार नगर पालिका सेवा चुनें</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8 max-w-7xl mx-auto">
           
           {/* Death Certificate Card */}
           <Link href="/death-certificate" className="group">
@@ -208,6 +211,53 @@ export default function HomePage() {
               </div>
 
               <div className="flex items-center text-teal-700 font-bold text-xs group-hover:gap-2 gap-1.5 transition-all duration-300 pt-2 border-t border-slate-100">
+                आवेदन शुरू करें
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-1.5 transition-transform duration-300" />
+              </div>
+            </div>
+          </Link>
+
+          {/* No Dues Certificate Card */}
+          <Link href="/no-dues-certificate" className="group">
+            <div className="bg-white border border-slate-200 rounded-3xl p-7 shadow-sm hover:shadow-2xl hover:shadow-violet-100 hover:border-violet-200 transition-all duration-500 h-full relative overflow-hidden flex flex-col justify-between">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-violet-50 to-transparent rounded-bl-full opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              <div className="relative">
+                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-violet-600 to-purple-700 flex items-center justify-center shadow-lg shadow-violet-200 mb-6 group-hover:scale-110 group-hover:-rotate-3 transition-all duration-500">
+                  <ShieldCheck className="w-7 h-7 text-white" />
+                </div>
+                <h3 className="text-base font-extrabold text-slate-900 mb-1">
+                  नो ड्यूज प्रमाण पत्र
+                </h3>
+                <p className="text-[10px] text-violet-700 font-bold uppercase tracking-wider mb-3">
+                  No Dues Certificate (NOC)
+                </p>
+                <p className="text-xs text-slate-600 leading-relaxed mb-6">
+                  संपत्ति कर एवं जल कर का कोई बकाया नहीं है इसका आधिकारिक प्रमाण पत्र प्राप्त करें। 100% डिजिटल सेवा।
+                </p>
+                
+                <div className="space-y-2.5 mb-6">
+                  <div className="flex items-center gap-2 text-xs text-slate-600">
+                    <div className="w-4 h-4 rounded-full bg-violet-100 flex items-center justify-center shrink-0">
+                      <CheckCircle2 className="w-3 h-3 text-violet-600" />
+                    </div>
+                    <span>ऑनलाइन आवेदन व भुगतान रसीद</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-xs text-slate-600">
+                    <div className="w-4 h-4 rounded-full bg-violet-100 flex items-center justify-center shrink-0">
+                      <Clock className="w-3 h-3 text-violet-600" />
+                    </div>
+                    <span>तत्काल डिजिटल प्रमाण पत्र</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-xs text-slate-600">
+                    <div className="w-4 h-4 rounded-full bg-violet-100 flex items-center justify-center shrink-0">
+                      <Shield className="w-3 h-3 text-violet-600" />
+                    </div>
+                    <span>100% डिजिटल - कार्यालय जाने की आवश्यकता नहीं</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-center text-violet-700 font-bold text-xs group-hover:gap-2 gap-1.5 transition-all duration-300 pt-2 border-t border-slate-100">
                 आवेदन शुरू करें
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1.5 transition-transform duration-300" />
               </div>
