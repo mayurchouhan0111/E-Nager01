@@ -238,6 +238,36 @@ export async function submitNoDuesCertificate(data, existingId = null) {
   };
 }
 
+const STATUS_PRIORITY = {
+  'Approved': 5,
+  'Certificate Generated': 5,
+  'Completed': 5,
+  'Sanctioned': 5,
+  'Rejected': 4,
+  'Correction Requested': 4,
+  'Under Review': 3,
+  'Submitted': 2,
+  'Draft': 1
+};
+
+function mergeRecords(existing, incoming) {
+  if (!existing) return incoming;
+  if (!incoming) return existing;
+
+  const existingPrio = STATUS_PRIORITY[existing.status] || 0;
+  const incomingPrio = STATUS_PRIORITY[incoming.status] || 0;
+
+  if (incomingPrio > existingPrio) {
+    return { ...existing, ...incoming };
+  } else if (incomingPrio < existingPrio) {
+    return { ...incoming, ...existing };
+  } else {
+    const existingTime = new Date(existing.updatedAt || existing.appliedAt || 0).getTime();
+    const incomingTime = new Date(incoming.updatedAt || incoming.appliedAt || 0).getTime();
+    return incomingTime >= existingTime ? { ...existing, ...incoming } : { ...incoming, ...existing };
+  }
+}
+
 export async function getNoDuesCertificates(param1 = null, param2 = false) {
   let filterEmail = null;
   let isOfficer = false;
@@ -260,15 +290,29 @@ export async function getNoDuesCertificates(param1 = null, param2 = false) {
     const colRef = collection(db, COLLECTION_NAME);
     const snap = await getDocs(colRef);
 
+    const remoteItems = snap.docs.map(d => ({
+      id: d.id,
+      ...d.data()
+    }));
+
     const mergedMap = new Map();
-    snap.docs.forEach(docSnap => {
-      mergedMap.set(docSnap.id, { id: docSnap.id, ...docSnap.data() });
+    remoteItems.forEach(item => {
+      const key = item.applicationNo || item.id;
+      const existing = mergedMap.get(key);
+      mergedMap.set(key, mergeRecords(existing, item));
     });
 
     localItems.forEach(item => {
       const key = item.applicationNo || item.id;
-      if (!mergedMap.has(key)) {
-        mergedMap.set(item.id, item);
+      const existingRemote = mergedMap.get(key) || mergedMap.get(item.id);
+      const merged = mergeRecords(existingRemote, item);
+      mergedMap.set(key, merged);
+
+      if (item.id && item.status && item.status !== 'Draft') {
+        try {
+          const docRef = doc(db, COLLECTION_NAME, item.id);
+          setDoc(docRef, sanitizeFirestorePayload(merged), { merge: true }).catch(() => {});
+        } catch (e) {}
       }
     });
 
@@ -358,11 +402,13 @@ export async function updateNoDuesCertificateStatus({
 
   let existing = {};
   const localList = getLocalNoDuesCertificates();
-  const localObj = localList.find(r => r.id === id);
+  const localObj = localList.find(r => r.id === id || (r.applicationNo && r.applicationNo === id));
   if (localObj) existing = { ...localObj };
 
+  const targetId = existing.id || id;
+
   try {
-    const docRef = doc(db, COLLECTION_NAME, id);
+    const docRef = doc(db, COLLECTION_NAME, targetId);
     const snap = await getDoc(docRef);
     if (snap && snap.exists()) {
       existing = { ...existing, ...snap.data() };
@@ -390,10 +436,10 @@ export async function updateNoDuesCertificateStatus({
   }
 
   await ensureFirebaseAuth();
-  const fullRecord = sanitizeFirestorePayload({ ...existing, ...updatePayload, id });
+  const fullRecord = sanitizeFirestorePayload({ ...existing, ...updatePayload, id: targetId });
 
   try {
-    const docRef = doc(db, COLLECTION_NAME, id);
+    const docRef = doc(db, COLLECTION_NAME, targetId);
     await setDoc(docRef, fullRecord, { merge: true });
   } catch (error) {}
 
