@@ -1475,96 +1475,158 @@ export default function AdminPage() {
                 ) : (
                   <div className="space-y-4">
                     {filteredNoDuesRecords.map((record, index) => (
-                      <div key={record.id} className="bg-white border border-slate-200 rounded-3xl p-5 sm:p-6 shadow-sm hover:shadow-md transition-shadow space-y-4">
-                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-3">
-                          <div className="space-y-1">
-                            <div className="flex items-center gap-2 flex-wrap">
-                              <span className="text-[11px] font-mono font-extrabold text-slate-900 bg-slate-100 border border-slate-300 px-2 py-0.5 rounded shadow-2xs">
-                                #{index + 1}
-                              </span>
-                              <span className="text-[11px] font-mono font-bold text-slate-700 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
-                                📅 {formatDate(record.appliedAt || record.createdAt)}
-                              </span>
-                              <span className="font-mono text-xs font-extrabold text-emerald-900 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-full">
-                                {record.applicationNo}
-                              </span>
-                              <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-extrabold border ${getStatusChip(record.status)}`}>
-                                {record.status}
-                              </span>
-                            </div>
-                            <h3 className="font-extrabold text-slate-900 text-sm sm:text-base">
-                              {cleanHindiText(record.applicantDetails?.fullName)} {cleanHindiText(record.applicantDetails?.fatherHusbandName) ? `(पिता/पति: ${cleanHindiText(record.applicantDetails?.fatherHusbandName)})` : ''}
+                      <div key={record.id} className="bg-white border border-slate-200/90 rounded-3xl p-5 hover:border-emerald-300 transition-all shadow-xs hover:shadow-md space-y-4">
+                        {/* Top Header Badge Bar */}
+                        <div className="flex items-center justify-between gap-2 flex-wrap border-b border-slate-100 pb-3">
+                          <div className="flex items-center gap-2 flex-wrap text-xs">
+                            <span className="bg-emerald-100/80 text-emerald-900 font-extrabold px-2.5 py-0.5 rounded-md text-xs">
+                              #{index + 1}
+                            </span>
+                            <span className="text-slate-300 font-light">|</span>
+                            <span className="text-slate-600 font-semibold flex items-center gap-1">
+                              📅 {formatDate(record.appliedAt || record.createdAt)}
+                            </span>
+                            <span className="text-slate-300 font-light">|</span>
+                            <span className="text-emerald-800 font-extrabold font-mono tracking-tight">
+                              {record.applicationNo || 'DRAFT'}
+                            </span>
+                          </div>
+                          <div>
+                            <span className={`px-3 py-1 rounded-full text-[10px] font-extrabold border uppercase tracking-wider ${getStatusChip(record.status)}`}>
+                              {record.status}
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Middle Info Row with Vertical Divider */}
+                        <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
+                          {/* Left Column */}
+                          <div className="md:col-span-8 space-y-2">
+                            <h3 className="text-slate-900 font-black text-lg sm:text-xl tracking-tight">
+                              🏢 {cleanHindiText(record.applicantDetails?.fullName)} {cleanHindiText(record.applicantDetails?.fatherHusbandName) ? `(पिता/पति: ${cleanHindiText(record.applicantDetails?.fatherHusbandName)})` : ''}
                             </h3>
-                            <p className="text-xs text-slate-600 font-medium">
-                              संपत्ति आईडी: <strong className="text-slate-900 font-mono">{record.propertyDetails?.propertyId}</strong> | टी.आर.आई. रिफरेंस: <strong className="text-slate-900 font-mono">{record.taxDetails?.triRefNo}</strong> | जमा कर: <strong>₹{record.taxDetails?.amountPaid}</strong>
-                            </p>
+                            <div className="space-y-1 text-xs text-slate-600 font-medium">
+                              <p className="flex items-center gap-2">
+                                <span className="text-slate-400">🏠</span>
+                                <span>संपत्ति आईडी: <strong className="text-slate-900 font-mono">{record.propertyDetails?.propertyId || '—'}</strong> | टी.आर.आई. रिफरेंस: <strong className="text-slate-900 font-mono">{record.taxDetails?.triRefNo || '—'}</strong></span>
+                              </p>
+                              <p className="flex items-center gap-2">
+                                <span className="text-slate-400">📞</span>
+                                <span>मोबाइल: <strong className="text-slate-800 font-mono">{record.applicantDetails?.mobile || 'N/A'}</strong> | पता: <span className="text-slate-800 font-semibold">{record.applicantDetails?.address || 'झाबुआ'}</span></span>
+                              </p>
+                              <p className="flex items-center gap-2">
+                                <span className="text-slate-400">💰</span>
+                                <span>जमा कर राशि: <strong className="text-emerald-800 font-extrabold">₹{record.taxDetails?.amountPaid || '0'}</strong> ({record.taxDetails?.financialYear || '2026-27'})</span>
+                              </p>
+                            </div>
                           </div>
 
-                          <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 w-full sm:w-auto">
-                            {/* Submission Letter Modal */}
-                            <button
-                              onClick={() => setLetterModal({ isOpen: true, record, serviceType: 'no_dues' })}
-                              className="btn btn-secondary btn-sm flex items-center gap-1 font-bold text-emerald-900 bg-emerald-50 hover:bg-emerald-100 border-emerald-200 text-[11px]"
-                            >
-                              <Printer className="w-3.5 h-3.5 text-emerald-700" /> आवेदन पत्र
-                            </button>
-
-                            {/* View Uploaded Tax Receipt */}
-                            {record.documents?.taxReceipt && (
-                              <a
-                                href={record.documents.taxReceipt.data}
-                                download={record.documents.taxReceipt.name || 'Property_Tax_Receipt.pdf'}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="btn btn-secondary btn-sm flex items-center gap-1 font-bold text-blue-900 bg-blue-50 border-blue-200 text-[11px]"
-                              >
-                                📄 कर रसीद देखें
-                              </a>
-                            )}
-
-                            {record.status === 'Submitted' && (
-                              <button
-                                onClick={() => setRemarkModal({ isOpen: true, record, serviceType: 'no_dues', targetStatus: 'Under Review', remarkText: 'कर रसीद व SAF सत्यापन हेतु चुना गया', officerName: adminAccounts[currentAdminUser]?.name || 'Zonal Revenue Officer' })}
-                                className="btn btn-secondary btn-sm bg-blue-50 border-blue-200 text-blue-700 font-bold text-[11px]"
-                              >
-                                👁️ समीक्षा करें
-                              </button>
-                            )}
-
-                            {record.status !== 'Approved' && record.status !== 'Certificate Generated' && record.status !== 'Completed' && (
-                              <button
-                                onClick={() => setRemarkModal({ isOpen: true, record, serviceType: 'no_dues', targetStatus: 'Approved', remarkText: 'संपत्ति कर व SAF पूर्णतः सत्यापित। नो ड्यूज प्रमाण पत्र स्वीकृत।', officerName: adminAccounts[currentAdminUser]?.name || 'Zonal Revenue Officer' })}
-                                className="btn btn-primary btn-sm bg-gradient-to-r from-emerald-700 to-teal-800 font-bold text-[11px]"
-                              >
-                                ✅ स्वीकृत करें व NOC जारी करें
-                              </button>
-                            )}
-
-                            {record.status !== 'Rejected' && (
-                              <button
-                                onClick={() => setRemarkModal({ isOpen: true, record, serviceType: 'no_dues', targetStatus: 'Rejected', remarkText: 'वर्तमान कर रसीद या दस्तावेज अमान्य', officerName: adminAccounts[currentAdminUser]?.name || 'Zonal Revenue Officer' })}
-                                className="btn btn-danger btn-sm font-bold text-[11px]"
-                              >
-                                ❌ निरस्त
-                              </button>
-                            )}
-
-                            {(record.status === 'Approved' || record.status === 'Certificate Generated' || record.status === 'Completed') && (
-                              <button
-                                onClick={() => setNoDuesCertPreview(record)}
-                                className="btn btn-primary btn-sm bg-emerald-800 font-bold text-[11px]"
-                              >
-                                📜 नो ड्यूज प्रमाण पत्र
-                              </button>
-                            )}
-
-                            <button
-                              onClick={() => setSelectedNoDuesDetail(record)}
-                              className="btn btn-secondary btn-sm flex items-center gap-1 font-bold text-slate-700 text-[11px]"
-                            >
-                              <History className="w-3.5 h-3.5 text-slate-500" /> विवरण
-                            </button>
+                          {/* Right Column: Service Type Badge */}
+                          <div className="hidden md:flex md:col-span-4 items-center justify-end border-l border-slate-100 pl-6 my-0.5">
+                            <div className="flex items-center gap-3">
+                              <div className="w-12 h-12 rounded-2xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-700 shrink-0 shadow-2xs">
+                                <Building2 className="w-6 h-6" />
+                              </div>
+                              <div>
+                                <p className="text-[11px] font-extrabold text-slate-900 uppercase tracking-wide">प्रमाण पत्र का प्रकार</p>
+                                <p className="text-xs font-semibold text-slate-500 mt-0.5">संपत्ति कर नो ड्यूज NOC</p>
+                              </div>
+                            </div>
                           </div>
+                        </div>
+
+                        {/* Bottom Action Bar */}
+                        <div className="border-t border-slate-100 pt-3.5 flex flex-wrap items-center gap-2">
+                          <button
+                            onClick={() => setLetterModal({ isOpen: true, record, serviceType: 'no_dues' })}
+                            className="btn btn-secondary btn-sm bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 text-xs font-bold px-3 py-2 rounded-xl flex items-center gap-1.5 shadow-2xs"
+                          >
+                            <Printer className="w-3.5 h-3.5 text-slate-600" /> पावती पत्र
+                          </button>
+
+                          {record.documents?.taxReceipt && (
+                            <a
+                              href={record.documents.taxReceipt.data}
+                              download={record.documents.taxReceipt.name || 'Property_Tax_Receipt.pdf'}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="btn btn-secondary btn-sm bg-white hover:bg-slate-50 border border-slate-200 text-blue-800 text-xs font-bold px-3 py-2 rounded-xl flex items-center gap-1.5 shadow-2xs"
+                            >
+                              📄 कर रसीद देखें
+                            </a>
+                          )}
+
+                          {(record.status === 'Approved' || record.status === 'Certificate Generated' || record.status === 'Completed') && (
+                            <button
+                              onClick={() => setNoDuesCertPreview(record)}
+                              className="btn btn-primary btn-sm bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold px-3.5 py-2 rounded-xl flex items-center gap-1.5 shadow-sm"
+                            >
+                              📜 नो ड्यूज प्रमाण पत्र
+                            </button>
+                          )}
+
+                          {record.officialUploadedCertificate && (
+                            <button
+                              type="button"
+                              onClick={() => downloadBlobFile(record.officialUploadedCertificate, 'Official_Signed_NoDues_Certificate.pdf')}
+                              className="btn btn-primary btn-sm bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold px-3.5 py-2 rounded-xl flex items-center gap-1.5 shadow-sm cursor-pointer transition-all"
+                              title="अधिकारी द्वारा अपलोड हस्ताक्षरित मूल दस्तावेज देखें/डाउनलोड करें"
+                            >
+                              <Download className="w-3.5 h-3.5" /> 📥 अपलोड हस्ताक्षरित आदेश
+                            </button>
+                          )}
+
+                          {(record.status === 'Approved' || record.status === 'Certificate Generated' || record.status === 'Completed' || record.status === 'Sanctioned') && (
+                            <button
+                              onClick={() => setRemarkModal({
+                                isOpen: true,
+                                record,
+                                serviceType: 'no_dues',
+                                targetStatus: record.status,
+                                remarkText: 'अधिकारी हस्ताक्षरित दस्तावेज अपडेट किया गया',
+                                officerName: adminAccounts[currentAdminUser]?.name || 'Zonal Revenue Officer',
+                                officialCertFile: record.officialUploadedCertificate || null
+                              })}
+                              className="btn btn-secondary btn-sm bg-white hover:bg-slate-50 border border-slate-200 text-amber-800 text-xs font-bold px-3 py-2 rounded-xl flex items-center gap-1.5 shadow-2xs"
+                              title="अधिकारी हस्ताक्षरित दस्तावेज री-अपलोड करें या बदलें"
+                            >
+                              <Edit className="w-3.5 h-3.5 text-amber-600" /> 📝 दस्तावेज अपडेट करें
+                            </button>
+                          )}
+
+                          {record.status === 'Submitted' && (
+                            <button
+                              onClick={() => setRemarkModal({ isOpen: true, record, serviceType: 'no_dues', targetStatus: 'Under Review', remarkText: 'कर रसीद व SAF सत्यापन हेतु चुना गया', officerName: adminAccounts[currentAdminUser]?.name || 'Zonal Revenue Officer' })}
+                              className="btn btn-secondary btn-sm bg-blue-50 hover:bg-blue-100 border border-blue-200 text-blue-700 text-xs font-bold px-3 py-2 rounded-xl flex items-center gap-1.5 shadow-2xs"
+                            >
+                              👁️ समीक्षा करें
+                            </button>
+                          )}
+
+                          {record.status !== 'Approved' && record.status !== 'Certificate Generated' && record.status !== 'Completed' && (
+                            <button
+                              onClick={() => setRemarkModal({ isOpen: true, record, serviceType: 'no_dues', targetStatus: 'Approved', remarkText: 'संपत्ति कर व SAF पूर्णतः सत्यापित। नो ड्यूज प्रमाण पत्र स्वीकृत।', officerName: adminAccounts[currentAdminUser]?.name || 'Zonal Revenue Officer' })}
+                              className="btn btn-primary btn-sm bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold px-3.5 py-2 rounded-xl flex items-center gap-1.5 shadow-sm"
+                            >
+                              ✅ स्वीकृत करें व NOC जारी करें
+                            </button>
+                          )}
+
+                          {record.status !== 'Rejected' && (
+                            <button
+                              onClick={() => setRemarkModal({ isOpen: true, record, serviceType: 'no_dues', targetStatus: 'Rejected', remarkText: 'वर्तमान कर रसीद या दस्तावेज अमान्य', officerName: adminAccounts[currentAdminUser]?.name || 'Zonal Revenue Officer' })}
+                              className="btn btn-danger btn-sm bg-rose-100/80 hover:bg-rose-100 text-rose-700 border border-rose-200/60 text-xs font-bold px-3 py-2 rounded-xl flex items-center gap-1.5"
+                            >
+                              ❌ निरस्त
+                            </button>
+                          )}
+
+                          <button
+                            onClick={() => setSelectedNoDuesDetail(record)}
+                            className="btn btn-secondary btn-sm bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 text-xs font-bold px-3 py-2 rounded-xl flex items-center gap-1.5 shadow-2xs"
+                          >
+                            <History className="w-3.5 h-3.5 text-slate-500" /> ⏱️ विवरण
+                          </button>
                         </div>
                       </div>
                     ))}
