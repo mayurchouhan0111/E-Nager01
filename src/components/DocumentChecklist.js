@@ -280,25 +280,25 @@ export default function DocumentChecklist({ defaultCategory = 'all', compact = f
 
       {/* Professional Segmented Tab Bar */}
       {!compact && (
-        <div className="overflow-x-auto pb-1 scrollbar-none border-b border-slate-100 pb-4">
-          <div className="inline-flex items-center gap-1.5 bg-slate-100/90 p-1.5 rounded-2xl border border-slate-200/80 shadow-inner max-w-full">
+        <div className="border-b border-slate-100 pb-4">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 bg-slate-100/90 p-1.5 rounded-2xl border border-slate-200/80 shadow-inner">
             <button
               type="button"
               onClick={() => setActiveCategory('all')}
-              className={`px-4 py-2 rounded-xl text-xs font-extrabold whitespace-nowrap transition-all duration-200 flex items-center gap-1.5 ${
+              className={`px-3 py-2.5 rounded-xl text-xs font-extrabold whitespace-nowrap transition-all duration-200 flex items-center justify-center gap-1.5 ${
                 activeCategory === 'all'
                   ? 'bg-white text-slate-900 shadow-sm border border-slate-200/90 scale-[1.02]'
                   : 'text-slate-600 hover:text-slate-900 hover:bg-white/50'
               }`}
             >
               <span>✨</span>
-              <span>सभी सूची (All List)</span>
+              <span>सभी सूची</span>
             </button>
 
             <button
               type="button"
               onClick={() => setActiveCategory('birth')}
-              className={`px-4 py-2 rounded-xl text-xs font-extrabold whitespace-nowrap transition-all duration-200 flex items-center gap-1.5 ${
+              className={`px-3 py-2.5 rounded-xl text-xs font-extrabold whitespace-nowrap transition-all duration-200 flex items-center justify-center gap-1.5 ${
                 activeCategory === 'birth'
                   ? 'bg-white text-blue-900 shadow-sm border border-blue-200/90 scale-[1.02]'
                   : 'text-slate-600 hover:text-slate-900 hover:bg-white/50'
@@ -311,7 +311,7 @@ export default function DocumentChecklist({ defaultCategory = 'all', compact = f
             <button
               type="button"
               onClick={() => setActiveCategory('death')}
-              className={`px-4 py-2 rounded-xl text-xs font-extrabold whitespace-nowrap transition-all duration-200 flex items-center gap-1.5 ${
+              className={`px-3 py-2.5 rounded-xl text-xs font-extrabold whitespace-nowrap transition-all duration-200 flex items-center justify-center gap-1.5 ${
                 activeCategory === 'death'
                   ? 'bg-white text-emerald-900 shadow-sm border border-emerald-200/90 scale-[1.02]'
                   : 'text-slate-600 hover:text-slate-900 hover:bg-white/50'
@@ -324,7 +324,7 @@ export default function DocumentChecklist({ defaultCategory = 'all', compact = f
             <button
               type="button"
               onClick={() => setActiveCategory('water')}
-              className={`px-4 py-2 rounded-xl text-xs font-extrabold whitespace-nowrap transition-all duration-200 flex items-center gap-1.5 ${
+              className={`px-3 py-2.5 rounded-xl text-xs font-extrabold whitespace-nowrap transition-all duration-200 flex items-center justify-center gap-1.5 ${
                 activeCategory === 'water'
                   ? 'bg-white text-teal-900 shadow-sm border border-teal-200/90 scale-[1.02]'
                   : 'text-slate-600 hover:text-slate-900 hover:bg-white/50'
