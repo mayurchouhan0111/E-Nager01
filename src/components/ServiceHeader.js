@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { getNotifications, markNotificationAsRead } from '../services/notificationService';
+import { getNotifications, markNotificationAsRead, subscribeNotifications } from '../services/notificationService';
 import { getBirthCertificates } from '../services/birthCertificateService';
 import { getDeathCertificates } from '../services/deathCertificateService';
 import { getWaterConnections } from '../services/waterConnectionService';
