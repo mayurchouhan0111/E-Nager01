@@ -1371,7 +1371,14 @@ export default function DeathCertificatePage() {
                       {app.officialUploadedCertificate ? (
                         <button
                           type="button"
-                          onClick={() => downloadBlobFile(app.officialUploadedCertificate, 'Official_Signed_Death_Certificate.pdf')}
+                          onClick={async () => {
+                            const success = await downloadBlobFile(app.officialUploadedCertificate, 'Official_Signed_Death_Certificate.pdf');
+                            if (!success) {
+                              toast.success('प्रमाण पत्र डिजिटल स्वरूप में प्रदर्शित किया जा रहा है...');
+                              setSelectedApp(app);
+                              setShowCertModal(true);
+                            }
+                          }}
                           className="btn btn-primary btn-sm bg-gradient-to-r from-emerald-700 to-emerald-800 text-white font-bold flex items-center gap-1 shadow-md cursor-pointer transition-all"
                         >
                           <Download className="w-3.5 h-3.5" /> 📜 अधिकारी हस्ताक्षरित प्रमाण पत्र

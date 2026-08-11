@@ -144,7 +144,7 @@ export function processOfficialFile(file, docKey = null) {
           fileName: file.name,
           fileType: file.type || 'application/pdf',
           fileSize: sizeKb + ' KB',
-          fileData: fullDataUrl, // 100% intact PDF data
+          fileData: fullDataUrl,
           uploadedAt: new Date().toISOString(),
           docKey: storageKey
         };
@@ -170,13 +170,21 @@ export async function getFullFileData(docObj) {
 }
 
 // Triggers a 100% valid Blob download so Chrome/browsers open the PDF without corruption
+// Returns true on success, false on truncated/invalid data
 export async function downloadBlobFile(docObj, defaultFileName = 'Official_Signed_Document.pdf') {
-  if (!docObj) return;
+  if (!docObj) return false;
 
-  const dataUrl = await getFullFileData(docObj);
-  if (!dataUrl) {
-    alert('दस्तावेज़ डाउनलोड करने में असमर्थ। (Document data missing)');
-    return;
+  let dataUrl = await getFullFileData(docObj);
+  if (!dataUrl) return false;
+
+  // Validate PDF integrity: if PDF base64 was truncated by old code (< 150KB for a large PDF file), return false for fallback
+  if (docObj.fileType?.includes('pdf') || dataUrl.startsWith('data:application/pdf')) {
+    if (docObj.fileSize && (docObj.fileSize.includes('MB') || parseFloat(docObj.fileSize) > 250)) {
+      if (dataUrl.length < 100000) {
+        console.warn('[DocVault] PDF data truncated from old upload. Triggering template fallback.');
+        return false;
+      }
+    }
   }
 
   const fileName = docObj.fileName || defaultFileName;
@@ -184,9 +192,17 @@ export async function downloadBlobFile(docObj, defaultFileName = 'Official_Signe
   try {
     if (dataUrl.startsWith('data:')) {
       const parts = dataUrl.split(';base64,');
+      if (parts.length < 2) return false;
+
       const contentType = parts[0].replace('data:', '') || 'application/pdf';
       const bstr = atob(parts[1]);
       let n = bstr.length;
+
+      // If decoded binary size is < 5KB for a PDF, it's incomplete
+      if (n < 5000 && (contentType.includes('pdf') || fileName.endsWith('.pdf'))) {
+        return false;
+      }
+
       const u8arr = new Uint8Array(n);
       while (n--) {
         u8arr[n] = bstr.charCodeAt(n);
@@ -201,6 +217,7 @@ export async function downloadBlobFile(docObj, defaultFileName = 'Official_Signe
       link.click();
       document.body.removeChild(link);
       setTimeout(() => URL.revokeObjectURL(blobUrl), 10000);
+      return true;
     } else {
       const link = document.createElement('a');
       link.href = dataUrl;
@@ -208,15 +225,10 @@ export async function downloadBlobFile(docObj, defaultFileName = 'Official_Signe
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
+      return true;
     }
   } catch (err) {
-    console.error('[DocVault] Blob download error:', err);
-    const link = document.createElement('a');
-    link.href = dataUrl;
-    link.download = fileName;
-    link.target = '_blank';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    console.error('[DocVault] Download error:', err);
+    return false;
   }
 }

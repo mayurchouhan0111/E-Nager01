@@ -967,7 +967,14 @@ export default function WaterConnectionPage() {
                         {app.officialUploadedCertificate ? (
                           <button
                             type="button"
-                            onClick={() => downloadBlobFile(app.officialUploadedCertificate, 'Official_Signed_Water_Sanction_Permit.pdf')}
+                            onClick={async () => {
+                              const success = await downloadBlobFile(app.officialUploadedCertificate, 'Official_Signed_Water_Sanction_Permit.pdf');
+                              if (!success) {
+                                toast.success('स्वीकृति आदेश डिजिटल स्वरूप में प्रदर्शित किया जा रहा है...');
+                                setSelectedApp(app);
+                                setShowCertModal(true);
+                              }
+                            }}
                             className="btn btn-primary btn-sm bg-teal-700 hover:bg-teal-800 text-white font-bold text-xs flex items-center gap-1 shadow-md cursor-pointer transition-all"
                           >
                             <Download className="w-3.5 h-3.5" /> 📜 अधिकारी हस्ताक्षरित आदेश

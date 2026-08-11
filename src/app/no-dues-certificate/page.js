@@ -732,7 +732,14 @@ export default function NoDuesCertificatePage() {
                       {app.officialUploadedCertificate ? (
                         <button
                           type="button"
-                          onClick={() => downloadBlobFile(app.officialUploadedCertificate, 'Official_Signed_No_Dues_NOC.pdf')}
+                          onClick={async () => {
+                            const success = await downloadBlobFile(app.officialUploadedCertificate, 'Official_Signed_No_Dues_NOC.pdf');
+                            if (!success) {
+                              toast.success('प्रमाण पत्र डिजिटल स्वरूप में प्रदर्शित किया जा रहा है...');
+                              setSelectedApp(app);
+                              setShowCertModal(true);
+                            }
+                          }}
                           className="btn btn-primary btn-sm bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs flex items-center gap-1 shadow-md cursor-pointer transition-all"
                         >
                           <Download className="w-3.5 h-3.5" /> 📜 अधिकारी हस्ताक्षरित NOC डाउनलोड

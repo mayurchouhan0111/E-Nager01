@@ -413,7 +413,14 @@ export default function ServiceHeader() {
                           {rec.officialUploadedCertificate ? (
                             <button
                               type="button"
-                              onClick={() => downloadBlobFile(rec.officialUploadedCertificate, 'Official_Signed_Certificate.pdf')}
+                              onClick={async () => {
+                                const success = await downloadBlobFile(rec.officialUploadedCertificate, 'Official_Signed_Certificate.pdf');
+                                if (!success) {
+                                  toast.success('प्रमाण पत्र डिजिटल स्वरूप में प्रदर्शित किया जा रहा है...');
+                                  setSelectedRecord(rec);
+                                  setModalType('certificate');
+                                }
+                              }}
                               className="btn btn-primary btn-sm text-[11px] font-bold flex items-center gap-1 bg-emerald-700 hover:bg-emerald-800 text-white shadow-md cursor-pointer transition-all"
                             >
                               <Download className="w-3.5 h-3.5" /> 📜 अधिकारी हस्ताक्षरित प्रमाण पत्र
