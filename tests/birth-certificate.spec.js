@@ -25,14 +25,45 @@ test.describe('Birth Certificate Application Flow', () => {
     const data = birthTestData();
     await page.goto('/birth-certificate');
 
-    // --- Tab 1: Child details ---
+    // ── Section 1: Child details ────────────────────────────
     await page.getByPlaceholder('यदि नामकरण हो गया हो (जैसे: आरव शर्मा)').fill(data.childName);
     await page.locator('#field_child_dateOfBirth').fill(data.dateOfBirth);
     await page.getByPlaceholder('2.8 kg').fill(data.birthWeight);
+    await page.locator('select').filter({ hasText: 'Cesarean' })
+      .selectOption({ label: 'सिजेरियन (Cesarean)' });
 
-    // Select delivery type if present
-    const deliverySelect = page.locator('select').filter({ hasText: /प्रसव का प्रकार|Normal|सिजेरियन/ });
-    // Continue - mother/father/applicant fields are on later tabs
+    // ── Section 2: Place of birth & address ─────────────────
+    await page.getByPlaceholder('जिला चिकित्सालय झाबुआ / निजी अस्पताल').fill('जिला चिकित्सालय झाबुआ');
+
+    // ── Section 3: Mother details ───────────────────────────
+    await page.locator('#field_mother_fullName').fill(data.motherName);
+    await page.getByPlaceholder('गृहणी / नौकरी / व्यापार').fill('गृहणी');
+
+    // ── Section 4: Father details ───────────────────────────
+    await page.locator('#field_father_fullName').fill(data.fatherName);
+    await page.locator('#field_father_aadhaarNo').fill(data.aadhaar);
+    await page.getByPlaceholder('कृषि / व्यापार / शासकीय सेवा').fill('व्यापार');
+
+    // ── Section 5: Applicant / Informant details ────────────
+    await page.locator('#field_applicant_fullName').fill(data.applicantName);
+    await page.locator('#field_applicant_mobile').fill(data.mobile);
+    await page.getByPlaceholder('citizen@example.com').fill('citizen.test@example.com');
+    await page.getByPlaceholder('मकान नंबर, वार्ड नंबर, झाबुआ').last().fill('मकान 5, वार्ड 7');
+
+    // DPDP consent (native required)
+    await page.locator('#field_dpdpConsent input[type="checkbox"]').check();
+
+    // ── Save Draft ──────────────────────────────────────────
+    await page.getByRole('button', { name: /ड्राफ्ट सहेजें \(Save Draft\)/ }).click();
+
+    // Success message with application number
+    await expect(page.getByText(/प्रारूप सहेजा गया \(Draft saved! App No:/)).toBeVisible({ timeout: 15000 });
+
+    // ── Track tab shows the saved draft ─────────────────────
+    await page.getByRole('button', { name: /मेरे आवेदन एवं स्थिति/ }).click();
+    await expect(page.getByText(data.childName)).toBeVisible();
+    await expect(page.getByText(data.motherName)).toBeVisible();
+    await expect(page.getByText(data.fatherName)).toBeVisible();
   });
 
   test('mobile number validation rejects invalid number', async ({ page }) => {
