@@ -26,7 +26,12 @@ export async function ensureFirebaseAuth() {
  */
 export function sanitizeFirestorePayload(obj) {
   if (obj === undefined) return null;
-  if (obj === null || typeof obj !== 'object') return obj;
+  if (obj === null || typeof obj !== 'object') {
+    if (typeof obj === 'string' && obj.length > 500000 && obj.startsWith('data:')) {
+      return obj.substring(0, 50000);
+    }
+    return obj;
+  }
   if (Array.isArray(obj)) {
     return obj.map(sanitizeFirestorePayload);
   }

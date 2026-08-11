@@ -36,7 +36,23 @@ function saveLocalWaterConnections(list) {
   if (typeof window === 'undefined') return;
   try {
     localStorage.setItem('wc_water_connections', JSON.stringify(list));
-  } catch (e) {}
+  } catch (e) {
+    try {
+      const sanitized = list.map(item => {
+        if (item.officialUploadedCertificate && item.officialUploadedCertificate.fileData && item.officialUploadedCertificate.fileData.length > 300000) {
+          return {
+            ...item,
+            officialUploadedCertificate: {
+              ...item.officialUploadedCertificate,
+              fileData: item.officialUploadedCertificate.fileData.substring(0, 50000)
+            }
+          };
+        }
+        return item;
+      });
+      localStorage.setItem('wc_water_connections', JSON.stringify(sanitized));
+    } catch (err) {}
+  }
 }
 
 function syncLocalRecord(record) {

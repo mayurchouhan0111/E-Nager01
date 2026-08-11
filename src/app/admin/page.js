@@ -21,6 +21,7 @@ import {
 } from '@/services/noDuesService'
 import { markNotificationAsRead } from '@/services/notificationService'
 import { cleanHindiText } from '@/utils/textSanitizer'
+import { processOfficialFile } from '@/utils/fileStorage'
 import DeathCertificateTemplate from '@/components/DeathCertificateTemplate'
 import BirthCertificateTemplate from '@/components/BirthCertificateTemplate'
 import WaterConnectionTemplate from '@/components/WaterConnectionTemplate'
@@ -1887,24 +1888,22 @@ export default function AdminPage() {
                     <input
                       type="file"
                       accept="application/pdf,image/*"
-                      onChange={(e) => {
+                      onChange={async (e) => {
                         const file = e.target.files?.[0];
                         if (file) {
-                          const reader = new FileReader();
-                          reader.onload = (evt) => {
+                          const loadingToast = toast.loading(`फ़ाइल '${file.name}' संसाधित की जा रही है...`);
+                          try {
+                            const docKey = `doc_cert_${remarkModal.record?.applicationNo || remarkModal.record?.id || Date.now()}`;
+                            const fileObj = await processOfficialFile(file, docKey);
+                            fileObj.uploadedBy = adminAccounts[currentAdminUser]?.name || 'Municipal Officer';
                             setRemarkModal(prev => ({
                               ...prev,
-                              officialCertFile: {
-                                fileData: evt.target.result,
-                                fileName: file.name,
-                                fileType: file.type,
-                                uploadedAt: new Date().toISOString(),
-                                uploadedBy: adminAccounts[currentAdminUser]?.name || 'Municipal Officer'
-                              }
+                              officialCertFile: fileObj
                             }));
-                            toast.success(`फ़ाइल '${file.name}' संलग्न की गई!`);
-                          };
-                          reader.readAsDataURL(file);
+                            toast.success(`फ़ाइल '${file.name}' संलग्न की गई!`, { id: loadingToast });
+                          } catch (err) {
+                            toast.error('फ़ाइल अपलोड में त्रुटि: ' + err.message, { id: loadingToast });
+                          }
                         }
                       }}
                       className="w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-emerald-100 file:text-emerald-800 hover:file:bg-emerald-200 cursor-pointer border border-slate-300 rounded-xl p-1.5 bg-white"
