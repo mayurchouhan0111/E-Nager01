@@ -12,6 +12,7 @@ import {
 } from '../../services/noDuesService';
 import { getCurrentCitizen, loginWithGoogle, createOrUpdateLocalCitizenProfile, subscribeToCitizenAuth } from '../../services/citizenAuthService';
 import toast from 'react-hot-toast';
+import { downloadBlobFile } from '../../utils/fileStorage';
 import { 
   FileText, Activity, CheckCircle2, AlertCircle, RefreshCw, Printer, X, History, Plus, 
   Download, Building2, UploadCloud, Info, ShieldCheck, CheckSquare, Search, Phone
@@ -729,15 +730,13 @@ export default function NoDuesCertificatePage() {
                       </button>
 
                       {app.officialUploadedCertificate ? (
-                        <a
-                          href={app.officialUploadedCertificate.fileData}
-                          download={app.officialUploadedCertificate.fileName || 'Official_Signed_No_Dues_NOC.pdf'}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="btn btn-primary btn-sm bg-emerald-700 text-white font-bold text-xs flex items-center gap-1 shadow-md"
+                        <button
+                          type="button"
+                          onClick={() => downloadBlobFile(app.officialUploadedCertificate, 'Official_Signed_No_Dues_NOC.pdf')}
+                          className="btn btn-primary btn-sm bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs flex items-center gap-1 shadow-md cursor-pointer transition-all"
                         >
                           <Download className="w-3.5 h-3.5" /> 📜 अधिकारी हस्ताक्षरित NOC डाउनलोड
-                        </a>
+                        </button>
                       ) : (
                         (app.status === 'Approved' || app.status === 'Sanctioned' || app.status === 'Completed') && (
                           <button

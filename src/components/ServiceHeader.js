@@ -18,6 +18,7 @@ import { Layers, ShieldAlert, Bell, X, Search, Printer, FileText, Baby, Droplets
 import { subscribeToMaintenance } from '../services/maintenanceService';
 import { loginWithGoogle, logoutCitizen, getCurrentCitizen, subscribeToCitizenAuth, loginWithMobileOrEmail } from '../services/citizenAuthService';
 import toast from 'react-hot-toast';
+import { downloadBlobFile } from '../utils/fileStorage';
 
 export default function ServiceHeader() {
   const pathname = usePathname();
@@ -410,15 +411,13 @@ export default function ServiceHeader() {
                           </button>
 
                           {rec.officialUploadedCertificate ? (
-                            <a 
-                              href={rec.officialUploadedCertificate.fileData} 
-                              download={rec.officialUploadedCertificate.fileName || 'Official_Signed_Certificate.pdf'} 
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="btn btn-primary btn-sm text-[11px] font-bold flex items-center gap-1 bg-emerald-700 hover:bg-emerald-800 text-white shadow-md"
+                            <button
+                              type="button"
+                              onClick={() => downloadBlobFile(rec.officialUploadedCertificate, 'Official_Signed_Certificate.pdf')}
+                              className="btn btn-primary btn-sm text-[11px] font-bold flex items-center gap-1 bg-emerald-700 hover:bg-emerald-800 text-white shadow-md cursor-pointer transition-all"
                             >
                               <Download className="w-3.5 h-3.5" /> 📜 अधिकारी हस्ताक्षरित प्रमाण पत्र
-                            </a>
+                            </button>
                           ) : (
                             (rec.status === 'Approved' || rec.status === 'Sanctioned' || rec.status === 'Certificate Generated' || rec.status === 'Completed') && (
                               <button 

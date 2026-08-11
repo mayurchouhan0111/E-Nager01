@@ -21,7 +21,7 @@ import {
 } from '@/services/noDuesService'
 import { markNotificationAsRead } from '@/services/notificationService'
 import { cleanHindiText } from '@/utils/textSanitizer'
-import { processOfficialFile } from '@/utils/fileStorage'
+import { processOfficialFile, downloadBlobFile } from '@/utils/fileStorage'
 import DeathCertificateTemplate from '@/components/DeathCertificateTemplate'
 import BirthCertificateTemplate from '@/components/BirthCertificateTemplate'
 import WaterConnectionTemplate from '@/components/WaterConnectionTemplate'
@@ -907,16 +907,14 @@ export default function AdminPage() {
                             )}
 
                             {record.officialUploadedCertificate && (
-                              <a
-                                href={record.officialUploadedCertificate.fileData}
-                                download={record.officialUploadedCertificate.fileName || 'Official_Signed_Death_Certificate.pdf'}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="btn btn-primary btn-sm bg-gradient-to-r from-emerald-800 to-teal-800 text-white font-bold text-[11px] flex items-center gap-1 shadow-sm"
+                              <button
+                                type="button"
+                                onClick={() => downloadBlobFile(record.officialUploadedCertificate, 'Official_Signed_Death_Certificate.pdf')}
+                                className="btn btn-primary btn-sm bg-gradient-to-r from-emerald-800 to-teal-800 hover:from-emerald-900 hover:to-teal-900 text-white font-bold text-[11px] flex items-center gap-1 shadow-sm cursor-pointer transition-all"
                                 title="अधिकारी द्वारा अपलोड हस्ताक्षरित मूल दस्तावेज देखें/डाउनलोड करें"
                               >
                                 <Download className="w-3.5 h-3.5" /> 📜 अपलोड हस्ताक्षरित आदेश
-                              </a>
+                              </button>
                             )}
 
                             {(record.status === 'Approved' || record.status === 'Certificate Generated' || record.status === 'Completed' || record.status === 'Sanctioned') && (
@@ -1078,16 +1076,14 @@ export default function AdminPage() {
                             )}
 
                             {record.officialUploadedCertificate && (
-                              <a
-                                href={record.officialUploadedCertificate.fileData}
-                                download={record.officialUploadedCertificate.fileName || 'Official_Signed_Birth_Certificate.pdf'}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="btn btn-primary btn-sm bg-gradient-to-r from-blue-800 to-indigo-800 text-white font-bold text-[11px] flex items-center gap-1 shadow-sm"
+                              <button
+                                type="button"
+                                onClick={() => downloadBlobFile(record.officialUploadedCertificate, 'Official_Signed_Birth_Certificate.pdf')}
+                                className="btn btn-primary btn-sm bg-gradient-to-r from-blue-800 to-indigo-800 hover:from-blue-900 hover:to-indigo-900 text-white font-bold text-[11px] flex items-center gap-1 shadow-sm cursor-pointer transition-all"
                                 title="अधिकारी द्वारा अपलोड हस्ताक्षरित मूल दस्तावेज देखें/डाउनलोड करें"
                               >
                                 <Download className="w-3.5 h-3.5" /> 📜 अपलोड हस्ताक्षरित आदेश
-                              </a>
+                              </button>
                             )}
 
                             {(record.status === 'Approved' || record.status === 'Certificate Generated' || record.status === 'Completed' || record.status === 'Sanctioned') && (
@@ -1276,16 +1272,14 @@ export default function AdminPage() {
                             )}
 
                             {record.officialUploadedCertificate && (
-                              <a
-                                href={record.officialUploadedCertificate.fileData}
-                                download={record.officialUploadedCertificate.fileName || 'Official_Signed_Water_Sanction_Permit.pdf'}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="btn btn-primary btn-sm bg-gradient-to-r from-teal-800 to-emerald-800 text-white font-bold text-[11px] flex items-center gap-1 shadow-sm"
+                              <button
+                                type="button"
+                                onClick={() => downloadBlobFile(record.officialUploadedCertificate, 'Official_Signed_Water_Sanction_Permit.pdf')}
+                                className="btn btn-primary btn-sm bg-gradient-to-r from-teal-800 to-emerald-800 hover:from-teal-900 hover:to-emerald-900 text-white font-bold text-[11px] flex items-center gap-1 shadow-sm cursor-pointer transition-all"
                                 title="अधिकारी द्वारा अपलोड हस्ताक्षरित मूल दस्तावेज देखें/डाउनलोड करें"
                               >
                                 <Download className="w-3.5 h-3.5" /> 📜 अपलोड हस्ताक्षरित आदेश
-                              </a>
+                              </button>
                             )}
 
                             {(record.status === 'Approved' || record.status === 'Certificate Generated' || record.status === 'Completed' || record.status === 'Sanctioned') && (
@@ -1855,15 +1849,13 @@ export default function AdminPage() {
                           <span className="text-[11px] font-extrabold text-emerald-950 flex items-center gap-1.5">
                             <span>📄</span> पूर्व में अपलोड अधिकारी हस्ताक्षरित दस्तावेज (Current Official Upload):
                           </span>
-                          <a
-                            href={(remarkModal.officialCertFile || remarkModal.record?.officialUploadedCertificate)?.fileData}
-                            download={(remarkModal.officialCertFile || remarkModal.record?.officialUploadedCertificate)?.fileName || 'Official_Document.pdf'}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-[10px] font-bold text-emerald-800 underline hover:text-emerald-950 flex items-center gap-1 bg-white px-2 py-0.5 rounded border border-emerald-300"
+                          <button
+                            type="button"
+                            onClick={() => downloadBlobFile(remarkModal.officialCertFile || remarkModal.record?.officialUploadedCertificate, 'Official_Document.pdf')}
+                            className="text-[10px] font-bold text-emerald-800 underline hover:text-emerald-950 flex items-center gap-1 bg-white px-2 py-0.5 rounded border border-emerald-300 cursor-pointer"
                           >
                             <Eye className="w-3 h-3 text-emerald-700" /> देखें / डाउनलोड
-                          </a>
+                          </button>
                         </div>
                         
                         <div className="flex items-center gap-3">

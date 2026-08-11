@@ -14,6 +14,7 @@ import {
 } from '@/services/waterConnectionService';
 import { getCurrentCitizen, loginWithGoogle, createOrUpdateLocalCitizenProfile, subscribeToCitizenAuth } from '@/services/citizenAuthService';
 import toast from 'react-hot-toast';
+import { downloadBlobFile } from '../../utils/fileStorage';
 import { 
   Droplet, Activity, CheckCircle2, AlertCircle, RefreshCw, Printer, X, History, Plus, 
   Building2, User, Home, FileText, Download, ShieldAlert, CheckSquare, Wrench, ListChecks
@@ -964,15 +965,13 @@ export default function WaterConnectionPage() {
                         </button>
 
                         {app.officialUploadedCertificate ? (
-                          <a
-                            href={app.officialUploadedCertificate.fileData}
-                            download={app.officialUploadedCertificate.fileName || 'Official_Signed_Water_Sanction_Permit.pdf'}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="btn btn-primary btn-sm bg-teal-700 hover:bg-teal-800 text-white font-bold text-xs flex items-center gap-1 shadow-md"
+                          <button
+                            type="button"
+                            onClick={() => downloadBlobFile(app.officialUploadedCertificate, 'Official_Signed_Water_Sanction_Permit.pdf')}
+                            className="btn btn-primary btn-sm bg-teal-700 hover:bg-teal-800 text-white font-bold text-xs flex items-center gap-1 shadow-md cursor-pointer transition-all"
                           >
                             <Download className="w-3.5 h-3.5" /> 📜 अधिकारी हस्ताक्षरित आदेश
-                          </a>
+                          </button>
                         ) : (
                           (app.status === 'Approved' || app.status === 'Sanctioned' || app.status === 'Completed') && (
                             <button

@@ -115,7 +115,6 @@ export function processOfficialFile(file, docKey = null) {
         await storeInIndexedDB(storageKey, fileObj.fileData);
         resolve(fileObj);
       } catch (e) {
-        // Fallback to raw FileReader if compression fails
         const reader = new FileReader();
         reader.onload = async () => {
           const fileObj = {
@@ -132,29 +131,20 @@ export function processOfficialFile(file, docKey = null) {
         reader.readAsDataURL(file);
       }
     } else {
-      // PDF File processing
+      // PDF File processing - Store 100% complete untouched data URL
       const reader = new FileReader();
       reader.onload = async () => {
         const fullDataUrl = reader.result;
         const sizeKb = (file.size / 1024).toFixed(1);
 
-        // Always store FULL PDF base64 in IndexedDB
+        // Always store FULL untouched PDF base64 in IndexedDB
         await storeInIndexedDB(storageKey, fullDataUrl);
-
-        // Check if PDF data exceeds ~400KB (Firestore safe limit)
-        // If data URL length > 500,000 chars (~375KB), create Firestore safe payload
-        let firestoreSafeData = fullDataUrl;
-        if (fullDataUrl.length > 500000) {
-          // Store IndexedDB key reference so it can be loaded instantly on client
-          firestoreSafeData = fullDataUrl.substring(0, 100000); // lightweight stub for remote sync
-        }
 
         const fileObj = {
           fileName: file.name,
           fileType: file.type || 'application/pdf',
           fileSize: sizeKb + ' KB',
-          fileData: fullDataUrl, // full data in client state
-          firestoreData: firestoreSafeData,
+          fileData: fullDataUrl, // 100% intact PDF data
           uploadedAt: new Date().toISOString(),
           docKey: storageKey
         };
@@ -169,7 +159,7 @@ export function processOfficialFile(file, docKey = null) {
 // Retrieve Full File Data (from object or IndexedDB)
 export async function getFullFileData(docObj) {
   if (!docObj) return null;
-  if (docObj.fileData && docObj.fileData.length > 100000) {
+  if (docObj.fileData && docObj.fileData.length > 500) {
     return docObj.fileData;
   }
   if (docObj.docKey) {
@@ -177,4 +167,56 @@ export async function getFullFileData(docObj) {
     if (idbData) return idbData;
   }
   return docObj.fileData || null;
+}
+
+// Triggers a 100% valid Blob download so Chrome/browsers open the PDF without corruption
+export async function downloadBlobFile(docObj, defaultFileName = 'Official_Signed_Document.pdf') {
+  if (!docObj) return;
+
+  const dataUrl = await getFullFileData(docObj);
+  if (!dataUrl) {
+    alert('दस्तावेज़ डाउनलोड करने में असमर्थ। (Document data missing)');
+    return;
+  }
+
+  const fileName = docObj.fileName || defaultFileName;
+
+  try {
+    if (dataUrl.startsWith('data:')) {
+      const parts = dataUrl.split(';base64,');
+      const contentType = parts[0].replace('data:', '') || 'application/pdf';
+      const bstr = atob(parts[1]);
+      let n = bstr.length;
+      const u8arr = new Uint8Array(n);
+      while (n--) {
+        u8arr[n] = bstr.charCodeAt(n);
+      }
+      const blob = new Blob([u8arr], { type: contentType });
+      const blobUrl = URL.createObjectURL(blob);
+
+      const link = document.createElement('a');
+      link.href = blobUrl;
+      link.download = fileName;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      setTimeout(() => URL.revokeObjectURL(blobUrl), 10000);
+    } else {
+      const link = document.createElement('a');
+      link.href = dataUrl;
+      link.download = fileName;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  } catch (err) {
+    console.error('[DocVault] Blob download error:', err);
+    const link = document.createElement('a');
+    link.href = dataUrl;
+    link.download = fileName;
+    link.target = '_blank';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
 }

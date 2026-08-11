@@ -14,6 +14,7 @@ import {
 } from '@/services/birthCertificateService';
 import { getCurrentCitizen, loginWithGoogle, createOrUpdateLocalCitizenProfile, subscribeToCitizenAuth } from '@/services/citizenAuthService';
 import toast from 'react-hot-toast';
+import { downloadBlobFile } from '../../utils/fileStorage';
 import { validateBirthCertificateForm, navigateToFirstErrorField } from '../../utils/formValidationHelper';
 import { 
   Baby, Activity, CheckCircle2, AlertCircle, RefreshCw, Printer, X, History, Plus, 
@@ -1508,15 +1509,13 @@ export default function BirthCertificatePage() {
 
                       {/* View & Download Official Uploaded Certificate or Auto Generated Certificate */}
                       {app.officialUploadedCertificate ? (
-                        <a
-                          href={app.officialUploadedCertificate.fileData}
-                          download={app.officialUploadedCertificate.fileName || 'Official_Signed_Birth_Certificate.pdf'}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="btn btn-primary btn-sm bg-gradient-to-r from-emerald-700 to-emerald-800 text-white font-bold flex items-center gap-1 shadow-md"
+                        <button
+                          type="button"
+                          onClick={() => downloadBlobFile(app.officialUploadedCertificate, 'Official_Signed_Birth_Certificate.pdf')}
+                          className="btn btn-primary btn-sm bg-gradient-to-r from-emerald-700 to-emerald-800 text-white font-bold flex items-center gap-1 shadow-md cursor-pointer transition-all"
                         >
                           <Download className="w-3.5 h-3.5" /> 📜 अधिकारी हस्ताक्षरित प्रमाण पत्र
-                        </a>
+                        </button>
                       ) : (
                         (app.status === 'Approved' || app.status === 'Certificate Generated' || app.status === 'Completed') && (
                           <button
