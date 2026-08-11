@@ -3,6 +3,8 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { getNotifications, markNotificationAsRead, subscribeNotifications } from '../services/notificationService';
+import { db } from '../lib/firebase';
+import { collection, query, where, getDocs } from 'firebase/firestore';
 import { getBirthCertificates } from '../services/birthCertificateService';
 import { getDeathCertificates } from '../services/deathCertificateService';
 import { getWaterConnections } from '../services/waterConnectionService';
@@ -134,49 +136,27 @@ export default function ServiceHeader() {
     setHasSearched(true);
     setSearchResults([]);
 
-    const cleanQuery = queryText.trim().toLowerCase();
+    const cleanQuery = queryText.trim().toUpperCase();
 
     try {
-      const [births, deaths, waters, nodues] = await Promise.all([
-        getBirthCertificates(),
-        getDeathCertificates(),
-        getWaterConnections(),
-        getNoDuesCertificates()
-      ]);
+      const collectionsToSearch = [
+        { name: 'deathCertificates', serviceName: 'मृत्यु प्रमाण पत्र', serviceType: 'death' },
+        { name: 'birthCertificates', serviceName: 'जन्म प्रमाण पत्र', serviceType: 'birth' },
+        { name: 'waterConnections', serviceName: 'जल कनेक्शन', serviceType: 'water_connection' },
+        { name: 'noDuesCertificates', serviceName: 'नो ड्यूज NOC', serviceType: 'no_dues' }
+      ];
 
       const matches = [];
 
-      const isMatch = (app) => {
-        const appNo = (app.applicationNo || '').toLowerCase();
-        const appId = (app.id || '').toLowerCase();
-        const certNo = (app.certificateNo || app.permitNo || '').toLowerCase();
-        const propId = (app.propertyDetails?.propertyId || '').toLowerCase();
-
-        // Secure Application Search: Strictly match Application No / Certificate No / Property ID
-        return (
-          appNo === cleanQuery || 
-          appId === cleanQuery || 
-          certNo === cleanQuery ||
-          propId === cleanQuery ||
-          (cleanQuery.length >= 5 && (appNo.includes(cleanQuery) || certNo.includes(cleanQuery)))
-        );
-      };
-
-      births.forEach(app => {
-        if (isMatch(app)) matches.push({ ...app, serviceName: 'जन्म प्रमाण पत्र', serviceType: 'birth' });
-      });
-
-      deaths.forEach(app => {
-        if (isMatch(app)) matches.push({ ...app, serviceName: 'मृत्यु प्रमाण पत्र', serviceType: 'death' });
-      });
-
-      waters.forEach(app => {
-        if (isMatch(app)) matches.push({ ...app, serviceName: 'जल कनेक्शन', serviceType: 'water_connection' });
-      });
-
-      nodues.forEach(app => {
-        if (isMatch(app)) matches.push({ ...app, serviceName: 'नो ड्यूज NOC', serviceType: 'no_dues' });
-      });
+      for (const col of collectionsToSearch) {
+        try {
+          const q = query(collection(db, col.name), where('applicationNo', '==', cleanQuery));
+          const snap = await getDocs(q);
+          snap.docs.forEach(docSnap => {
+            matches.push({ id: docSnap.id, ...docSnap.data(), serviceName: col.serviceName, serviceType: col.serviceType });
+          });
+        } catch (e) {}
+      }
 
       setSearchResults(matches);
     } catch (err) {
@@ -505,11 +485,15 @@ export default function ServiceHeader() {
                   alt="Official Signed Document"
                   className="max-h-[65vh] w-auto object-contain rounded-xl shadow-md"
                 />
+              ) : selectedRecord.officialUploadedCertificate?.fileData?.startsWith('data:text/html') ? (
+                <div className="p-6 text-center text-rose-600 font-bold text-xs">
+                  ❌ अमान्य दस्तावेज़ प्रारूप (HTML scripts not allowed in document preview)
+                </div>
               ) : (
                 <iframe
                   src={selectedRecord.officialUploadedCertificate?.fileData}
                   title="Official Signed Document"
-                  sandbox="allow-scripts allow-same-origin"
+                  sandbox="allow-scripts"
                   className="w-full h-[65vh] rounded-xl border-0 shadow-sm"
                 />
               )}

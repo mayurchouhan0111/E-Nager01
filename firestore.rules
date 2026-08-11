@@ -22,8 +22,9 @@ service cloud.firestore {
       allow create: if hasRequiredFields(['applicationNo', 'deceasedDetails', 'applicantDetails', 'status'])
                     && request.resource.data.status == 'Submitted';
       
-      // Allow reading for application status tracking or authenticated users
-      allow read: if isAuthenticated() || resource.data.applicationNo != null;
+      // Restrict bulk listing to authenticated users, allow single document get by appNo query
+      allow list: if isAuthenticated();
+      allow get: if true;
 
       // Allow status updates by authenticated admin users only
       allow update: if isAuthenticated() && isValidStatus(request.resource.data.status);
@@ -38,8 +39,9 @@ service cloud.firestore {
       allow create: if hasRequiredFields(['applicationNo', 'childDetails', 'applicantDetails', 'status'])
                     && request.resource.data.status == 'Submitted';
       
-      // Allow reading for application status tracking or authenticated users
-      allow read: if isAuthenticated() || resource.data.applicationNo != null;
+      // Restrict bulk listing to authenticated users, allow single document get by appNo query
+      allow list: if isAuthenticated();
+      allow get: if true;
 
       // Allow status updates by authenticated admin users only
       allow update: if isAuthenticated() && isValidStatus(request.resource.data.status);
@@ -54,8 +56,9 @@ service cloud.firestore {
       allow create: if hasRequiredFields(['applicationNo', 'applicantDetails', 'propertyDetails', 'status'])
                     && request.resource.data.status == 'Submitted';
       
-      // Allow reading for application status tracking or authenticated users
-      allow read: if isAuthenticated() || resource.data.applicationNo != null;
+      // Restrict bulk listing to authenticated users, allow single document get by appNo query
+      allow list: if isAuthenticated();
+      allow get: if true;
 
       // Allow status updates by authenticated admin users only
       allow update: if isAuthenticated() && isValidStatus(request.resource.data.status);
@@ -70,11 +73,12 @@ service cloud.firestore {
       allow create: if hasRequiredFields(['applicationNo', 'applicantDetails', 'propertyDetails', 'status'])
                     && request.resource.data.status == 'Submitted';
       
-      // Allow reading for status tracking or authenticated users
-      allow read: if isAuthenticated() || resource.data.applicationNo != null;
+      // Restrict bulk listing to authenticated users, allow single document get by appNo query
+      allow list: if isAuthenticated();
+      allow get: if true;
 
-      // Allow status updates by authenticated users or payment webhook
-      allow update: if isValidStatus(request.resource.data.status);
+      // Allow status updates by authenticated users or payment update
+      allow update: if (isAuthenticated() || request.resource.data.paymentStatus == 'Paid') && isValidStatus(request.resource.data.status);
       
       // Disallow unauthorized deletion
       allow delete: if false;
@@ -96,7 +100,8 @@ service cloud.firestore {
     // Notifications Collection
     match /notifications/{docId} {
       allow create: if true;
-      allow read, update: if true;
+      allow read: if true;
+      allow update: if isAuthenticated();
       allow delete: if false;
     }
 
