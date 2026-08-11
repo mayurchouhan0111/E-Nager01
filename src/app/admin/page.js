@@ -2136,6 +2136,7 @@ function ApplicationDetailModal({ record, serviceType, onClose, onOpenRemark, on
   const mother = record.motherDetails || {}
   const father = record.fatherDetails || {}
   const property = record.propertyDetails || {}
+  const tax = record.taxDetails || {}
 
   // Official document key title mapping
   const docTitleMap = {
