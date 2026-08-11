@@ -20,9 +20,9 @@ export default function DocumentUploader({
 
     setError(null);
 
-    // Validate size (max 5MB)
-    if (file.size > 5 * 1024 * 1024) {
-      setError('फ़ाइल का आकार 5 MB से कम होना चाहिए (File size must be under 5MB)');
+    // Validate size (max 1MB)
+    if (file.size > 1 * 1024 * 1024) {
+      setError('फ़ाइल का आकार 1 MB से कम होना अनिवार्य है (File size must be under 1MB)');
       return;
     }
 

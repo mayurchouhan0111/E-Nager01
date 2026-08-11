@@ -102,6 +102,10 @@ export function processOfficialFile(file, docKey = null) {
   return new Promise(async (resolve, reject) => {
     if (!file) return reject(new Error('No file provided'));
 
+    if (file.size > 1 * 1024 * 1024) {
+      return reject(new Error('फ़ाइल का आकार 1 MB (1024 KB) से कम होना अनिवार्य है। कृपया छोटी PDF या फ़ोटो अपलोड करें।'));
+    }
+
     const storageKey = docKey || `doc_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
 
     if (file.type.startsWith('image/')) {

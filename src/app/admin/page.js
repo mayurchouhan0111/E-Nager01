@@ -2179,9 +2179,15 @@ export default function AdminPage() {
                     <label className="block text-[11px] font-extrabold text-slate-900 mb-1">
                       📤 आधिकारिक हस्ताक्षरित प्रमाण पत्र / स्वीकृति आदेश संलग्न करें (Upload Official Signed Certificate PDF/Image)
                     </label>
-                    <p className="text-[10px] text-slate-500">
+                    <p className="text-xs text-slate-500">
                       नगर पालिका द्वारा तैयार भौतिक हस्ताक्षरित PDF या स्कैन कॉपी संलग्न करें। यह फ़ाइल नागरिक अपने पोर्टल से सीधे डाउनलोड कर सकेगा।
                     </p>
+
+                    {/* Prominent 1 MB Limit Badge */}
+                    <div className="flex items-center gap-1.5 bg-amber-50 border border-amber-200/90 text-amber-900 text-xs font-bold px-3 py-1.5 rounded-xl">
+                      <span>⚠️</span>
+                      <span>अनिवार्य नियम: फ़ाइल का आकार <strong>1 MB (1024 KB) से कम</strong> होना चाहिए। 1 MB से बड़ी फ़ाइल स्वीकार नहीं होगी।</span>
+                    </div>
 
                     {/* Previously Uploaded Document Preview */}
                     {(remarkModal.officialCertFile || remarkModal.record?.officialUploadedCertificate) && (
@@ -2224,6 +2230,11 @@ export default function AdminPage() {
                       onChange={async (e) => {
                         const file = e.target.files?.[0];
                         if (file) {
+                          if (file.size > 1 * 1024 * 1024) {
+                            toast.error('❌ फ़ाइल का आकार 1 MB (1024 KB) से अधिक है! कृपया 1 MB से कम साइज की PDF या Photo चुनें।', { duration: 5000 });
+                            e.target.value = '';
+                            return;
+                          }
                           const loadingToast = toast.loading(`फ़ाइल '${file.name}' संसाधित की जा रही है...`);
                           try {
                             const docKey = `doc_cert_${remarkModal.record?.applicationNo || remarkModal.record?.id || Date.now()}`;
