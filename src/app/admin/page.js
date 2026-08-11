@@ -33,7 +33,7 @@ import { DEFAULT_ADMIN_ACCOUNTS, fetchAdminAccounts, updateAdminAccountCredentia
 import { subscribeToMaintenance, toggleMaintenanceMode } from '@/services/maintenanceService'
 import {
   ShieldAlert, Search, Trash2, Download, Edit, Printer, Eye, Activity, FileText, CheckCircle2,
-  AlertCircle, Calendar, UserCheck, History, Info, Lock, LogOut, RefreshCw, X, Settings2, Baby, Eye as EyeIcon, Droplet, Key, Save, Building2, Bell, Mail, Clock, ChevronDown, ChevronRight, User
+  AlertCircle, Calendar, UserCheck, History, Info, Lock, LogOut, RefreshCw, X, Settings2, Baby, Eye as EyeIcon, Droplet, Key, Save, Building2, Bell, Mail, Clock, ChevronDown, ChevronRight, User, Phone
 } from 'lucide-react'
 
 function formatTimestamp(ts) {
@@ -2165,7 +2165,7 @@ export default function AdminPage() {
         {/* Status Update Remark Modal (Redesigned Modern UI) */}
         {remarkModal.isOpen && (
           <div className="fixed inset-0 bg-slate-950/75 backdrop-blur-md z-[9999] overflow-y-auto p-4 sm:p-6 flex items-center justify-center animate-in fade-in duration-200">
-            <div className="bg-white border border-slate-200 rounded-3xl max-w-xl w-full shadow-2xl overflow-hidden space-y-0 my-auto">
+            <div className="bg-white border border-slate-200 rounded-3xl max-w-lg w-full shadow-2xl overflow-hidden space-y-0 my-auto">
               
               {/* Top Modal Header */}
               <div className="bg-slate-900 text-white px-6 py-4 flex items-center justify-between border-b border-slate-800">
@@ -2636,7 +2636,7 @@ function ApplicationDetailModal({ record, serviceType, onClose, onOpenRemark, on
 
   return (
     <div className="fixed inset-0 bg-slate-900/75 backdrop-blur-md z-50 overflow-y-auto p-3 sm:p-6 flex items-start justify-center pt-4 sm:pt-8">
-      <div className="bg-white border border-slate-200 rounded-3xl max-w-4xl w-full p-6 shadow-2xl flex flex-col max-h-[90vh]">
+      <div className="bg-white border border-slate-200 rounded-3xl max-w-3xl w-full p-5 sm:p-6 shadow-2xl flex flex-col max-h-[85vh]">
         {/* Header */}
         <div className="flex items-start justify-between border-b border-slate-100 pb-4 shrink-0">
           <div className="space-y-2">
