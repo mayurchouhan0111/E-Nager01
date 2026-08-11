@@ -14,7 +14,7 @@ import DeathCertificateTemplate from './DeathCertificateTemplate';
 import WaterConnectionTemplate from './WaterConnectionTemplate';
 import NoDuesCertificateTemplate from './NoDuesCertificateTemplate';
 import NoDuesLetterTemplate from './NoDuesLetterTemplate';
-import { Layers, ShieldAlert, Bell, X, Search, Printer, FileText, Baby, Droplets, ShieldCheck, Building2, Sparkles, CheckCircle2, Presentation, LogOut, User } from 'lucide-react';
+import { Layers, ShieldAlert, Bell, X, Search, Printer, FileText, Baby, Droplets, ShieldCheck, Building2, Sparkles, CheckCircle2, Presentation, LogOut, User, Download } from 'lucide-react';
 import { subscribeToMaintenance } from '../services/maintenanceService';
 import { loginWithGoogle, logoutCitizen, getCurrentCitizen, subscribeToCitizenAuth, loginWithMobileOrEmail } from '../services/citizenAuthService';
 import toast from 'react-hot-toast';
@@ -151,21 +151,14 @@ export default function ServiceHeader() {
         const appId = (app.id || '').toLowerCase();
         const certNo = (app.certificateNo || app.permitNo || '').toLowerCase();
         const propId = (app.propertyDetails?.propertyId || '').toLowerCase();
-        const name = (
-          app.childDetails?.fullName || 
-          app.deceasedDetails?.fullName || 
-          app.applicantDetails?.fullName || ''
-        ).toLowerCase();
-        const mobile = (app.applicantDetails?.mobile || app.informantMobile || '').replace(/[\s-]/g, '');
-        const q = cleanQuery.replace(/[\s-]/g, '');
 
+        // Secure Application Search: Strictly match Application No / Certificate No / Property ID
         return (
-          appNo.includes(cleanQuery) || 
-          appId.includes(cleanQuery) || 
-          certNo.includes(cleanQuery) ||
-          propId.includes(cleanQuery) ||
-          name.includes(cleanQuery) || 
-          (mobile && mobile.includes(q))
+          appNo === cleanQuery || 
+          appId === cleanQuery || 
+          certNo === cleanQuery ||
+          propId === cleanQuery ||
+          (cleanQuery.length >= 5 && (appNo.includes(cleanQuery) || certNo.includes(cleanQuery)))
         );
       };
 
@@ -516,6 +509,7 @@ export default function ServiceHeader() {
                 <iframe
                   src={selectedRecord.officialUploadedCertificate?.fileData}
                   title="Official Signed Document"
+                  sandbox="allow-scripts allow-same-origin"
                   className="w-full h-[65vh] rounded-xl border-0 shadow-sm"
                 />
               )}
