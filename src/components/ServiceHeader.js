@@ -470,6 +470,8 @@ export default function ServiceHeader() {
             </div>
           </div>
         </div>
+      )}
+
       {selectedRecord && modalType === 'official_doc' && (
         <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-md z-[9999] overflow-y-auto p-3 sm:p-6 flex items-start sm:items-center justify-center pt-14 sm:pt-6">
           <div className="bg-white rounded-3xl max-w-4xl w-full p-4 sm:p-6 shadow-2xl flex flex-col max-h-[80vh] sm:max-h-[85vh] my-auto space-y-4">

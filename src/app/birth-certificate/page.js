@@ -1654,6 +1654,9 @@ export default function BirthCertificatePage() {
                 <BirthCertificateTemplate record={selectedApp} />
               </div>
             </div>
+          </div>
+        )}
+
         {/* OFFICIAL UPLOADED CERTIFICATE VIEWER & DOWNLOAD MODAL */}
         {selectedApp && showOfficialDocModal && (
           <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-md z-50 overflow-y-auto p-4 flex items-center justify-center pt-8">
