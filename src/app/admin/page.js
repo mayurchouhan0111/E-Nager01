@@ -928,34 +928,46 @@ export default function AdminPage() {
                           </div>
                         </div>
 
-                        {/* Bottom Action Bar matching reference screenshot */}
-                        <div className="border-t border-slate-100 pt-3.5 flex flex-wrap items-center gap-2.5">
-                          <button
-                            onClick={() => setLetterModal({ isOpen: true, record, serviceType: 'death' })}
-                            className="bg-white hover:bg-slate-50 border border-slate-200 text-slate-800 text-xs font-bold px-3.5 py-2 rounded-xl flex items-center gap-2 transition-all shadow-2xs"
-                          >
-                            <Printer className="w-4 h-4 text-emerald-700" /> পাवती पत्र
-                          </button>
-
-                          {(record.status === 'Approved' || record.status === 'Certificate Generated' || record.status === 'Completed') && (
+{/* Bottom Action Bar — professional action cluster */}
+                        <div className="border-t border-slate-100 pt-3.5 flex flex-wrap items-center gap-2">
+                          <div className="flex items-center gap-2 bg-slate-50/80 border border-slate-200/80 rounded-xl p-1 mr-1">
                             <button
-                              onClick={() => setDeathCertPreview(record)}
-                              className="bg-emerald-50 hover:bg-emerald-100/80 border border-emerald-200/90 text-emerald-900 text-xs font-extrabold px-3.5 py-2 rounded-xl flex items-center gap-2 transition-all shadow-2xs"
+                              onClick={() => setLetterModal({ isOpen: true, record, serviceType: 'death' })}
+                              className="px-3 py-1.5 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 hover:bg-white transition-all flex items-center gap-1.5"
+                              title="आवेदन पावती पत्र"
                             >
-                              <FileText className="w-4 h-4 text-emerald-700" /> प्रमाण पत्र
+                              <Printer className="w-3.5 h-3.5" /> पावती पत्र
                             </button>
-                          )}
 
-                          {record.officialUploadedCertificate && (
+                            {(record.status === 'Approved' || record.status === 'Certificate Generated' || record.status === 'Completed') && (
+                              <button
+                                onClick={() => setDeathCertPreview(record)}
+                                className="px-3 py-1.5 rounded-lg text-xs font-bold text-emerald-700 hover:text-emerald-900 hover:bg-white transition-all flex items-center gap-1.5"
+                                title="प्रमाण पत्र देखें"
+                              >
+                                <FileText className="w-3.5 h-3.5" /> प्रमाण पत्र
+                              </button>
+                            )}
+
+                            {record.officialUploadedCertificate && (
+                              <button
+                                type="button"
+                                onClick={() => downloadBlobFile(record.officialUploadedCertificate, 'Official_Signed_Death_Certificate.pdf')}
+                                className="px-3 py-1.5 rounded-lg text-xs font-bold text-emerald-700 hover:text-emerald-900 hover:bg-white transition-all flex items-center gap-1.5 cursor-pointer"
+                                title="अधिकारी द्वारा अपलोड हस्ताक्षरित मूल दस्तावेज देखें/डाउनलोड करें"
+                              >
+                                <Download className="w-3.5 h-3.5" /> हस्ताक्षरित आदेश
+                              </button>
+                            )}
+
                             <button
-                              type="button"
-                              onClick={() => downloadBlobFile(record.officialUploadedCertificate, 'Official_Signed_Death_Certificate.pdf')}
-                              className="bg-emerald-50 hover:bg-emerald-100/80 border border-emerald-200/90 text-emerald-900 text-xs font-extrabold px-3.5 py-2 rounded-xl flex items-center gap-2 transition-all shadow-2xs cursor-pointer"
-                              title="अधिकारी द्वारा अपलोड हस्ताक्षरित मूल दस्तावेज देखें/डाउनलोड करें"
+                              onClick={() => setSelectedDeathDetail(record)}
+                              className="px-3 py-1.5 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 hover:bg-white transition-all flex items-center gap-1.5"
+                              title="आवेदन विवरण"
                             >
-                              <Download className="w-4 h-4 text-emerald-700" /> अपलोड हस्ताक्षरित आदेश
+                              <History className="w-3.5 h-3.5" /> विवरण
                             </button>
-                          )}
+                          </div>
 
                           {(record.status === 'Approved' || record.status === 'Certificate Generated' || record.status === 'Completed' || record.status === 'Sanctioned') && (
                             <button
@@ -968,7 +980,7 @@ export default function AdminPage() {
                                 officerName: adminAccounts[currentAdminUser]?.name || 'Registrar Officer',
                                 officialCertFile: record.officialUploadedCertificate || null
                               })}
-                              className="bg-white hover:bg-amber-50/60 border border-amber-300 text-amber-900 text-xs font-bold px-3.5 py-2 rounded-xl flex items-center gap-2 transition-all shadow-2xs"
+                              className="bg-amber-50 hover:bg-amber-100 border border-amber-300 text-amber-900 text-xs font-bold px-3.5 py-2 rounded-xl flex items-center gap-2 transition-all shadow-2xs"
                               title="अधिकारी हस्ताक्षरित दस्तावेज री-अपलोड करें या बदलें"
                             >
                               <Edit className="w-4 h-4 text-amber-600" /> दस्तावेज़ अपडेट करें
@@ -978,36 +990,29 @@ export default function AdminPage() {
                           {record.status === 'Submitted' && (
                             <button
                               onClick={() => setRemarkModal({ isOpen: true, record, serviceType: 'death', targetStatus: 'Under Review', remarkText: 'समीक्षा हेतु चुना गया', officerName: adminAccounts[currentAdminUser]?.name || 'Registrar Officer' })}
-                              className="bg-white hover:bg-blue-50/60 border border-blue-200 text-blue-800 text-xs font-bold px-3.5 py-2 rounded-xl flex items-center gap-2 transition-all shadow-2xs"
+                              className="bg-sky-50 hover:bg-sky-100/80 border border-sky-300 text-sky-800 text-xs font-bold px-3.5 py-2 rounded-xl flex items-center gap-2 transition-all shadow-2xs"
                             >
-                              <Eye className="w-4 h-4 text-blue-600" /> समीक्षा करें
+                              <Eye className="w-4 h-4 text-sky-600" /> समीक्षा करें
                             </button>
                           )}
 
                           {record.status !== 'Approved' && record.status !== 'Certificate Generated' && record.status !== 'Completed' && (
                             <button
                               onClick={() => setRemarkModal({ isOpen: true, record, serviceType: 'death', targetStatus: 'Approved', remarkText: 'सभी दस्तावेज सत्यापित। स्वीकृत।', officerName: adminAccounts[currentAdminUser]?.name || 'Registrar Officer' })}
-                              className="bg-emerald-50 hover:bg-emerald-100/80 border border-emerald-200/90 text-emerald-900 text-xs font-extrabold px-3.5 py-2 rounded-xl flex items-center gap-2 transition-all shadow-2xs"
+                              className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-extrabold px-4 py-2 rounded-xl flex items-center gap-2 transition-all shadow-md shadow-emerald-600/20"
                             >
-                              <CheckCircle2 className="w-4 h-4 text-emerald-700" /> स्वीकृत करें
+                              <CheckCircle2 className="w-4 h-4" /> स्वीकृत करें
                             </button>
                           )}
 
                           {record.status !== 'Rejected' && (
                             <button
                               onClick={() => setRemarkModal({ isOpen: true, record, serviceType: 'death', targetStatus: 'Rejected', remarkText: 'दस्तावेज अपूर्ण', officerName: adminAccounts[currentAdminUser]?.name || 'Registrar Officer' })}
-                              className="bg-white hover:bg-rose-50/60 border border-rose-300 text-rose-600 text-xs font-bold px-3.5 py-2 rounded-xl flex items-center gap-2 transition-all shadow-2xs"
+                              className="bg-rose-50 hover:bg-rose-100 border border-rose-300 text-rose-700 text-xs font-bold px-3.5 py-2 rounded-xl flex items-center gap-2 transition-all shadow-2xs"
                             >
                               <Trash2 className="w-4 h-4 text-rose-500" /> निरस्त करें
                             </button>
                           )}
-
-                          <button
-                            onClick={() => setSelectedDeathDetail(record)}
-                            className="bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 text-xs font-bold px-3.5 py-2 rounded-xl flex items-center gap-2 transition-all shadow-2xs"
-                          >
-                            <History className="w-4 h-4 text-slate-500" /> विवरण
-                          </button>
                         </div>
                       </div>
                     ))}
@@ -1131,34 +1136,46 @@ export default function AdminPage() {
                           </div>
                         </div>
 
-                        {/* Bottom Action Bar matching reference screenshot */}
-                        <div className="border-t border-slate-100 pt-3.5 flex flex-wrap items-center gap-2.5">
-                          <button
-                            onClick={() => setLetterModal({ isOpen: true, record, serviceType: 'birth' })}
-                            className="bg-white hover:bg-slate-50 border border-slate-200 text-slate-800 text-xs font-bold px-3.5 py-2 rounded-xl flex items-center gap-2 transition-all shadow-2xs"
-                          >
-                            <Printer className="w-4 h-4 text-emerald-700" /> पावती पत्र
-                          </button>
-
-                          {(record.status === 'Approved' || record.status === 'Certificate Generated' || record.status === 'Completed') && (
+                        {/* Bottom Action Bar — professional action cluster */}
+                        <div className="border-t border-slate-100 pt-3.5 flex flex-wrap items-center gap-2">
+                          <div className="flex items-center gap-2 bg-slate-50/80 border border-slate-200/80 rounded-xl p-1 mr-1">
                             <button
-                              onClick={() => setBirthCertPreview(record)}
-                              className="bg-emerald-50 hover:bg-emerald-100/80 border border-emerald-200/90 text-emerald-900 text-xs font-extrabold px-3.5 py-2 rounded-xl flex items-center gap-2 transition-all shadow-2xs"
+                              onClick={() => setLetterModal({ isOpen: true, record, serviceType: 'birth' })}
+                              className="px-3 py-1.5 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 hover:bg-white transition-all flex items-center gap-1.5"
+                              title="आवेदन पावती पत्र"
                             >
-                              <FileText className="w-4 h-4 text-emerald-700" /> प्रमाण पत्र
+                              <Printer className="w-3.5 h-3.5" /> पावती पत्र
                             </button>
-                          )}
 
-                          {record.officialUploadedCertificate && (
+                            {(record.status === 'Approved' || record.status === 'Certificate Generated' || record.status === 'Completed') && (
+                              <button
+                                onClick={() => setBirthCertPreview(record)}
+                                className="px-3 py-1.5 rounded-lg text-xs font-bold text-emerald-700 hover:text-emerald-900 hover:bg-white transition-all flex items-center gap-1.5"
+                                title="प्रमाण पत्र देखें"
+                              >
+                                <FileText className="w-3.5 h-3.5" /> प्रमाण पत्र
+                              </button>
+                            )}
+
+                            {record.officialUploadedCertificate && (
+                              <button
+                                type="button"
+                                onClick={() => downloadBlobFile(record.officialUploadedCertificate, 'Official_Signed_Birth_Certificate.pdf')}
+                                className="px-3 py-1.5 rounded-lg text-xs font-bold text-emerald-700 hover:text-emerald-900 hover:bg-white transition-all flex items-center gap-1.5 cursor-pointer"
+                                title="अधिकारी द्वारा अपलोड हस्ताक्षरित मूल दस्तावेज देखें/डाउनलोड करें"
+                              >
+                                <Download className="w-3.5 h-3.5" /> हस्ताक्षरित आदेश
+                              </button>
+                            )}
+
                             <button
-                              type="button"
-                              onClick={() => downloadBlobFile(record.officialUploadedCertificate, 'Official_Signed_Birth_Certificate.pdf')}
-                              className="bg-emerald-50 hover:bg-emerald-100/80 border border-emerald-200/90 text-emerald-900 text-xs font-extrabold px-3.5 py-2 rounded-xl flex items-center gap-2 transition-all shadow-2xs cursor-pointer"
-                              title="अधिकारी द्वारा अपलोड हस्ताक्षरित मूल दस्तावेज देखें/डाउनलोड करें"
+                              onClick={() => setSelectedBirthDetail(record)}
+                              className="px-3 py-1.5 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 hover:bg-white transition-all flex items-center gap-1.5"
+                              title="आवेदन विवरण"
                             >
-                              <Download className="w-4 h-4 text-emerald-700" /> अपलोड हस्ताक्षरित आदेश
+                              <History className="w-3.5 h-3.5" /> विवरण
                             </button>
-                          )}
+                          </div>
 
                           {(record.status === 'Approved' || record.status === 'Certificate Generated' || record.status === 'Completed' || record.status === 'Sanctioned') && (
                             <button
@@ -1171,7 +1188,7 @@ export default function AdminPage() {
                                 officerName: adminAccounts[currentAdminUser]?.name || 'Registrar Officer',
                                 officialCertFile: record.officialUploadedCertificate || null
                               })}
-                              className="bg-white hover:bg-amber-50/60 border border-amber-300 text-amber-900 text-xs font-bold px-3.5 py-2 rounded-xl flex items-center gap-2 transition-all shadow-2xs"
+                              className="bg-amber-50 hover:bg-amber-100 border border-amber-300 text-amber-900 text-xs font-bold px-3.5 py-2 rounded-xl flex items-center gap-2 transition-all shadow-2xs"
                               title="अधिकारी हस्ताक्षरित दस्तावेज री-अपलोड करें या बदलें"
                             >
                               <Edit className="w-4 h-4 text-amber-600" /> दस्तावेज़ अपडेट करें
@@ -1181,36 +1198,29 @@ export default function AdminPage() {
                           {record.status === 'Submitted' && (
                             <button
                               onClick={() => setRemarkModal({ isOpen: true, record, serviceType: 'birth', targetStatus: 'Under Review', remarkText: 'समीक्षा हेतु चुना गया', officerName: adminAccounts[currentAdminUser]?.name || 'Registrar Officer' })}
-                              className="bg-white hover:bg-blue-50/60 border border-blue-200 text-blue-800 text-xs font-bold px-3.5 py-2 rounded-xl flex items-center gap-2 transition-all shadow-2xs"
+                              className="bg-sky-50 hover:bg-sky-100/80 border border-sky-300 text-sky-800 text-xs font-bold px-3.5 py-2 rounded-xl flex items-center gap-2 transition-all shadow-2xs"
                             >
-                              <Eye className="w-4 h-4 text-blue-600" /> समीक्षा करें
+                              <Eye className="w-4 h-4 text-sky-600" /> समीक्षा करें
                             </button>
                           )}
 
                           {record.status !== 'Approved' && record.status !== 'Certificate Generated' && record.status !== 'Completed' && (
                             <button
                               onClick={() => setRemarkModal({ isOpen: true, record, serviceType: 'birth', targetStatus: 'Approved', remarkText: 'सभी दस्तावेज सत्यापित। स्वीकृत।', officerName: adminAccounts[currentAdminUser]?.name || 'Registrar Officer' })}
-                              className="bg-emerald-50 hover:bg-emerald-100/80 border border-emerald-200/90 text-emerald-900 text-xs font-extrabold px-3.5 py-2 rounded-xl flex items-center gap-2 transition-all shadow-2xs"
+                              className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-extrabold px-4 py-2 rounded-xl flex items-center gap-2 transition-all shadow-md shadow-emerald-600/20"
                             >
-                              <CheckCircle2 className="w-4 h-4 text-emerald-700" /> स्वीकृत करें
+                              <CheckCircle2 className="w-4 h-4" /> स्वीकृत करें
                             </button>
                           )}
 
                           {record.status !== 'Rejected' && (
                             <button
                               onClick={() => setRemarkModal({ isOpen: true, record, serviceType: 'birth', targetStatus: 'Rejected', remarkText: 'दस्तावेज अपूर्ण', officerName: adminAccounts[currentAdminUser]?.name || 'Registrar Officer' })}
-                              className="bg-white hover:bg-rose-50/60 border border-rose-300 text-rose-600 text-xs font-bold px-3.5 py-2 rounded-xl flex items-center gap-2 transition-all shadow-2xs"
+                              className="bg-rose-50 hover:bg-rose-100 border border-rose-300 text-rose-700 text-xs font-bold px-3.5 py-2 rounded-xl flex items-center gap-2 transition-all shadow-2xs"
                             >
                               <Trash2 className="w-4 h-4 text-rose-500" /> निरस्त करें
                             </button>
                           )}
-
-                          <button
-                            onClick={() => setSelectedBirthDetail(record)}
-                            className="bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 text-xs font-bold px-3.5 py-2 rounded-xl flex items-center gap-2 transition-all shadow-2xs"
-                          >
-                            <History className="w-4 h-4 text-slate-500" /> विवरण
-                          </button>
                         </div>
                       </div>
                     ))}
@@ -1334,34 +1344,46 @@ export default function AdminPage() {
                           </div>
                         </div>
 
-                        {/* Bottom Action Bar matching reference screenshot */}
-                        <div className="border-t border-slate-100 pt-3.5 flex flex-wrap items-center gap-2.5">
-                          <button
-                            onClick={() => setLetterModal({ isOpen: true, record, serviceType: 'water_connection' })}
-                            className="bg-white hover:bg-slate-50 border border-slate-200 text-slate-800 text-xs font-bold px-3.5 py-2 rounded-xl flex items-center gap-2 transition-all shadow-2xs"
-                          >
-                            <Printer className="w-4 h-4 text-emerald-700" /> पावती पत्र
-                          </button>
-
-                          {(record.status === 'Approved' || record.status === 'Sanctioned' || record.status === 'Completed') && (
+                        {/* Bottom Action Bar — professional action cluster */}
+                        <div className="border-t border-slate-100 pt-3.5 flex flex-wrap items-center gap-2">
+                          <div className="flex items-center gap-2 bg-slate-50/80 border border-slate-200/80 rounded-xl p-1 mr-1">
                             <button
-                              onClick={() => setWaterCertPreview(record)}
-                              className="bg-emerald-50 hover:bg-emerald-100/80 border border-emerald-200/90 text-emerald-900 text-xs font-extrabold px-3.5 py-2 rounded-xl flex items-center gap-2 transition-all shadow-2xs"
+                              onClick={() => setLetterModal({ isOpen: true, record, serviceType: 'water_connection' })}
+                              className="px-3 py-1.5 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 hover:bg-white transition-all flex items-center gap-1.5"
+                              title="आवेदन पावती पत्र"
                             >
-                              <FileText className="w-4 h-4 text-emerald-700" /> स्वीकृति पत्र
+                              <Printer className="w-3.5 h-3.5" /> पावती पत्र
                             </button>
-                          )}
 
-                          {record.officialUploadedCertificate && (
+                            {(record.status === 'Approved' || record.status === 'Sanctioned' || record.status === 'Completed') && (
+                              <button
+                                onClick={() => setWaterCertPreview(record)}
+                                className="px-3 py-1.5 rounded-lg text-xs font-bold text-emerald-700 hover:text-emerald-900 hover:bg-white transition-all flex items-center gap-1.5"
+                                title="स्वीकृति पत्र देखें"
+                              >
+                                <FileText className="w-3.5 h-3.5" /> स्वीकृति पत्र
+                              </button>
+                            )}
+
+                            {record.officialUploadedCertificate && (
+                              <button
+                                type="button"
+                                onClick={() => downloadBlobFile(record.officialUploadedCertificate, 'Official_Signed_Water_Sanction_Permit.pdf')}
+                                className="px-3 py-1.5 rounded-lg text-xs font-bold text-emerald-700 hover:text-emerald-900 hover:bg-white transition-all flex items-center gap-1.5 cursor-pointer"
+                                title="अधिकारी द्वारा अपलोड हस्ताक्षरित मूल दस्तावेज देखें/डाउनलोड करें"
+                              >
+                                <Download className="w-3.5 h-3.5" /> हस्ताक्षरित आदेश
+                              </button>
+                            )}
+
                             <button
-                              type="button"
-                              onClick={() => downloadBlobFile(record.officialUploadedCertificate, 'Official_Signed_Water_Sanction_Permit.pdf')}
-                              className="bg-emerald-50 hover:bg-emerald-100/80 border border-emerald-200/90 text-emerald-900 text-xs font-extrabold px-3.5 py-2 rounded-xl flex items-center gap-2 transition-all shadow-2xs cursor-pointer"
-                              title="अधिकारी द्वारा अपलोड हस्ताक्षरित मूल दस्तावेज देखें/डाउनलोड करें"
+                              onClick={() => setSelectedWaterDetail(record)}
+                              className="px-3 py-1.5 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 hover:bg-white transition-all flex items-center gap-1.5"
+                              title="आवेदन विवरण"
                             >
-                              <Download className="w-4 h-4 text-emerald-700" /> अपलोड हस्ताक्षरित आदेश
+                              <History className="w-3.5 h-3.5" /> विवरण
                             </button>
-                          )}
+                          </div>
 
                           {(record.status === 'Approved' || record.status === 'Certificate Generated' || record.status === 'Completed' || record.status === 'Sanctioned') && (
                             <button
@@ -1374,7 +1396,7 @@ export default function AdminPage() {
                                 officerName: adminAccounts[currentAdminUser]?.name || 'Water Supply Officer',
                                 officialCertFile: record.officialUploadedCertificate || null
                               })}
-                              className="bg-white hover:bg-amber-50/60 border border-amber-300 text-amber-900 text-xs font-bold px-3.5 py-2 rounded-xl flex items-center gap-2 transition-all shadow-2xs"
+                              className="bg-amber-50 hover:bg-amber-100 border border-amber-300 text-amber-900 text-xs font-bold px-3.5 py-2 rounded-xl flex items-center gap-2 transition-all shadow-2xs"
                               title="अधिकारी हस्ताक्षरित दस्तावेज री-अपलोड करें या बदलें"
                             >
                               <Edit className="w-4 h-4 text-amber-600" /> दस्तावेज़ अपडेट करें
@@ -1384,36 +1406,29 @@ export default function AdminPage() {
                           {record.status === 'Submitted' && (
                             <button
                               onClick={() => setRemarkModal({ isOpen: true, record, serviceType: 'water_connection', targetStatus: 'Under Review', remarkText: 'समीक्षा हेतु चुना गया', officerName: adminAccounts[currentAdminUser]?.name || 'Water Supply Officer' })}
-                              className="bg-white hover:bg-blue-50/60 border border-blue-200 text-blue-800 text-xs font-bold px-3.5 py-2 rounded-xl flex items-center gap-2 transition-all shadow-2xs"
+                              className="bg-sky-50 hover:bg-sky-100/80 border border-sky-300 text-sky-800 text-xs font-bold px-3.5 py-2 rounded-xl flex items-center gap-2 transition-all shadow-2xs"
                             >
-                              <Eye className="w-4 h-4 text-blue-600" /> समीक्षा करें
+                              <Eye className="w-4 h-4 text-sky-600" /> समीक्षा करें
                             </button>
                           )}
 
                           {record.status !== 'Approved' && record.status !== 'Sanctioned' && record.status !== 'Completed' && (
                             <button
                               onClick={() => setRemarkModal({ isOpen: true, record, serviceType: 'water_connection', targetStatus: 'Approved', remarkText: 'साइट प्लान एवं चार्जेज सत्यापित। जल कनेक्शन स्वीकृत।', officerName: adminAccounts[currentAdminUser]?.name || 'Water Supply Officer' })}
-                              className="bg-emerald-50 hover:bg-emerald-100/80 border border-emerald-200/90 text-emerald-900 text-xs font-extrabold px-3.5 py-2 rounded-xl flex items-center gap-2 transition-all shadow-2xs"
+                              className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-extrabold px-4 py-2 rounded-xl flex items-center gap-2 transition-all shadow-md shadow-emerald-600/20"
                             >
-                              <CheckCircle2 className="w-4 h-4 text-emerald-700" /> स्वीकृत करें
+                              <CheckCircle2 className="w-4 h-4" /> स्वीकृत करें
                             </button>
                           )}
 
                           {record.status !== 'Rejected' && (
                             <button
                               onClick={() => setRemarkModal({ isOpen: true, record, serviceType: 'water_connection', targetStatus: 'Rejected', remarkText: 'दस्तावेज अपूर्ण', officerName: adminAccounts[currentAdminUser]?.name || 'Water Supply Officer' })}
-                              className="bg-white hover:bg-rose-50/60 border border-rose-300 text-rose-600 text-xs font-bold px-3.5 py-2 rounded-xl flex items-center gap-2 transition-all shadow-2xs"
+                              className="bg-rose-50 hover:bg-rose-100 border border-rose-300 text-rose-700 text-xs font-bold px-3.5 py-2 rounded-xl flex items-center gap-2 transition-all shadow-2xs"
                             >
                               <Trash2 className="w-4 h-4 text-rose-500" /> निरस्त करें
                             </button>
                           )}
-
-                          <button
-                            onClick={() => setSelectedWaterDetail(record)}
-                            className="bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 text-xs font-bold px-3.5 py-2 rounded-xl flex items-center gap-2 transition-all shadow-2xs"
-                          >
-                            <History className="w-4 h-4 text-slate-500" /> विवरण
-                          </button>
                         </div>
                       </div>
                     ))}
@@ -1535,46 +1550,59 @@ export default function AdminPage() {
                           </div>
                         </div>
 
-                        {/* Bottom Action Bar matching reference screenshot */}
-                        <div className="border-t border-slate-100 pt-3.5 flex flex-wrap items-center gap-2.5">
-                          <button
-                            onClick={() => setLetterModal({ isOpen: true, record, serviceType: 'no_dues' })}
-                            className="bg-white hover:bg-slate-50 border border-slate-200 text-slate-800 text-xs font-bold px-3.5 py-2 rounded-xl flex items-center gap-2 transition-all shadow-2xs"
-                          >
-                            <Printer className="w-4 h-4 text-emerald-700" /> पावती पत्र
-                          </button>
-
-                          {record.documents?.taxReceipt && (
-                            <a
-                              href={record.documents.taxReceipt.data}
-                              download={record.documents.taxReceipt.name || 'Property_Tax_Receipt.pdf'}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="bg-white hover:bg-slate-50 border border-slate-200 text-blue-800 text-xs font-bold px-3.5 py-2 rounded-xl flex items-center gap-2 transition-all shadow-2xs"
-                            >
-                              <FileText className="w-4 h-4 text-blue-600" /> कर रसीद देखें
-                            </a>
-                          )}
-
-                          {(record.status === 'Approved' || record.status === 'Certificate Generated' || record.status === 'Completed') && (
+                        {/* Bottom Action Bar — professional action cluster */}
+                        <div className="border-t border-slate-100 pt-3.5 flex flex-wrap items-center gap-2">
+                          <div className="flex items-center gap-2 bg-slate-50/80 border border-slate-200/80 rounded-xl p-1 mr-1">
                             <button
-                              onClick={() => setNoDuesCertPreview(record)}
-                              className="bg-emerald-50 hover:bg-emerald-100/80 border border-emerald-200/90 text-emerald-900 text-xs font-extrabold px-3.5 py-2 rounded-xl flex items-center gap-2 transition-all shadow-2xs"
+                              onClick={() => setLetterModal({ isOpen: true, record, serviceType: 'no_dues' })}
+                              className="px-3 py-1.5 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 hover:bg-white transition-all flex items-center gap-1.5"
+                              title="आवेदन पावती पत्र"
                             >
-                              <FileText className="w-4 h-4 text-emerald-700" /> नो ड्यूज प्रमाण पत्र
+                              <Printer className="w-3.5 h-3.5" /> पावती पत्र
                             </button>
-                          )}
 
-                          {record.officialUploadedCertificate && (
+                            {record.documents?.taxReceipt && (
+                              <a
+                                href={record.documents.taxReceipt.data}
+                                download={record.documents.taxReceipt.name || 'Property_Tax_Receipt.pdf'}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="px-3 py-1.5 rounded-lg text-xs font-bold text-blue-700 hover:text-blue-900 hover:bg-white transition-all flex items-center gap-1.5"
+                                title="संपत्ति कर रसीद देखें"
+                              >
+                                <FileText className="w-3.5 h-3.5" /> कर रसीद देखें
+                              </a>
+                            )}
+
+                            {(record.status === 'Approved' || record.status === 'Certificate Generated' || record.status === 'Completed') && (
+                              <button
+                                onClick={() => setNoDuesCertPreview(record)}
+                                className="px-3 py-1.5 rounded-lg text-xs font-bold text-emerald-700 hover:text-emerald-900 hover:bg-white transition-all flex items-center gap-1.5"
+                                title="नो ड्यूज प्रमाण पत्र देखें"
+                              >
+                                <FileText className="w-3.5 h-3.5" /> नो ड्यूज प्रमाण पत्र
+                              </button>
+                            )}
+
+                            {record.officialUploadedCertificate && (
+                              <button
+                                type="button"
+                                onClick={() => downloadBlobFile(record.officialUploadedCertificate, 'Official_Signed_NoDues_Certificate.pdf')}
+                                className="px-3 py-1.5 rounded-lg text-xs font-bold text-emerald-700 hover:text-emerald-900 hover:bg-white transition-all flex items-center gap-1.5 cursor-pointer"
+                                title="अधिकारी द्वारा अपलोड हस्ताक्षरित मूल दस्तावेज देखें/डाउनलोड करें"
+                              >
+                                <Download className="w-3.5 h-3.5" /> हस्ताक्षरित आदेश
+                              </button>
+                            )}
+
                             <button
-                              type="button"
-                              onClick={() => downloadBlobFile(record.officialUploadedCertificate, 'Official_Signed_NoDues_Certificate.pdf')}
-                              className="bg-emerald-50 hover:bg-emerald-100/80 border border-emerald-200/90 text-emerald-900 text-xs font-extrabold px-3.5 py-2 rounded-xl flex items-center gap-2 transition-all shadow-2xs cursor-pointer"
-                              title="अधिकारी द्वारा अपलोड हस्ताक्षरित मूल दस्तावेज देखें/डाउनलोड करें"
+                              onClick={() => setSelectedNoDuesDetail(record)}
+                              className="px-3 py-1.5 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 hover:bg-white transition-all flex items-center gap-1.5"
+                              title="आवेदन विवरण"
                             >
-                              <Download className="w-4 h-4 text-emerald-700" /> अपलोड हस्ताक्षरित आदेश
+                              <History className="w-3.5 h-3.5" /> विवरण
                             </button>
-                          )}
+                          </div>
 
                           {(record.status === 'Approved' || record.status === 'Certificate Generated' || record.status === 'Completed' || record.status === 'Sanctioned') && (
                             <button
@@ -1587,7 +1615,7 @@ export default function AdminPage() {
                                 officerName: adminAccounts[currentAdminUser]?.name || 'Zonal Revenue Officer',
                                 officialCertFile: record.officialUploadedCertificate || null
                               })}
-                              className="bg-white hover:bg-amber-50/60 border border-amber-300 text-amber-900 text-xs font-bold px-3.5 py-2 rounded-xl flex items-center gap-2 transition-all shadow-2xs"
+                              className="bg-amber-50 hover:bg-amber-100 border border-amber-300 text-amber-900 text-xs font-bold px-3.5 py-2 rounded-xl flex items-center gap-2 transition-all shadow-2xs"
                               title="अधिकारी हस्ताक्षरित दस्तावेज री-अपलोड करें या बदलें"
                             >
                               <Edit className="w-4 h-4 text-amber-600" /> दस्तावेज़ अपडेट करें
@@ -1597,36 +1625,29 @@ export default function AdminPage() {
                           {record.status === 'Submitted' && (
                             <button
                               onClick={() => setRemarkModal({ isOpen: true, record, serviceType: 'no_dues', targetStatus: 'Under Review', remarkText: 'कर रसीद व SAF सत्यापन हेतु चुना गया', officerName: adminAccounts[currentAdminUser]?.name || 'Zonal Revenue Officer' })}
-                              className="bg-white hover:bg-blue-50/60 border border-blue-200 text-blue-800 text-xs font-bold px-3.5 py-2 rounded-xl flex items-center gap-2 transition-all shadow-2xs"
+                              className="bg-sky-50 hover:bg-sky-100/80 border border-sky-300 text-sky-800 text-xs font-bold px-3.5 py-2 rounded-xl flex items-center gap-2 transition-all shadow-2xs"
                             >
-                              <Eye className="w-4 h-4 text-blue-600" /> समीक्षा करें
+                              <Eye className="w-4 h-4 text-sky-600" /> समीक्षा करें
                             </button>
                           )}
 
                           {record.status !== 'Approved' && record.status !== 'Certificate Generated' && record.status !== 'Completed' && (
                             <button
                               onClick={() => setRemarkModal({ isOpen: true, record, serviceType: 'no_dues', targetStatus: 'Approved', remarkText: 'संपत्ति कर व SAF पूर्णतः सत्यापित। नो ड्यूज प्रमाण पत्र स्वीकृत।', officerName: adminAccounts[currentAdminUser]?.name || 'Zonal Revenue Officer' })}
-                              className="bg-emerald-50 hover:bg-emerald-100/80 border border-emerald-200/90 text-emerald-900 text-xs font-extrabold px-3.5 py-2 rounded-xl flex items-center gap-2 transition-all shadow-2xs"
+                              className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-extrabold px-4 py-2 rounded-xl flex items-center gap-2 transition-all shadow-md shadow-emerald-600/20"
                             >
-                              <CheckCircle2 className="w-4 h-4 text-emerald-700" /> स्वीकृत करें व NOC जारी करें
+                              <CheckCircle2 className="w-4 h-4" /> स्वीकृत करें व NOC जारी करें
                             </button>
                           )}
 
                           {record.status !== 'Rejected' && (
                             <button
                               onClick={() => setRemarkModal({ isOpen: true, record, serviceType: 'no_dues', targetStatus: 'Rejected', remarkText: 'वर्तमान कर रसीद या दस्तावेज अमान्य', officerName: adminAccounts[currentAdminUser]?.name || 'Zonal Revenue Officer' })}
-                              className="bg-white hover:bg-rose-50/60 border border-rose-300 text-rose-600 text-xs font-bold px-3.5 py-2 rounded-xl flex items-center gap-2 transition-all shadow-2xs"
+                              className="bg-rose-50 hover:bg-rose-100 border border-rose-300 text-rose-700 text-xs font-bold px-3.5 py-2 rounded-xl flex items-center gap-2 transition-all shadow-2xs"
                             >
                               <Trash2 className="w-4 h-4 text-rose-500" /> निरस्त करें
                             </button>
                           )}
-
-                          <button
-                            onClick={() => setSelectedNoDuesDetail(record)}
-                            className="bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 text-xs font-bold px-3.5 py-2 rounded-xl flex items-center gap-2 transition-all shadow-2xs"
-                          >
-                            <History className="w-4 h-4 text-slate-500" /> विवरण
-                          </button>
                         </div>
                       </div>
                     ))}
