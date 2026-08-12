@@ -10,18 +10,32 @@ export default function AdminMobileBottomNav() {
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const stored = sessionStorage.getItem('dc_admin_authenticated');
-      setIsAdminAuthenticated(stored === 'true');
+      const checkAuth = () => {
+        const stored = sessionStorage.getItem('dc_admin_authenticated');
+        setIsAdminAuthenticated(stored === 'true');
+      };
+      
+      checkAuth();
 
       const handleTabChange = (e) => {
-        if (e.detail) {
+        if (e.detail?.tab) {
+          setActiveTab(e.detail.tab);
+        } else if (typeof e.detail === 'string') {
           setActiveTab(e.detail);
-          setIsAdminAuthenticated(true);
         }
       };
 
+      const handleAuthChange = (e) => {
+        setIsAdminAuthenticated(!!e.detail);
+      };
+
       window.addEventListener('admin-tab-changed', handleTabChange);
-      return () => window.removeEventListener('admin-tab-changed', handleTabChange);
+      window.addEventListener('admin-auth-changed', handleAuthChange);
+      
+      return () => {
+        window.removeEventListener('admin-tab-changed', handleTabChange);
+        window.removeEventListener('admin-auth-changed', handleAuthChange);
+      };
     }
   }, [pathname]);
 

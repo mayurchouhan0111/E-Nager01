@@ -159,8 +159,11 @@ export default function AdminPage() {
   }, [])
 
   useEffect(() => {
-    if (typeof window !== 'undefined' && isAdmin) {
-      window.dispatchEvent(new CustomEvent('admin-tab-changed', { detail: activeTab }))
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('admin-auth-changed', { detail: isAdmin }))
+      if (isAdmin) {
+        window.dispatchEvent(new CustomEvent('admin-tab-changed', { detail: activeTab }))
+      }
     }
   }, [activeTab, isAdmin])
 
@@ -378,6 +381,7 @@ export default function AdminPage() {
       sessionStorage.removeItem('dc_admin_authenticated')
       sessionStorage.removeItem('dc_admin_username')
       sessionStorage.removeItem('dc_admin_role')
+      window.dispatchEvent(new CustomEvent('admin-auth-changed', { detail: false }))
     }
   }
 
