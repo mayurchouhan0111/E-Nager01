@@ -76,7 +76,21 @@ export default function ServiceHeader() {
       }
     }
 
-    return () => unsubNotif();
+    const handleCustomTrackModal = () => {
+      setShowTrackModal(true);
+      setHasSearched(false);
+    };
+
+    if (typeof window !== 'undefined') {
+      window.addEventListener('open-track-modal', handleCustomTrackModal);
+    }
+
+    return () => {
+      unsubNotif();
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('open-track-modal', handleCustomTrackModal);
+      }
+    };
   }, [citizenUser]);
 
   useEffect(() => {
@@ -220,12 +234,12 @@ export default function ServiceHeader() {
                 alt="मध्य प्रदेश शासन" 
                 className="w-11 h-11 object-contain drop-shadow-sm group-hover:scale-105 transition-transform duration-300" 
               />
-              <div className="hidden sm:block">
-                <div className="text-slate-900 font-extrabold text-sm leading-tight flex items-center gap-2">
-                  नगर पालिका ई-सेवा पोर्टल
-                  <span className="text-[9px] bg-emerald-100 text-emerald-800 border border-emerald-200 px-2 py-0.5 rounded-full uppercase tracking-wider font-bold">MP e-Seva</span>
+              <div className="block">
+                <div className="text-slate-900 font-extrabold text-xs sm:text-sm leading-tight flex items-center gap-1.5">
+                  नगर पालिका ई-सेवा
+                  <span className="text-[8px] sm:text-[9px] bg-emerald-100 text-emerald-800 border border-emerald-200 px-1.5 sm:px-2 py-0.5 rounded-full uppercase tracking-wider font-bold">MP e-Seva</span>
                 </div>
-                <p className="text-[11px] text-slate-400 font-medium">झाबुआ — मध्य प्रदेश शासन</p>
+                <p className="text-[10px] sm:text-[11px] text-slate-400 font-medium">झाबुआ — मध्य प्रदेश</p>
               </div>
             </Link>
 

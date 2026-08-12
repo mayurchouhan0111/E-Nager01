@@ -1281,12 +1281,12 @@ export default function DeathCertificatePage() {
             </div>
 
             {/* ACTION BUTTONS */}
-            <div className="flex flex-wrap items-center justify-end gap-3 pt-2">
+            <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-3 pt-2">
               <button
                 type="button"
                 onClick={handleSaveDraft}
                 disabled={loading}
-                className="btn btn-secondary flex items-center gap-1.5 font-bold text-slate-700"
+                className="btn btn-secondary w-full sm:w-auto flex items-center justify-center gap-1.5 font-bold text-slate-700"
               >
                 💾 ड्राफ्ट सहेजें (Save Draft)
               </button>
@@ -1294,7 +1294,7 @@ export default function DeathCertificatePage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="btn btn-primary flex items-center gap-2 shadow-lg shadow-emerald-700/20 font-bold"
+                className="btn btn-primary w-full sm:w-auto flex items-center justify-center gap-2 shadow-lg shadow-emerald-700/20 font-bold"
               >
                 {loading ? (
                   <RefreshCw className="animate-spin w-4 h-4 text-white" />

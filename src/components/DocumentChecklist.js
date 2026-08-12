@@ -275,11 +275,11 @@ export default function DocumentChecklist({ defaultCategory = 'all', compact = f
       {/* Professional Segmented Tab Bar */}
       {!compact && (
         <div className="border-b border-slate-100 pb-4">
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 bg-slate-100/90 p-1.5 rounded-2xl border border-slate-200/80 shadow-inner">
+          <div className="flex overflow-x-auto no-scrollbar gap-1.5 sm:grid sm:grid-cols-4 bg-slate-100/90 p-1.5 rounded-2xl border border-slate-200/80 shadow-inner">
             <button
               type="button"
               onClick={() => setActiveCategory('all')}
-              className={`px-3 py-2.5 rounded-xl text-xs font-extrabold whitespace-nowrap transition-all duration-200 flex items-center justify-center gap-1.5 ${
+              className={`px-3 py-2.5 rounded-xl text-xs font-extrabold whitespace-nowrap transition-all duration-200 flex items-center justify-center gap-1.5 shrink-0 sm:shrink ${
                 activeCategory === 'all'
                   ? 'bg-white text-slate-900 shadow-sm border border-slate-200/90 scale-[1.02]'
                   : 'text-slate-600 hover:text-slate-900 hover:bg-white/50'
@@ -292,7 +292,7 @@ export default function DocumentChecklist({ defaultCategory = 'all', compact = f
             <button
               type="button"
               onClick={() => setActiveCategory('birth')}
-              className={`px-3 py-2.5 rounded-xl text-xs font-extrabold whitespace-nowrap transition-all duration-200 flex items-center justify-center gap-1.5 ${
+              className={`px-3 py-2.5 rounded-xl text-xs font-extrabold whitespace-nowrap transition-all duration-200 flex items-center justify-center gap-1.5 shrink-0 sm:shrink ${
                 activeCategory === 'birth'
                   ? 'bg-white text-blue-900 shadow-sm border border-blue-200/90 scale-[1.02]'
                   : 'text-slate-600 hover:text-slate-900 hover:bg-white/50'
@@ -305,7 +305,7 @@ export default function DocumentChecklist({ defaultCategory = 'all', compact = f
             <button
               type="button"
               onClick={() => setActiveCategory('death')}
-              className={`px-3 py-2.5 rounded-xl text-xs font-extrabold whitespace-nowrap transition-all duration-200 flex items-center justify-center gap-1.5 ${
+              className={`px-3 py-2.5 rounded-xl text-xs font-extrabold whitespace-nowrap transition-all duration-200 flex items-center justify-center gap-1.5 shrink-0 sm:shrink ${
                 activeCategory === 'death'
                   ? 'bg-white text-emerald-900 shadow-sm border border-emerald-200/90 scale-[1.02]'
                   : 'text-slate-600 hover:text-slate-900 hover:bg-white/50'
@@ -318,7 +318,7 @@ export default function DocumentChecklist({ defaultCategory = 'all', compact = f
             <button
               type="button"
               onClick={() => setActiveCategory('water')}
-              className={`px-3 py-2.5 rounded-xl text-xs font-extrabold whitespace-nowrap transition-all duration-200 flex items-center justify-center gap-1.5 ${
+              className={`px-3 py-2.5 rounded-xl text-xs font-extrabold whitespace-nowrap transition-all duration-200 flex items-center justify-center gap-1.5 shrink-0 sm:shrink ${
                 activeCategory === 'water'
                   ? 'bg-white text-teal-900 shadow-sm border border-teal-200/90 scale-[1.02]'
                   : 'text-slate-600 hover:text-slate-900 hover:bg-white/50'

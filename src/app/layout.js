@@ -3,6 +3,7 @@ import './globals.css'
 import AuthProvider from '@/components/AuthProvider'
 import Footer from '@/components/Footer'
 import MaintenanceGuard from '@/components/MaintenanceGuard'
+import MobileBottomNav from '@/components/MobileBottomNav'
 
 const baseUrl = 'https://jhabua-nagarpalika-aapke-dwar.netlify.app'
 
@@ -151,6 +152,7 @@ export default function RootLayout({ children }) {
           <MaintenanceGuard />
           {children}
           <Footer />
+          <MobileBottomNav />
         </AuthProvider>
       </body>
     </html>
