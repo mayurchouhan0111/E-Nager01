@@ -312,8 +312,9 @@ body {
 /* ── Overflow ───────────────────────────────── */
 
 html, body {
-  overflow-x: hidden;
-  max-width: 100vw;
+  overflow-x: hidden !important;
+  max-width: 100vw !important;
+  width: 100% !important;
 }
 
 /* ── Mobile & Touch Usability Adjustments ─────────────────────── */

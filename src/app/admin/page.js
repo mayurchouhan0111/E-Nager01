@@ -806,8 +806,8 @@ export default function AdminPage() {
         {isAdmin && (
           <div className="space-y-6 animate-fade-in">
             
-            {/* Dynamic Role-Filtered Tab Navigation Menu */}
-            <div className="flex gap-1 bg-white border border-slate-200 rounded-2xl p-1 shadow-sm overflow-x-auto">
+            {/* Dynamic Role-Filtered Tab Navigation Menu (Hidden on mobile where bottom nav is active) */}
+            <div className="hidden lg:flex gap-1 bg-white border border-slate-200 rounded-2xl p-1 shadow-sm overflow-x-auto">
               {visibleTabs.map(tab => {
                 const Icon = tab.icon
                 return (
@@ -944,8 +944,8 @@ export default function AdminPage() {
                         </div>
 
 {/* Bottom Action Bar — professional action cluster */}
-                        <div className="border-t border-slate-100 pt-3.5 flex flex-wrap items-center gap-2">
-                          <div className="flex items-center gap-2 bg-slate-50/80 border border-slate-200/80 rounded-xl p-1 mr-1">
+                        <div className="border-t border-slate-100 pt-3.5 flex flex-wrap items-center gap-2 max-w-full">
+                          <div className="flex flex-wrap items-center gap-1.5 bg-slate-50/80 border border-slate-200/80 rounded-xl p-1 max-w-full">
                             <button
                               onClick={() => setLetterModal({ isOpen: true, record, serviceType: 'death' })}
                               className="px-3 py-1.5 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 hover:bg-white transition-all flex items-center gap-1.5"
@@ -1152,8 +1152,8 @@ export default function AdminPage() {
                         </div>
 
                         {/* Bottom Action Bar — professional action cluster */}
-                        <div className="border-t border-slate-100 pt-3.5 flex flex-wrap items-center gap-2">
-                          <div className="flex items-center gap-2 bg-slate-50/80 border border-slate-200/80 rounded-xl p-1 mr-1">
+                        <div className="border-t border-slate-100 pt-3.5 flex flex-wrap items-center gap-2 max-w-full">
+                          <div className="flex flex-wrap items-center gap-1.5 bg-slate-50/80 border border-slate-200/80 rounded-xl p-1 max-w-full">
                             <button
                               onClick={() => setLetterModal({ isOpen: true, record, serviceType: 'birth' })}
                               className="px-3 py-1.5 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 hover:bg-white transition-all flex items-center gap-1.5"
@@ -1360,8 +1360,8 @@ export default function AdminPage() {
                         </div>
 
                         {/* Bottom Action Bar — professional action cluster */}
-                        <div className="border-t border-slate-100 pt-3.5 flex flex-wrap items-center gap-2">
-                          <div className="flex items-center gap-2 bg-slate-50/80 border border-slate-200/80 rounded-xl p-1 mr-1">
+                        <div className="border-t border-slate-100 pt-3.5 flex flex-wrap items-center gap-2 max-w-full">
+                          <div className="flex flex-wrap items-center gap-1.5 bg-slate-50/80 border border-slate-200/80 rounded-xl p-1 max-w-full">
                             <button
                               onClick={() => setLetterModal({ isOpen: true, record, serviceType: 'water_connection' })}
                               className="px-3 py-1.5 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 hover:bg-white transition-all flex items-center gap-1.5"
@@ -1566,8 +1566,8 @@ export default function AdminPage() {
                         </div>
 
                         {/* Bottom Action Bar — professional action cluster */}
-                        <div className="border-t border-slate-100 pt-3.5 flex flex-wrap items-center gap-2">
-                          <div className="flex items-center gap-2 bg-slate-50/80 border border-slate-200/80 rounded-xl p-1 mr-1">
+                        <div className="border-t border-slate-100 pt-3.5 flex flex-wrap items-center gap-2 max-w-full">
+                          <div className="flex flex-wrap items-center gap-1.5 bg-slate-50/80 border border-slate-200/80 rounded-xl p-1 max-w-full">
                             <button
                               onClick={() => setLetterModal({ isOpen: true, record, serviceType: 'no_dues' })}
                               className="px-3 py-1.5 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 hover:bg-white transition-all flex items-center gap-1.5"

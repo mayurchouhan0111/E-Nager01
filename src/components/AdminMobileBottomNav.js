@@ -1,7 +1,7 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
-import { FileText, Baby, Droplet, Building2, History } from 'lucide-react';
+import { FileText, Baby, Droplets, Building2, History } from 'lucide-react';
 
 export default function AdminMobileBottomNav() {
   const pathname = usePathname();
@@ -50,7 +50,7 @@ export default function AdminMobileBottomNav() {
     {
       key: 'water-connections',
       label: 'जल',
-      icon: Droplet,
+      icon: Droplets,
     },
     {
       key: 'no-dues-certificates',
@@ -65,7 +65,7 @@ export default function AdminMobileBottomNav() {
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 lg:hidden bg-slate-950/95 backdrop-blur-xl border-t border-slate-800 text-white shadow-[0_-4px_24px_rgba(0,0,0,0.4)] no-print pb-safe">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 lg:hidden bg-white/95 backdrop-blur-xl border-t border-slate-200 text-slate-900 shadow-[0_-4px_24px_rgba(0,0,0,0.07)] no-print pb-safe">
       <div className="flex items-center justify-around h-15 max-w-md mx-auto relative px-2">
         {navItems.map((item) => {
           const Icon = item.icon;
@@ -80,23 +80,23 @@ export default function AdminMobileBottomNav() {
               aria-label={item.label}
             >
               <div className="relative flex flex-col items-center justify-center w-full h-full py-1">
-                {/* Active Top Accent Line */}
+                {/* Sleek Top Active Accent Line */}
                 {active && (
-                  <div className="absolute top-0 w-8 h-1 bg-gradient-to-r from-amber-400 to-emerald-400 rounded-b-full shadow-xs animate-scale-in" />
+                  <div className="absolute top-0 w-8 h-1 bg-gradient-to-r from-emerald-600 to-teal-500 rounded-b-full shadow-xs animate-scale-in" />
                 )}
 
-                {/* Icon Container with Officer Dark Glow Pill */}
+                {/* Icon Container with Pill Highlight */}
                 <div className={`px-3 py-1 rounded-full transition-all duration-300 flex items-center justify-center ${
                   active
-                    ? 'bg-emerald-600 text-white scale-105 shadow-md'
-                    : 'text-slate-400 hover:text-slate-200 bg-transparent'
+                    ? 'bg-emerald-100/90 text-emerald-800 scale-105 shadow-xs'
+                    : 'text-slate-500 hover:text-slate-900 bg-transparent'
                 }`}>
-                  <Icon className={`w-5 h-5 transition-transform duration-300 ${active ? 'stroke-[2.4] text-white' : 'stroke-[1.8]'}`} />
+                  <Icon className={`w-5 h-5 transition-transform duration-300 ${active ? 'stroke-[2.4] text-emerald-800' : 'stroke-[1.8]'}`} />
                 </div>
 
                 {/* Text Label */}
                 <span className={`text-[10px] leading-tight mt-0.5 tracking-tight transition-colors ${
-                  active ? 'font-extrabold text-emerald-300' : 'font-medium text-slate-400'
+                  active ? 'font-extrabold text-emerald-900' : 'font-semibold text-slate-500'
                 }`}>
                   {item.label}
                 </span>
