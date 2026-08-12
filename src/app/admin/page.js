@@ -95,28 +95,6 @@ export default function AdminPage() {
     }
   }, [])
 
-  useEffect(() => {
-    const handleTabChangeFromMobileNav = (e) => {
-      if (e.detail) {
-        setActiveTab(e.detail)
-      }
-    }
-    if (typeof window !== 'undefined') {
-      window.addEventListener('change-admin-tab', handleTabChangeFromMobileNav)
-    }
-    return () => {
-      if (typeof window !== 'undefined') {
-        window.removeEventListener('change-admin-tab', handleTabChangeFromMobileNav)
-      }
-    }
-  }, [])
-
-  useEffect(() => {
-    if (typeof window !== 'undefined' && isAdmin) {
-      window.dispatchEvent(new CustomEvent('admin-tab-changed', { detail: activeTab }))
-    }
-  }, [activeTab, isAdmin])
-
   // Death Certificate state
   const [deathRecords, setDeathRecords] = useState([])
   const [deathLoading, setDeathLoading] = useState(false)
@@ -163,6 +141,28 @@ export default function AdminPage() {
 
   // Tab navigation
   const [activeTab, setActiveTab] = useState('death-certificates') // 'death-certificates' | 'birth-certificates' | 'water-connections' | 'no-dues-certificates' | 'audit'
+
+  useEffect(() => {
+    const handleTabChangeFromMobileNav = (e) => {
+      if (e.detail) {
+        setActiveTab(e.detail)
+      }
+    }
+    if (typeof window !== 'undefined') {
+      window.addEventListener('change-admin-tab', handleTabChangeFromMobileNav)
+    }
+    return () => {
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('change-admin-tab', handleTabChangeFromMobileNav)
+      }
+    }
+  }, [])
+
+  useEffect(() => {
+    if (typeof window !== 'undefined' && isAdmin) {
+      window.dispatchEvent(new CustomEvent('admin-tab-changed', { detail: activeTab }))
+    }
+  }, [activeTab, isAdmin])
 
   // Officer Real-Time Notifications State
   const [officerNotifications, setOfficerNotifications] = useState([])
