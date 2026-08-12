@@ -201,7 +201,7 @@ export const CHECKLIST_DATA = {
     icon: '🚰',
     badge: 'नल कनेक्शन',
     badgeColor: 'bg-teal-100 text-teal-800 border-teal-300',
-    description: 'नगर पालिका वाटर टैक्स पोर्टल नियमानुसार नए नल कनेक्शन हेतु दस्तावेज सूची (क्रम 1 से 3 अनिवार्य एवं क्रम 4 वैकल्पिक):',
+    description: 'नगर पालिका वाटर टैक्स पोर्टल नियमानुसार नए नल कनेक्शन हेतु दस्तावेज सूची (क्रम 1 व 2 अनिवार्य एवं क्रम 3 वैकल्पिक):',
     items: [
       {
         id: 'wc_1',
@@ -217,13 +217,7 @@ export const CHECKLIST_DATA = {
       },
       {
         id: 'wc_3',
-        title: '3. नल कनेक्शन शुल्क रसीद ₹4250/- (अनिवार्य)',
-        detail: 'नल कनेक्शन चार्जेज (charges ₹4250/-) भुगतान रसीद फोटोकॉपी',
-        required: true
-      },
-      {
-        id: 'wc_4',
-        title: '4. सड़क खुदाई शुल्क रसीद (वैकल्पिक / Optional)',
+        title: '3. सड़क खुदाई शुल्क रसीद (वैकल्पिक / Optional)',
         detail: 'सड़क खुदाई शुल्क (Road Cutting Charges - If Applicable)',
         required: false
       }

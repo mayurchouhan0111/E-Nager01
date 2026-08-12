@@ -85,7 +85,6 @@ export default function WaterConnectionPage() {
     documents: {
       idProofDoc: null,
       sitePlanDoc: null,
-      connectionChargesReceipt: null,
       roadCuttingReceipt: null
     }
   });
@@ -284,7 +283,7 @@ export default function WaterConnectionPage() {
       propertyDetails: { ...defaultPropertyDetails, ...(app.propertyDetails || {}) },
       existingConnectionDetails: { ...defaultExistingConnectionDetails, ...(app.existingConnectionDetails || {}) },
       plumberDetails: { ...defaultPlumberDetails, ...(app.plumberDetails || {}) },
-      documents: app.documents || { idProofDoc: null, sitePlanDoc: null, connectionChargesReceipt: null, roadCuttingReceipt: null }
+      documents: app.documents || { idProofDoc: null, sitePlanDoc: null, roadCuttingReceipt: null }
     });
     setActiveTab('apply');
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -303,7 +302,6 @@ export default function WaterConnectionPage() {
       documents: {
         idProofDoc: null,
         sitePlanDoc: null,
-        connectionChargesReceipt: null,
         roadCuttingReceipt: null
       }
     });
@@ -805,7 +803,7 @@ export default function WaterConnectionPage() {
               </div>
 
               <p className="text-xs text-slate-500 leading-relaxed">
-                नगर पालिका जल प्रदाय पोर्टल नियमानुसार आवश्यक दस्तावेजों की स्पष्ट फोटो या PDF संलग्न करें (क्रम 1 से 3 अनिवार्य एवं क्रम 4 वैकल्पिक/लागू होने पर):
+                नगर पालिका जल प्रदाय पोर्टल नियमानुसार आवश्यक दस्तावेजों की स्पष्ट फोटो या PDF संलग्न करें (क्रम 1 व 2 अनिवार्य एवं क्रम 3 वैकल्पिक/लागू होने पर):
               </p>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -828,17 +826,8 @@ export default function WaterConnectionPage() {
                 />
 
                 <DocumentUploader
-                  title="3. नल कनेक्शन शुल्क रसीद (Charges ₹4250/-)"
-                  description="नल कनेक्शन चार्जेज (charges ₹4250/-) की आधिकारिक रसीद की फोटोकॉपी"
-                  required={true}
-                  documentData={formData.documents?.connectionChargesReceipt}
-                  onUpload={(doc) => handleDocumentUpload('connectionChargesReceipt', doc)}
-                  onRemove={() => handleDocumentRemove('connectionChargesReceipt')}
-                />
-
-                <DocumentUploader
-                  title="4. सड़क खुदाई शुल्क रसीद (Road Cutting Fee - If Applicable)"
-                  description="सड़क खुदाई शुल्क भुगतान रसीd (Road Cutting Charges - यदि लागू हो)"
+                  title="3. सड़क खुदाई शुल्क रसीद (Road Cutting Fee - If Applicable)"
+                  description="सड़क खुदाई शुल्क भुगतान रसीद (Road Cutting Charges - यदि लागू हो)"
                   required={false}
                   documentData={formData.documents?.roadCuttingReceipt}
                   onUpload={(doc) => handleDocumentUpload('roadCuttingReceipt', doc)}

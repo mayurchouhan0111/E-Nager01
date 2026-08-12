@@ -2571,8 +2571,7 @@ function ApplicationDetailModal({ record, serviceType, onClose, onOpenRemark, on
     hospitalDeathSlip: '5. अस्पताल मृत्यु पर्ची (Hospital Death Slip)',
     idProofDoc: '1. आईडी प्रूफ एवं संपत्ति / शपथ पत्र (ID & Property / Affidavit)',
     sitePlanDoc: '2. साइट प्लान नक्शा (Site Plan Map)',
-    connectionChargesReceipt: '3. नल कनेक्शन शुल्क रसीद (Connection Fee Receipt)',
-    roadCuttingReceipt: '4. सड़क खुदाई शुल्क रसीद (Road Cutting Fee Receipt)'
+    roadCuttingReceipt: '3. सड़क खुदाई शुल्क रसीद (Road Cutting Fee Receipt)'
   };
 
   const getNormalizedDocs = () => {
