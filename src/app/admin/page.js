@@ -95,6 +95,28 @@ export default function AdminPage() {
     }
   }, [])
 
+  useEffect(() => {
+    const handleTabChangeFromMobileNav = (e) => {
+      if (e.detail) {
+        setActiveTab(e.detail)
+      }
+    }
+    if (typeof window !== 'undefined') {
+      window.addEventListener('change-admin-tab', handleTabChangeFromMobileNav)
+    }
+    return () => {
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('change-admin-tab', handleTabChangeFromMobileNav)
+      }
+    }
+  }, [])
+
+  useEffect(() => {
+    if (typeof window !== 'undefined' && isAdmin) {
+      window.dispatchEvent(new CustomEvent('admin-tab-changed', { detail: activeTab }))
+    }
+  }, [activeTab, isAdmin])
+
   // Death Certificate state
   const [deathRecords, setDeathRecords] = useState([])
   const [deathLoading, setDeathLoading] = useState(false)

@@ -7,6 +7,10 @@ import { Home, FileText, Baby, Droplets, Search } from 'lucide-react';
 export default function MobileBottomNav() {
   const pathname = usePathname();
 
+  if (pathname?.startsWith('/admin')) {
+    return null;
+  }
+
   const isCurrentTab = (path) => {
     if (path === '/' && pathname === '/') return true;
     if (path !== '/' && pathname?.startsWith(path)) return true;
