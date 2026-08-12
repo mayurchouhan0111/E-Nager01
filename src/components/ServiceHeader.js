@@ -228,16 +228,18 @@ export default function ServiceHeader() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             
-            <Link href="/" className="flex items-center gap-3 group">
+            <Link href="/" className="flex items-center gap-2 sm:gap-3 group shrink-0">
               <img 
                 src="/mp-logo.png" 
                 alt="मध्य प्रदेश शासन" 
-                className="w-11 h-11 object-contain drop-shadow-sm group-hover:scale-105 transition-transform duration-300" 
+                className="w-10 h-10 sm:w-11 sm:h-11 object-contain drop-shadow-sm group-hover:scale-105 transition-transform duration-300 shrink-0" 
               />
-              <div className="block">
-                <div className="text-slate-900 font-extrabold text-xs sm:text-sm leading-tight flex items-center gap-1.5">
-                  नगर पालिका ई-सेवा
-                  <span className="text-[8px] sm:text-[9px] bg-emerald-100 text-emerald-800 border border-emerald-200 px-1.5 sm:px-2 py-0.5 rounded-full uppercase tracking-wider font-bold">MP e-Seva</span>
+              <div className="flex flex-col justify-center">
+                <div className="text-slate-900 font-extrabold text-xs sm:text-sm leading-tight flex items-center gap-1.5 whitespace-nowrap">
+                  <span>नगर पालिका ई-सेवा</span>
+                  <span className="hidden sm:inline-flex text-[9px] bg-emerald-100 text-emerald-800 border border-emerald-200 px-2 py-0.5 rounded-full uppercase tracking-wider font-bold">
+                    MP e-Seva
+                  </span>
                 </div>
                 <p className="text-[10px] sm:text-[11px] text-slate-400 font-medium">झाबुआ — मध्य प्रदेश</p>
               </div>
@@ -262,13 +264,13 @@ export default function ServiceHeader() {
               </Link>
             </nav>
 
-            <div className="flex items-center gap-2">
-              <button onClick={() => { setShowTrackModal(true); setHasSearched(false); }} aria-label="आवेदन स्थिति खोजें" className="px-3 py-2 rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 text-xs font-bold flex items-center gap-1.5 transition-all icon-hover-bounce">
-                <Search className="w-3.5 h-3.5 text-emerald-700" /> <span className="hidden sm:inline">स्थिति खोजें</span>
+            <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+              <button onClick={() => { setShowTrackModal(true); setHasSearched(false); }} aria-label="आवेदन स्थिति खोजें" className="hidden sm:flex px-3 py-2 rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 text-xs font-bold items-center gap-1.5 transition-all icon-hover-bounce">
+                <Search className="w-3.5 h-3.5 text-emerald-700" /> <span>स्थिति खोजें</span>
               </button>
 
               <div className="relative">
-                <button onClick={() => setShowNotifications(!showNotifications)} aria-label="सूचनाएँ (Notifications)" className="relative p-2.5 rounded-xl bg-white border border-slate-200 text-slate-500 hover:bg-slate-50 shadow-sm transition-all duration-200 icon-hover-bounce">
+                <button onClick={() => setShowNotifications(!showNotifications)} aria-label="सूचनाएँ (Notifications)" className="relative p-2 sm:p-2.5 rounded-xl bg-white border border-slate-200 text-slate-500 hover:bg-slate-50 shadow-xs transition-all duration-200 icon-hover-bounce">
                   <Bell className="w-4 h-4 text-emerald-700" />
                   {unreadCount > 0 && <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] rounded-full bg-rose-500 text-white text-[9px] flex items-center justify-center animate-bounce">{unreadCount}</span>}
                 </button>
@@ -296,11 +298,11 @@ export default function ServiceHeader() {
 
               {/* Google Citizen Auth Badge / Direct Google Sign In Button */}
               {citizenUser ? (
-                <div className="flex items-center gap-1 bg-emerald-50 p-1 rounded-xl border border-emerald-200 shadow-sm">
+                <div className="flex items-center gap-1 bg-emerald-50 p-1 rounded-xl border border-emerald-200 shadow-xs">
                   {citizenUser.photoURL ? (
-                    <img src={citizenUser.photoURL} alt={citizenUser.displayName || 'Profile'} className="w-7 h-7 rounded-full border border-emerald-400 object-cover shrink-0" />
+                    <img src={citizenUser.photoURL} alt={citizenUser.displayName || 'Profile'} className="w-6 h-6 sm:w-7 sm:h-7 rounded-full border border-emerald-400 object-cover shrink-0" />
                   ) : (
-                    <div className="w-7 h-7 rounded-full bg-emerald-700 text-white font-extrabold text-xs flex items-center justify-center shrink-0 shadow-xs">
+                    <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-emerald-700 text-white font-extrabold text-[11px] sm:text-xs flex items-center justify-center shrink-0 shadow-xs">
                       {citizenUser.displayName?.[0]?.toUpperCase() || 'C'}
                     </div>
                   )}
@@ -318,15 +320,15 @@ export default function ServiceHeader() {
               ) : (
                 <button
                   onClick={handleGoogleLogin}
-                  className="px-3 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold flex items-center gap-1.5 transition-all shadow-sm icon-hover-bounce shrink-0"
+                  className="px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold flex items-center gap-1.5 transition-all shadow-xs icon-hover-bounce shrink-0"
                 >
                   <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="" className="w-3.5 h-3.5 shrink-0" />
                   <span className="hidden sm:inline">गूगल साइन इन</span>
                 </button>
               )}
 
-              <Link href="/admin" aria-label="अधिकारी लॉगिन" className={`px-3 py-2 rounded-xl text-xs font-bold border transition-all flex items-center gap-1.5 icon-hover-bounce ${isCurrentTab('/admin') ? 'bg-emerald-700 text-white border-emerald-700 shadow-md' : 'bg-emerald-50 text-emerald-800 border-emerald-200'}`}>
-                <ShieldAlert className="w-3.5 h-3.5 animate-pulse text-amber-500" /> <span className="hidden sm:inline">अधिकारी लॉगिन</span>
+              <Link href="/admin" aria-label="अधिकारी लॉगिन" title="अधिकारी लॉगिन" className={`p-2 sm:px-3 sm:py-2 rounded-xl text-xs font-bold border transition-all flex items-center gap-1.5 icon-hover-bounce shrink-0 ${isCurrentTab('/admin') ? 'bg-emerald-700 text-white border-emerald-700 shadow-md' : 'bg-emerald-50 text-emerald-800 border-emerald-200'}`}>
+                <ShieldAlert className="w-3.5 h-3.5 animate-pulse text-amber-500 shrink-0" /> <span className="hidden sm:inline">अधिकारी लॉगिन</span>
               </Link>
             </div>
           </div>

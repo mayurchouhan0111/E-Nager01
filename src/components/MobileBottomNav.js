@@ -22,31 +22,26 @@ export default function MobileBottomNav() {
   const navItems = [
     {
       label: 'गृह',
-      sublabel: 'Home',
       href: '/',
       icon: Home,
     },
     {
       label: 'मृत्यु',
-      sublabel: 'Death',
       href: '/death-certificate',
       icon: FileText,
     },
     {
       label: 'जन्म',
-      sublabel: 'Birth',
       href: '/birth-certificate',
       icon: Baby,
     },
     {
       label: 'जल',
-      sublabel: 'Water',
       href: '/water-connection',
       icon: Droplets,
     },
     {
       label: 'स्थिति',
-      sublabel: 'Track',
       action: handleOpenTrackModal,
       icon: Search,
       isAction: true,
@@ -54,27 +49,32 @@ export default function MobileBottomNav() {
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 lg:hidden bg-white/95 backdrop-blur-lg border-t border-slate-200/90 shadow-[0_-4px_20px_rgba(0,0,0,0.06)] no-print pb-safe">
-      <div className="flex items-center justify-around h-15 px-1 max-w-md mx-auto">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 lg:hidden bg-white/95 backdrop-blur-xl border-t border-slate-200 shadow-[0_-4px_24px_rgba(0,0,0,0.07)] no-print pb-safe">
+      <div className="flex items-center justify-around h-15 max-w-md mx-auto relative px-2">
         {navItems.map((item, index) => {
           const Icon = item.icon;
           const active = !item.isAction && isCurrentTab(item.href);
 
           const content = (
-            <div className={`flex flex-col items-center justify-center w-full h-full py-1 rounded-xl transition-all duration-200 ${
-              active 
-                ? 'text-emerald-700 font-extrabold scale-105' 
-                : 'text-slate-500 hover:text-slate-800 font-medium'
-            }`}>
-              <div className={`relative p-1 rounded-xl transition-colors ${
-                active ? 'bg-emerald-100/90 text-emerald-800' : 'bg-transparent'
+            <div className="relative flex flex-col items-center justify-center w-full h-full py-1">
+              {/* Sleek Top Active Accent Line */}
+              {active && (
+                <div className="absolute top-0 w-8 h-1 bg-gradient-to-r from-emerald-600 to-teal-500 rounded-b-full shadow-xs animate-scale-in" />
+              )}
+              
+              {/* Icon Container with Pill Highlight */}
+              <div className={`px-3 py-1 rounded-full transition-all duration-300 flex items-center justify-center ${
+                active 
+                  ? 'bg-emerald-100/90 text-emerald-800 scale-105 shadow-xs' 
+                  : 'text-slate-500 hover:text-slate-900 bg-transparent'
               }`}>
-                <Icon className={`w-5 h-5 ${active ? 'stroke-[2.5]' : 'stroke-[1.8]'}`} />
-                {active && (
-                  <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                )}
+                <Icon className={`w-5 h-5 transition-transform duration-300 ${active ? 'stroke-[2.4] text-emerald-800' : 'stroke-[1.8]'}`} />
               </div>
-              <span className="text-[10px] leading-none mt-1 tracking-tight">
+
+              {/* Text Label */}
+              <span className={`text-[11px] leading-tight mt-0.5 tracking-tight transition-colors ${
+                active ? 'font-extrabold text-emerald-900' : 'font-semibold text-slate-500'
+              }`}>
                 {item.label}
               </span>
             </div>
