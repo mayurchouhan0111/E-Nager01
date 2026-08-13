@@ -797,7 +797,6 @@ export default function DeathCertificatePage() {
               </h2>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
                 <div>
                   <label htmlFor="field_deceased_placeType" className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">मृत्यु का स्थान प्रकार (Place Type)</label>
                   <select
