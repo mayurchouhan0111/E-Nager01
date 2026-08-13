@@ -806,60 +806,63 @@ export default function NoDuesCertificatePage() {
 
         {/* OFFICIAL UPLOADED CERTIFICATE VIEWER & DOWNLOAD MODAL */}
         {selectedApp && showOfficialDocModal && (
-          <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-md z-50 overflow-y-auto p-4 flex items-center justify-center pt-8">
-            <div className="bg-white rounded-3xl max-w-4xl w-full p-6 shadow-2xl space-y-4 max-h-[90vh] flex flex-col">
-              <div className="flex items-center justify-between border-b border-slate-200 pb-3 shrink-0">
+          <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-md z-[9999] overflow-y-auto p-2 sm:p-4 flex items-center justify-center pt-2 sm:pt-8">
+            <div className="bg-white rounded-3xl max-w-4xl w-full p-4 sm:p-6 shadow-2xl space-y-3 sm:space-y-4 max-h-[92vh] flex flex-col relative overflow-hidden">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5 border-b border-slate-200 pb-3 shrink-0 relative pr-10 sm:pr-0">
                 <div>
-                  <h3 className="font-extrabold text-slate-900 text-sm flex items-center gap-2">
+                  <h3 className="font-extrabold text-slate-900 text-xs sm:text-sm flex items-center gap-1.5 leading-tight">
                     <span>📜</span> अधिकारी द्वारा जारी एवं हस्ताक्षरित नो ड्यूज प्रमाण पत्र (Official Signed NOC)
                   </h3>
-                  <p className="text-xs text-slate-500 font-mono mt-0.5">
+                  <p className="text-[11px] text-slate-500 font-mono mt-0.5 truncate max-w-[240px] sm:max-w-md">
                     {selectedApp.officialUploadedCertificate?.fileName || 'Official_Signed_No_Dues_NOC.pdf'}
                   </p>
                 </div>
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={async () => {
-                      const success = await downloadBlobFile(selectedApp.officialUploadedCertificate, selectedApp.officialUploadedCertificate?.fileName || 'Official_Signed_No_Dues_NOC.pdf');
-                      if (!success) {
-                        toast.success('प्रमाण पत्र डिजिटल टेम्पलेट में खोला जा रहा है...');
-                        setShowOfficialDocModal(false);
-                        setShowCertModal(true);
-                      }
-                    }}
-                    className="btn btn-primary btn-sm bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs flex items-center gap-1 shadow-md"
-                  >
-                    <Download className="w-3.5 h-3.5" /> 📥 फ़ाइल डाउनलोड करें
-                  </button>
-                  <button onClick={() => { setShowOfficialDocModal(false); setSelectedApp(null); }} className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100">
-                    <X className="w-5 h-5" />
-                  </button>
-                </div>
+                
+                <button 
+                  onClick={() => { setShowOfficialDocModal(false); setSelectedApp(null); }} 
+                  className="absolute top-0 right-0 sm:relative p-1.5 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+
+                <button
+                  onClick={async () => {
+                    const success = await downloadBlobFile(selectedApp.officialUploadedCertificate, selectedApp.officialUploadedCertificate?.fileName || 'Official_Signed_No_Dues_NOC.pdf');
+                    if (!success) {
+                      toast.success('प्रमाण पत्र डिजिटल टेम्पलेट में खोला जा रहा है...');
+                      setShowOfficialDocModal(false);
+                      setShowCertModal(true);
+                    }
+                  }}
+                  className="w-full sm:w-auto btn btn-primary btn-sm bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-md py-2 px-4 rounded-xl cursor-pointer"
+                >
+                  <Download className="w-4 h-4" /> 📥 फ़ाइल डाउनलोड करें
+                </button>
               </div>
 
-              <div className="overflow-y-auto flex-1 bg-slate-100 rounded-2xl p-4 flex justify-center items-center min-h-[350px]">
+              <div className="overflow-y-auto flex-1 bg-slate-100 rounded-2xl p-2 sm:p-4 flex justify-center items-center min-h-[260px]">
                 {selectedApp.officialUploadedCertificate?.fileType?.includes('image') || selectedApp.officialUploadedCertificate?.fileData?.startsWith('data:image') ? (
                   <img
                     src={selectedApp.officialUploadedCertificate.fileData}
                     alt="Official Signed Document"
-                    className="max-h-[65vh] w-auto object-contain rounded-xl shadow-md"
+                    className="max-h-[60vh] sm:max-h-[65vh] w-auto object-contain rounded-xl shadow-md"
                   />
                 ) : (
                   <iframe
                     src={selectedApp.officialUploadedCertificate?.fileData}
                     title="Official Signed Document"
-                    className="w-full h-[65vh] rounded-xl border-0 shadow-sm"
+                    className="w-full h-[58vh] sm:h-[65vh] rounded-xl border-0 shadow-sm"
                   />
                 )}
               </div>
 
-              <div className="flex items-center justify-between pt-2 border-t border-slate-100 text-xs">
-                <span className="text-slate-500 font-medium">
+              <div className="flex flex-col sm:flex-row items-center justify-between pt-2.5 border-t border-slate-100 text-xs gap-2 shrink-0">
+                <span className="text-slate-600 font-medium text-center sm:text-left text-[11px] sm:text-xs">
                   अपलोडकर्ता: {selectedApp.officialUploadedCertificate?.uploadedBy || 'Nagar Palika Officer'}
                 </span>
                 <button
                   onClick={() => { setShowOfficialDocModal(false); setShowCertModal(true); }}
-                  className="text-emerald-800 font-bold hover:underline flex items-center gap-1"
+                  className="text-emerald-800 font-bold hover:underline flex items-center gap-1 text-[11px] sm:text-xs py-1"
                 >
                   🖨️ डिजिटल टेम्पलेट (Digital Template View) देखें
                 </button>
