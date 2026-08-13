@@ -357,13 +357,6 @@ export async function getWaterConnections(filterEmail = null, isOfficer = false)
       const existingRemote = mergedMap.get(key) || mergedMap.get(item.id);
       const merged = mergeRecords(existingRemote, item);
       mergedMap.set(key, merged);
-
-      if (item.id && item.status && item.status !== 'Draft') {
-        try {
-          const docRef = doc(db, COLLECTION_NAME, item.id);
-          setDoc(docRef, sanitizeFirestorePayload(merged), { merge: true }).catch(() => {});
-        } catch (e) {}
-      }
     });
 
     let items = Array.from(mergedMap.values());
