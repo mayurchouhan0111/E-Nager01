@@ -26,20 +26,65 @@ export async function fetchMaintenanceStatus() {
 }
 
 export function subscribeToMaintenance(callback) {
-  try {
-    return onSnapshot(MAINTENANCE_DOC_REF, (snap) => {
-      if (snap.exists()) {
-        callback(snap.data());
-      } else {
-        callback({ isMaintenanceMode: false });
+  // 1. Immediately return cached state if available for 0ms instant load
+  if (typeof window !== 'undefined') {
+    try {
+      const cached = localStorage.getItem('cached_maint_status');
+      if (cached) {
+        callback(JSON.parse(cached));
       }
+    } catch (e) {}
+  }
+
+  const handleCustomEvent = (e) => {
+    if (e.detail) {
+      callback(e.detail);
+    }
+  };
+
+  const handleStorageEvent = (e) => {
+    if (e.key === 'cached_maint_status' && e.newValue) {
+      try {
+        callback(JSON.parse(e.newValue));
+      } catch (err) {}
+    }
+  };
+
+  if (typeof window !== 'undefined') {
+    window.addEventListener('maintenance-status-change', handleCustomEvent);
+    window.addEventListener('storage', handleStorageEvent);
+  }
+
+  try {
+    const unsub = onSnapshot(MAINTENANCE_DOC_REF, (snap) => {
+      let data = { isMaintenanceMode: false };
+      if (snap.exists()) {
+        data = snap.data();
+      }
+      if (typeof window !== 'undefined') {
+        try {
+          localStorage.setItem('cached_maint_status', JSON.stringify(data));
+        } catch (err) {}
+      }
+      callback(data);
     }, (err) => {
       console.warn('[MaintenanceService] Snapshot error:', err);
-      callback({ isMaintenanceMode: false });
     });
+
+    return () => {
+      unsub();
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('maintenance-status-change', handleCustomEvent);
+        window.removeEventListener('storage', handleStorageEvent);
+      }
+    };
   } catch (e) {
-    callback({ isMaintenanceMode: false });
-    return () => {};
+    return () => {
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('maintenance-status-change', handleCustomEvent);
+        window.removeEventListener('storage', handleStorageEvent);
+      }
+    };
   }
 }
 
@@ -53,14 +98,27 @@ export async function toggleMaintenanceMode({ isEnabled, message, reason, update
       updatedAt: new Date().toISOString()
     };
 
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.setItem('cached_maint_status', JSON.stringify(payload));
+        window.dispatchEvent(new CustomEvent('maintenance-status-change', { detail: payload }));
+      } catch (e) {}
+    }
+
     await setDoc(MAINTENANCE_DOC_REF, sanitizeFirestorePayload(payload), { merge: true });
 
     // Audit Log Entry
     try {
+      const officerDisplayName = updatedBy && updatedBy !== 'super_admin' ? updatedBy : 'मुख्य नगर पालिका अधिकारी (Chief Municipal Officer - CMO)';
       await addDoc(collection(db, 'auditLogs'), {
         action: isEnabled ? 'MAINTENANCE_MODE_ENABLED' : 'MAINTENANCE_MODE_DISABLED',
-        details: isEnabled ? `सुरक्षा लॉकडाउन: सुपर एडमिन (${updatedBy}) द्वारा पोर्टल रखरखाव मोड चालू किया गया।` : `सुरक्षा अद्यतन समाप्त: सुपर एडमिन (${updatedBy}) द्वारा पोर्टल सामान्य स्थिति में बहाल किया गया।`,
-        performedBy: updatedBy || 'super_admin',
+        user: officerDisplayName,
+        performedBy: officerDisplayName,
+        officerName: officerDisplayName,
+        role: 'Chief Municipal Officer - CMO',
+        serviceType: 'system_admin',
+        applicationNo: '—',
+        details: isEnabled ? `सुरक्षा लॉकडाउन: (${officerDisplayName}) द्वारा पोर्टल रखरखाव मोड चालू किया गया।` : `सुरक्षा अद्यतन समाप्त: (${officerDisplayName}) द्वारा पोर्टल सामान्य स्थिति में बहाल किया गया।`,
         timestamp: new Date().toISOString(),
         serverTime: serverTimestamp()
       });

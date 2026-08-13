@@ -477,8 +477,10 @@ export default function AdminPage() {
             serviceType: remarkModal.serviceType,
             applicationId: remarkModal.record.id,
             applicationNo: remarkModal.record.applicationNo || 'N/A',
+            user: officerName,
             performedBy: officerName,
             officerName: officerName,
+            role: 'Chief Municipal Officer - CMO',
             remarks: remarkModal.remarkText.trim(),
             officialCertFileName: remarkModal.officialCertFile?.fileName || null,
             timestamp: nowIso,
@@ -1865,50 +1867,71 @@ export default function AdminPage() {
                               </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-100">
-                              {paginated.map((log) => (
-                                <tr key={log.id} className="hover:bg-slate-50/80 transition-colors">
-                                  <td className="p-4 font-mono text-slate-600 text-xs font-medium whitespace-nowrap">
-                                    <div className="flex items-center gap-2">
-                                      <Clock className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                                      <span>{formatTimestamp(log.timestamp)}</span>
-                                    </div>
-                                  </td>
-                                  <td className="p-4 whitespace-nowrap">
-                                    <div className="flex items-center gap-2.5">
-                                      <div className="w-7 h-7 rounded-full bg-emerald-50 text-emerald-800 flex items-center justify-center font-bold text-xs shrink-0 border border-emerald-100">
-                                        <User className="w-3.5 h-3.5" />
+                              {paginated.map((log) => {
+                                const rawOfficer = log.user || log.performedBy || log.officerName || log.updatedBy;
+                                const officerDisplay = (rawOfficer && rawOfficer !== 'N/A' && rawOfficer !== 'super_admin') 
+                                  ? rawOfficer 
+                                  : 'मुख्य नगर पालिका अधिकारी (Chief Municipal Officer - CMO)';
+                                
+                                const rawService = log.serviceType;
+                                let serviceDisplay = 'प्रशासनिक सेवा';
+                                if (log.action?.includes('MAINTENANCE') || rawService === 'system_admin') {
+                                  serviceDisplay = '⚙️ सिस्टम प्रशासन';
+                                } else if (rawService === 'death' || rawService === 'death_certificate') {
+                                  serviceDisplay = '🕯️ मृत्यु प्रमाण पत्र';
+                                } else if (rawService === 'birth' || rawService === 'birth_certificate') {
+                                  serviceDisplay = '👶 जन्म प्रमाण पत्र';
+                                } else if (rawService === 'water_connection') {
+                                  serviceDisplay = '🚰 जल कनेक्शन';
+                                } else if (rawService === 'no_dues') {
+                                  serviceDisplay = '🏢 नो ड्यूज NOC';
+                                }
+
+                                return (
+                                  <tr key={log.id} className="hover:bg-slate-50/80 transition-colors">
+                                    <td className="p-4 font-mono text-slate-600 text-xs font-medium whitespace-nowrap">
+                                      <div className="flex items-center gap-2">
+                                        <Clock className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                                        <span>{formatTimestamp(log.timestamp)}</span>
                                       </div>
-                                      <div>
-                                        <p className="font-extrabold text-slate-900 text-xs">{log.user || 'N/A'}</p>
-                                        <p className="text-[10px] text-slate-400 font-semibold">{(!log.user || log.user === 'N/A') ? 'System' : 'Chief Municipal Officer - CMO'}</p>
+                                    </td>
+                                    <td className="p-4 whitespace-nowrap">
+                                      <div className="flex items-center gap-2.5">
+                                        <div className="w-7 h-7 rounded-full bg-emerald-50 text-emerald-800 flex items-center justify-center font-bold text-xs shrink-0 border border-emerald-100">
+                                          <User className="w-3.5 h-3.5" />
+                                        </div>
+                                        <div>
+                                          <p className="font-extrabold text-slate-900 text-xs">{officerDisplay}</p>
+                                          <p className="text-[10px] text-emerald-700 font-semibold">Chief Municipal Officer - CMO</p>
+                                        </div>
                                       </div>
-                                    </div>
-                                  </td>
-                                  <td className="p-4 whitespace-nowrap">
-                                    <span className={`px-3 py-1 rounded-full text-[11px] font-extrabold border inline-flex items-center gap-1.5 ${
-                                      log.action?.includes('APPROVED') ? 'bg-emerald-50 text-emerald-800 border-emerald-200' :
-                                      log.action?.includes('REJECTED') ? 'bg-rose-50 text-rose-700 border-rose-200' :
-                                      log.action?.includes('UPLOADED') || log.action?.includes('CERTIFICATE') ? 'bg-purple-50 text-purple-800 border-purple-200' :
-                                      'bg-blue-50 text-blue-800 border-blue-200'
-                                    }`}>
-                                      {log.action?.includes('APPROVED') && <span>✅</span>}
-                                      {log.action?.includes('REJECTED') && <span>❌</span>}
-                                      {(log.action?.includes('UPLOADED') || log.action?.includes('CERTIFICATE')) && <span>📤</span>}
-                                      {log.action?.includes('REVIEW') && <span>👁️</span>}
-                                      <span>{log.action || 'N/A'}</span>
-                                    </span>
-                                  </td>
-                                  <td className="p-4 font-mono text-slate-600 font-semibold text-xs whitespace-nowrap">
-                                    {log.serviceType || 'no_dues'}
-                                  </td>
-                                  <td className="p-4 font-mono text-slate-900 font-black text-xs whitespace-nowrap">
-                                    {log.applicationNo || '—'}
-                                  </td>
-                                  <td className="p-4 text-slate-400 hover:text-slate-700 cursor-pointer text-center">
-                                    <ChevronDown className="w-4 h-4 mx-auto" />
-                                  </td>
-                                </tr>
-                              ))}
+                                    </td>
+                                    <td className="p-4 whitespace-nowrap">
+                                      <span className={`px-3 py-1 rounded-full text-[11px] font-extrabold border inline-flex items-center gap-1.5 ${
+                                        log.action?.includes('APPROVED') ? 'bg-emerald-50 text-emerald-800 border-emerald-200' :
+                                        log.action?.includes('REJECTED') ? 'bg-rose-50 text-rose-700 border-rose-200' :
+                                        log.action?.includes('UPLOADED') || log.action?.includes('CERTIFICATE') ? 'bg-purple-50 text-purple-800 border-purple-200' :
+                                        'bg-blue-50 text-blue-800 border-blue-200'
+                                      }`}>
+                                        {log.action?.includes('APPROVED') && <span>✅</span>}
+                                        {log.action?.includes('REJECTED') && <span>❌</span>}
+                                        {(log.action?.includes('UPLOADED') || log.action?.includes('CERTIFICATE')) && <span>📤</span>}
+                                        {log.action?.includes('REVIEW') && <span>👁️</span>}
+                                        <span>{log.action || 'N/A'}</span>
+                                      </span>
+                                    </td>
+                                    <td className="p-4 font-sans text-slate-700 font-bold text-xs whitespace-nowrap">
+                                      {serviceDisplay}
+                                    </td>
+                                    <td className="p-4 font-mono text-slate-900 font-black text-xs whitespace-nowrap">
+                                      {log.applicationNo || '—'}
+                                    </td>
+                                    <td className="p-4 text-slate-400 hover:text-slate-700 cursor-pointer text-center">
+                                      <ChevronDown className="w-4 h-4 mx-auto" />
+                                    </td>
+                                  </tr>
+                                );
+                              })}
                             </tbody>
                           </table>
                         </div>
