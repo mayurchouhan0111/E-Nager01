@@ -87,7 +87,6 @@ export const metadata = {
 export const viewport = {
   width: 'device-width',
   initialScale: 1,
-  maximumScale: 1,
 }
 
 const jsonLd = {
@@ -121,13 +120,13 @@ export default function RootLayout({ children }) {
   return (
     <html lang="hi-IN">
       <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;600;700&family=Noto+Sans+Devanagari:wght@400;600;700&display=swap" />
         <link rel="preload" as="image" href="/mp-logo.png" type="image/png" />
-        <link rel="icon" href="/favicon.ico" sizes="any" />
-        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+        <link rel="icon" href="/mp-logo.png" type="image/png" />
+        <link rel="apple-touch-icon" href="/mp-logo.png" />
         <link rel="manifest" href="/manifest.json" />
         <meta name="theme-color" content="#047857" />
         <script

@@ -270,7 +270,11 @@ export default function ServiceHeader() {
               </button>
 
               <div className="relative">
-                <button onClick={() => setShowNotifications(!showNotifications)} aria-label="सूचनाएँ (Notifications)" className="relative p-2 sm:p-2.5 rounded-xl bg-white border border-slate-200 text-slate-500 hover:bg-slate-50 shadow-xs transition-all duration-200 icon-hover-bounce">
+                <button
+                  onClick={() => setShowNotifications(!showNotifications)}
+                  aria-label="सूचनाएँ (Notifications)"
+                  className="relative p-2.5 sm:p-2.5 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 shadow-xs transition-all duration-200 icon-hover-bounce"
+                >
                   <Bell className="w-4 h-4 text-emerald-700" />
                   {unreadCount > 0 && <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] rounded-full bg-rose-500 text-white text-[9px] flex items-center justify-center animate-bounce">{unreadCount}</span>}
                 </button>
@@ -298,11 +302,11 @@ export default function ServiceHeader() {
 
               {/* Google Citizen Auth Badge / Direct Google Sign In Button */}
               {citizenUser ? (
-                <div className="flex items-center gap-1 bg-emerald-50 p-1 rounded-xl border border-emerald-200 shadow-xs">
+                <div className="flex items-center gap-1 bg-emerald-50 p-1 rounded-xl border border-emerald-200 shadow-xs min-h-[44px]">
                   {citizenUser.photoURL ? (
-                    <img src={citizenUser.photoURL} alt={citizenUser.displayName || 'Profile'} className="w-6 h-6 sm:w-7 sm:h-7 rounded-full border border-emerald-400 object-cover shrink-0" />
+                    <img src={citizenUser.photoURL} alt={citizenUser.displayName || 'Profile'} className="w-7 h-7 rounded-full border border-emerald-400 object-cover shrink-0" />
                   ) : (
-                    <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-emerald-700 text-white font-extrabold text-[11px] sm:text-xs flex items-center justify-center shrink-0 shadow-xs">
+                    <div className="w-7 h-7 rounded-full bg-emerald-700 text-white font-extrabold text-xs flex items-center justify-center shrink-0 shadow-xs">
                       {citizenUser.displayName?.[0]?.toUpperCase() || 'C'}
                     </div>
                   )}
@@ -311,24 +315,32 @@ export default function ServiceHeader() {
                   </span>
                   <button
                     onClick={handleCitizenLogout}
+                    aria-label="नागरिक साइन आउट (Sign Out)"
                     title="नागरिक साइन आउट (Sign Out)"
-                    className="p-1 text-slate-400 hover:text-rose-600 rounded-lg hover:bg-slate-200/80 transition-colors shrink-0"
+                    className="p-2 text-slate-500 hover:text-rose-600 rounded-lg hover:bg-slate-200/80 transition-colors shrink-0 min-h-[44px] min-w-[44px] flex items-center justify-center"
                   >
-                    <LogOut className="w-3.5 h-3.5" />
+                    <LogOut className="w-4 h-4" />
                   </button>
                 </div>
               ) : (
                 <button
                   onClick={handleGoogleLogin}
-                  className="px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold flex items-center gap-1.5 transition-all shadow-xs icon-hover-bounce shrink-0"
+                  aria-label="गूगल साइन इन करें (Google Sign-In)"
+                  title="गूगल साइन इन"
+                  className="px-3 py-2 min-h-[44px] min-w-[44px] rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold flex items-center justify-center gap-1.5 transition-all shadow-xs icon-hover-bounce shrink-0"
                 >
-                  <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="" className="w-3.5 h-3.5 shrink-0" />
+                  <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="गूगल लोगों" className="w-4 h-4 shrink-0" />
                   <span className="hidden sm:inline">गूगल साइन इन</span>
                 </button>
               )}
 
-              <Link href="/admin" aria-label="अधिकारी लॉगिन" title="अधिकारी लॉगिन" className={`p-2 sm:px-3 sm:py-2 rounded-xl text-xs font-bold border transition-all flex items-center gap-1.5 icon-hover-bounce shrink-0 ${isCurrentTab('/admin') ? 'bg-emerald-700 text-white border-emerald-700 shadow-md' : 'bg-emerald-50 text-emerald-800 border-emerald-200'}`}>
-                <ShieldAlert className="w-3.5 h-3.5 animate-pulse text-amber-500 shrink-0" /> <span className="hidden sm:inline">अधिकारी लॉगिन</span>
+              <Link
+                href="/admin"
+                aria-label="अधिकारी लॉगिन (Officer Login)"
+                title="अधिकारी लॉगिन"
+                className={`px-3 py-2 min-h-[44px] min-w-[44px] rounded-xl text-xs font-bold border transition-all flex items-center justify-center gap-1.5 icon-hover-bounce shrink-0 ${isCurrentTab('/admin') ? 'bg-emerald-700 text-white border-emerald-700 shadow-md' : 'bg-emerald-50 text-emerald-800 border-emerald-200'}`}
+              >
+                <ShieldAlert className="w-4 h-4 animate-pulse text-amber-500 shrink-0" /> <span className="hidden sm:inline">अधिकारी लॉगिन</span>
               </Link>
             </div>
           </div>

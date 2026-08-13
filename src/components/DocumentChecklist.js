@@ -396,12 +396,13 @@ export default function DocumentChecklist({ defaultCategory = 'all', compact = f
                     >
                       <button
                         type="button"
-                        className="mt-0.5 shrink-0 focus:outline-none"
+                        aria-label={`दस्तावेज स्थिति बदलें: ${item.title}`}
+                        className="mt-0.5 shrink-0 focus:outline-none min-w-[44px] min-h-[44px] flex items-center justify-center -m-2 p-2 rounded-lg"
                       >
                         {isChecked ? (
-                          <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                          <CheckCircle2 className="w-5 h-5 text-emerald-600" />
                         ) : (
-                          <Square className="w-4 h-4 text-slate-400 hover:text-slate-600" />
+                          <Square className="w-5 h-5 text-slate-400 hover:text-slate-600" />
                         )}
                       </button>
 

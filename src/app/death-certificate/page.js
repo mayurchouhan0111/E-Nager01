@@ -641,9 +641,10 @@ export default function DeathCertificatePage() {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
                 <div>
-                  <label className="block text-[10px] sm:text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">मृतक का पूरा नाम (Full Name) *</label>
+                  <label htmlFor="field_deceased_fullName" className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">मृतक का पूरा नाम (Full Name) *</label>
                   <input
                     id="field_deceased_fullName"
+                    name="deceased_fullName"
                     type="text"
                     required
                     value={formData.deceasedDetails.fullName}
@@ -654,7 +655,7 @@ export default function DeathCertificatePage() {
                       }
                     }}
                     placeholder="जैसे: स्व. रामेश्वर प्रसाद शर्मा"
-                    className={`w-full bg-white border rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-slate-900 focus:outline-none font-medium transition-all ${
+                    className={`w-full bg-white border rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-slate-900 focus:outline-none font-medium min-h-[44px] transition-all ${
                       fieldErrors['deceasedDetails.fullName']
                         ? 'border-red-500 bg-red-50/40 ring-2 ring-red-300'
                         : 'border-slate-300 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20'
@@ -669,11 +670,13 @@ export default function DeathCertificatePage() {
                 </div>
 
                 <div>
-                  <label className="block text-[10px] sm:text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">लिंग (Gender) *</label>
+                  <label htmlFor="field_deceased_gender" className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">लिंग (Gender) *</label>
                   <select
+                    id="field_deceased_gender"
+                    name="deceased_gender"
                     value={formData.deceasedDetails.gender}
                     onChange={(e) => handleInputChange('deceasedDetails', 'gender', e.target.value)}
-                    className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-slate-900 focus:outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20 font-medium"
+                    className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-slate-900 focus:outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20 font-medium min-h-[44px]"
                   >
                     <option>पुरुष (Male)</option>
                     <option>महिला (Female)</option>
@@ -682,9 +685,10 @@ export default function DeathCertificatePage() {
                 </div>
 
                 <div>
-                  <label className="block text-[10px] sm:text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">मृत्यु की तिथि (Date of Death) *</label>
+                  <label htmlFor="field_deceased_dateOfDeath" className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">मृत्यु की तिथि (Date of Death) *</label>
                   <input
                     id="field_deceased_dateOfDeath"
+                    name="deceased_dateOfDeath"
                     type="date"
                     required
                     value={formData.deceasedDetails.dateOfDeath}
@@ -694,7 +698,7 @@ export default function DeathCertificatePage() {
                         setFieldErrors(prev => ({ ...prev, 'deceasedDetails.dateOfDeath': null }));
                       }
                     }}
-                    className={`w-full bg-white border rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-slate-900 focus:outline-none font-medium transition-all ${
+                    className={`w-full bg-white border rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-slate-900 focus:outline-none font-medium min-h-[44px] transition-all ${
                       fieldErrors['deceasedDetails.dateOfDeath']
                         ? 'border-red-500 bg-red-50/40 ring-2 ring-red-300'
                         : 'border-slate-300 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20'
@@ -709,9 +713,10 @@ export default function DeathCertificatePage() {
                 </div>
 
                 <div>
-                  <label className="block text-[10px] sm:text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">मृत्यु के समय आयु (वर्षों में)</label>
+                  <label htmlFor="field_deceased_age" className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">मृत्यु के समय आयु (वर्षों में)</label>
                   <input
                     id="field_deceased_age"
+                    name="deceased_age"
                     type="number"
                     min="0"
                     max="120"
@@ -723,7 +728,7 @@ export default function DeathCertificatePage() {
                       }
                     }}
                     placeholder="65"
-                    className={`w-full bg-white border rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-slate-900 focus:outline-none font-medium transition-all ${
+                    className={`w-full bg-white border rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-slate-900 focus:outline-none font-medium min-h-[44px] transition-all ${
                       fieldErrors['deceasedDetails.age']
                         ? 'border-red-500 bg-red-50/40 ring-2 ring-red-300'
                         : 'border-slate-300 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20'
@@ -738,23 +743,27 @@ export default function DeathCertificatePage() {
                 </div>
 
                 <div>
-                  <label className="block text-[10px] sm:text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">मृतक आधार संख्या (Aadhaar No. - 12 Digits)</label>
+                  <label htmlFor="field_deceased_aadhaarNo" className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">मृतक आधार संख्या (Aadhaar No. - 12 Digits)</label>
                   <input
+                    id="field_deceased_aadhaarNo"
+                    name="deceased_aadhaarNo"
                     type="text"
                     maxLength={14}
                     value={formData.deceasedDetails.aadhaarNo}
                     onChange={(e) => handleInputChange('deceasedDetails', 'aadhaarNo', e.target.value)}
                     placeholder="XXXX-XXXX-XXXX"
-                    className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-slate-900 focus:outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20 font-medium"
+                    className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-slate-900 focus:outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20 font-medium min-h-[44px]"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-[10px] sm:text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">धर्म (Religion)</label>
+                  <label htmlFor="field_deceased_religion" className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">धर्म (Religion)</label>
                   <select
+                    id="field_deceased_religion"
+                    name="deceased_religion"
                     value={formData.statisticalDetails.religion}
                     onChange={(e) => handleInputChange('statisticalDetails', 'religion', e.target.value)}
-                    className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-slate-900 focus:outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20 font-medium"
+                    className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-slate-900 focus:outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20 font-medium min-h-[44px]"
                   >
                     <option>हिंदू (Hindu)</option>
                     <option>मुस्लिम (Muslim)</option>
@@ -767,13 +776,15 @@ export default function DeathCertificatePage() {
                 </div>
 
                 <div>
-                  <label className="block text-[10px] sm:text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">व्यवसाय (Occupation of Deceased)</label>
+                  <label htmlFor="field_deceased_occupation" className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">व्यवसाय (Occupation of Deceased)</label>
                   <input
+                    id="field_deceased_occupation"
+                    name="deceased_occupation"
                     type="text"
                     value={formData.statisticalDetails.occupation}
                     onChange={(e) => handleInputChange('statisticalDetails', 'occupation', e.target.value)}
                     placeholder="कृषि / व्यापार / गृहणी / सेवानिवृत्त"
-                    className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-slate-900 focus:outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20 font-medium"
+                    className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-slate-900 focus:outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20 font-medium min-h-[44px]"
                   />
                 </div>
               </div>
@@ -786,12 +797,15 @@ export default function DeathCertificatePage() {
               </h2>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
                 <div>
-                  <label className="block text-[10px] sm:text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">मृत्यु का स्थान प्रकार (Place Type)</label>
+                  <label htmlFor="field_deceased_placeType" className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">मृत्यु का स्थान प्रकार (Place Type)</label>
                   <select
+                    id="field_deceased_placeType"
+                    name="deceased_placeType"
                     value={formData.deceasedDetails.placeType}
                     onChange={(e) => handleInputChange('deceasedDetails', 'placeType', e.target.value)}
-                    className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-slate-900 focus:outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20 font-medium"
+                    className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-slate-900 focus:outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20 font-medium min-h-[44px]"
                   >
                     <option>अस्पताल (Hospital)</option>
                     <option>घर (Home)</option>
@@ -801,51 +815,59 @@ export default function DeathCertificatePage() {
 
                 {formData.deceasedDetails.placeType.includes('अस्पताल') && (
                   <div>
-                    <label className="block text-[10px] sm:text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">अस्पताल का नाम (Hospital Name)</label>
+                    <label htmlFor="field_deceased_hospitalName" className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">अस्पताल का नाम (Hospital Name)</label>
                     <input
+                      id="field_deceased_hospitalName"
+                      name="deceased_hospitalName"
                       type="text"
                       value={formData.deceasedDetails.hospitalName}
                       onChange={(e) => handleInputChange('deceasedDetails', 'hospitalName', e.target.value)}
                       placeholder="जैसे: जिला चिकित्सालय झाबुआ"
-                      className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-slate-900 focus:outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20 font-medium"
+                      className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-slate-900 focus:outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20 font-medium min-h-[44px]"
                     />
                   </div>
                 )}
 
                 {formData.deceasedDetails.placeType.includes('घर') && (
                   <div>
-                    <label className="block text-[10px] sm:text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">घर का पता (Home Address of Death)</label>
+                    <label htmlFor="field_deceased_homeAddress" className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">घर का पता (Home Address of Death)</label>
                     <input
+                      id="field_deceased_homeAddress"
+                      name="deceased_homeAddress"
                       type="text"
                       value={formData.deceasedDetails.homeAddress}
                       onChange={(e) => handleInputChange('deceasedDetails', 'homeAddress', e.target.value)}
                       placeholder="मकान नंबर, वार्ड नंबर, झाबुआ"
-                      className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-slate-900 focus:outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20 font-medium"
+                      className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-slate-900 focus:outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20 font-medium min-h-[44px]"
                     />
                   </div>
                 )}
 
                 {formData.deceasedDetails.placeType.includes('अन्य') && (
                   <div>
-                    <label className="block text-[10px] sm:text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">अन्य स्थान का विवरण (Other Place Details)</label>
+                    <label htmlFor="field_deceased_otherPlaceDetails" className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">अन्य स्थान का विवरण (Other Place Details)</label>
                     <input
+                      id="field_deceased_otherPlaceDetails"
+                      name="deceased_otherPlaceDetails"
                       type="text"
                       value={formData.deceasedDetails.otherPlaceDetails}
                       onChange={(e) => handleInputChange('deceasedDetails', 'otherPlaceDetails', e.target.value)}
                       placeholder="घटना स्थल / मार्ग / अन्य पता"
-                      className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-slate-900 focus:outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20 font-medium"
+                      className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-slate-900 focus:outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20 font-medium min-h-[44px]"
                     />
                   </div>
                 )}
 
                 <div className="sm:col-span-2">
-                  <label className="block text-[10px] sm:text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">मृत्यु स्थल संपूर्ण विवरण (Full Place Description)</label>
+                  <label htmlFor="field_deceased_placeOfDeath" className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">मृत्यु स्थल संपूर्ण विवरण (Full Place Description)</label>
                   <input
+                    id="field_deceased_placeOfDeath"
+                    name="deceased_placeOfDeath"
                     type="text"
                     value={formData.deceasedDetails.placeOfDeath}
                     onChange={(e) => handleInputChange('deceasedDetails', 'placeOfDeath', e.target.value)}
                     placeholder="जिला अस्पताल झाबुआ / वार्ड 12"
-                    className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-slate-900 focus:outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20 font-medium"
+                    className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-slate-900 focus:outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20 font-medium min-h-[44px]"
                   />
                 </div>
               </div>
@@ -855,69 +877,81 @@ export default function DeathCertificatePage() {
                 <h3 className="text-xs font-extrabold text-slate-700 uppercase tracking-wider mb-3">📍 मृतक का मृत्यु के समय का पता (Present Address at Time of Death)</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   <div>
-                    <label className="block text-[10px] font-bold text-slate-500 mb-1">मकान / द्वार संख्या (House / Door No.)</label>
+                    <label htmlFor="field_present_houseNo" className="block text-xs font-bold text-slate-700 mb-1">मकान / द्वार संख्या (House / Door No.)</label>
                     <input
+                      id="field_present_houseNo"
+                      name="present_houseNo"
                       type="text"
                       value={formData.deceasedDetails.presentAddress.houseNo}
                       onChange={(e) => handleInputChange('deceasedDetails', 'presentAddress', e.target.value, 'houseNo')}
                       placeholder="मकान क्र. 12/B"
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-medium"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-medium min-h-[44px]"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-[10px] font-bold text-slate-500 mb-1">मार्ग / मोहल्ला (Street / Colony)</label>
+                    <label htmlFor="field_present_street" className="block text-xs font-bold text-slate-700 mb-1">मार्ग / मोहल्ला (Street / Colony)</label>
                     <input
+                      id="field_present_street"
+                      name="present_street"
                       type="text"
                       value={formData.deceasedDetails.presentAddress.street}
                       onChange={(e) => handleInputChange('deceasedDetails', 'presentAddress', e.target.value, 'street')}
                       placeholder="तिलक मार्ग"
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-medium"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-medium min-h-[44px]"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-[10px] font-bold text-slate-500 mb-1">ग्राम / नगर (Village / City)</label>
+                    <label htmlFor="field_present_villageCity" className="block text-xs font-bold text-slate-700 mb-1">ग्राम / नगर (Village / City)</label>
                     <input
+                      id="field_present_villageCity"
+                      name="present_villageCity"
                       type="text"
                       value={formData.deceasedDetails.presentAddress.villageCity}
                       onChange={(e) => handleInputChange('deceasedDetails', 'presentAddress', e.target.value, 'villageCity')}
                       placeholder="झाबुआ"
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-medium"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-medium min-h-[44px]"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-[10px] font-bold text-slate-500 mb-1">जिला (District)</label>
+                    <label htmlFor="field_present_district" className="block text-xs font-bold text-slate-700 mb-1">जिला (District)</label>
                     <input
+                      id="field_present_district"
+                      name="present_district"
                       type="text"
                       value={formData.deceasedDetails.presentAddress.district}
                       onChange={(e) => handleInputChange('deceasedDetails', 'presentAddress', e.target.value, 'district')}
                       placeholder="झाबुआ"
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-medium"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-medium min-h-[44px]"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-[10px] font-bold text-slate-500 mb-1">राज्य (State)</label>
+                    <label htmlFor="field_present_state" className="block text-xs font-bold text-slate-700 mb-1">राज्य (State)</label>
                     <input
+                      id="field_present_state"
+                      name="present_state"
                       type="text"
                       value={formData.deceasedDetails.presentAddress.state}
                       onChange={(e) => handleInputChange('deceasedDetails', 'presentAddress', e.target.value, 'state')}
                       placeholder="मध्य प्रदेश"
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-medium"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-medium min-h-[44px]"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-[10px] font-bold text-slate-500 mb-1">पिनकोड (Pincode - 6 Digits)</label>
+                    <label htmlFor="field_present_pincode" className="block text-xs font-bold text-slate-700 mb-1">पिनकोड (Pincode - 6 Digits)</label>
                     <input
+                      id="field_present_pincode"
+                      name="present_pincode"
                       type="text"
                       maxLength={6}
                       value={formData.deceasedDetails.presentAddress.pincode}
                       onChange={(e) => handleInputChange('deceasedDetails', 'presentAddress', e.target.value, 'pincode')}
                       placeholder="457661"
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-medium"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-medium min-h-[44px]"
                     />
                   </div>
                 </div>
