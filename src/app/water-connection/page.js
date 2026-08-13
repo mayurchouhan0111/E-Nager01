@@ -1028,18 +1028,18 @@ export default function WaterConnectionPage() {
 
       {/* Pawati Application Letter Modal */}
       {showLetterModal && selectedApp && (
-        <div className="fixed inset-0 bg-slate-900/75 backdrop-blur-md z-50 overflow-y-auto p-3 sm:p-6 flex items-start justify-center pt-4 sm:pt-8">
-          <div className="bg-white border border-slate-200 rounded-3xl max-w-4xl w-full p-4 sm:p-6 shadow-2xl flex flex-col max-h-[84vh] sm:max-h-[86vh]">
+        <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-md z-[9999] overflow-y-auto p-2 sm:p-4 flex items-center justify-center pt-2 sm:pt-6">
+          <div className="bg-white border border-slate-200 rounded-3xl max-w-4xl w-full p-4 sm:p-6 shadow-2xl flex flex-col max-h-[92vh] space-y-3 shrink-0 relative overflow-hidden">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3 shrink-0">
-              <h3 className="text-slate-900 font-extrabold text-base flex items-center gap-2">
+              <h3 className="text-slate-900 font-extrabold text-xs sm:text-base flex items-center gap-2">
                 📄 भौतिक पावती पत्र (Official Physical Submission Letter)
               </h3>
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => window.print()}
-                  className="btn btn-primary btn-sm flex items-center gap-1 font-bold text-xs bg-teal-700"
+                  className="btn btn-primary btn-sm flex items-center gap-1 font-bold text-xs bg-teal-700 hover:bg-teal-800"
                 >
-                  <Printer className="w-3.5 h-3.5" /> प्रिंट / PDF डाउनलोड
+                  <Printer className="w-3.5 h-3.5" /> प्रिंट / PDF
                 </button>
                 <button onClick={() => setShowLetterModal(false)} className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors">
                   <X className="w-5 h-5" />
@@ -1047,7 +1047,7 @@ export default function WaterConnectionPage() {
               </div>
             </div>
 
-            <div className="overflow-y-auto flex-1 pr-1 pt-3">
+            <div className="overflow-y-auto flex-1 pr-1 pt-2 pb-6">
               <ApplicationLetterTemplate record={selectedApp} serviceType="water_connection" />
             </div>
           </div>
@@ -1056,18 +1056,18 @@ export default function WaterConnectionPage() {
 
       {/* Approved Permit Certificate Modal */}
       {showCertModal && selectedApp && (
-        <div className="fixed inset-0 bg-slate-900/75 backdrop-blur-md z-50 overflow-y-auto p-3 sm:p-6 flex items-start justify-center pt-4 sm:pt-8">
-          <div className="bg-white border border-slate-200 rounded-3xl max-w-4xl w-full p-4 sm:p-6 shadow-2xl flex flex-col max-h-[84vh] sm:max-h-[86vh]">
+        <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-md z-[9999] overflow-y-auto p-2 sm:p-4 flex items-center justify-center pt-2 sm:pt-6">
+          <div className="bg-white border border-slate-200 rounded-3xl max-w-4xl w-full p-4 sm:p-6 shadow-2xl flex flex-col max-h-[92vh] space-y-3 relative overflow-hidden">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3 shrink-0">
-              <h3 className="text-slate-900 font-extrabold text-base flex items-center gap-2">
+              <h3 className="text-slate-900 font-extrabold text-xs sm:text-base flex items-center gap-2">
                 📜 नल कनेक्शन स्वीकृत आदेश (Sanction Permit Certificate)
               </h3>
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => window.print()}
-                  className="btn btn-primary btn-sm flex items-center gap-1 font-bold text-xs bg-teal-700"
+                  className="btn btn-primary btn-sm flex items-center gap-1 font-bold text-xs bg-teal-700 hover:bg-teal-800"
                 >
-                  <Printer className="w-3.5 h-3.5" /> प्रिंट / PDF डाउनलोड
+                  <Printer className="w-3.5 h-3.5" /> प्रिंट / PDF
                 </button>
                 <button onClick={() => setShowCertModal(false)} className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors">
                   <X className="w-5 h-5" />
@@ -1075,7 +1075,7 @@ export default function WaterConnectionPage() {
               </div>
             </div>
 
-            <div className="overflow-y-auto flex-1 pr-1 pt-3">
+            <div className="overflow-y-auto flex-1 pr-1 pt-2 pb-6">
               <WaterConnectionTemplate record={selectedApp} />
             </div>
           </div>
