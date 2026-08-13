@@ -33,7 +33,7 @@ import { DEFAULT_ADMIN_ACCOUNTS, fetchAdminAccounts, updateAdminAccountCredentia
 import { subscribeToMaintenance, toggleMaintenanceMode } from '@/services/maintenanceService'
 import {
   ShieldAlert, Search, Trash2, Download, Edit, Printer, Eye, Activity, FileText, CheckCircle2,
-  AlertCircle, Calendar, UserCheck, History, Info, Lock, LogOut, RefreshCw, X, Settings2, Baby, Eye as EyeIcon, Droplet, Key, Save, Building2, Bell, Mail, Clock, ChevronDown, ChevronRight, User, Phone, Paperclip, Upload
+  AlertCircle, Calendar, UserCheck, History, Info, Lock, LogOut, RefreshCw, X, Settings2, Baby, Eye as EyeIcon, Droplet, Key, Save, Building2, Bell, Mail, Clock, ChevronDown, ChevronRight, User, Phone, Paperclip, Upload, Loader2
 } from 'lucide-react'
 
 function formatTimestamp(ts) {
@@ -49,6 +49,13 @@ export default function AdminPage() {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [loginError, setLoginError] = useState('')
+
+  // Operation Progress Loading Indicators
+  const [isSubmittingStatus, setIsSubmittingStatus] = useState(false)
+  const [isFileProcessing, setIsFileProcessing] = useState(false)
+  const [isLoggingIn, setIsLoggingIn] = useState(false)
+  const [updatingCredUser, setUpdatingCredUser] = useState(null)
+  const [isTogglingMaint, setIsTogglingMaint] = useState(false)
 
   const [adminAccounts, setAdminAccounts] = useState(DEFAULT_ADMIN_ACCOUNTS)
   const [credEditState, setCredEditState] = useState({
@@ -300,29 +307,34 @@ export default function AdminPage() {
 
   async function handleLogin(e) {
     e.preventDefault()
-    let cleanUser = username.trim().toLowerCase()
-    if (ADMIN_USERNAME_ALIASES && ADMIN_USERNAME_ALIASES[cleanUser]) {
-      cleanUser = ADMIN_USERNAME_ALIASES[cleanUser]
-    }
-    const latestAccounts = await fetchAdminAccounts()
-    setAdminAccounts(latestAccounts)
-    const account = latestAccounts[cleanUser]
-
-    if (account && password === account.password) {
-      setIsAdmin(true)
-      setCurrentAdminUser(cleanUser)
-      setCurrentAdminRole(account.role)
-      setActiveTab(account.defaultTab || 'death-certificates')
-
-      if (typeof window !== 'undefined') {
-        sessionStorage.setItem('dc_admin_authenticated', 'true')
-        sessionStorage.setItem('dc_admin_username', cleanUser)
-        sessionStorage.setItem('dc_admin_role', account.role)
+    setIsLoggingIn(true)
+    try {
+      let cleanUser = username.trim().toLowerCase()
+      if (ADMIN_USERNAME_ALIASES && ADMIN_USERNAME_ALIASES[cleanUser]) {
+        cleanUser = ADMIN_USERNAME_ALIASES[cleanUser]
       }
-      setLoginError('')
-      toast.success(`लॉगिन सफल: ${account.name}`)
-    } else {
-      setLoginError('अमान्य उपयोगकर्ता नाम (Username) या पासवर्ड (Password)')
+      const latestAccounts = await fetchAdminAccounts()
+      setAdminAccounts(latestAccounts)
+      const account = latestAccounts[cleanUser]
+
+      if (account && password === account.password) {
+        setIsAdmin(true)
+        setCurrentAdminUser(cleanUser)
+        setCurrentAdminRole(account.role)
+        setActiveTab(account.defaultTab || 'death-certificates')
+
+        if (typeof window !== 'undefined') {
+          sessionStorage.setItem('dc_admin_authenticated', 'true')
+          sessionStorage.setItem('dc_admin_username', cleanUser)
+          sessionStorage.setItem('dc_admin_role', account.role)
+        }
+        setLoginError('')
+        toast.success(`लॉगिन सफल: ${account.name}`)
+      } else {
+        setLoginError('अमान्य उपयोगकर्ता नाम (Username) या पासवर्ड (Password)')
+      }
+    } finally {
+      setIsLoggingIn(false)
     }
   }
 
@@ -333,21 +345,26 @@ export default function AdminPage() {
       return
     }
 
+    setUpdatingCredUser(targetUsername)
     const toastId = toast.loading(`'${targetUsername}' के क्रेडेंशियल अद्यतन हो रहे हैं...`)
-    const result = await updateAdminAccountCredential({
-      targetUsername,
-      newPassword: editData.password,
-      newName: editData.name,
-      newEmail: editData.email,
-      updatedBy: currentAdminUser
-    })
+    try {
+      const result = await updateAdminAccountCredential({
+        targetUsername,
+        newPassword: editData.password,
+        newName: editData.name,
+        newEmail: editData.email,
+        updatedBy: currentAdminUser
+      })
 
-    if (result.success) {
-      toast.success(`✅ '${targetUsername}' का क्रेडेंशियल फायरस्टोर में अद्यतन हो गया!`, { id: toastId })
-      setAdminAccounts(result.updatedAccounts)
-      loadAuditLogs()
-    } else {
-      toast.error(`अपडेट विफल: ${result.error}`, { id: toastId })
+      if (result.success) {
+        toast.success(`✅ '${targetUsername}' का क्रेडेंशियल फायरस्टोर में अद्यतन हो गया!`, { id: toastId })
+        setAdminAccounts(result.updatedAccounts)
+        loadAuditLogs()
+      } else {
+        toast.error(`अपडेट विफल: ${result.error}`, { id: toastId })
+      }
+    } finally {
+      setUpdatingCredUser(null)
     }
   }
 
@@ -356,20 +373,25 @@ export default function AdminPage() {
     const actionName = targetState ? 'सुरक्षा अद्यतन / रखरखाव मोड' : 'सामान्य पोर्टल स्थिति'
     const toastId = toast.loading(`${actionName} परिवर्तित किया जा रहा है...`)
 
-    const res = await toggleMaintenanceMode({
-      isEnabled: targetState,
-      message: targetState 
-        ? 'सुरक्षा एवं तकनीकी रखरखाव हेतु पोर्टल अस्थायी रूप से स्थगित है। शीघ्र सेवाएं पुनः शुरू की जाएंगी।'
-        : 'पोर्टल सामान्य स्थिति में कार्यरत है।',
-      reason: 'नियमित तकनीकी एवं सुरक्षा अद्यतन',
-      updatedBy: currentAdminUser
-    })
+    setIsTogglingMaint(true)
+    try {
+      const res = await toggleMaintenanceMode({
+        isEnabled: targetState,
+        message: targetState 
+          ? 'सुरक्षा एवं तकनीकी रखरखाव हेतु पोर्टल अस्थायी रूप से स्थगित है। शीघ्र सेवाएं पुनः शुरू की जाएंगी।'
+          : 'पोर्टल सामान्य स्थिति में कार्यरत है।',
+        reason: 'नियमित तकनीकी एवं सुरक्षा अद्यतन',
+        updatedBy: currentAdminUser
+      })
 
-    if (res.success) {
-      toast.success(`✅ पोर्टल अब ${targetState ? 'रखरखाव / रूटीन चेक मोड में है (Maintenance ON)' : 'सामान्य स्थिति में बहाल हो गया (System Online)'}`, { id: toastId })
-      loadAuditLogs()
-    } else {
-      toast.error(`विफलता: ${res.error}`, { id: toastId })
+      if (res.success) {
+        toast.success(`✅ पोर्टल अब ${targetState ? 'रखरखाव / रूटीन चेक मोड में है (Maintenance ON)' : 'सामान्य स्थिति में बहाल हो गया (System Online)'}`, { id: toastId })
+        loadAuditLogs()
+      } else {
+        toast.error(`विफलता: ${res.error}`, { id: toastId })
+      }
+    } finally {
+      setIsTogglingMaint(false)
     }
   }
 
@@ -392,132 +414,137 @@ export default function AdminPage() {
       return
     }
 
+    setIsSubmittingStatus(true)
     const toastId = toast.loading(`स्थिति अपडेट हो रही है: ${remarkModal.targetStatus}... (Updating status...)`)
     let res;
     const officerName = adminAccounts[currentAdminUser]?.name || remarkModal.officerName;
 
-    if (remarkModal.serviceType === 'birth') {
-      res = await updateBirthCertificateStatus({
-        id: remarkModal.record.id,
-        newStatus: remarkModal.targetStatus,
-        remarks: remarkModal.remarkText,
-        officerName,
-        officialUploadedCertificate: remarkModal.officialCertFile || null
-      })
-    } else if (remarkModal.serviceType === 'water_connection' || remarkModal.serviceType === 'water') {
-      res = await updateWaterConnectionStatus({
-        id: remarkModal.record.id,
-        newStatus: remarkModal.targetStatus,
-        remarks: remarkModal.remarkText,
-        officerName,
-        officialUploadedCertificate: remarkModal.officialCertFile || null
-      })
-    } else if (remarkModal.serviceType === 'no_dues') {
-      res = await updateNoDuesCertificateStatus({
-        id: remarkModal.record.id,
-        newStatus: remarkModal.targetStatus,
-        remarks: remarkModal.remarkText,
-        officerName,
-        officialUploadedCertificate: remarkModal.officialCertFile || null
-      })
-    } else {
-      res = await updateDeathCertificateStatus({
-        id: remarkModal.record.id,
-        newStatus: remarkModal.targetStatus,
-        remarks: remarkModal.remarkText,
-        officerName,
-        officialUploadedCertificate: remarkModal.officialCertFile || null
-      })
-    }
-
-    if (res.success) {
-      toast.success(`स्थिति/दस्तावेज अपडेट हो गए: ${remarkModal.targetStatus}!`, { id: toastId })
-      
-      const nowIso = new Date().toISOString()
-      const updatedTimelineItem = {
-        id: `t-${Date.now()}`,
-        action: remarkModal.officialCertFile ? `Official Signed Document Uploaded/Updated (${remarkModal.targetStatus})` : `Status Changed to ${remarkModal.targetStatus}`,
-        status: remarkModal.targetStatus,
-        performedBy: officerName,
-        role: 'Officer',
-        remarks: remarkModal.remarkText.trim(),
-        officialUploadedCertificate: remarkModal.officialCertFile || null,
-        timestamp: nowIso
+    try {
+      if (remarkModal.serviceType === 'birth') {
+        res = await updateBirthCertificateStatus({
+          id: remarkModal.record.id,
+          newStatus: remarkModal.targetStatus,
+          remarks: remarkModal.remarkText,
+          officerName,
+          officialUploadedCertificate: remarkModal.officialCertFile || null
+        })
+      } else if (remarkModal.serviceType === 'water_connection' || remarkModal.serviceType === 'water') {
+        res = await updateWaterConnectionStatus({
+          id: remarkModal.record.id,
+          newStatus: remarkModal.targetStatus,
+          remarks: remarkModal.remarkText,
+          officerName,
+          officialUploadedCertificate: remarkModal.officialCertFile || null
+        })
+      } else if (remarkModal.serviceType === 'no_dues') {
+        res = await updateNoDuesCertificateStatus({
+          id: remarkModal.record.id,
+          newStatus: remarkModal.targetStatus,
+          remarks: remarkModal.remarkText,
+          officerName,
+          officialUploadedCertificate: remarkModal.officialCertFile || null
+        })
+      } else {
+        res = await updateDeathCertificateStatus({
+          id: remarkModal.record.id,
+          newStatus: remarkModal.targetStatus,
+          remarks: remarkModal.remarkText,
+          officerName,
+          officialUploadedCertificate: remarkModal.officialCertFile || null
+        })
       }
 
-      // Audit Trail Logging in Firestore auditLogs collection
-      try {
-        addDoc(collection(db, 'auditLogs'), {
-          action: remarkModal.officialCertFile ? 'OFFICIAL_CERTIFICATE_UPLOADED_OR_UPDATED' : `STATUS_CHANGE_TO_${remarkModal.targetStatus.toUpperCase().replace(/\s+/g, '_')}`,
+      if (res.success) {
+        toast.success(`स्थिति/दस्तावेज अपडेट हो गए: ${remarkModal.targetStatus}!`, { id: toastId })
+        
+        const nowIso = new Date().toISOString()
+        const updatedTimelineItem = {
+          id: `t-${Date.now()}`,
+          action: remarkModal.officialCertFile ? `Official Signed Document Uploaded/Updated (${remarkModal.targetStatus})` : `Status Changed to ${remarkModal.targetStatus}`,
           status: remarkModal.targetStatus,
-          serviceType: remarkModal.serviceType,
-          applicationId: remarkModal.record.id,
-          applicationNo: remarkModal.record.applicationNo || 'N/A',
           performedBy: officerName,
-          officerName: officerName,
+          role: 'Officer',
           remarks: remarkModal.remarkText.trim(),
-          officialCertFileName: remarkModal.officialCertFile?.fileName || null,
-          timestamp: nowIso,
-          createdAt: serverTimestamp()
-        }).catch(err => console.warn('[Admin Audit Log Error]:', err));
-      } catch (auditErr) {}
+          officialUploadedCertificate: remarkModal.officialCertFile || null,
+          timestamp: nowIso
+        }
 
-      const updateLocalDetail = (prev) => {
-        if (!prev || prev.id !== remarkModal.record.id) return prev
-        return {
-          ...prev,
+        // Audit Trail Logging in Firestore auditLogs collection
+        try {
+          addDoc(collection(db, 'auditLogs'), {
+            action: remarkModal.officialCertFile ? 'OFFICIAL_CERTIFICATE_UPLOADED_OR_UPDATED' : `STATUS_CHANGE_TO_${remarkModal.targetStatus.toUpperCase().replace(/\s+/g, '_')}`,
+            status: remarkModal.targetStatus,
+            serviceType: remarkModal.serviceType,
+            applicationId: remarkModal.record.id,
+            applicationNo: remarkModal.record.applicationNo || 'N/A',
+            performedBy: officerName,
+            officerName: officerName,
+            remarks: remarkModal.remarkText.trim(),
+            officialCertFileName: remarkModal.officialCertFile?.fileName || null,
+            timestamp: nowIso,
+            createdAt: serverTimestamp()
+          }).catch(err => console.warn('[Admin Audit Log Error]:', err));
+        } catch (auditErr) {}
+
+        const updateLocalDetail = (prev) => {
+          if (!prev || prev.id !== remarkModal.record.id) return prev
+          return {
+            ...prev,
+            status: remarkModal.targetStatus,
+            lastOfficerRemark: remarkModal.remarkText.trim(),
+            lastOfficerName: officerName,
+            officialUploadedCertificate: remarkModal.officialCertFile || prev.officialUploadedCertificate || null,
+            timeline: [...(prev.timeline || []), updatedTimelineItem]
+          }
+        }
+
+        setSelectedDeathDetail(prev => updateLocalDetail(prev))
+        setSelectedBirthDetail(prev => updateLocalDetail(prev))
+        setSelectedWaterDetail(prev => updateLocalDetail(prev))
+        setSelectedNoDuesDetail(prev => updateLocalDetail(prev))
+
+        // Direct React State Update for instant top stats counter & list card updates
+        const updateRecordState = (list) => list.map(r => (r.id === remarkModal.record.id || (r.applicationNo && r.applicationNo === remarkModal.record.applicationNo)) ? { 
+          ...r, 
           status: remarkModal.targetStatus,
           lastOfficerRemark: remarkModal.remarkText.trim(),
           lastOfficerName: officerName,
-          officialUploadedCertificate: remarkModal.officialCertFile || prev.officialUploadedCertificate || null,
-          timeline: [...(prev.timeline || []), updatedTimelineItem]
+          officialUploadedCertificate: remarkModal.officialCertFile || r.officialUploadedCertificate || null,
+          timeline: [...(r.timeline || []), updatedTimelineItem]
+        } : r)
+
+        setDeathRecords(prev => updateRecordState(prev))
+        setBirthRecords(prev => updateRecordState(prev))
+        setWaterRecords(prev => updateRecordState(prev))
+        setNoDuesRecords(prev => updateRecordState(prev))
+
+        // Send Targeted Notification to Citizen Email & UID
+        const rec = remarkModal.record;
+        if (rec) {
+          sendNotification({
+            serviceType: remarkModal.serviceType,
+            applicationId: rec.id,
+            applicationNo: rec.applicationNo,
+            userEmail: rec.userEmail || rec.applicantDetails?.email || '',
+            userUid: rec.userUid || '',
+            event: 'STATUS_UPDATE',
+            status: remarkModal.targetStatus,
+            message: `आपके आवेदन (${rec.applicationNo || 'N/A'}) की स्थिति अपडेट कर '${remarkModal.targetStatus}' कर दी गई है।`,
+            officerRemark: remarkModal.remarkText.trim(),
+            officerName
+          }).catch(err => console.warn('[Admin] Send notification error:', err));
         }
+
+        setRemarkModal({ isOpen: false, record: null, serviceType: 'death', targetStatus: '', remarkText: '', officerName: 'Nagar Palika Officer', officialCertFile: null })
+        loadDeathRecords()
+        loadBirthRecords()
+        loadWaterRecords()
+        loadNoDuesRecords()
+      } else {
+        toast.error(`अपडेट विफल: ${res.error} (Update failed)`, { id: toastId })
       }
-
-      setSelectedDeathDetail(prev => updateLocalDetail(prev))
-      setSelectedBirthDetail(prev => updateLocalDetail(prev))
-      setSelectedWaterDetail(prev => updateLocalDetail(prev))
-      setSelectedNoDuesDetail(prev => updateLocalDetail(prev))
-
-      // Direct React State Update for instant top stats counter & list card updates
-      const updateRecordState = (list) => list.map(r => (r.id === remarkModal.record.id || (r.applicationNo && r.applicationNo === remarkModal.record.applicationNo)) ? { 
-        ...r, 
-        status: remarkModal.targetStatus,
-        lastOfficerRemark: remarkModal.remarkText.trim(),
-        lastOfficerName: officerName,
-        officialUploadedCertificate: remarkModal.officialCertFile || r.officialUploadedCertificate || null,
-        timeline: [...(r.timeline || []), updatedTimelineItem]
-      } : r)
-
-      setDeathRecords(prev => updateRecordState(prev))
-      setBirthRecords(prev => updateRecordState(prev))
-      setWaterRecords(prev => updateRecordState(prev))
-      setNoDuesRecords(prev => updateRecordState(prev))
-
-      // Send Targeted Notification to Citizen Email & UID
-      const rec = remarkModal.record;
-      if (rec) {
-        sendNotification({
-          serviceType: remarkModal.serviceType,
-          applicationId: rec.id,
-          applicationNo: rec.applicationNo,
-          userEmail: rec.userEmail || rec.applicantDetails?.email || '',
-          userUid: rec.userUid || '',
-          event: 'STATUS_UPDATE',
-          status: remarkModal.targetStatus,
-          message: `आपके आवेदन (${rec.applicationNo || 'N/A'}) की स्थिति अपडेट कर '${remarkModal.targetStatus}' कर दी गई है।`,
-          officerRemark: remarkModal.remarkText.trim(),
-          officerName
-        }).catch(err => console.warn('[Admin] Send notification error:', err));
-      }
-
-      setRemarkModal({ isOpen: false, record: null, serviceType: 'death', targetStatus: '', remarkText: '', officerName: 'Nagar Palika Officer', officialCertFile: null })
-      loadDeathRecords()
-      loadBirthRecords()
-      loadWaterRecords()
-      loadNoDuesRecords()
-    } else {
-      toast.error(`अपडेट विफल: ${res.error} (Update failed)`, { id: toastId })
+    } finally {
+      setIsSubmittingStatus(false)
     }
   }
 
@@ -798,8 +825,19 @@ export default function AdminPage() {
                   />
                 </div>
                 
-                <button type="submit" className="w-full btn btn-primary py-3 text-xs uppercase tracking-wider font-bold mt-2">
-                  प्रमाण सत्यापित करें एवं लॉगिन करें (Verify Credentials)
+                <button 
+                  type="submit" 
+                  disabled={isLoggingIn}
+                  className="w-full btn btn-primary py-3 text-xs uppercase tracking-wider font-bold mt-2 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
+                >
+                  {isLoggingIn ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin text-white" />
+                      <span>सत्यापित हो रहा है...</span>
+                    </>
+                  ) : (
+                    <span>प्रमाण सत्यापित करें एवं लॉगिन करें (Verify Credentials)</span>
+                  )}
                 </button>
               </form>
             </div>
@@ -1947,13 +1985,18 @@ export default function AdminPage() {
 
                 <button
                   onClick={handleToggleMaintenance}
-                  className={`px-5 py-2.5 rounded-2xl text-xs font-extrabold flex items-center gap-2 transition-all shadow-md shrink-0 ${
+                  disabled={isTogglingMaint}
+                  className={`px-5 py-2.5 rounded-2xl text-xs font-extrabold flex items-center gap-2 transition-all shadow-md shrink-0 cursor-pointer disabled:opacity-60 ${
                     maintState.isMaintenanceMode
                       ? 'bg-emerald-700 hover:bg-emerald-800 text-white'
                       : 'bg-rose-700 hover:bg-rose-800 text-white'
                   }`}
                 >
-                  <RefreshCw className="w-4 h-4" />
+                  {isTogglingMaint ? (
+                    <Loader2 className="w-4 h-4 animate-spin text-white" />
+                  ) : (
+                    <RefreshCw className="w-4 h-4" />
+                  )}
                   <span>{maintState.isMaintenanceMode ? 'सुरक्षा अद्यतन समाप्त करें (Restore Website)' : 'रूटीन सुरक्षा अद्यतन मोड चालू करें (Enable Maintenance Lockdown)'}</span>
                 </button>
               </div>
@@ -1972,7 +2015,7 @@ export default function AdminPage() {
                 </div>
                 <button
                   onClick={loadCloudAccounts}
-                  className="btn btn-secondary btn-sm text-xs font-bold flex items-center gap-1.5"
+                  className="btn btn-secondary btn-sm text-xs font-bold flex items-center gap-1.5 cursor-pointer"
                 >
                   <RefreshCw className="w-3.5 h-3.5" /> क्लाउड सिंक (Sync Cloud)
                 </button>
@@ -2021,9 +2064,15 @@ export default function AdminPage() {
                     </div>
                     <button
                       onClick={() => handleUpdateCredentials('admin')}
-                      className="w-full btn btn-primary btn-sm text-xs font-bold flex items-center justify-center gap-1.5 mt-2"
+                      disabled={updatingCredUser === 'admin'}
+                      className="w-full btn btn-primary btn-sm text-xs font-bold flex items-center justify-center gap-1.5 mt-2 cursor-pointer disabled:opacity-60"
                     >
-                      <Save className="w-3.5 h-3.5" /> क्रेडेंशियल सहेजें
+                      {updatingCredUser === 'admin' ? (
+                        <Loader2 className="w-3.5 h-3.5 animate-spin text-white" />
+                      ) : (
+                        <Save className="w-3.5 h-3.5" />
+                      )}
+                      <span>क्रेडेंशियल सहेजें</span>
                     </button>
                   </div>
                 </div>
@@ -2070,9 +2119,15 @@ export default function AdminPage() {
                     </div>
                     <button
                       onClick={() => handleUpdateCredentials('water_admin')}
-                      className="w-full btn btn-primary btn-sm text-xs font-bold flex items-center justify-center gap-1.5 mt-2"
+                      disabled={updatingCredUser === 'water_admin'}
+                      className="w-full btn btn-primary btn-sm text-xs font-bold flex items-center justify-center gap-1.5 mt-2 cursor-pointer disabled:opacity-60"
                     >
-                      <Save className="w-3.5 h-3.5" /> क्रेडेंशियल सहेजें
+                      {updatingCredUser === 'water_admin' ? (
+                        <Loader2 className="w-3.5 h-3.5 animate-spin text-white" />
+                      ) : (
+                        <Save className="w-3.5 h-3.5" />
+                      )}
+                      <span>क्रेडेंशियल सहेजें</span>
                     </button>
                   </div>
                 </div>
@@ -2119,9 +2174,15 @@ export default function AdminPage() {
                     </div>
                     <button
                       onClick={() => handleUpdateCredentials('nodues_admin')}
-                      className="w-full btn btn-primary btn-sm text-xs font-bold flex items-center justify-center gap-1.5 mt-2"
+                      disabled={updatingCredUser === 'nodues_admin'}
+                      className="w-full btn btn-primary btn-sm text-xs font-bold flex items-center justify-center gap-1.5 mt-2 cursor-pointer disabled:opacity-60"
                     >
-                      <Save className="w-3.5 h-3.5" /> क्रेडेंशियल सहेजें
+                      {updatingCredUser === 'nodues_admin' ? (
+                        <Loader2 className="w-3.5 h-3.5 animate-spin text-white" />
+                      ) : (
+                        <Save className="w-3.5 h-3.5" />
+                      )}
+                      <span>क्रेडेंशियल सहेजें</span>
                     </button>
                   </div>
                 </div>
@@ -2168,9 +2229,15 @@ export default function AdminPage() {
                     </div>
                     <button
                       onClick={() => handleUpdateCredentials('super_admin')}
-                      className="w-full bg-purple-700 hover:bg-purple-800 text-white py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 mt-2 transition-all shadow-md"
+                      disabled={updatingCredUser === 'super_admin'}
+                      className="w-full bg-purple-700 hover:bg-purple-800 disabled:opacity-60 text-white py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 mt-2 transition-all shadow-md cursor-pointer"
                     >
-                      <Save className="w-3.5 h-3.5" /> सुपर एडमिन सहेजें
+                      {updatingCredUser === 'super_admin' ? (
+                        <Loader2 className="w-3.5 h-3.5 animate-spin text-white" />
+                      ) : (
+                        <Save className="w-3.5 h-3.5" />
+                      )}
+                      <span>सुपर एडमिन सहेजें</span>
                     </button>
                   </div>
                 </div>
@@ -2181,36 +2248,44 @@ export default function AdminPage() {
       </div>
     )}
 
-        {/* Status Update Remark Modal (Redesigned Modern UI) */}
+        {/* Status Update Remark Modal (Redesigned Modern UI with Mobile Progress Bar) */}
         {remarkModal.isOpen && (
-          <div className="fixed inset-0 bg-slate-950/75 backdrop-blur-md z-[9999] overflow-y-auto p-4 sm:p-6 flex items-center justify-center animate-in fade-in duration-200">
-            <div className="bg-white border border-slate-200 rounded-3xl max-w-lg w-full shadow-2xl overflow-hidden space-y-0 my-auto">
+          <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-[10000] overflow-y-auto p-2 sm:p-6 flex items-center justify-center animate-in fade-in duration-200">
+            <div className="bg-white border border-slate-200 rounded-3xl max-w-lg w-full shadow-2xl overflow-hidden flex flex-col max-h-[92vh] my-auto">
               
+              {/* Top Animated Progress Indicator Bar */}
+              {(isSubmittingStatus || isFileProcessing) && (
+                <div className="w-full bg-emerald-100 h-1.5 overflow-hidden shrink-0">
+                  <div className="bg-gradient-to-r from-emerald-600 via-teal-500 to-emerald-600 h-full animate-pulse w-full shadow-xs" />
+                </div>
+              )}
+
               {/* Top Modal Header */}
-              <div className="bg-slate-900 text-white px-6 py-4 flex items-center justify-between border-b border-slate-800">
+              <div className="bg-slate-900 text-white px-5 sm:px-6 py-4 flex items-center justify-between border-b border-slate-800 shrink-0">
                 <div className="flex items-center gap-2.5">
                   <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                  <h3 className="font-black text-white text-base tracking-tight">
+                  <h3 className="font-black text-white text-sm sm:text-base tracking-tight">
                     स्थिति अद्यतन (Status Update)
                   </h3>
-                  <span className={`px-3 py-0.5 rounded-full text-[10px] font-extrabold border uppercase tracking-wider ${getStatusChip(remarkModal.targetStatus)}`}>
+                  <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-extrabold border uppercase tracking-wider ${getStatusChip(remarkModal.targetStatus)}`}>
                     {remarkModal.targetStatus}
                   </span>
                 </div>
                 <button
                   type="button"
+                  disabled={isSubmittingStatus || isFileProcessing}
                   onClick={() => setRemarkModal({ isOpen: false, record: null, serviceType: 'death', targetStatus: '', remarkText: '', officerName: 'Nagar Palika Officer', officialCertFile: null })}
-                  className="p-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white transition-all cursor-pointer"
+                  className="p-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white transition-all cursor-pointer disabled:opacity-50"
                 >
                   <X className="w-5 h-5" />
                 </button>
               </div>
 
               {/* Modal Inner Body */}
-              <div className="p-6 space-y-4 max-h-[80vh] overflow-y-auto">
+              <div className="p-4 sm:p-6 space-y-4 overflow-y-auto flex-1 pb-24 sm:pb-6">
 
                 {/* Application Context Summary Banner */}
-                <div className="bg-slate-50 border border-slate-200/90 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div className="bg-slate-50 border border-slate-200/90 rounded-2xl p-3.5 sm:p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                   <div className="space-y-0.5">
                     <div className="flex items-center gap-2">
                       <span className="text-[11px] font-mono font-black text-emerald-900 bg-emerald-100 border border-emerald-300 px-2.5 py-0.5 rounded-lg shadow-2xs">
@@ -2233,7 +2308,7 @@ export default function AdminPage() {
                   </div>
                 </div>
 
-                <form onSubmit={handleConfirmStatusUpdate} className="space-y-4">
+                <form id="remarkModalForm" onSubmit={handleConfirmStatusUpdate} className="space-y-4">
                   {/* Officer Remark Textarea */}
                   <div>
                     <label className="block text-xs font-bold text-slate-900 mb-1.5 flex items-center gap-1.5">
@@ -2304,18 +2379,28 @@ export default function AdminPage() {
                         </div>
                       )}
 
-                      {/* Styled File Input Button */}
-                      <label className="border-2 border-dashed border-slate-300 hover:border-emerald-500 bg-white hover:bg-emerald-50/40 rounded-2xl p-4 flex flex-col items-center justify-center cursor-pointer transition-all group">
-                        <Upload className="w-6 h-6 text-slate-400 group-hover:text-emerald-600 mb-1 transition-colors" />
-                        <span className="text-xs font-bold text-slate-700 group-hover:text-emerald-800">
-                          नवीनीकरण फ़ाइल चुनें (Choose New File)
-                        </span>
-                        <span className="text-[10px] text-slate-500 mt-0.5">
-                          केवल PDF या Photo (अधिकतम आकार 1 MB)
-                        </span>
+                      {/* Styled File Input Button with Active Spinner */}
+                      <label className="border-2 border-dashed border-slate-300 hover:border-emerald-500 bg-white hover:bg-emerald-50/40 rounded-2xl p-4 flex flex-col items-center justify-center cursor-pointer transition-all group relative">
+                        {isFileProcessing ? (
+                          <div className="flex flex-col items-center py-2">
+                            <Loader2 className="w-7 h-7 text-emerald-600 animate-spin mb-1" />
+                            <span className="text-xs font-extrabold text-emerald-800">फ़ाइल संसाधित एवं एन्कोड की जा रही है...</span>
+                          </div>
+                        ) : (
+                          <>
+                            <Upload className="w-6 h-6 text-slate-400 group-hover:text-emerald-600 mb-1 transition-colors" />
+                            <span className="text-xs font-bold text-slate-700 group-hover:text-emerald-800">
+                              नवीनीकरण फ़ाइल चुनें (Choose New File)
+                            </span>
+                            <span className="text-[10px] text-slate-500 mt-0.5">
+                              केवल PDF या Photo (अधिकतम आकार 1 MB)
+                            </span>
+                          </>
+                        )}
                         <input
                           type="file"
                           accept="application/pdf,image/*"
+                          disabled={isFileProcessing || isSubmittingStatus}
                           onChange={async (e) => {
                             const file = e.target.files?.[0];
                             if (file) {
@@ -2324,6 +2409,7 @@ export default function AdminPage() {
                                 e.target.value = '';
                                 return;
                               }
+                              setIsFileProcessing(true);
                               const loadingToast = toast.loading(`फ़ाइल '${file.name}' संसाधित की जा रही है...`);
                               try {
                                 const docKey = `doc_cert_${remarkModal.record?.applicationNo || remarkModal.record?.id || Date.now()}`;
@@ -2336,6 +2422,8 @@ export default function AdminPage() {
                                 toast.success(`फ़ाइल '${file.name}' संलग्न की गई!`, { id: loadingToast });
                               } catch (err) {
                                 toast.error('फ़ाइल अपलोड में त्रुटि: ' + err.message, { id: loadingToast });
+                              } finally {
+                                setIsFileProcessing(false);
                               }
                             }
                           }}
@@ -2357,25 +2445,39 @@ export default function AdminPage() {
                       )}
                     </div>
                   )}
-
-                  {/* Footer Buttons */}
-                  <div className="border-t border-slate-100 pt-4 flex items-center justify-end gap-2.5">
-                    <button
-                      type="button"
-                      onClick={() => setRemarkModal({ isOpen: false, record: null, serviceType: 'death', targetStatus: '', remarkText: '', officerName: 'Nagar Palika Officer', officialCertFile: null })}
-                      className="bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 text-xs font-bold px-4 py-2.5 rounded-xl cursor-pointer transition-all"
-                    >
-                      रद्द करें
-                    </button>
-                    <button
-                      type="submit"
-                      className="bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-extrabold px-5 py-2.5 rounded-xl shadow-md cursor-pointer transition-all"
-                    >
-                      पुष्टि करें और स्थिति अद्यतन करें
-                    </button>
-                  </div>
                 </form>
               </div>
+
+              {/* Sticky Footer Buttons (Always Visible on Mobile View) */}
+              <div className="sticky bottom-0 bg-white border-t border-slate-100 p-4 shrink-0 flex items-center justify-end gap-2.5 z-20 shadow-md">
+                <button
+                  type="button"
+                  disabled={isSubmittingStatus || isFileProcessing}
+                  onClick={() => setRemarkModal({ isOpen: false, record: null, serviceType: 'death', targetStatus: '', remarkText: '', officerName: 'Nagar Palika Officer', officialCertFile: null })}
+                  className="bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 text-xs font-bold px-4 py-2.5 rounded-xl cursor-pointer transition-all disabled:opacity-50"
+                >
+                  रद्द करें
+                </button>
+                <button
+                  type="submit"
+                  form="remarkModalForm"
+                  disabled={isSubmittingStatus || isFileProcessing}
+                  className="bg-emerald-700 hover:bg-emerald-800 disabled:opacity-60 text-white text-xs font-extrabold px-5 py-2.5 rounded-xl shadow-md cursor-pointer transition-all flex items-center gap-2"
+                >
+                  {isSubmittingStatus ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin text-white" />
+                      <span>अपडेट किया जा रहा है...</span>
+                    </>
+                  ) : (
+                    <>
+                      <CheckCircle2 className="w-4 h-4 text-emerald-200" />
+                      <span>पुष्टि करें और स्थिति अद्यतन करें</span>
+                    </>
+                  )}
+                </button>
+              </div>
+
             </div>
           </div>
         )}
@@ -2653,8 +2755,8 @@ function ApplicationDetailModal({ record, serviceType, onClose, onOpenRemark, on
   const docEntries = getNormalizedDocs();
 
   return (
-    <div className="fixed inset-0 bg-slate-900/75 backdrop-blur-md z-50 overflow-y-auto p-3 sm:p-6 flex items-start justify-center pt-4 sm:pt-8">
-      <div className="bg-white border border-slate-200 rounded-3xl max-w-3xl w-full p-5 sm:p-6 shadow-2xl flex flex-col max-h-[85vh]">
+    <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-md z-[9999] overflow-y-auto p-2 sm:p-6 flex items-center justify-center pt-2 sm:pt-6">
+      <div className="bg-white border border-slate-200 rounded-3xl max-w-3xl w-full p-4 sm:p-6 shadow-2xl flex flex-col max-h-[92vh]">
         {/* Header */}
         <div className="flex items-start justify-between border-b border-slate-100 pb-4 shrink-0">
           <div className="space-y-2">
@@ -2689,7 +2791,7 @@ function ApplicationDetailModal({ record, serviceType, onClose, onOpenRemark, on
         </div>
 
         {/* Content */}
-        <div className="overflow-y-auto flex-1 pr-1 pt-5 space-y-5">
+        <div className="overflow-y-auto flex-1 pr-1 pt-4 space-y-5 pb-20 sm:pb-6">
           {/* 2 Main Info Cards Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Card 1: Subject Details */}
@@ -2923,11 +3025,11 @@ function ApplicationDetailModal({ record, serviceType, onClose, onOpenRemark, on
           </div>
         )}
 
-        {/* Footer Actions matching 2nd screenshot */}
-        <div className="border-t border-slate-100 pt-4 mt-2 shrink-0 flex flex-wrap items-center justify-between gap-3">
+        {/* Footer Actions matching 2nd screenshot (Sticky for Mobile View) */}
+        <div className="sticky bottom-0 bg-white border-t border-slate-100 pt-3 pb-3 mt-auto shrink-0 flex flex-wrap items-center justify-between gap-2.5 z-20 shadow-md px-1">
           <button
             onClick={() => { onOpenLetter(record, currentServiceKey); }}
-            className="btn btn-secondary btn-sm bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 font-bold text-xs px-4 py-2.5 rounded-2xl flex items-center gap-2 shadow-2xs"
+            className="btn btn-secondary btn-sm bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 font-bold text-xs px-4 py-2 rounded-2xl flex items-center gap-2 shadow-2xs"
           >
             <Printer className="w-4 h-4 text-slate-600" /> पावती पत्र (Print Pawati)
           </button>
@@ -2935,25 +3037,25 @@ function ApplicationDetailModal({ record, serviceType, onClose, onOpenRemark, on
           <div className="flex items-center gap-2 flex-wrap">
             <button
               onClick={() => onOpenRemark(record, 'Under Review', currentServiceKey)}
-              className="btn btn-secondary btn-sm bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 font-bold text-xs px-4 py-2.5 rounded-2xl flex items-center gap-2 shadow-2xs"
+              className="btn btn-secondary btn-sm bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 font-bold text-xs px-3.5 py-2 rounded-2xl flex items-center gap-1.5 shadow-2xs"
             >
               👁️ समीक्षा में डालें
             </button>
             <button
               onClick={() => onOpenRemark(record, 'Approved', currentServiceKey)}
-              className="btn btn-primary btn-sm bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-5 py-2.5 rounded-2xl flex items-center gap-2 shadow-md"
+              className="btn btn-primary btn-sm bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-4 py-2 rounded-2xl flex items-center gap-1.5 shadow-md"
             >
               ✅ स्वीकृत करें
             </button>
             <button
               onClick={() => onOpenRemark(record, 'Correction Requested', currentServiceKey)}
-              className="btn btn-secondary btn-sm bg-amber-50 hover:bg-amber-100 border border-amber-300 text-amber-900 font-bold text-xs px-4 py-2.5 rounded-2xl flex items-center gap-2"
+              className="btn btn-secondary btn-sm bg-amber-50 hover:bg-amber-100 border border-amber-300 text-amber-900 font-bold text-xs px-3.5 py-2 rounded-2xl flex items-center gap-1.5"
             >
               ✏️ सुधार मांगें
             </button>
             <button
               onClick={() => onOpenRemark(record, 'Rejected', currentServiceKey)}
-              className="btn btn-danger btn-sm bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs px-4 py-2.5 rounded-2xl flex items-center gap-2 shadow-md"
+              className="btn btn-danger btn-sm bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs px-3.5 py-2 rounded-2xl flex items-center gap-1.5 shadow-md"
             >
               🗑️ निरस्त करें
             </button>
