@@ -280,6 +280,15 @@ export function validateWaterConnectionForm(formData, dpdpConsent) {
   }
 
   // Tab 1: मकान व संपत्ति विवरण
+  if (!property.propertyId || !property.propertyId.trim()) {
+    fieldErrors['propertyDetails.propertyId'] = {
+      tab: 1,
+      fieldId: 'field_property_propertyId',
+      message: '⚠️ संपत्ति क्रमांक / प्रॉपर्टी आईडी दर्ज करना अनिवार्य है (Property ID is required)'
+    };
+    errorList.push(fieldErrors['propertyDetails.propertyId'].message);
+  }
+
   if (!property.houseNo || !property.houseNo.trim()) {
     fieldErrors['propertyDetails.houseNo'] = {
       tab: 1,

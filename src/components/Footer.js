@@ -79,9 +79,10 @@ export default function Footer() {
           <div className="space-y-2 text-xs">
             <h4 className="font-extrabold text-white uppercase tracking-wider text-[11px] text-cyan-400">संपर्क व हेल्पलाइन (Helpdesk)</h4>
             <p className="text-slate-300 text-[11px]">नगर पालिका परिषद कार्यालय, झाबुआ (म.प्र.) - 457661</p>
-            <p className="text-slate-300 text-[11px]">हेल्पलाइन: +91-7392-243201</p>
+            <p className="text-slate-300 text-[11px]">हेल्पलाइन (CMO मिलन सर): <a href="tel:9713175838" className="font-bold text-emerald-400 hover:underline">+91 97131 75838</a></p>
+            <p className="text-slate-300 text-[11px]">कार्यालय हेल्पलाइन: +91-7392-243201</p>
             <p className="text-slate-300 text-[11px]">ई-मेल: cmomjhabua@mp.gov.in</p>
-            <p className="text-slate-400 text-[10px] pt-1">समय: सोमवार से शनिवार (10:30 AM - 05:30 PM)</p>
+            <p className="text-slate-400 text-[10px] pt-1">समय: सोमवार से शुक्रवार (10:30 AM - 05:30 PM)</p>
           </div>
 
         </div>

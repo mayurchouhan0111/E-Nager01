@@ -79,6 +79,10 @@ export default function WaterConnectionTemplate({ record }) {
               <td className="p-2.5 font-semibold text-slate-900">{applicant.fatherHusbandName || 'N/A'}</td>
             </tr>
             <tr className="border-b border-slate-300 bg-slate-50">
+              <td className="p-2.5 font-bold text-slate-700 border-r border-slate-300">संपत्ति क्रमांक / प्रॉपर्टी आईडी (Property ID):</td>
+              <td className="p-2.5 font-bold text-slate-900 font-mono">{property.propertyId || 'N/A'}</td>
+            </tr>
+            <tr className="border-b border-slate-300">
               <td className="p-2.5 font-bold text-slate-700 border-r border-slate-300">भवन क्रमांक एवं वार्ड (Building & Ward No):</td>
               <td className="p-2.5 font-bold text-slate-900">भवन क्र. {property.houseNo || 'N/A'}, वार्ड क्र. {applicant.wardNo || 'N/A'}, झाबुआ</td>
             </tr>

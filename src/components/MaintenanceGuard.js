@@ -77,7 +77,7 @@ export default function MaintenanceGuard() {
             {maintStatus.message || 'सुरक्षा एवं तकनीकी सर्वर अद्यतन के कारण नागरिक ऑनलाइन सेवाएं (जन्म, मृत्यु, जल कनेक्शन, नो ड्यूज NOC) अस्थायी रूप से स्थगित की गई हैं। सेवाएं अतिशीघ्र पुनः बहाल की जाएंगी।'}
           </p>
           <div className="border-t border-slate-800/80 pt-2.5 flex items-center justify-between text-[11px] text-slate-400 font-medium flex-wrap gap-2">
-            <span>हेल्पलाइन: <strong>+91-7392-243201</strong></span>
+            <span>हेल्पलाइन (CMO मिलन सर, सोम-शुक्र): <strong>+91 97131 75838</strong> / <strong>+91-7392-243201</strong></span>
             <span>ई-मेल: <strong>cmomjhabua@mp.gov.in</strong></span>
           </div>
         </div>
