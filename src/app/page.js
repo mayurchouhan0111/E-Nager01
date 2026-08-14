@@ -2,7 +2,7 @@
 import Link from 'next/link'
 import ServiceHeader from '@/components/ServiceHeader'
 import DocumentChecklist from '@/components/DocumentChecklist'
-import { FileText, Baby, Droplet, ShieldCheck, ArrowRight, Shield, Clock, CheckCircle2, AlertTriangle, ShieldAlert, ListChecks, Droplets, FileCheck, MessageSquare, LayoutGrid } from 'lucide-react'
+import { FileText, Baby, Droplet, ShieldCheck, ArrowRight, Shield, Clock, CheckCircle2, AlertTriangle, ShieldAlert, ListChecks, Droplets, FileCheck, MessageSquare, LayoutGrid, Sparkles } from 'lucide-react'
 
 export default function HomePage() {
   return (
@@ -73,7 +73,7 @@ export default function HomePage() {
                 href="/death-certificate" 
                 className="inline-flex items-center gap-2 px-4.5 py-2.5 rounded-full bg-white text-[#013524] font-bold text-xs sm:text-sm shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200"
               >
-                <FileText className="w-4 h-4 text-[#013524] shrink-0" />
+                <FileText className="w-4 h-4 text-[#013524] shrink-0 animate-pulse" />
                 <span>मृत्यु प्रमाण पत्र</span>
                 <span className="text-[#013524] font-bold ml-0.5">&rarr;</span>
               </Link>
@@ -83,7 +83,7 @@ export default function HomePage() {
                 href="/birth-certificate" 
                 className="inline-flex items-center gap-2 px-4.5 py-2.5 rounded-full bg-[#0088cc] hover:bg-[#007cbd] text-white font-bold text-xs sm:text-sm shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200"
               >
-                <MessageSquare className="w-4 h-4 text-white shrink-0" />
+                <Baby className="w-4 h-4 text-white shrink-0 animate-bounce" />
                 <span>जन्म प्रमाण पत्र</span>
                 <span className="text-sky-100 font-bold ml-0.5">&rarr;</span>
               </Link>
@@ -93,7 +93,7 @@ export default function HomePage() {
                 href="/water-connection" 
                 className="inline-flex items-center gap-2 px-4.5 py-2.5 rounded-full bg-[#00a884] hover:bg-[#009676] text-white font-bold text-xs sm:text-sm shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200"
               >
-                <Clock className="w-4 h-4 text-white shrink-0" />
+                <Droplets className="w-4 h-4 text-white shrink-0 animate-pulse" />
                 <span>जल कनेक्शन आवेदन</span>
                 <span className="text-teal-100 font-bold ml-0.5">&rarr;</span>
               </Link>
@@ -107,7 +107,7 @@ export default function HomePage() {
                 }}
                 className="inline-flex items-center gap-2 px-4.5 py-2.5 rounded-full bg-[#5c54e5] hover:bg-[#4e45d9] text-white font-bold text-xs sm:text-sm shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200 cursor-pointer"
               >
-                <LayoutGrid className="w-4 h-4 text-white shrink-0" />
+                <LayoutGrid className="w-4 h-4 text-white shrink-0 animate-spin" style={{ animationDuration: '6s' }} />
                 <span>मेरे अनुरोध देखें</span>
                 <span className="text-indigo-100 font-bold ml-0.5">&rarr;</span>
               </button>
@@ -143,7 +143,8 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* Official Legal Disclaimer Strip matching reference image */}
+      {/* Official Legal Disclaimer Strip matching reference image (Commented out) */}
+      {/* 
       <div className="bg-[#FAF7F2] border-t border-b border-amber-200/70 py-3.5 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-3 text-slate-700 text-xs leading-relaxed font-medium">
           <div className="flex items-center gap-2 font-extrabold text-[#c25e00] shrink-0">
@@ -165,11 +166,15 @@ export default function HomePage() {
           </div>
         </div>
       </div>
+      */}
 
       {/* Service Cards */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 flex-1 w-full">
         <div className="text-center mb-12">
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900">हमारी ऑनलाइन नागरिक सेवाएँ</h2>
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 flex items-center justify-center gap-2">
+            <span>हमारी ऑनलाइन नागरिक सेवाएँ</span>
+            <Sparkles className="w-6 h-6 text-amber-500 animate-pulse" />
+          </h2>
           <p className="text-sm text-slate-500 mt-2">अपनी आवश्यकता अनुसार नगर पालिका सेवा चुनें</p>
         </div>
 
@@ -180,8 +185,8 @@ export default function HomePage() {
             <div className="bg-white border border-slate-200 rounded-3xl p-7 shadow-sm hover:shadow-2xl hover:shadow-emerald-100 hover:border-emerald-200 transition-all duration-500 h-full relative overflow-hidden flex flex-col justify-between">
               <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-emerald-50 to-transparent rounded-bl-full opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               <div className="relative">
-                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-500 to-emerald-700 flex items-center justify-center shadow-lg shadow-emerald-200 mb-6 group-hover:scale-110 group-hover:rotate-3 transition-all duration-500">
-                  <FileText className="w-7 h-7 text-white" />
+                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-500 to-emerald-700 flex items-center justify-center shadow-lg shadow-emerald-200 mb-6 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 transform-gpu">
+                  <FileText className="w-7 h-7 text-white animate-pulse" />
                 </div>
                 <h3 className="text-base font-extrabold text-slate-900 mb-1">
                   मृत्यु प्रमाण पत्र ऑनलाइन आवेदन
@@ -196,19 +201,19 @@ export default function HomePage() {
                 <div className="space-y-2.5 mb-6">
                   <div className="flex items-center gap-2 text-xs text-slate-600">
                     <div className="w-4 h-4 rounded-full bg-emerald-100 flex items-center justify-center shrink-0">
-                      <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                      <CheckCircle2 className="w-3 h-3 text-emerald-600 animate-pulse" />
                     </div>
                     <span>ऑनलाइन फॉर्म व Hard Copy पावती</span>
                   </div>
                   <div className="flex items-center gap-2 text-xs text-slate-600">
                     <div className="w-4 h-4 rounded-full bg-emerald-100 flex items-center justify-center shrink-0">
-                      <Clock className="w-3 h-3 text-emerald-600" />
+                      <Clock className="w-3 h-3 text-emerald-600 animate-pulse" />
                     </div>
                     <span>दस्तावेज अपलोड व ट्रैकिंग</span>
                   </div>
                   <div className="flex items-center gap-2 text-xs text-slate-600">
                     <div className="w-4 h-4 rounded-full bg-emerald-100 flex items-center justify-center shrink-0">
-                      <Shield className="w-3 h-3 text-emerald-600" />
+                      <Shield className="w-3 h-3 text-emerald-600 animate-pulse" />
                     </div>
                     <span>डिजिटल प्रमाण पत्र डाउनलोड</span>
                   </div>
@@ -227,8 +232,8 @@ export default function HomePage() {
             <div className="bg-white border border-slate-200 rounded-3xl p-7 shadow-sm hover:shadow-2xl hover:shadow-blue-100 hover:border-blue-200 transition-all duration-500 h-full relative overflow-hidden flex flex-col justify-between">
               <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-blue-50 to-transparent rounded-bl-full opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               <div className="relative">
-                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-200 mb-6 group-hover:scale-110 group-hover:-rotate-3 transition-all duration-500">
-                  <Baby className="w-7 h-7 text-white" />
+                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-200 mb-6 group-hover:scale-110 group-hover:-rotate-3 transition-all duration-300 transform-gpu">
+                  <Baby className="w-7 h-7 text-white animate-bounce" />
                 </div>
                 <h3 className="text-base font-extrabold text-slate-900 mb-1">
                   जन्म प्रमाण पत्र ऑनलाइन आवेदन
@@ -243,19 +248,19 @@ export default function HomePage() {
                 <div className="space-y-2.5 mb-6">
                   <div className="flex items-center gap-2 text-xs text-slate-600">
                     <div className="w-4 h-4 rounded-full bg-blue-100 flex items-center justify-center shrink-0">
-                      <CheckCircle2 className="w-3 h-3 text-blue-600" />
+                      <CheckCircle2 className="w-3 h-3 text-blue-600 animate-pulse" />
                     </div>
                     <span>ऑनलाइन फॉर्म व Hard Copy पावती</span>
                   </div>
                   <div className="flex items-center gap-2 text-xs text-slate-600">
                     <div className="w-4 h-4 rounded-full bg-blue-100 flex items-center justify-center shrink-0">
-                      <Clock className="w-3 h-3 text-blue-600" />
+                      <Clock className="w-3 h-3 text-blue-600 animate-pulse" />
                     </div>
                     <span>दस्तावेज फोटो अपलोड व स्थिति ट्रैकिंग</span>
                   </div>
                   <div className="flex items-center gap-2 text-xs text-slate-600">
                     <div className="w-4 h-4 rounded-full bg-blue-100 flex items-center justify-center shrink-0">
-                      <Shield className="w-3 h-3 text-blue-600" />
+                      <Shield className="w-3 h-3 text-blue-600 animate-pulse" />
                     </div>
                     <span>डिजिटल रूप से प्रमाणित प्रमाण पत्र</span>
                   </div>
@@ -274,8 +279,8 @@ export default function HomePage() {
             <div className="bg-white border border-slate-200 rounded-3xl p-7 shadow-sm hover:shadow-2xl hover:shadow-teal-100 hover:border-teal-200 transition-all duration-500 h-full relative overflow-hidden flex flex-col justify-between">
               <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-teal-50 to-transparent rounded-bl-full opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               <div className="relative">
-                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-teal-600 to-emerald-700 flex items-center justify-center shadow-lg shadow-teal-200 mb-6 group-hover:scale-110 group-hover:rotate-3 transition-all duration-500">
-                  <Droplet className="w-7 h-7 text-white" />
+                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-teal-600 to-emerald-700 flex items-center justify-center shadow-lg shadow-teal-200 mb-6 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 transform-gpu">
+                  <Droplet className="w-7 h-7 text-white animate-pulse" />
                 </div>
                 <h3 className="text-base font-extrabold text-slate-900 mb-1">
                   जल (नल) कनेक्शन ऑनलाइन आवेदन
@@ -290,19 +295,19 @@ export default function HomePage() {
                 <div className="space-y-2.5 mb-6">
                   <div className="flex items-center gap-2 text-xs text-slate-600">
                     <div className="w-4 h-4 rounded-full bg-teal-100 flex items-center justify-center shrink-0">
-                      <CheckCircle2 className="w-3 h-3 text-teal-600" />
+                      <CheckCircle2 className="w-3 h-3 text-teal-600 animate-pulse" />
                     </div>
                     <span>आधिकारिक नल कनेक्शन आवेदन पत्र</span>
                   </div>
                   <div className="flex items-center gap-2 text-xs text-slate-600">
                     <div className="w-4 h-4 rounded-full bg-teal-100 flex items-center justify-center shrink-0">
-                      <Clock className="w-3 h-3 text-teal-600" />
+                      <Clock className="w-3 h-3 text-teal-600 animate-pulse" />
                     </div>
                     <span>शपथ पत्र व संपत्ति कर रसीद अपलोड</span>
                   </div>
                   <div className="flex items-center gap-2 text-xs text-slate-600">
                     <div className="w-4 h-4 rounded-full bg-teal-100 flex items-center justify-center shrink-0">
-                      <Shield className="w-3 h-3 text-teal-600" />
+                      <Shield className="w-3 h-3 text-teal-600 animate-pulse" />
                     </div>
                     <span>जल कनेक्शन स्वीकृति पत्र डाउनलोड</span>
                   </div>
@@ -321,8 +326,8 @@ export default function HomePage() {
             <div className="bg-white border border-slate-200 rounded-3xl p-7 shadow-sm hover:shadow-2xl hover:shadow-violet-100 hover:border-violet-200 transition-all duration-500 h-full relative overflow-hidden flex flex-col justify-between">
               <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-violet-50 to-transparent rounded-bl-full opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               <div className="relative">
-                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-violet-600 to-purple-700 flex items-center justify-center shadow-lg shadow-violet-200 mb-6 group-hover:scale-110 group-hover:-rotate-3 transition-all duration-500">
-                  <ShieldCheck className="w-7 h-7 text-white" />
+                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-violet-600 to-purple-700 flex items-center justify-center shadow-lg shadow-violet-200 mb-6 group-hover:scale-110 group-hover:-rotate-3 transition-all duration-300 transform-gpu">
+                  <ShieldCheck className="w-7 h-7 text-white animate-pulse" />
                 </div>
                 <h3 className="text-base font-extrabold text-slate-900 mb-1">
                   नो ड्यूज प्रमाण पत्र
@@ -369,45 +374,45 @@ export default function HomePage() {
           <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-sm space-y-6">
             <h3 className="text-base font-extrabold text-slate-900 border-b border-slate-100 pb-3 flex items-center justify-between flex-wrap gap-2">
               <span className="flex items-center gap-2">
-                <span className="p-1.5 bg-emerald-100 text-emerald-800 rounded-xl text-xs">📞</span> नगर पालिका परिषद झाबुआ — आधिकारिक विभागीय संपर्क सूत्र (Official Contact Directory)
+                <span className="p-1.5 bg-emerald-100 text-emerald-800 rounded-xl text-xs flex items-center justify-center">📞</span> नगर पालिका परिषद झाबुआ — आधिकारिक विभागीय संपर्क सूत्र (Official Contact Directory)
               </span>
               <span className="text-xs text-slate-400 font-mono font-bold">MP e-Nagar Helpline</span>
             </h3>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-1.5 hover:border-emerald-300 transition-all">
+              <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-1.5 hover:border-emerald-300 transition-all group">
                 <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">नोडल प्रशासक (Nodal Administrator)</span>
                 <p className="font-extrabold text-slate-900 text-sm">मुख्य नगर पालिका अधिकारी (CMO)</p>
                 <p className="text-xs text-slate-500 font-medium">समस्त नगर पालिका सेवाएँ व शिकायत निवारण</p>
-                <a href="tel:9713175838" className="inline-flex items-center gap-1.5 text-xs font-mono font-extrabold text-emerald-800 bg-emerald-100 hover:bg-emerald-200 px-3 py-1.5 rounded-xl border border-emerald-300 transition mt-1">
-                  📞 9713175838
+                <a href="tel:9713175838" className="inline-flex items-center gap-1.5 text-xs font-mono font-extrabold text-emerald-800 bg-emerald-100 hover:bg-emerald-200 px-3 py-1.5 rounded-xl border border-emerald-300 transition-all duration-200 hover:scale-105 mt-1">
+                  <span className="animate-pulse">📞</span> 9713175838
                 </a>
               </div>
 
-              <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-1.5 hover:border-purple-300 transition-all">
+              <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-1.5 hover:border-purple-300 transition-all group">
                 <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">राजस्व शाखा प्रभारी (नो ड्यूज NOC)</span>
                 <p className="font-extrabold text-slate-900 text-sm">श्री प्रेमसिंह वसुनिया</p>
                 <p className="text-xs text-slate-500 font-medium">संपत्ति कर एवं नो ड्यूज एनओसी प्रभारी</p>
-                <a href="tel:9424032601" className="inline-flex items-center gap-1.5 text-xs font-mono font-extrabold text-purple-800 bg-purple-100 hover:bg-purple-200 px-3 py-1.5 rounded-xl border border-purple-300 transition mt-1">
-                  📞 9424032601
+                <a href="tel:9424032601" className="inline-flex items-center gap-1.5 text-xs font-mono font-extrabold text-purple-800 bg-purple-100 hover:bg-purple-200 px-3 py-1.5 rounded-xl border border-purple-300 transition-all duration-200 hover:scale-105 mt-1">
+                  <span className="animate-pulse">📞</span> 9424032601
                 </a>
               </div>
 
-              <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-1.5 hover:border-teal-300 transition-all">
+              <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-1.5 hover:border-teal-300 transition-all group">
                 <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">जल कर / नल कनेक्शन प्रभारी</span>
                 <p className="font-extrabold text-slate-900 text-sm">श्री अय्यूब खान</p>
                 <p className="text-xs text-slate-500 font-medium">Water Tax & New Connection Official</p>
-                <a href="tel:8224083390" className="inline-flex items-center gap-1.5 text-xs font-mono font-extrabold text-teal-800 bg-teal-100 hover:bg-teal-200 px-3 py-1.5 rounded-xl border border-teal-300 transition mt-1">
-                  📞 8224083390
+                <a href="tel:8224083390" className="inline-flex items-center gap-1.5 text-xs font-mono font-extrabold text-teal-800 bg-teal-100 hover:bg-teal-200 px-3 py-1.5 rounded-xl border border-teal-300 transition-all duration-200 hover:scale-105 mt-1">
+                  <span className="animate-pulse">📞</span> 8224083390
                 </a>
               </div>
 
-              <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-1.5 hover:border-blue-300 transition-all">
+              <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-1.5 hover:border-blue-300 transition-all group">
                 <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">जन्म एवं मृत्यु पंजीयन प्रभारी</span>
                 <p className="font-extrabold text-slate-900 text-sm">श्री अरविंद बुंदेला</p>
                 <p className="text-xs text-slate-500 font-medium">Birth & Death Registration Official</p>
-                <a href="tel:9993177917" className="inline-flex items-center gap-1.5 text-xs font-mono font-extrabold text-blue-800 bg-blue-100 hover:bg-blue-200 px-3 py-1.5 rounded-xl border border-blue-300 transition mt-1">
-                  📞 9993177917
+                <a href="tel:9993177917" className="inline-flex items-center gap-1.5 text-xs font-mono font-extrabold text-blue-800 bg-blue-100 hover:bg-blue-200 px-3 py-1.5 rounded-xl border border-blue-300 transition-all duration-200 hover:scale-105 mt-1">
+                  <span className="animate-pulse">📞</span> 9993177917
                 </a>
               </div>
             </div>
