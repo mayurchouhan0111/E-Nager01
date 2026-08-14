@@ -37,7 +37,7 @@ global.window = {
   addEventListener: () => {},
   removeEventListener: () => {}
 };
-global.navigator = { onLine: true };
+Object.defineProperty(global, 'navigator', { value: { onLine: true }, configurable: true });
 
 async function runOfflineSyncEngineVerification() {
   console.log('🚀 OFFLINE-TO-ONLINE AUTO-RETRY SYNC SAFEGUARD AUDIT STARTED...\n');
