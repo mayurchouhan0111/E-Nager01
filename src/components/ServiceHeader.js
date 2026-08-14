@@ -155,9 +155,24 @@ export default function ServiceHeader() {
       return;
     }
 
+      try {
       const cleanQuery = queryText.trim().toLowerCase();
       const cleanDigits = cleanQuery.replace(/\D/g, '');
       const cleanAlphaNum = cleanQuery.replace(/[^a-z0-9]/gi, '');
+
+      const [births, deaths, waters, noDues] = await Promise.all([
+        getBirthCertificates(null, true).catch(() => []),
+        getDeathCertificates(null, true).catch(() => []),
+        getWaterConnections(null, true).catch(() => []),
+        getNoDuesCertificates(null, true).catch(() => [])
+      ]);
+
+      const allRecords = [
+        ...births.map(r => ({ ...r, serviceName: 'जन्म प्रमाण पत्र', serviceType: 'birth' })),
+        ...deaths.map(r => ({ ...r, serviceName: 'मृत्यु प्रमाण पत्र', serviceType: 'death' })),
+        ...waters.map(r => ({ ...r, serviceName: 'जल कनेक्शन', serviceType: 'water_connection' })),
+        ...noDues.map(r => ({ ...r, serviceName: 'नो ड्यूज NOC', serviceType: 'no_dues' }))
+      ];
 
       const matches = allRecords.filter(rec => {
         const appNo = (rec.applicationNo || '').toLowerCase();

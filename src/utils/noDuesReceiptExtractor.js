@@ -3,9 +3,9 @@
  * Designed for production real-time extraction from PDF and Image files (PNG, JPG, WEBP).
  */
 
-import { cleanHindiText } from './textSanitizer';
-import { isKrutiDev, ensureUnicode } from './krutiDevConverter';
-import { inflateAll } from './pdfInflate';
+import { cleanHindiText } from './textSanitizer.js';
+import { isKrutiDev, ensureUnicode } from './krutiDevConverter.js';
+import { inflateAll } from './pdfInflate.js';
 
 // Sample dataset corresponding to the Jhabua Nagar Palika Property Tax Receipt
 export const JHABUA_SAMPLE_RECEIPT = {
@@ -611,11 +611,11 @@ export function parseReceiptText(text, isDemoPreset = false, fileName = '') {
   }
 
   // 2. Property ID (e.g. 9000006757, 7001659374, 7001662737, 6-12 digit numbers)
-  const propIdMatch = cleanText.match(/(?:New\s*Property\s*ID|Old\s*Property\s*ID|Property\s*(?:ID|Id|No|Number)|Asset\s*ID|PID|संपत्ति\s*(?:आईडी|क्रमांक|संख्या|सं\.?)|प्रॉपर्टी\s*आईडी)\s*[:\-]?\s*(\d{6,12})/i) ||
+  const propIdMatch = cleanText.match(/(?:New\s*Property\s*ID|Old\s*Property\s*ID|Property\s*(?:ID|Id|No|Number)|Asset\s*ID|PID|संपत्ति\s*(?:आईडी|क्रमांक|संख्या|सं\.?)|प्रॉपर्टी\s*आईडी)\s*[:\-]?\s*([A-Za-z0-9\-\/]{4,16})/i) ||
                       cleanText.match(/\b(900\d{7})\b/i) ||
                       cleanText.match(/\b(700\d{7})\b/i) ||
                       cleanText.match(/\b(179\d{7})\b/i) ||
-                      cleanText.match(/\b(\d{9,10})\b/);
+                      cleanText.match(/\b(\d{6,12})\b/);
   if (propIdMatch) {
     result.propertyDetails.propertyId = propIdMatch[1].trim();
     result.propertyDetails.propertyNo = propIdMatch[1].trim();
@@ -930,6 +930,23 @@ export async function extractNoDuesReceiptData(file) {
     return {
       success: false,
       error: 'कोई फ़ाइल अपलोड नहीं की गई'
+    };
+  }
+
+  if (typeof file === 'string') {
+    const parsed = parseReceiptText(file);
+    return {
+      success: true,
+      data: parsed,
+      rawText: file,
+      engine: 'String Text Parser'
+    };
+  }
+
+  if (typeof file.arrayBuffer !== 'function') {
+    return {
+      success: false,
+      error: 'अमान्य फ़ाइल प्रारूप (Invalid File object)'
     };
   }
 
