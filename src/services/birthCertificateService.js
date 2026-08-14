@@ -400,6 +400,27 @@ export async function getBirthCertificates(filterEmail = null, isOfficer = false
         let itemDerivedMobile = itemMobile;
         if (!itemDerivedMobile && itemEmail) {
           const m = itemEmail.match(/^([6-9]\d{9})/);
+          if (m) itemDerivedMobile = m[1];
+        }
+
+        const emailMatch = activeEmail && itemEmail && (itemEmail === activeEmail || itemEmail.includes(activeEmail) || activeEmail.includes(itemEmail));
+        const uidMatch = activeUid && itemUid && itemUid === activeUid;
+        const mobileMatch = derivedMobile && itemDerivedMobile && derivedMobile === itemDerivedMobile;
+        const nameMatch = activeName && itemName && activeName.length >= 3 && itemName.length >= 3 && (activeName.includes(itemName) || itemName.includes(activeName));
+
+        return Boolean(emailMatch || uidMatch || mobileMatch || nameMatch);
+      });
+    }
+
+    items.sort((a, b) => new Date(b.updatedAt || b.appliedAt || b.createdAt || 0) - new Date(a.updatedAt || a.appliedAt || a.createdAt || 0));
+    saveLocalBirthCertificates(items);
+    return items;
+  } catch (error) {
+    console.warn('[BirthCertificateService] Firestore read notice:', error.message);
+    return localItems;
+  }
+}
+
 export async function updateBirthCertificateStatus({
   id,
   newStatus,
