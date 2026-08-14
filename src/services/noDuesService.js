@@ -342,6 +342,7 @@ export async function getNoDuesCertificates(param1 = null, param2 = false) {
       const activeEmail = cleanEmail(filterEmail || citizen?.email);
       const activeUid = citizen?.uid;
       const activeMobile = cleanMobile(citizen?.mobile);
+      const activeName = cleanEmail(citizen?.displayName);
 
       let derivedMobile = activeMobile;
       if (!derivedMobile && activeEmail) {
@@ -349,7 +350,7 @@ export async function getNoDuesCertificates(param1 = null, param2 = false) {
         if (m) derivedMobile = m[1];
       }
 
-      if (!activeEmail && !activeUid && !derivedMobile) {
+      if (!activeEmail && !activeUid && !derivedMobile && !activeName) {
         return localItems;
       }
 
@@ -360,6 +361,7 @@ export async function getNoDuesCertificates(param1 = null, param2 = false) {
         const itemEmail = cleanEmail(item.userEmail || item.applicantDetails?.email);
         const itemUid = item.userUid;
         const itemMobile = cleanMobile(item.userMobile || item.applicantDetails?.mobile);
+        const itemName = cleanEmail(item.userDisplayName || item.applicantDetails?.fullName);
 
         let itemDerivedMobile = itemMobile;
         if (!itemDerivedMobile && itemEmail) {
@@ -370,8 +372,9 @@ export async function getNoDuesCertificates(param1 = null, param2 = false) {
         const emailMatch = activeEmail && itemEmail && (itemEmail === activeEmail || itemEmail.includes(activeEmail) || activeEmail.includes(itemEmail));
         const uidMatch = activeUid && itemUid && itemUid === activeUid;
         const mobileMatch = derivedMobile && itemDerivedMobile && derivedMobile === itemDerivedMobile;
+        const nameMatch = activeName && itemName && activeName.length >= 3 && itemName.length >= 3 && (activeName.includes(itemName) || itemName.includes(activeName));
 
-        return Boolean(emailMatch || uidMatch || mobileMatch);
+        return Boolean(emailMatch || uidMatch || mobileMatch || nameMatch);
       });
     }
 
