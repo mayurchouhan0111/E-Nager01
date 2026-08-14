@@ -5,6 +5,8 @@ import {
   getDocs, 
   getDoc, 
   doc, 
+  query,
+  where,
   updateDoc, 
   setDoc,
   deleteDoc,
@@ -85,7 +87,7 @@ export async function saveWaterConnectionDraft(data, existingId = null) {
   try {
     if (existingId) {
       const docRef = doc(db, COLLECTION_NAME, existingId);
-      await updateDoc(docRef, { ...payload, updatedAtServer: serverTimestamp() });
+      await updateDoc(docRef, sanitizeFirestorePayload({ ...payload, updatedAtServer: serverTimestamp() }));
       syncLocalRecord({ id: existingId, ...payload });
       return { success: true, id: existingId, applicationNo: data.applicationNo };
     } else {
@@ -107,7 +109,7 @@ export async function saveWaterConnectionDraft(data, existingId = null) {
           }
         ]
       };
-      const docRef = await addDoc(collection(db, COLLECTION_NAME), newDoc);
+      const docRef = await addDoc(collection(db, COLLECTION_NAME), sanitizeFirestorePayload(newDoc));
       syncLocalRecord({ id: docRef.id, ...newDoc });
 
       await sendNotification({
@@ -385,12 +387,15 @@ export async function getWaterConnections(filterEmail = null, isOfficer = false)
       }
 
       if (!activeEmail && !activeUid && !derivedMobile && !activeName) {
-        return localItems;
+        return localItems.filter(item => !(item.userEmail || item.userUid || item.userMobile || item.applicantDetails?.email || item.applicantDetails?.mobile));
       }
 
       items = items.filter(item => {
-        const isLocal = localItems.some(loc => loc.id === item.id || (item.applicationNo && loc.applicationNo === item.applicationNo));
-        if (isLocal) return true;
+        const localMatch = localItems.find(loc => loc.id === item.id || (item.applicationNo && loc.applicationNo === item.applicationNo));
+        if (localMatch) {
+          const hasOwnerIdentity = item.userEmail || item.userUid || item.userMobile || item.applicantDetails?.email || item.applicantDetails?.mobile;
+          if (!hasOwnerIdentity) return true;
+        }
 
         const itemEmail = cleanEmail(item.userEmail || item.applicantDetails?.email);
         const itemUid = item.userUid;
@@ -549,7 +554,7 @@ export async function updateWaterConnectionStatus({
     officerName
   });
 
-  return { success: true, permitNo: updatePayload.permitNo };
+  return { success: true, certificateNo: updatePayload.certificateNo };
 }
 
 export async function purgeAnonymousWaterConnections() {

@@ -5,6 +5,8 @@ import {
   getDocs, 
   getDoc, 
   doc, 
+  query,
+  where,
   updateDoc, 
   setDoc,
   deleteDoc,
@@ -349,12 +351,15 @@ export async function getNoDuesCertificates(param1 = null, param2 = false) {
       }
 
       if (!activeEmail && !activeUid && !derivedMobile && !activeName) {
-        return localItems;
+        return localItems.filter(item => !(item.userEmail || item.userUid || item.userMobile || item.applicantDetails?.email || item.applicantDetails?.mobile));
       }
 
       items = items.filter(item => {
-        const isLocal = localItems.some(loc => loc.id === item.id || (item.applicationNo && loc.applicationNo === item.applicationNo));
-        if (isLocal) return true;
+        const localMatch = localItems.find(loc => loc.id === item.id || (item.applicationNo && loc.applicationNo === item.applicationNo));
+        if (localMatch) {
+          const hasOwnerIdentity = item.userEmail || item.userUid || item.userMobile || item.applicantDetails?.email || item.applicantDetails?.mobile;
+          if (!hasOwnerIdentity) return true;
+        }
 
         const itemEmail = cleanEmail(item.userEmail || item.applicantDetails?.email);
         const itemUid = item.userUid;
