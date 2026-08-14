@@ -384,77 +384,35 @@ export async function getDeathCertificates(filterEmail = null, isOfficer = false
         if (m) derivedMobile = m[1];
       }
 
-      if (!activeEmail && !activeUid && !derivedMobile && !activeName) {
-        return localItems;
+      if (activeEmail || activeUid || derivedMobile || activeName) {
+        items = items.filter(item => {
+          const itemEmail = cleanEmail(item.userEmail || item.applicantDetails?.email || item.informantDetails?.email);
+          const itemUid = item.userUid;
+          const itemMobile = cleanMobile(item.userMobile || item.applicantDetails?.mobile || item.informantMobile);
+          const itemName = cleanEmail(item.userDisplayName || item.applicantDetails?.fullName);
+
+          let itemDerivedMobile = itemMobile;
+          if (!itemDerivedMobile && itemEmail) {
+            const m = itemEmail.match(/^([6-9]\d{9})/);
+            if (m) itemDerivedMobile = m[1];
+          }
+
+          const emailMatch = activeEmail && itemEmail && (itemEmail === activeEmail || itemEmail.includes(activeEmail) || activeEmail.includes(itemEmail));
+          const uidMatch = activeUid && itemUid && itemUid === activeUid;
+          const mobileMatch = derivedMobile && itemDerivedMobile && derivedMobile === itemDerivedMobile;
+          const nameMatch = activeName && itemName && activeName.length >= 3 && itemName.length >= 3 && (activeName.includes(itemName) || itemName.includes(activeName));
+
+          return Boolean(emailMatch || uidMatch || mobileMatch || nameMatch);
+        });
       }
-
-      items = items.filter(item => {
-        const isLocal = localItems.some(loc => loc.id === item.id || (item.applicationNo && loc.applicationNo === item.applicationNo));
-        if (isLocal) return true;
-
-        const itemEmail = cleanEmail(item.userEmail || item.applicantDetails?.email || item.informantDetails?.email);
-        const itemUid = item.userUid;
-        const itemMobile = cleanMobile(item.userMobile || item.applicantDetails?.mobile || item.informantMobile);
-        const itemName = cleanEmail(item.userDisplayName || item.applicantDetails?.fullName);
-
-        let itemDerivedMobile = itemMobile;
-        if (!itemDerivedMobile && itemEmail) {
-          const m = itemEmail.match(/^([6-9]\d{9})/);
-          if (m) itemDerivedMobile = m[1];
-        }
-
-        const emailMatch = activeEmail && itemEmail && (itemEmail === activeEmail || itemEmail.includes(activeEmail) || activeEmail.includes(itemEmail));
-        const uidMatch = activeUid && itemUid && itemUid === activeUid;
-        const mobileMatch = derivedMobile && itemDerivedMobile && derivedMobile === itemDerivedMobile;
-        const nameMatch = activeName && itemName && activeName.length >= 3 && itemName.length >= 3 && (activeName.includes(itemName) || itemName.includes(activeName));
-
-        return Boolean(emailMatch || uidMatch || mobileMatch || nameMatch);
-      });
     }
 
-    items.sort((a, b) => new Date(b.updatedAt || b.appliedAt || 0) - new Date(a.updatedAt || a.appliedAt || 0));
+    items.sort((a, b) => new Date(b.updatedAt || b.appliedAt || b.createdAt || 0) - new Date(a.updatedAt || a.appliedAt || a.createdAt || 0));
     saveLocalDeathCertificates(items);
     return items;
   } catch (error) {
-    console.warn('[DeathCertificateService] Firestore read fallback to local storage:', error.message);
-    let items = localItems;
-    if (!isOfficer) {
-      const activeEmail = cleanEmail(filterEmail || citizen?.email);
-      const activeUid = citizen?.uid;
-      const activeMobile = cleanMobile(citizen?.mobile);
-
-      let derivedMobile = activeMobile;
-      if (!derivedMobile && activeEmail) {
-        const m = activeEmail.match(/^([6-9]\d{9})/);
-        if (m) derivedMobile = m[1];
-      }
-
-      if (!activeEmail && !activeUid && !derivedMobile) {
-        return localItems;
-      }
-
-      items = items.filter(item => {
-        const isLocal = localItems.some(loc => loc.id === item.id || (item.applicationNo && loc.applicationNo === item.applicationNo));
-        if (isLocal) return true;
-
-        const itemEmail = cleanEmail(item.userEmail || item.applicantDetails?.email || item.informantDetails?.email);
-        const itemUid = item.userUid;
-        const itemMobile = cleanMobile(item.userMobile || item.applicantDetails?.mobile || item.informantMobile);
-
-        let itemDerivedMobile = itemMobile;
-        if (!itemDerivedMobile && itemEmail) {
-          const m = itemEmail.match(/^([6-9]\d{9})/);
-          if (m) itemDerivedMobile = m[1];
-        }
-
-        const emailMatch = activeEmail && itemEmail && (itemEmail === activeEmail || itemEmail.includes(activeEmail) || activeEmail.includes(itemEmail));
-        const uidMatch = activeUid && itemUid && itemUid === activeUid;
-        const mobileMatch = derivedMobile && itemDerivedMobile && derivedMobile === itemDerivedMobile;
-
-        return Boolean(emailMatch || uidMatch || mobileMatch);
-      });
-    }
-    return items;
+    console.warn('[DeathCertificateService] Firestore read notice:', error.message);
+    return localItems;
   }
 }
 
