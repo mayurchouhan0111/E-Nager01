@@ -25,25 +25,25 @@ const INITIAL_FORM = {
     mobile: '',
     email: '',
     aadhaarNo: '',
-    wardNo: '6',
-    address: '11, चन्द्रशेखर आजाद मार्ग/TTOGB-Ward-6, Ward-6, Zone-1, झाबुआ, 457661'
+    wardNo: '',
+    address: ''
   },
   propertyDetails: {
-    propertyId: '7001662737',
-    propertyNo: '7001662737',
-    wardNo: '6',
-    zoneNo: '1',
-    plotArea: '900',
-    builtupArea: '900.0',
-    openArea: '0.0',
-    address: '11, चन्द्रशेखर आजाद मार्ग/TTOGB-Ward-6, Ward-6, Zone-1, झाबुआ, 457661',
-    pincode: '457661'
+    propertyId: '',
+    propertyNo: '',
+    wardNo: '',
+    zoneNo: '',
+    plotArea: '',
+    builtupArea: '',
+    openArea: '',
+    address: '',
+    pincode: ''
   },
   taxDetails: {
-    financialYear: '2026-27',
-    triRefNo: 'PC-0179-03-6-1-00117',
-    paymentDate: new Date().toISOString().split('T')[0],
-    amountPaid: '7098.00'
+    financialYear: '',
+    triRefNo: '',
+    paymentDate: '',
+    amountPaid: ''
   },
   documents: {
     taxReceipt: null,
