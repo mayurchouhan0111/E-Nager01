@@ -135,38 +135,46 @@ export default function NoDuesCertificatePage() {
   const handleApplyFastData = (extractedData) => {
     if (!extractedData) return;
 
-    const mergeNonEmpty = (target, source) => {
-      if (!source) return target;
-      const res = { ...target };
-      Object.keys(source).forEach(key => {
-        if (source[key] !== undefined && source[key] !== null && source[key] !== '') {
-          res[key] = source[key];
-        }
-      });
-      return res;
-    };
+    setFormData(prev => {
+      const newApp = { ...prev.applicantDetails };
+      const newProp = { ...prev.propertyDetails };
+      const newTax = { ...prev.taxDetails };
 
-    setFormData(prev => ({
-      ...prev,
-      applicantDetails: mergeNonEmpty(prev.applicantDetails, extractedData.applicantDetails),
-      propertyDetails: mergeNonEmpty(prev.propertyDetails, extractedData.propertyDetails),
-      taxDetails: mergeNonEmpty(prev.taxDetails, extractedData.taxDetails),
-      documents: {
-        ...prev.documents,
-        taxReceipt: extractedData.fileData ? {
-          name: extractedData.fileName || 'Property_Tax_Receipt_Auto.pdf',
-          data: extractedData.fileData,
-          uploadedAt: new Date().toISOString()
-        } : prev.documents.taxReceipt
+      if (extractedData.applicantDetails) {
+        Object.entries(extractedData.applicantDetails).forEach(([k, v]) => {
+          if (v && String(v).trim()) newApp[k] = String(v).trim();
+        });
       }
-    }));
+      if (extractedData.propertyDetails) {
+        Object.entries(extractedData.propertyDetails).forEach(([k, v]) => {
+          if (v && String(v).trim()) newProp[k] = String(v).trim();
+        });
+      }
+      if (extractedData.taxDetails) {
+        Object.entries(extractedData.taxDetails).forEach(([k, v]) => {
+          if (v && String(v).trim()) newTax[k] = String(v).trim();
+        });
+      }
 
-    const extractedName = extractedData.applicantDetails?.fullName;
-    if (extractedName) {
-      toast.success(`⚡ रसीद से ${extractedName} के विवरण फॉर्म में स्वतः भर गए हैं!`);
-    } else {
-      toast.success('⚡ रसीद दस्तावेज सफलतापूर्वक संलग्न हुआ एवं एक्सट्रैक्टेड विवरण फॉर्म में भर गए!');
-    }
+      return {
+        ...prev,
+        applicantDetails: newApp,
+        propertyDetails: newProp,
+        taxDetails: newTax,
+        documents: {
+          ...prev.documents,
+          taxReceipt: extractedData.fileData ? {
+            name: extractedData.fileName || 'Property_Tax_Receipt_Auto.pdf',
+            data: extractedData.fileData,
+            uploadedAt: new Date().toISOString()
+          } : prev.documents.taxReceipt
+        }
+      };
+    });
+
+    const name = extractedData.applicantDetails?.fullName;
+    const propId = extractedData.propertyDetails?.propertyId;
+    toast.success(`⚡ 0ms Real-Time OCR: ${name ? `'${name}' ` : ''}${propId ? `(Property ID: ${propId}) ` : ''}विवरण फॉर्म में ऑटो-फिल हो गए!`);
   };
 
   const validateForm = () => {

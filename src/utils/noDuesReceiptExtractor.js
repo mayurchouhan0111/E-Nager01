@@ -553,42 +553,39 @@ export async function extractNoDuesReceiptData(file) {
 
   // 2. Real-Time Extraction Strategy based on File Type
   if (isPdf) {
-    // PDF Extraction Pathway
+    const arrayBuffer = await file.arrayBuffer();
+
+    // Step A (INSTANT 0ms): Offline Native Binary Text Stream & Decompression Parser
     try {
-      // Step A: Attempt PDF.js parsing with CDN Fallbacks
-      const pdfjs = await loadPdfJs();
-      const arrayBuffer = await file.arrayBuffer();
-      const loadingTask = pdfjs.getDocument({ data: arrayBuffer });
-      const pdfDoc = await loadingTask.promise;
-
-      let fullText = '';
-      for (let pageNum = 1; pageNum <= pdfDoc.numPages; pageNum++) {
-        const page = await pdfDoc.getPage(pageNum);
-        const textContent = await page.getTextContent();
-        const pageString = textContent.items.map(item => item.str).join(' ');
-        fullText += pageString + '\n';
+      const streamText = await parsePdfBinaryStreamOffline(arrayBuffer);
+      if (streamText && streamText.trim().length > 5) {
+        extractedRawText = streamText;
+        extractionEngine = '⚡ Instant Real-Time PDF Stream Parser (Offline zlib)';
       }
-
-      if (fullText && fullText.trim().length > 10) {
-        extractedRawText = fullText;
-        extractionEngine = 'PDF.js High-Precision Engine';
-      }
-    } catch (pdfJsErr) {
-      console.warn('PDF.js engine warning, attempting advanced offline binary text stream extraction:', pdfJsErr);
+    } catch (binErr) {
+      console.warn('Native binary stream parsing warning:', binErr);
     }
 
-    // Step B: Offline FlateDecode Stream Parser Fallback if PDF.js is unavailable/offline
-    if (!extractedRawText) {
+    // Step B: PDF.js Parser fallback if binary stream was empty or short
+    if (!extractedRawText || extractedRawText.trim().length < 5) {
       try {
-        const arrayBuffer = await file.arrayBuffer();
-        const streamText = await parsePdfBinaryStreamOffline(arrayBuffer);
-        
-        if (streamText && streamText.length > 5) {
-          extractedRawText = streamText;
-          extractionEngine = 'Native PDF Stream Parser (Offline zlib)';
+        const pdfjs = await loadPdfJs();
+        const loadingTask = pdfjs.getDocument({ data: arrayBuffer });
+        const pdfDoc = await loadingTask.promise;
+
+        let fullText = '';
+        for (let pageNum = 1; pageNum <= pdfDoc.numPages; pageNum++) {
+          const page = await pdfDoc.getPage(pageNum);
+          const textContent = await page.getTextContent();
+          fullText += textContent.items.map(item => item.str).join(' ') + '\n';
         }
-      } catch (binErr) {
-        console.error('Binary PDF stream parsing failed:', binErr);
+
+        if (fullText && fullText.trim().length > 5) {
+          extractedRawText = fullText;
+          extractionEngine = 'PDF.js High-Precision Engine';
+        }
+      } catch (pdfJsErr) {
+        console.warn('PDF.js engine warning:', pdfJsErr);
       }
     }
   } else {

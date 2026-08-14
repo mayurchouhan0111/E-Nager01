@@ -1,7 +1,7 @@
 'use client'
 import { useState, useEffect, useCallback } from 'react'
 import { db } from '@/lib/firebase'
-import { collection, getDocs, query, orderBy, serverTimestamp, addDoc, limit } from 'firebase/firestore'
+import { collection, getDocs, query, orderBy, serverTimestamp, addDoc, limit, onSnapshot } from 'firebase/firestore'
 import toast from 'react-hot-toast'
 import {
   getDeathCertificates,
