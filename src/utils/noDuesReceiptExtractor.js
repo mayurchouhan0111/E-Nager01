@@ -286,17 +286,42 @@ async function parsePdfBinaryStreamOffline(arrayBuffer) {
 }
 
 /**
+ * Helper to repair kerned/spaced PDF text streams e.g. "M a y u r   C h o u h a n" -> "Mayur Chouhan"
+ * or "7 0 0 1 6 5 9 3 7 4" -> "7001659374"
+ */
+function repairKernedPdfText(str) {
+  if (!str) return '';
+  let repaired = String(str);
+  
+  // 1. Repair single-space-separated letters e.g. "P r o p e r t y   O w n e r"
+  repaired = repaired.replace(/(?:^|\s)(?:[A-Za-z0-9\u0900-\u097F]\s+){2,}[A-Za-z0-9\u0900-\u097F](?=\s|$)/g, (m) => {
+    return m.replace(/\s+/g, '');
+  });
+  
+  // 2. Repair single-space-separated 10-digit numbers e.g. "7 0 0 1 6 5 9 3 7 4" -> "7001659374"
+  repaired = repaired.replace(/(\b\d)\s+(\d)\s+(\d)\s+(\d)\s+(\d)\s+(\d)\s+(\d)\s+(\d)\s+(\d)\s+(\d\b)/g, '$1$2$3$4$5$6$7$8$9$10');
+  
+  // 3. Repair spaced PC Ref strings e.g. "P C - 0 1 7 9" -> "PC-0179"
+  repaired = repaired.replace(/P\s*C\s*-\s*(\d+)\s*-\s*(\d+)\s*-\s*(\d+)\s*-\s*(\d+)\s*-\s*(\d+)/gi, 'PC-$1-$2-$3-$4-$5');
+  
+  return repaired;
+}
+
+/**
  * Robust Regex & Text Parsing Engine specifically tuned for MP e-Nagar Palika & Property Tax Receipts
  * @param {string} text - Raw text extracted from PDF or OCR image
  * @param {boolean} [isDemoPreset=false] - Whether this is demo sample fill
+ * @param {string} [fileName=''] - Original file name for fallback parsing
  * @returns {object} Structured Form Data
  */
-export function parseReceiptText(text, isDemoPreset = false) {
-  if (isDemoPreset || (!text && typeof text !== 'string')) {
+export function parseReceiptText(text, isDemoPreset = false, fileName = '') {
+  if (isDemoPreset || (!text && typeof text !== 'string' && !fileName)) {
     return JSON.parse(JSON.stringify(JHABUA_SAMPLE_RECEIPT));
   }
 
-  const cleanText = text ? String(text) : '';
+  const rawText = text ? String(text) : '';
+  const repairedText = repairKernedPdfText(rawText);
+  const cleanText = `${rawText}\n${repairedText}\n${fileName || ''}`;
 
   const result = {
     applicantDetails: {
@@ -336,8 +361,8 @@ export function parseReceiptText(text, isDemoPreset = false) {
 
   // 1. TRI Reference Number / Receipt No (e.g. PC-0179-03-16-1-00473, PC-0179-03-6-1-00117, etc.)
   const triMatch = cleanText.match(/(PC-\d{4}-\d{2}-\d{1,2}-\d{1,2}-\d{5})/i) ||
-                   cleanText.match(/(?:Receipt|Ref(?:erence)?|TRI|ТRI|TXN)\s*(?:No|ID|Number)?\.?\s*[:\-]?\s*([A-Za-z0-9\-\/]{8,30})/i) ||
-                   cleanText.match(/(?:रसीद|टी\.आर\.आई|रिफरेंस)\s*(?:क्र|क्रमांक|नंबर)?\.?\s*[:\-]?\s*([A-Za-z0-9\-\/]{8,30})/i);
+                   cleanText.match(/(PC-[A-Za-z0-9\-\/]{8,30})/i) ||
+                   cleanText.match(/(?:Receipt|Ref(?:erence)?|TRI|ТRI|TXN|रसीद|रिफरेंस)\s*(?:No|ID|Number|क्र|क्रमांक|नंबर)?\.?\s*[:\-]?\s*([A-Za-z0-9\-\/]{8,30})/i);
   if (triMatch) {
     result.taxDetails.triRefNo = triMatch[1].trim();
     matchCount++;
@@ -345,8 +370,9 @@ export function parseReceiptText(text, isDemoPreset = false) {
 
   // 2. Property ID (e.g. 7001659374, 7001662737, 6-12 digit numbers)
   const propIdMatch = cleanText.match(/(700\d{7})/i) ||
-                      cleanText.match(/(?:New\s*Property\s*Id|Property\s*(?:Id|ID|No|Number)|Asset\s*ID|PID)\s*[:\-]?\s*(\d{6,12})/i) ||
-                      cleanText.match(/(?:संपत्ति\s*(?:आईडी|क्रमांक|संख्या|सं\.?)|प्रॉपर्टी\s*आईडी)\s*[:\-]?\s*(\d{6,12})/i);
+                      cleanText.match(/(179\d{7})/i) ||
+                      cleanText.match(/(?:New\s*Property\s*Id|Property\s*(?:Id|ID|No|Number)|Asset\s*ID|PID|संपत्ति\s*(?:आईडी|क्रमांक|संख्या|सं\.?)|प्रॉपर्टी\s*आईडी)\s*[:\-]?\s*(\d{6,12})/i) ||
+                      cleanText.match(/\b(700\d{7})\b/);
   if (propIdMatch) {
     result.propertyDetails.propertyId = propIdMatch[1].trim();
     result.propertyDetails.propertyNo = propIdMatch[1].trim();
@@ -365,7 +391,7 @@ export function parseReceiptText(text, isDemoPreset = false) {
   let rawOwnerName = '';
   
   // Layer A: Label-based matching (multilingual English & Hindi)
-  const ownerMatch = cleanText.match(/(?:Property\s*Owner\s*Name|Owner\s*Name|Taxpayer\s*Name|Tax\s*Payer\s*Name|Applicant\s*Name|Customer\s*Name|Consumer\s*Name|Name\s*of\s*(?:Owner|Taxpayer|Applicant)|Payee\s*Name|User\s*Name|करदाता\s*का\s*नाम|करदाता\s*नाम|आवेदक\s*का\s*नाम|आवेदक\s*नाम|स्वामी\s*का\s*नाम|संपत्ति\s*मालिक\s*का\s*नाम|नाम)\s*[:\-\/]?\s*([^\n\r\t,;]+)/i) ||
+  const ownerMatch = cleanText.match(/(?:Property\s*Owner\s*Name|Owner\s*Name|Taxpayer\s*Name|Tax\s*Payer\s*Name|Applicant\s*Name|Customer\s*Name|Consumer\s*Name|Name\s*of\s*(?:Owner|Taxpayer|Applicant)|Payee\s*Name|User\s*Name|Name|करदाता\s*का\s*नाम|करदाता\s*नाम|आवेदक\s*का\s*नाम|आवेदक\s*नाम|स्वामी\s*का\s*नाम|संपत्ति\s*मालिक\s*का\s*नाम|नाम)\s*[:\-\/]?\s*([^\n\r\t,;]+)/i) ||
                      cleanText.match(/(?:Property\s*Owner|Taxpayer|Tax\s*Payer|करदाता|आवेदक)\s*[:\-]?\s*([^\n\r\t,;]+)/i);
 
   if (ownerMatch && ownerMatch[1]?.trim()) {
@@ -385,7 +411,7 @@ export function parseReceiptText(text, isDemoPreset = false) {
         const standaloneNameMatch = cleanText.match(/\b([A-Z][a-z]{2,15}\s+(?:[A-Z][a-z]{1,15}\s+)?(?:Chouhan|Chauhan|Singh|Sharma|Verma|Gupta|Jain|Rathore|Patel|Pati|Kumar|Kumari|Devi|Shah|Joshi|Yadav|Mishra|Pandey|Tiwari|Shukla|Bhatt|Vaidya|Soni|Agrawal|Khan|Rawat|Solanki|Parmar|Vasuniya|Thakur))\b/i) ||
                                      cleanText.match(/\b([A-Z][a-z]{2,15}\s+[A-Z][a-z]{2,15})\b/);
         
-        const blacklist = ['Nagar Palika', 'Property Tax', 'Payment Receipt', 'Zone Ward', 'State Bank', 'Total Amount', 'Financial Year', 'No Dues', 'Building Tax', 'Assessment Year', 'Receipt No', 'Tax Payment'];
+        const blacklist = ['Nagar Palika', 'Property Tax', 'Payment Receipt', 'Zone Ward', 'State Bank', 'Total Amount', 'Financial Year', 'No Dues', 'Building Tax', 'Assessment Year', 'Receipt No', 'Tax Payment', 'PDF Engine', 'Stream Parser'];
         if (standaloneNameMatch && standaloneNameMatch[1]?.trim()) {
           const cand = standaloneNameMatch[1].trim();
           if (!blacklist.some(b => cand.toLowerCase().includes(b.toLowerCase()))) {
@@ -436,30 +462,25 @@ export function parseReceiptText(text, isDemoPreset = false) {
   }
 
   // 6. Paid Amount (e.g. 10913.00, 7098.00)
-  const amountMatch = cleanText.match(/(?:Net\s*Paid\s*Amount|Paid\s*Amount|Total\s*Paid|Amount\s*Paid|जमा\s*राशि|कुल\s*राशि|भुगतान\s*राशि)\s*[:\-]?\s*₹?\s*([\d,]+\.?\d*)/i) ||
-                      cleanText.match(/₹\s*([\d,]+\.?\d*)/);
+  const amountMatch = cleanText.match(/(?:Net\s*Paid\s*Amount|Paid\s*Amount|Total\s*Paid|Amount\s*Paid|Total\s*Amount|Net\s*Paid|जमा\s*राशि|कुल\s*राशि|भुगतान\s*राशि)\s*[:\-]?\s*₹?\s*([\d,]+\.?\d*)/i) ||
+                      cleanText.match(/₹\s*([\d,]+\.?\d*)/) ||
+                      cleanText.match(/(?:Rs\.?|INR)\s*([\d,]+\.?\d*)/i) ||
+                      cleanText.match(/\b([1-9]\d{2,5}\.\d{2})\b/);
   if (amountMatch) {
     result.taxDetails.amountPaid = amountMatch[1].replace(/,/g, '').trim();
     matchCount++;
   }
 
-  // 7. Payment Date (e.g. 13-07-2026, 13/07/2026, 2026-07-13)
-  const dateMatch = cleanText.match(/(?:Date|Payment\s*Date|दिनांक)\s*[:\-]?\s*(\d{2})[\/\-](\d{2})[\/\-](\d{4})/i);
+  // 7. Payment Date (e.g. 13-07-2026, 13/07/2026, 2026-07-13, 2023/06/11)
+  const dateMatch = cleanText.match(/(?:Date|Payment\s*Date|दिनांक)\s*[:\-]?\s*(\d{2,4}[\/\-\.]\d{2}[\/\-\.]\d{2,4})/i) ||
+                    cleanText.match(/(\d{4}[\/\-\.]\d{2}[\/\-\.]\d{2})/) ||
+                    cleanText.match(/(\d{2}[\/\-\.]\d{2}[\/\-\.]\d{4})/);
   if (dateMatch) {
-    const day = dateMatch[1];
-    const month = dateMatch[2];
-    const year = dateMatch[3];
-    result.taxDetails.paymentDate = `${year}-${month}-${day}`;
+    result.taxDetails.paymentDate = dateMatch[1].replace(/\//g, '-');
     matchCount++;
-  } else {
-    const isoDateMatch = cleanText.match(/(\d{4})[\/\-](\d{2})[\/\-](\d{2})/);
-    if (isoDateMatch) {
-      result.taxDetails.paymentDate = isoDateMatch[0];
-      matchCount++;
-    }
   }
 
-  // 8. Financial Year (e.g. 2026-27, 2026-2027, 2023-24)
+  // 8. Financial Year (e.g. 2026-27, 2026-2027, 2023-24, 2023/06)
   const fyMatch = cleanText.match(/(?:Financial\s*Year|Year|कर\s*वर्ष|वित्तीय\s*वर्ष)\s*[:\-]?\s*(\d{4}\s*[\-\/]\s*\d{2,4})/i) ||
                   cleanText.match(/(\b20\d{2}\s*[\-\/]\s*\d{2,4}\b)/);
   if (fyMatch) {
@@ -584,8 +605,8 @@ export async function extractNoDuesReceiptData(file) {
     }
   }
 
-  // 3. Process raw text through pattern matching engine
-  const parsed = parseReceiptText(extractedRawText);
+  // 3. Process raw text through pattern matching engine with filename fallback
+  const parsed = parseReceiptText(extractedRawText, false, file.name);
   parsed.fileData = dataUrl;
   parsed.fileName = file.name;
   parsed.rawExtractedText = extractedRawText || 'रसीद फ़ाइल पूर्वावलोकन के साथ सफलतापूर्वक अटैच हो गई।';
@@ -597,4 +618,5 @@ export async function extractNoDuesReceiptData(file) {
     message: `${extractionEngine ? extractionEngine + ' द्वारा ' : ''}रसीद से विवरण सफलतापूर्वक एक्सट्रैक्ट हो गए!`
   };
 }
+
 
