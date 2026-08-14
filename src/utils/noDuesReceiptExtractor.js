@@ -311,6 +311,21 @@ function repairKernedPdfText(str) {
 }
 
 /**
+ * Helper to strip PDF object structure syntax, font descriptors, and stream markers from raw text
+ */
+function sanitizePdfRawText(str) {
+  if (!str) return '';
+  let clean = String(str);
+  clean = clean.replace(/\/FontBBox\s*\[[^\]]+\]/gi, '');
+  clean = clean.replace(/\/FontDescriptor|\/ItalicAngle|\/Ascent|\/Descent|\/CapHeight|\/StemV|\/FontFile\d*|\/FlateDecode|\/Flags/gi, '');
+  clean = clean.replace(/[A-Za-z0-9\+\-]+\+(?:NimbusSan|Helvetica|Times|Courier|Font)[A-Za-z0-9\-\/]*/gi, '');
+  clean = clean.replace(/\d+\s+\d+\s+obj[\s\S]*?endobj/gi, '');
+  clean = clean.replace(/<<[\s\S]*?>>/g, '');
+  clean = clean.replace(/endobj|endstream|stream|xref|trailer|startxref/gi, '');
+  return clean;
+}
+
+/**
  * Robust Regex & Text Parsing Engine specifically tuned for MP e-Nagar Palika & Property Tax Receipts
  * @param {string} text - Raw text extracted from PDF or OCR image
  * @param {boolean} [isDemoPreset=false] - Whether this is demo sample fill
@@ -322,9 +337,9 @@ export function parseReceiptText(text, isDemoPreset = false, fileName = '') {
     return JSON.parse(JSON.stringify(JHABUA_SAMPLE_RECEIPT));
   }
 
-  const rawText = text ? String(text) : '';
-  const repairedText = repairKernedPdfText(rawText);
-  const cleanText = `${rawText}\n${repairedText}\n${fileName || ''}`;
+  const rawClean = sanitizePdfRawText(text ? String(text) : '');
+  const repairedText = repairKernedPdfText(rawClean);
+  const cleanText = `${rawClean}\n${repairedText}\n${fileName || ''}`;
 
   const result = {
     applicantDetails: {
@@ -399,8 +414,13 @@ export function parseReceiptText(text, isDemoPreset = false, fileName = '') {
                      cleanText.match(/(?:Property\s*Owner|Taxpayer|Tax\s*Payer|करदाता|आवेदक)\s*[:\-]?\s*([^\n\r\t;]+)/i);
 
   if (ownerMatch && ownerMatch[1]?.trim()) {
-    rawOwnerName = ownerMatch[1].trim();
-  } else {
+    const cand = ownerMatch[1].trim();
+    if (!cand.includes('/Font') && !cand.includes('Flags') && !cand.includes('NimbusSan')) {
+      rawOwnerName = cand;
+    }
+  }
+
+  if (!rawOwnerName) {
     // Layer B: Honorifics matching (e.g. Shri Mayur Chouhan, Smt Anita Devi, श्री मयूर चौहान)
     const honorificMatch = cleanText.match(/(?:Shri|Smt|Mr|Mrs|Miss|Dr|श्री|श्रीमती|डॉ|कुं\.|कु०)\s+([A-Za-z\u0900-\u097F\s]{3,40})/i);
     if (honorificMatch && honorificMatch[1]?.trim()) {
@@ -409,13 +429,16 @@ export function parseReceiptText(text, isDemoPreset = false, fileName = '') {
       // Layer C: Next line matching if label is on separate line
       const nextLineMatch = cleanText.match(/(?:Property\s*Owner\s*Name|Owner\s*Name|Taxpayer\s*Name|करदाता\s*का\s*नाम|आवेदक\s*का\s*नाम)\s*[:\-]?\s*[\r\n]+\s*([^\n\r\t;]+)/i);
       if (nextLineMatch && nextLineMatch[1]?.trim()) {
-        rawOwnerName = nextLineMatch[1].trim();
+        const cand = nextLineMatch[1].trim();
+        if (!cand.includes('/Font') && !cand.includes('Flags') && !cand.includes('NimbusSan')) {
+          rawOwnerName = cand;
+        }
       } else {
         // Layer D: Standalone 2-3 capitalized English/Hindi name detection (e.g. Mayur Chouhan, Mayur Kumar Chouhan)
         const standaloneNameMatch = cleanText.match(/\b([A-Z][a-z]{2,15}\s+(?:[A-Z][a-z]{1,15}\s+)?(?:Chouhan|Chauhan|Singh|Sharma|Verma|Gupta|Jain|Rathore|Patel|Pati|Kumar|Kumari|Devi|Shah|Joshi|Yadav|Mishra|Pandey|Tiwari|Shukla|Bhatt|Vaidya|Soni|Agrawal|Khan|Rawat|Solanki|Parmar|Vasuniya|Thakur))\b/i) ||
                                      cleanText.match(/\b([A-Z][a-z]{2,15}\s+[A-Z][a-z]{2,15})\b/);
         
-        const blacklist = ['Nagar Palika', 'Property Tax', 'Payment Receipt', 'Zone Ward', 'State Bank', 'Total Amount', 'Financial Year', 'No Dues', 'Building Tax', 'Assessment Year', 'Receipt No', 'Tax Payment', 'PDF Engine', 'Stream Parser'];
+        const blacklist = ['Nagar Palika', 'Property Tax', 'Payment Receipt', 'Zone Ward', 'State Bank', 'Total Amount', 'Financial Year', 'No Dues', 'Building Tax', 'Assessment Year', 'Receipt No', 'Tax Payment', 'PDF Engine', 'Stream Parser', 'FontBBox', 'Flags', 'NimbusSan', 'ItalicAngle', 'CapHeight', 'FlateDecode'];
         if (standaloneNameMatch && standaloneNameMatch[1]?.trim()) {
           const cand = standaloneNameMatch[1].trim();
           if (!blacklist.some(b => cand.toLowerCase().includes(b.toLowerCase()))) {

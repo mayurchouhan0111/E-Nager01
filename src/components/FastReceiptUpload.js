@@ -34,9 +34,10 @@ export default function FastReceiptUpload({ onApplyData }) {
       if (res.success) {
         setExtractedResult(res.data);
         const nameExtracted = res.data.applicantDetails?.fullName;
-        const msg = nameExtracted 
+        const isCleanName = nameExtracted && !nameExtracted.includes('/') && !nameExtracted.includes('Font') && !nameExtracted.includes('Flags') && !nameExtracted.includes('NimbusSan');
+        const msg = isCleanName 
           ? `⚡ रसीद एक्सट्रैक्टर से '${nameExtracted}' का डेटा भर गया!`
-          : `⚡ ${res.data.metadata?.extractionEngine || 'रसीद एक्सट्रैक्टर'} द्वारा विवरण फॉर्म में भर गए!`;
+          : `⚡ रसीद से विवरण सफलतापूर्वक फॉर्म में भर गए!`;
         toast.success(msg);
         
         // Auto-apply immediately for super fast UX
