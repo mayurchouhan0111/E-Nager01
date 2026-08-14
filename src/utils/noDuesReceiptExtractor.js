@@ -219,7 +219,8 @@ async function parsePdfBinaryStreamOffline(arrayBuffer) {
         let decompressedBytes = null;
         if (typeof DecompressionStream !== 'undefined') {
           try {
-            const payload = (chunk[0] === 0x78) ? chunk.subarray(2) : chunk;
+            // Trim 2-byte zlib header (0x78) and 4-byte Adler32 checksum at the end
+            const payload = (chunk[0] === 0x78 && chunk.length > 6) ? chunk.subarray(2, chunk.length - 4) : chunk;
             const ds = new DecompressionStream('deflate-raw');
             const writer = ds.writable.getWriter();
             writer.write(payload);
@@ -240,7 +241,7 @@ async function parsePdfBinaryStreamOffline(arrayBuffer) {
             }
           } catch (e1) {
             try {
-              const ds = new DecompressionStream('deflate');
+              const ds = new DecompressionStream('deflate-raw');
               const writer = ds.writable.getWriter();
               writer.write(chunk);
               writer.close();
@@ -263,6 +264,8 @@ async function parsePdfBinaryStreamOffline(arrayBuffer) {
         }
 
         const streamText = decompressedBytes ? textDecoder.decode(decompressedBytes) : textDecoder.decode(chunk);
+        fullDecodedText += ' ' + streamText + ' ';
+
         const pTokens = streamText.match(/\(([^()]+)\)/g) || [];
         const hTokens = streamText.match(/<([0-9A-Fa-f]{4,})>/g) || [];
 
@@ -553,7 +556,11 @@ export async function extractNoDuesReceiptData(file) {
     };
   }
 
-  const isPdf = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
+  const arrayBuffer = await file.arrayBuffer();
+  const bytes = new Uint8Array(arrayBuffer);
+  const isPdfMagic = bytes.length >= 4 && bytes[0] === 0x25 && bytes[1] === 0x50 && bytes[2] === 0x44 && bytes[3] === 0x46; // %PDF
+  const isPdf = isPdfMagic || (file.type && file.type.includes('pdf')) || (file.name && file.name.toLowerCase().endsWith('.pdf'));
+
   let extractedRawText = '';
   let extractionEngine = '';
 
@@ -567,8 +574,6 @@ export async function extractNoDuesReceiptData(file) {
 
   // 2. Real-Time Extraction Strategy based on File Type
   if (isPdf) {
-    const arrayBuffer = await file.arrayBuffer();
-
     // Step A (INSTANT 0ms): Offline Native Binary Text Stream & Decompression Parser
     try {
       const streamText = await parsePdfBinaryStreamOffline(arrayBuffer);
