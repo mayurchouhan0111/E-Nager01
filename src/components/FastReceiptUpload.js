@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { 
   Zap, UploadCloud, CheckCircle2, FileText, Sparkles, RefreshCw, AlertCircle, ArrowRight, ShieldCheck, Eye, EyeOff 
 } from 'lucide-react';
-import { extractNoDuesReceiptData, JHABUA_SAMPLE_RECEIPT } from '../utils/noDuesReceiptExtractor';
+import { extractNoDuesReceiptData, parseReceiptText, JHABUA_SAMPLE_RECEIPT } from '../utils/noDuesReceiptExtractor';
 import toast from 'react-hot-toast';
 
 export default function FastReceiptUpload({ onApplyData }) {
@@ -33,7 +33,11 @@ export default function FastReceiptUpload({ onApplyData }) {
 
       if (res.success) {
         setExtractedResult(res.data);
-        toast.success(`⚡ ${res.data.metadata?.extractionEngine || 'रसीद एक्सट्रैक्टर'} से 10+ संपत्ति व कर विवरण फॉर्म में भर गए!`);
+        const nameExtracted = res.data.applicantDetails?.fullName;
+        const msg = nameExtracted 
+          ? `⚡ रसीद एक्सट्रैक्टर से '${nameExtracted}' का डेटा भर गया!`
+          : `⚡ ${res.data.metadata?.extractionEngine || 'रसीद एक्सट्रैक्टर'} द्वारा विवरण फॉर्म में भर गए!`;
+        toast.success(msg);
         
         // Auto-apply immediately for super fast UX
         if (onApplyData) {
@@ -57,7 +61,7 @@ export default function FastReceiptUpload({ onApplyData }) {
       setLoading(false);
       setStatusMessage('');
       toast.dismiss('demo-fill');
-      const data = { ...JHABUA_SAMPLE_RECEIPT };
+      const data = parseReceiptText('', true);
       setExtractedResult(data);
       toast.success('⚡ झाबुआ संपत्ति कर रसीद डेटा फॉर्म में लागू हो गया!');
       if (onApplyData) {
@@ -194,7 +198,7 @@ export default function FastReceiptUpload({ onApplyData }) {
             <div className="bg-slate-800/80 p-2.5 rounded-xl border border-slate-700">
               <span className="text-[10px] text-slate-400 block font-medium">प्रॉपर्टी ID / Ward</span>
               <span className="font-mono font-extrabold text-emerald-400 text-xs truncate block">{extractedResult.propertyDetails?.propertyId || '—'}</span>
-              <span className="text-[10px] text-slate-400 block">वार्ड: {extractedResult.propertyDetails?.wardNo || '6'} | Zone {extractedResult.propertyDetails?.zoneNo || '1'}</span>
+              <span className="text-[10px] text-slate-400 block">वार्ड: {extractedResult.propertyDetails?.wardNo || '—'} | Zone {extractedResult.propertyDetails?.zoneNo || '—'}</span>
             </div>
 
             <div className="bg-slate-800/80 p-2.5 rounded-xl border border-slate-700">
@@ -205,8 +209,8 @@ export default function FastReceiptUpload({ onApplyData }) {
 
             <div className="bg-slate-800/80 p-2.5 rounded-xl border border-slate-700">
               <span className="text-[10px] text-slate-400 block font-medium">जमा संपत्ति कर राशि</span>
-              <span className="font-extrabold text-emerald-400 text-sm block">₹{extractedResult.taxDetails?.amountPaid || '0.00'}</span>
-              <span className="text-[10px] text-slate-300 block font-semibold">कर वर्ष: {extractedResult.taxDetails?.financialYear || '2026-27'}</span>
+              <span className="font-extrabold text-emerald-400 text-sm block">{extractedResult.taxDetails?.amountPaid ? `₹${extractedResult.taxDetails.amountPaid}` : '—'}</span>
+              <span className="text-[10px] text-slate-300 block font-semibold">कर वर्ष: {extractedResult.taxDetails?.financialYear || '—'}</span>
             </div>
           </div>
 

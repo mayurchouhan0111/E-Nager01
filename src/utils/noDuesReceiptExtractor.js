@@ -92,14 +92,18 @@ function loadTesseractJs() {
 }
 
 /**
+/**
  * Robust Regex & Text Parsing Engine specifically tuned for MP e-Nagar Palika & Property Tax Receipts
- * @param {string} text 
+ * @param {string} text - Raw text extracted from PDF or OCR image
+ * @param {boolean} [isDemoPreset=false] - Whether this is demo sample fill
  * @returns {object} Structured Form Data
  */
-export function parseReceiptText(text) {
-  if (!text || typeof text !== 'string') {
-    return { ...JHABUA_SAMPLE_RECEIPT };
+export function parseReceiptText(text, isDemoPreset = false) {
+  if (isDemoPreset || (!text && typeof text !== 'string')) {
+    return JSON.parse(JSON.stringify(JHABUA_SAMPLE_RECEIPT));
   }
+
+  const cleanText = text ? String(text) : '';
 
   const result = {
     applicantDetails: {
@@ -108,28 +112,28 @@ export function parseReceiptText(text) {
       mobile: '',
       email: '',
       aadhaarNo: '',
-      wardNo: '6',
+      wardNo: '',
       address: ''
     },
     propertyDetails: {
       propertyId: '',
       propertyNo: '',
-      wardNo: '6',
-      zoneNo: '1',
-      plotArea: '600',
-      builtupArea: '600.0',
-      openArea: '0.0',
+      wardNo: '',
+      zoneNo: '',
+      plotArea: '',
+      builtupArea: '',
+      openArea: '',
       address: '',
-      pincode: '457661'
+      pincode: ''
     },
     taxDetails: {
-      financialYear: '2026-27',
+      financialYear: '',
       triRefNo: '',
-      paymentDate: new Date().toISOString().split('T')[0],
+      paymentDate: '',
       amountPaid: ''
     },
     metadata: {
-      confidence: '95%',
+      confidence: '0%',
       extractedAt: new Date().toISOString(),
       fieldsExtractedCount: 0
     }
@@ -138,18 +142,18 @@ export function parseReceiptText(text) {
   let matchCount = 0;
 
   // 1. TRI Reference Number / Receipt No (e.g. PC-0179-03-16-1-00473, PC-0179-03-6-1-00117, etc.)
-  const triMatch = text.match(/(PC-\d{4}-\d{2}-\d{1,2}-\d{1,2}-\d{5})/i) ||
-                   text.match(/(?:Receipt|Ref(?:erence)?|TRI|ТRI)\s*(?:No|ID|Number)?\.?\s*[:\-]?\s*([A-Za-z0-9\-\/]{8,30})/i) ||
-                   text.match(/(?:रसीद|टी\.आर\.आई)\s*(?:क्र|क्रमांक|नंबर)?\.?\s*[:\-]?\s*([A-Za-z0-9\-\/]{8,30})/i);
+  const triMatch = cleanText.match(/(PC-\d{4}-\d{2}-\d{1,2}-\d{1,2}-\d{5})/i) ||
+                   cleanText.match(/(?:Receipt|Ref(?:erence)?|TRI|ТRI)\s*(?:No|ID|Number)?\.?\s*[:\-]?\s*([A-Za-z0-9\-\/]{8,30})/i) ||
+                   cleanText.match(/(?:रसीद|टी\.आर\.आई)\s*(?:क्र|क्रमांक|नंबर)?\.?\s*[:\-]?\s*([A-Za-z0-9\-\/]{8,30})/i);
   if (triMatch) {
     result.taxDetails.triRefNo = triMatch[1].trim();
     matchCount++;
   }
 
-  // 2. Property ID (e.g. 7001659374, 7001662737)
-  const propIdMatch = text.match(/(700\d{7})/i) ||
-                      text.match(/(?:New\s*Property\s*Id|Property\s*(?:Id|ID|No|Number))\s*[:\-]?\s*(\d{6,12})/i) ||
-                      text.match(/(?:संपत्ति\s*(?:आईडी|क्रमांक|सं\.?))\s*[:\-]?\s*(\d{6,12})/i);
+  // 2. Property ID (e.g. 7001659374, 7001662737, 10-12 digit numbers)
+  const propIdMatch = cleanText.match(/(700\d{7})/i) ||
+                      cleanText.match(/(?:New\s*Property\s*Id|Property\s*(?:Id|ID|No|Number)|Asset\s*ID)\s*[:\-]?\s*(\d{6,12})/i) ||
+                      cleanText.match(/(?:संपत्ति\s*(?:आईडी|क्रमांक|संख्या|सं\.?)|प्रॉपर्टी\s*आईडी)\s*[:\-]?\s*(\d{6,12})/i);
   if (propIdMatch) {
     result.propertyDetails.propertyId = propIdMatch[1].trim();
     result.propertyDetails.propertyNo = propIdMatch[1].trim();
@@ -157,44 +161,67 @@ export function parseReceiptText(text) {
   }
 
   // 3. Mobile Number (10 digits starting with 6-9)
-  const mobileMatch = text.match(/(?:Mobile|Phone|Mo|मोबाई‌ल|मोबाइल|मों)\s*(?:No|Number)?\.?\s*[:\-]?\s*(\d{10})/i) ||
-                      text.match(/(\b[6-9]\d{9}\b)/);
+  const mobileMatch = cleanText.match(/(?:Mobile|Phone|Mo|Mob|मोबाई‌ल|मोबाइल|मों|संपर्क)\s*(?:No|Number)?\.?\s*[:\-]?\s*([6-9]\d{9})/i) ||
+                      cleanText.match(/(\b[6-9]\d{9}\b)/);
   if (mobileMatch) {
     result.applicantDetails.mobile = mobileMatch[1].trim();
     matchCount++;
   }
 
-  // 4. Property Owner Name & Husband/Father Name
-  const ownerMatch = text.match(/(?:Property\s*Owner\s*Name|Owner\s*Name|Taxpayer\s*Name|करदाता\s*का\s*नाम|नाम)\s*[:\-]?\s*([^\n\r\t,;]+)/i);
-  if (ownerMatch) {
-    const rawOwner = ownerMatch[1].trim();
-    const splitRel = rawOwner.split(/W\/O|S\/O|D\/O|C\/O|W\/o|S\/o|D\/o|C\/o|पति|पिता|पत्नी|सुपुत्र|सुपुत्री/i);
-    if (splitRel.length > 1) {
-      result.applicantDetails.fullName = splitRel[0].trim();
-      result.applicantDetails.fatherHusbandName = splitRel[1].replace(/^[\s.:]+/, '').trim();
+  // 4. Property Owner / Applicant Name & Husband/Father Name Extraction
+  // Layer A: Label-based matching (multilingual English & Hindi)
+  let rawOwnerName = '';
+  const ownerMatch = cleanText.match(/(?:Property\s*Owner\s*Name|Owner\s*Name|Taxpayer\s*Name|Tax\s*Payer\s*Name|Applicant\s*Name|Customer\s*Name|Consumer\s*Name|Name\s*of\s*(?:Owner|Taxpayer|Applicant)|करदाता\s*का\s*नाम|करदाता\s*नाम|आवेदक\s*का\s*नाम|आवेदक\s*नाम|स्वामी\s*का\s*नाम|संपत्ति\s*मालिक\s*का\s*नाम|नाम)\s*[:\-\/]?\s*([^\n\r\t,;]+)/i) ||
+                     cleanText.match(/(?:Property\s*Owner|Taxpayer|करदाता|आवेदक)\s*[:\-]?\s*([^\n\r\t,;]+)/i);
+
+  if (ownerMatch && ownerMatch[1]?.trim()) {
+    rawOwnerName = ownerMatch[1].trim();
+  } else {
+    // Layer B: Honorifics matching (e.g. Shri Krishna Kumar Chauhan, Smt Anita Devi, श्री रमेश शर्मा)
+    const honorificMatch = cleanText.match(/(?:Shri|Smt|Mr|Mrs|Miss|Dr|श्री|श्रीमती|डॉ|कुं\.|कु०)\s+([A-Za-z\u0900-\u097F\s]{3,40})/i);
+    if (honorificMatch && honorificMatch[1]?.trim()) {
+      rawOwnerName = honorificMatch[0].trim();
     } else {
-      result.applicantDetails.fullName = rawOwner;
+      // Layer C: Next line matching if label is on separate line
+      const nextLineMatch = cleanText.match(/(?:Property\s*Owner\s*Name|Owner\s*Name|Taxpayer\s*Name|करदाता\s*का\s*नाम|आवेदक\s*का\s*नाम)\s*[:\-]?\s*[\r\n]+\s*([^\n\r\t,;]+)/i);
+      if (nextLineMatch && nextLineMatch[1]?.trim()) {
+        rawOwnerName = nextLineMatch[1].trim();
+      }
+    }
+  }
+
+  if (rawOwnerName) {
+    // Clean unwanted trailing words or label noise
+    rawOwnerName = rawOwnerName.replace(/^(?:MX\.|Mx\.|Mr\.|Mrs\.)\s*/gi, '');
+    
+    // Check if relation is embedded (W/O, S/O, D/O, C/O, पति, पिता, etc.)
+    const splitRel = rawOwnerName.split(/\b(?:W\/O|S\/O|D\/O|C\/O|W\/o|S\/o|D\/o|C\/o)\b|पति|पिता|पत्नी|सुपुत्र|सुपुत्री|आत्मज|आत्मजा/i);
+    if (splitRel.length > 1 && splitRel[0].trim().length >= 2) {
+      result.applicantDetails.fullName = splitRel[0].trim();
+      result.applicantDetails.fatherHusbandName = splitRel[1].replace(/^[\s.:\-]+/, '').trim();
+    } else {
+      result.applicantDetails.fullName = rawOwnerName;
     }
     matchCount++;
   }
 
   // Husband / Father explicitly tagged
-  const fatherMatch = text.match(/(?:Father|Husband|W\/O|S\/O|पति|पिता)\s*(?:Name)?\s*[:\-]?\s*([^\n\r\t,;]+)/i);
-  if (fatherMatch && !result.applicantDetails.fatherHusbandName) {
-    result.applicantDetails.fatherHusbandName = fatherMatch[1].replace(/^[\s.:]+/, '').trim();
+  const fatherMatch = cleanText.match(/(?:Father\s*\/\s*Husband|Father|Husband|W\/O|S\/O|D\/O|पति\s*\/\s*पिता|पति|पिता)\s*(?:Name)?\s*[:\-]?\s*([^\n\r\t,;]+)/i);
+  if (fatherMatch && fatherMatch[1]?.trim() && !result.applicantDetails.fatherHusbandName) {
+    result.applicantDetails.fatherHusbandName = fatherMatch[1].replace(/^[\s.:\-]+/, '').trim();
     matchCount++;
   }
 
-  // 5. Zone / Ward Number (e.g. 1/16, Zone 1 Ward 16)
-  const zwMatch = text.match(/(?:Zone\s*\/\s*Ward|Zone\s*Ward)\s*[:\-]?\s*(\d+)\s*[\/\-]\s*(\d+)/i) ||
-                  text.match(/Zone\s*[:\-]?\s*(\d+).*?Ward\s*[:\-]?\s*(\d+)/i);
+  // 5. Zone / Ward Number (e.g. 1/16, Zone 1 Ward 16, Ward 6)
+  const zwMatch = cleanText.match(/(?:Zone\s*\/\s*Ward|Zone\s*Ward)\s*[:\-]?\s*(\d+)\s*[\/\-]\s*(\d+)/i) ||
+                  cleanText.match(/Zone\s*[:\-]?\s*(\d+).*?Ward\s*[:\-]?\s*(\d+)/i);
   if (zwMatch) {
     result.propertyDetails.zoneNo = zwMatch[1].trim();
     result.propertyDetails.wardNo = zwMatch[2].trim();
     result.applicantDetails.wardNo = zwMatch[2].trim();
     matchCount++;
   } else {
-    const wardMatch = text.match(/(?:Ward\s*(?:No|Number)?|वार्ड\s*(?:क्र|क्रमांक|नंबर)?)\s*[:\-]?\s*(\d{1,2})/i);
+    const wardMatch = cleanText.match(/(?:Ward\s*(?:No|Number)?|वार्ड\s*(?:क्र|क्रमांक|नंबर)?)\s*[:\-]?\s*(\d{1,2})/i);
     if (wardMatch) {
       result.propertyDetails.wardNo = wardMatch[1].trim();
       result.applicantDetails.wardNo = wardMatch[1].trim();
@@ -203,15 +230,15 @@ export function parseReceiptText(text) {
   }
 
   // 6. Paid Amount (e.g. 10913.00, 7098.00)
-  const amountMatch = text.match(/(?:Net\s*Paid\s*Amount|Paid\s*Amount|Total\s*Paid|Amount\s*Paid|जमा\s*राशि|कुल\s*राशि)\s*[:\-]?\s*₹?\s*([\d,]+\.?\d*)/i) ||
-                      text.match(/₹\s*([\d,]+\.?\d*)/);
+  const amountMatch = cleanText.match(/(?:Net\s*Paid\s*Amount|Paid\s*Amount|Total\s*Paid|Amount\s*Paid|जमा\s*राशि|कुल\s*राशि|भुगतान\s*राशि)\s*[:\-]?\s*₹?\s*([\d,]+\.?\d*)/i) ||
+                      cleanText.match(/₹\s*([\d,]+\.?\d*)/);
   if (amountMatch) {
     result.taxDetails.amountPaid = amountMatch[1].replace(/,/g, '').trim();
     matchCount++;
   }
 
   // 7. Payment Date (e.g. 13-07-2026, 13/07/2026, 2026-07-13)
-  const dateMatch = text.match(/(?:Date|Payment\s*Date|दिनांक)\s*[:\-]?\s*(\d{2})[\/\-](\d{2})[\/\-](\d{4})/i);
+  const dateMatch = cleanText.match(/(?:Date|Payment\s*Date|दिनांक)\s*[:\-]?\s*(\d{2})[\/\-](\d{2})[\/\-](\d{4})/i);
   if (dateMatch) {
     const day = dateMatch[1];
     const month = dateMatch[2];
@@ -219,7 +246,7 @@ export function parseReceiptText(text) {
     result.taxDetails.paymentDate = `${year}-${month}-${day}`;
     matchCount++;
   } else {
-    const isoDateMatch = text.match(/(\d{4})[\/\-](\d{2})[\/\-](\d{2})/);
+    const isoDateMatch = cleanText.match(/(\d{4})[\/\-](\d{2})[\/\-](\d{2})/);
     if (isoDateMatch) {
       result.taxDetails.paymentDate = isoDateMatch[0];
       matchCount++;
@@ -227,15 +254,15 @@ export function parseReceiptText(text) {
   }
 
   // 8. Financial Year (e.g. 2026-27, 2026-2027)
-  const fyMatch = text.match(/(?:Financial\s*Year|Year|वित्तीय\s*वर्ष)\s*[:\-]?\s*(\d{4}\s*[\-\/]\s*\d{2,4})/i) ||
-                  text.match(/(\b20\d{2}\s*[\-\/]\s*\d{2,4}\b)/);
+  const fyMatch = cleanText.match(/(?:Financial\s*Year|Year|वित्तीय\s*वर्ष)\s*[:\-]?\s*(\d{4}\s*[\-\/]\s*\d{2,4})/i) ||
+                  cleanText.match(/(\b20\d{2}\s*[\-\/]\s*\d{2,4}\b)/);
   if (fyMatch) {
     result.taxDetails.financialYear = fyMatch[1].replace(/\s+/g, '').trim();
     matchCount++;
   }
 
   // 9. Property Area (e.g. 600.00, 900 sq ft)
-  const areaMatch = text.match(/(?:Property\s*Area|Plot\s*Area|Built\-up\s*Area|क्षेत्रफल)\s*[:\-]?\s*([\d.]+)/i);
+  const areaMatch = cleanText.match(/(?:Property\s*Area|Plot\s*Area|Built\-up\s*Area|क्षेत्रफल)\s*[:\-]?\s*([\d.]+)/i);
   if (areaMatch) {
     result.propertyDetails.plotArea = areaMatch[1].trim();
     result.propertyDetails.builtupArea = areaMatch[1].trim();
@@ -243,25 +270,17 @@ export function parseReceiptText(text) {
   }
 
   // 10. Address & Pincode
-  const addrMatch = text.match(/(?:Address|Property\s*Address|पता)\s*[:\-]?\s*([^\n\r]+)/i);
+  const addrMatch = cleanText.match(/(?:Address|Property\s*Address|पता)\s*[:\-]?\s*([^\n\r]+)/i);
   if (addrMatch) {
     result.propertyDetails.address = addrMatch[1].trim();
     result.applicantDetails.address = addrMatch[1].trim();
     matchCount++;
   }
-  const pinMatch = text.match(/(\b4\d{5}\b)/);
+  const pinMatch = cleanText.match(/(\b4\d{5}\b)/);
   if (pinMatch) {
     result.propertyDetails.pincode = pinMatch[1].trim();
     matchCount++;
   }
-
-  // Fallback defaults if specific fields could not be parsed from document
-  if (!result.taxDetails.triRefNo) result.taxDetails.triRefNo = JHABUA_SAMPLE_RECEIPT.taxDetails.triRefNo;
-  if (!result.propertyDetails.propertyId) result.propertyDetails.propertyId = JHABUA_SAMPLE_RECEIPT.propertyDetails.propertyId;
-  if (!result.applicantDetails.fullName) result.applicantDetails.fullName = JHABUA_SAMPLE_RECEIPT.applicantDetails.fullName;
-  if (!result.applicantDetails.fatherHusbandName) result.applicantDetails.fatherHusbandName = JHABUA_SAMPLE_RECEIPT.applicantDetails.fatherHusbandName;
-  if (!result.applicantDetails.mobile) result.applicantDetails.mobile = JHABUA_SAMPLE_RECEIPT.applicantDetails.mobile;
-  if (!result.taxDetails.amountPaid) result.taxDetails.amountPaid = JHABUA_SAMPLE_RECEIPT.taxDetails.amountPaid;
 
   // Sanitize broken legacy font characters and OCR text dumps
   result.applicantDetails.fullName = cleanHindiText(result.applicantDetails.fullName);
@@ -270,7 +289,11 @@ export function parseReceiptText(text) {
   result.propertyDetails.address = cleanHindiText(result.propertyDetails.address);
 
   result.metadata.fieldsExtractedCount = matchCount;
-  result.metadata.confidence = matchCount >= 4 ? '100% (High Precision)' : '85% (Standard Match)';
+  result.metadata.confidence = matchCount >= 4 
+    ? '100% (High Precision Match)' 
+    : matchCount > 0 
+      ? `${Math.min(95, matchCount * 25)}% (Partial Extracted Match)`
+      : '0% (Manual Verification Required)';
 
   return result;
 }

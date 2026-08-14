@@ -134,34 +134,39 @@ export default function NoDuesCertificatePage() {
 
   const handleApplyFastData = (extractedData) => {
     if (!extractedData) return;
+
+    const mergeNonEmpty = (target, source) => {
+      if (!source) return target;
+      const res = { ...target };
+      Object.keys(source).forEach(key => {
+        if (source[key] !== undefined && source[key] !== null && source[key] !== '') {
+          res[key] = source[key];
+        }
+      });
+      return res;
+    };
+
     setFormData(prev => ({
       ...prev,
-      applicantDetails: {
-        ...prev.applicantDetails,
-        ...(extractedData.applicantDetails || {})
-      },
-      propertyDetails: {
-        ...prev.propertyDetails,
-        ...(extractedData.propertyDetails || {})
-      },
-      taxDetails: {
-        ...prev.taxDetails,
-        ...(extractedData.taxDetails || {})
-      },
+      applicantDetails: mergeNonEmpty(prev.applicantDetails, extractedData.applicantDetails),
+      propertyDetails: mergeNonEmpty(prev.propertyDetails, extractedData.propertyDetails),
+      taxDetails: mergeNonEmpty(prev.taxDetails, extractedData.taxDetails),
       documents: {
         ...prev.documents,
         taxReceipt: extractedData.fileData ? {
           name: extractedData.fileName || 'Property_Tax_Receipt_Auto.pdf',
           data: extractedData.fileData,
           uploadedAt: new Date().toISOString()
-        } : (prev.documents.taxReceipt || {
-          name: 'Jhabua_Property_Tax_Receipt_PC-0179.pdf',
-          data: 'data:application/pdf;base64,JVBERi0xLjQ...',
-          uploadedAt: new Date().toISOString()
-        })
+        } : prev.documents.taxReceipt
       }
     }));
-    toast.success('⚡ रसीद के सभी विवरण (नाम, ID, राशि, TRI Ref) फॉर्म में स्वतः भर गए हैं!');
+
+    const extractedName = extractedData.applicantDetails?.fullName;
+    if (extractedName) {
+      toast.success(`⚡ रसीद से ${extractedName} के विवरण फॉर्म में स्वतः भर गए हैं!`);
+    } else {
+      toast.success('⚡ रसीद दस्तावेज सफलतापूर्वक संलग्न हुआ एवं एक्सट्रैक्टेड विवरण फॉर्म में भर गए!');
+    }
   };
 
   const validateForm = () => {
