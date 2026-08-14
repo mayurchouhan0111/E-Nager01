@@ -1,5 +1,8 @@
 'use client';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 import React, { useState, useEffect } from 'react';
 import ServiceHeader from '../../components/ServiceHeader';
 import NoDuesCertificateTemplate from '../../components/NoDuesCertificateTemplate';
@@ -11,6 +14,8 @@ import {
   getNoDuesCertificates 
 } from '../../services/noDuesService';
 import { getCurrentCitizen, loginWithGoogle, createOrUpdateLocalCitizenProfile, subscribeToCitizenAuth } from '../../services/citizenAuthService';
+import { collection, onSnapshot } from 'firebase/firestore';
+import { db } from '../../lib/firebase';
 import toast from 'react-hot-toast';
 import { downloadBlobFile } from '../../utils/fileStorage';
 import { extractNoDuesReceiptData } from '../../utils/noDuesReceiptExtractor';
@@ -111,12 +116,29 @@ export default function NoDuesCertificatePage() {
     window.addEventListener('dragover', handleGlobalDragOver);
     window.addEventListener('drop', handleGlobalDrop);
 
+    let unsubFirestore = () => {};
+    try {
+      unsubFirestore = onSnapshot(collection(db, 'noDuesCertificates'), () => {
+        loadApplications();
+      }, err => console.warn('[NoDues] Live listener note:', err));
+    } catch (e) {}
+
+    const timer = setInterval(() => {
+      loadApplications();
+    }, 5000);
+
     return () => {
       unsubAuth();
+      unsubFirestore();
+      clearInterval(timer);
       window.removeEventListener('dragover', handleGlobalDragOver);
       window.removeEventListener('drop', handleGlobalDrop);
     };
   }, []);
+
+  useEffect(() => {
+    loadApplications();
+  }, [activeTab]);
 
   const loadApplications = async (overrideEmail = null) => {
     setLoading(true);

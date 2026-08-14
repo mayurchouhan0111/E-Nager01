@@ -1,4 +1,8 @@
 'use client'
+
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 import { useState, useEffect, useCallback } from 'react'
 import { db } from '@/lib/firebase'
 import { collection, getDocs, query, orderBy, serverTimestamp, addDoc, limit, onSnapshot } from 'firebase/firestore'

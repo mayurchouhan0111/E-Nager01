@@ -1,5 +1,8 @@
 'use client';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 import React, { useState, useEffect } from 'react';
 import ServiceHeader from '@/components/ServiceHeader';
 import ApplicationTimeline from '@/components/ApplicationTimeline';
@@ -13,6 +16,8 @@ import {
   getBirthCertificates 
 } from '@/services/birthCertificateService';
 import { getCurrentCitizen, loginWithGoogle, createOrUpdateLocalCitizenProfile, subscribeToCitizenAuth } from '@/services/citizenAuthService';
+import { collection, onSnapshot } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
 import toast from 'react-hot-toast';
 import { downloadBlobFile } from '../../utils/fileStorage';
 import { validateBirthCertificateForm, navigateToFirstErrorField } from '../../utils/formValidationHelper';
@@ -137,12 +142,29 @@ export default function BirthCertificatePage() {
     window.addEventListener('focus', handleFocus);
     window.addEventListener('visibilitychange', handleFocus);
 
+    let unsubFirestore = () => {};
+    try {
+      unsubFirestore = onSnapshot(collection(db, 'birthCertificates'), () => {
+        loadApplications();
+      }, err => console.warn('[BirthCert] Live listener note:', err));
+    } catch (e) {}
+
+    const timer = setInterval(() => {
+      loadApplications();
+    }, 5000);
+
     return () => {
       unsubAuth();
+      unsubFirestore();
+      clearInterval(timer);
       window.removeEventListener('focus', handleFocus);
       window.removeEventListener('visibilitychange', handleFocus);
     };
   }, []);
+
+  useEffect(() => {
+    loadApplications();
+  }, [activeTab]);
 
   useEffect(() => {
     if (selectedApp) {
