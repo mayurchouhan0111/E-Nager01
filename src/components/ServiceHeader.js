@@ -155,28 +155,18 @@ export default function ServiceHeader() {
       return;
     }
 
-    const cleanQuery = queryText.trim().toLowerCase();
-    const cleanDigits = cleanQuery.replace(/\D/g, '');
-
-    try {
-      const [births, deaths, waters, noDues] = await Promise.all([
-        getBirthCertificates(null, true).catch(() => []),
-        getDeathCertificates(null, true).catch(() => []),
-        getWaterConnections(null, true).catch(() => []),
-        getNoDuesCertificates(null, true).catch(() => [])
-      ]);
-
-      const allRecords = [
-        ...births.map(r => ({ ...r, serviceName: 'जन्म प्रमाण पत्र', serviceType: 'birth' })),
-        ...deaths.map(r => ({ ...r, serviceName: 'मृत्यु प्रमाण पत्र', serviceType: 'death' })),
-        ...waters.map(r => ({ ...r, serviceName: 'जल कनेक्शन', serviceType: 'water_connection' })),
-        ...noDues.map(r => ({ ...r, serviceName: 'नो ड्यूज NOC', serviceType: 'no_dues' }))
-      ];
+      const cleanQuery = queryText.trim().toLowerCase();
+      const cleanDigits = cleanQuery.replace(/\D/g, '');
+      const cleanAlphaNum = cleanQuery.replace(/[^a-z0-9]/gi, '');
 
       const matches = allRecords.filter(rec => {
         const appNo = (rec.applicationNo || '').toLowerCase();
+        const appNoAlphaNum = appNo.replace(/[^a-z0-9]/gi, '');
+        const appNoDigits = appNo.replace(/\D/g, '');
         const recId = (rec.id || '').toLowerCase();
+
         const name = (
+          rec.childDetails?.childName || 
           rec.childDetails?.fullName || 
           rec.deceasedDetails?.fullName || 
           rec.applicantDetails?.fullName || 
@@ -190,7 +180,9 @@ export default function ServiceHeader() {
         ).toString();
 
         if (appNo.includes(cleanQuery) || recId.includes(cleanQuery)) return true;
-        if (cleanQuery.length >= 3 && name.includes(cleanQuery)) return true;
+        if (cleanAlphaNum && appNoAlphaNum.includes(cleanAlphaNum)) return true;
+        if (cleanDigits.length >= 3 && appNoDigits.includes(cleanDigits)) return true;
+        if (cleanQuery.length >= 2 && name.includes(cleanQuery)) return true;
         if (cleanDigits.length >= 4 && mobile.includes(cleanDigits)) return true;
 
         return false;

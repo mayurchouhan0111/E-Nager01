@@ -387,7 +387,9 @@ export async function getWaterConnections(filterEmail = null, isOfficer = false)
       }
 
       if (!activeEmail && !activeUid && !derivedMobile && !activeName) {
-        return localItems.filter(item => !(item.userEmail || item.userUid || item.userMobile || item.applicantDetails?.email || item.applicantDetails?.mobile));
+        items.sort((a, b) => new Date(b.updatedAt || b.appliedAt || b.createdAt || 0) - new Date(a.updatedAt || a.appliedAt || a.createdAt || 0));
+        saveLocalWaterConnections(items);
+        return items;
       }
 
       items = items.filter(item => {
