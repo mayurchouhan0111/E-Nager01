@@ -211,6 +211,7 @@ export async function notifyDepartmentHeadOnNewSubmission({
     status: 'Submitted',
     title: `🚨 नया ऑनलाइन आवेदन प्राप्त: ${applicationNo}`,
     message: `[${serviceTitle}] हेतु नया आवेदन (${applicationNo}) नागरिक ${cleanHindiText(applicantName)} (मोबाइल: ${applicantMobile}) द्वारा जमा किया गया।`,
+    details: details || {},
     timestamp: new Date().toISOString()
   };
 

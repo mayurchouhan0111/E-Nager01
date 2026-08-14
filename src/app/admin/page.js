@@ -184,6 +184,48 @@ export default function AdminPage() {
       const snap = await getDocs(q)
       const notifs = snap.docs.map(d => ({ id: d.id, ...d.data() }))
       setOfficerNotifications(notifs)
+
+      // Merge any incoming application payloads embedded in notifications into record state
+      notifs.forEach(n => {
+        if (n.details && n.applicationNo) {
+          const appNo = n.applicationNo;
+          const st = (n.serviceType || '').toLowerCase();
+          const recObj = {
+            id: n.applicationId || n.details.id || `notif-app-${n.id}`,
+            applicationNo: appNo,
+            appliedAt: n.timestamp || new Date().toISOString(),
+            status: n.status || 'Submitted',
+            applicantDetails: {
+              fullName: n.applicantName || n.details.applicantDetails?.fullName || 'नागरिक',
+              mobile: n.applicantMobile || n.details.applicantDetails?.mobile || 'N/A',
+              email: n.applicantEmail || n.details.applicantDetails?.email || ''
+            },
+            ...n.details
+          };
+
+          if (st.includes('birth')) {
+            setBirthRecords(prev => {
+              if (prev.some(r => r.applicationNo === appNo || r.id === recObj.id)) return prev;
+              return [recObj, ...prev];
+            });
+          } else if (st.includes('death')) {
+            setDeathRecords(prev => {
+              if (prev.some(r => r.applicationNo === appNo || r.id === recObj.id)) return prev;
+              return [recObj, ...prev];
+            });
+          } else if (st.includes('water')) {
+            setWaterRecords(prev => {
+              if (prev.some(r => r.applicationNo === appNo || r.id === recObj.id)) return prev;
+              return [recObj, ...prev];
+            });
+          } else if (st.includes('no_dues') || st.includes('no-dues')) {
+            setNoDuesRecords(prev => {
+              if (prev.some(r => r.applicationNo === appNo || r.id === recObj.id)) return prev;
+              return [recObj, ...prev];
+            });
+          }
+        }
+      });
     } catch (e) {
       console.warn('Failed to load officer notifications:', e)
     }
@@ -195,17 +237,32 @@ export default function AdminPage() {
     );
     markNotificationAsRead(notif.id).catch(e => console.warn('Mark read error:', e));
 
+    // Force refresh all lists immediately
+    loadBirthRecords();
+    loadDeathRecords();
+    loadWaterRecords();
+    loadNoDuesRecords();
+
     if (notif.serviceType) {
-      if (notif.serviceType.includes('no_dues') || notif.serviceType.includes('no-dues')) {
+      const st = notif.serviceType.toLowerCase();
+      const appNo = notif.applicationNo || '';
+
+      if (st.includes('no_dues') || st.includes('no-dues')) {
         setActiveTab('no-dues-certificates');
-      } else if (notif.serviceType.includes('birth')) {
+        if (appNo) setNoDuesSearch(appNo);
+      } else if (st.includes('birth')) {
         setActiveTab('birth-certificates');
-      } else if (notif.serviceType.includes('death')) {
+        if (appNo) setBirthSearch(appNo);
+      } else if (st.includes('death')) {
         setActiveTab('death-certificates');
-      } else if (notif.serviceType.includes('water')) {
+        if (appNo) setDeathSearch(appNo);
+      } else if (st.includes('water')) {
         setActiveTab('water-connections');
+        if (appNo) setWaterSearch(appNo);
       }
     }
+
+    toast.success(`📋 नोटिफिकेशन ${notif.applicationNo || ''} लोड किया गया!`);
   };
 
   const handleMarkAllNotificationsRead = async () => {
@@ -302,6 +359,27 @@ export default function AdminPage() {
       loadNoDuesRecords()
       loadAuditLogs()
       loadOfficerNotifications()
+
+      // Realtime Firestore listeners for immediate live updates when citizens submit forms
+      const unsubBirth = onSnapshot(collection(db, 'birthCertificates'), () => loadBirthRecords(), err => console.warn(err));
+      const unsubDeath = onSnapshot(collection(db, 'deathCertificates'), () => loadDeathRecords(), err => console.warn(err));
+      const unsubWater = onSnapshot(collection(db, 'waterConnections'), () => loadWaterRecords(), err => console.warn(err));
+      const unsubNoDues = onSnapshot(collection(db, 'noDuesCertificates'), () => loadNoDuesRecords(), err => console.warn(err));
+      const unsubNotifs = onSnapshot(collection(db, 'notifications'), () => {
+        loadOfficerNotifications();
+        loadBirthRecords();
+        loadDeathRecords();
+        loadWaterRecords();
+        loadNoDuesRecords();
+      }, err => console.warn(err));
+
+      return () => {
+        unsubBirth();
+        unsubDeath();
+        unsubWater();
+        unsubNoDues();
+        unsubNotifs();
+      };
     }
   }, [isAdmin, loadDeathRecords, loadBirthRecords, loadWaterRecords, loadNoDuesRecords, loadAuditLogs, loadOfficerNotifications])
 
