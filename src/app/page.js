@@ -66,36 +66,42 @@ export default function HomePage() {
               <p>पावती पत्र एवं स्वीकृत प्रमाण पत्र डाउनलोड करें।</p>
             </div>
 
-            {/* 4 Action Buttons in ONE Horizontal Row matching reference image */}
-            <div className="flex flex-wrap items-center gap-2.5 sm:gap-3 pt-3">
+            {/* 4 Action Buttons in UNIFORM 2x2 Grid on Mobile, Horizontal Row on Desktop */}
+            <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2.5 sm:gap-3 pt-3 max-w-2xl w-full">
               {/* Button 1: Death Cert */}
               <Link 
                 href="/death-certificate" 
-                className="inline-flex items-center gap-2 px-4.5 py-2.5 rounded-full bg-white text-[#013524] font-bold text-xs sm:text-sm shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200"
+                className="w-full sm:w-auto inline-flex items-center justify-between sm:justify-center gap-2 px-3.5 sm:px-4.5 py-2.5 rounded-full bg-white text-[#013524] font-bold text-xs sm:text-sm shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200 min-h-[44px]"
               >
-                <FileText className="w-4 h-4 text-[#013524] shrink-0 animate-pulse" />
-                <span>मृत्यु प्रमाण पत्र</span>
-                <span className="text-[#013524] font-bold ml-0.5">&rarr;</span>
+                <div className="flex items-center gap-2 truncate">
+                  <FileText className="w-4 h-4 text-[#013524] shrink-0 animate-pulse" />
+                  <span className="truncate">मृत्यु प्रमाण पत्र</span>
+                </div>
+                <span className="text-[#013524] font-bold shrink-0">&rarr;</span>
               </Link>
 
               {/* Button 2: Birth Cert */}
               <Link 
                 href="/birth-certificate" 
-                className="inline-flex items-center gap-2 px-4.5 py-2.5 rounded-full bg-[#0088cc] hover:bg-[#007cbd] text-white font-bold text-xs sm:text-sm shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200"
+                className="w-full sm:w-auto inline-flex items-center justify-between sm:justify-center gap-2 px-3.5 sm:px-4.5 py-2.5 rounded-full bg-[#0088cc] hover:bg-[#007cbd] text-white font-bold text-xs sm:text-sm shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200 min-h-[44px]"
               >
-                <Baby className="w-4 h-4 text-white shrink-0 animate-bounce" />
-                <span>जन्म प्रमाण पत्र</span>
-                <span className="text-sky-100 font-bold ml-0.5">&rarr;</span>
+                <div className="flex items-center gap-2 truncate">
+                  <Baby className="w-4 h-4 text-white shrink-0 animate-bounce" />
+                  <span className="truncate">जन्म प्रमाण पत्र</span>
+                </div>
+                <span className="text-sky-100 font-bold shrink-0">&rarr;</span>
               </Link>
 
               {/* Button 3: Water Conn */}
               <Link 
                 href="/water-connection" 
-                className="inline-flex items-center gap-2 px-4.5 py-2.5 rounded-full bg-[#00a884] hover:bg-[#009676] text-white font-bold text-xs sm:text-sm shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200"
+                className="w-full sm:w-auto inline-flex items-center justify-between sm:justify-center gap-2 px-3.5 sm:px-4.5 py-2.5 rounded-full bg-[#00a884] hover:bg-[#009676] text-white font-bold text-xs sm:text-sm shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200 min-h-[44px]"
               >
-                <Droplets className="w-4 h-4 text-white shrink-0 animate-pulse" />
-                <span>जल कनेक्शन आवेदन</span>
-                <span className="text-teal-100 font-bold ml-0.5">&rarr;</span>
+                <div className="flex items-center gap-2 truncate">
+                  <Droplets className="w-4 h-4 text-white shrink-0 animate-pulse" />
+                  <span className="truncate">जल कनेक्शन</span>
+                </div>
+                <span className="text-teal-100 font-bold shrink-0">&rarr;</span>
               </Link>
 
               {/* Button 4: My Requests */}
@@ -105,11 +111,13 @@ export default function HomePage() {
                     window.dispatchEvent(new CustomEvent('open-track-modal'));
                   }
                 }}
-                className="inline-flex items-center gap-2 px-4.5 py-2.5 rounded-full bg-[#5c54e5] hover:bg-[#4e45d9] text-white font-bold text-xs sm:text-sm shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200 cursor-pointer"
+                className="w-full sm:w-auto inline-flex items-center justify-between sm:justify-center gap-2 px-3.5 sm:px-4.5 py-2.5 rounded-full bg-[#5c54e5] hover:bg-[#4e45d9] text-white font-bold text-xs sm:text-sm shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200 cursor-pointer min-h-[44px]"
               >
-                <LayoutGrid className="w-4 h-4 text-white shrink-0 animate-spin" style={{ animationDuration: '6s' }} />
-                <span>मेरे अनुरोध देखें</span>
-                <span className="text-indigo-100 font-bold ml-0.5">&rarr;</span>
+                <div className="flex items-center gap-2 truncate">
+                  <LayoutGrid className="w-4 h-4 text-white shrink-0 animate-spin" style={{ animationDuration: '6s' }} />
+                  <span className="truncate">अनुरोध देखें</span>
+                </div>
+                <span className="text-indigo-100 font-bold shrink-0">&rarr;</span>
               </button>
             </div>
 

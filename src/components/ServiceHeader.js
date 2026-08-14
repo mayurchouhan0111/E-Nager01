@@ -329,7 +329,7 @@ export default function ServiceHeader() {
                   onClick={handleGoogleLogin}
                   aria-label="गूगल साइन इन करें (Google Sign-In)"
                   title="गूगल साइन इन"
-                  className="px-3 py-2 min-h-[44px] min-w-[44px] rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold flex items-center justify-center gap-1.5 transition-all shadow-xs icon-hover-bounce shrink-0"
+                  className="px-2.5 sm:px-3 py-2 min-h-[44px] rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold flex items-center justify-center gap-1.5 transition-all shadow-xs icon-hover-bounce shrink-0"
                 >
                   <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="गूगल लोगों" className="w-4 h-4 shrink-0" />
                   <span className="hidden sm:inline">गूगल साइन इन</span>
@@ -340,7 +340,7 @@ export default function ServiceHeader() {
                 href="/admin"
                 aria-label="अधिकारी लॉगिन (Officer Login)"
                 title="अधिकारी लॉगिन"
-                className={`px-3 py-2 min-h-[44px] min-w-[44px] rounded-xl text-xs font-bold border transition-all flex items-center justify-center gap-1.5 icon-hover-bounce shrink-0 ${isCurrentTab('/admin') ? 'bg-emerald-700 text-white border-emerald-700 shadow-md' : 'bg-emerald-50 text-emerald-800 border-emerald-200'}`}
+                className={`px-2.5 sm:px-3 py-2 min-h-[44px] rounded-xl text-xs font-bold border transition-all flex items-center justify-center gap-1.5 icon-hover-bounce shrink-0 ${isCurrentTab('/admin') ? 'bg-emerald-700 text-white border-emerald-700 shadow-md' : 'bg-emerald-50 text-emerald-800 border-emerald-200'}`}
               >
                 <ShieldAlert className="w-4 h-4 animate-pulse text-amber-500 shrink-0" /> <span className="hidden sm:inline">अधिकारी लॉगिन</span>
               </Link>
@@ -352,8 +352,8 @@ export default function ServiceHeader() {
       {/* Ultra-Attractive Light-Colored Broadcasting Ticker Strip */}
       <div className="bg-gradient-to-r from-[#e6f7f2] via-[#f0fdf9] to-[#e6f7f2] border-y border-emerald-200/90 py-2 px-3 sm:px-6 flex items-center gap-3 overflow-hidden no-print print:hidden z-30 relative shadow-xs">
         
-        {/* Animated Badge Pill on Left (Acts as a clean mask overlay for text sliding under) */}
-        <div className="shrink-0 bg-gradient-to-r from-emerald-700 to-teal-700 text-white font-black text-[11px] sm:text-xs px-3 py-1 rounded-full shadow-md flex items-center gap-1.5 border border-emerald-500/30 z-20 relative">
+        {/* Animated Badge Pill on Left - Hidden on mobile view per user request */}
+        <div className="hidden sm:flex shrink-0 bg-gradient-to-r from-emerald-700 to-teal-700 text-white font-black text-[11px] sm:text-xs px-3 py-1 rounded-full shadow-md items-center gap-1.5 border border-emerald-500/30 z-20 relative">
           <span className="w-2 h-2 rounded-full bg-emerald-300 animate-ping shrink-0" />
           <Sparkles className="w-3.5 h-3.5 text-amber-300 animate-pulse shrink-0" />
           <span>विशेष पहल</span>
