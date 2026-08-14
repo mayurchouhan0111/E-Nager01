@@ -178,10 +178,62 @@ function decodePdfHexString(hex) {
   }
 }
 
+function parsePdfCMapTable(cmapText) {
+  const map = new Map();
+  if (!cmapText || typeof cmapText !== 'string') return map;
+
+  const charRegex = /<([0-9A-Fa-f]+)>\s*<([0-9A-Fa-f]+)>/g;
+  let match;
+  while ((match = charRegex.exec(cmapText)) !== null) {
+    const srcHex = match[1].toLowerCase();
+    const dstHex = match[2];
+    let dstChar = '';
+    for (let i = 0; i < dstHex.length; i += 4) {
+      const code = parseInt(dstHex.substr(i, 4), 16);
+      if (!isNaN(code)) dstChar += String.fromCharCode(code);
+    }
+    if (dstChar) map.set(srcHex, dstChar);
+  }
+
+  const rangeRegex = /<([0-9A-Fa-f]+)>\s*<([0-9A-Fa-f]+)>\s*<([0-9A-Fa-f]+)>/g;
+  while ((match = rangeRegex.exec(cmapText)) !== null) {
+    const startCode = parseInt(match[1], 16);
+    const endCode = parseInt(match[2], 16);
+    let dstCode = parseInt(match[3], 16);
+    const hexLen = match[1].length;
+
+    for (let code = startCode; code <= endCode; code++) {
+      const srcHex = code.toString(16).padStart(hexLen, '0').toLowerCase();
+      map.set(srcHex, String.fromCharCode(dstCode++));
+    }
+  }
+
+  return map;
+}
+
+function decodeHexWithCMap(hexStr, cmapMap) {
+  if (!hexStr || !cmapMap || cmapMap.size === 0) return '';
+  const cleanHex = hexStr.replace(/[^0-9A-Fa-f]/g, '').toLowerCase();
+  let decoded = '';
+  for (let i = 0; i < cleanHex.length; i += 4) {
+    const quad = cleanHex.substr(i, 4);
+    if (cmapMap.has(quad)) {
+      decoded += cmapMap.get(quad);
+    } else {
+      const pair = cleanHex.substr(i, 2);
+      if (cmapMap.has(pair)) {
+        decoded += cmapMap.get(pair);
+        i -= 2;
+      }
+    }
+  }
+  return decoded;
+}
+
 /**
  * Advanced Offline PDF Stream Text Extractor
  * Decompresses FlateDecode zlib streams using browser DecompressionStream (or fallback inflater),
- * parses PDF string objects `(...)` with octal/UTF-8 decoding, hex strings `<...>`, Tj/TJ operators.
+ * parses PDF string objects `(...)` with octal/UTF-8 decoding, hex strings `<...>`, CMap font tables, Tj/TJ operators.
  */
 async function parsePdfBinaryStreamOffline(arrayBuffer) {
   const bytes = new Uint8Array(arrayBuffer);
@@ -213,6 +265,9 @@ async function parsePdfBinaryStreamOffline(arrayBuffer) {
         streamChunks.push(bytes.subarray(streamStart, endPos));
       }
     }
+
+    const allStreamTexts = [];
+    const globalCMap = new Map();
 
     for (const chunk of streamChunks) {
       try {
@@ -264,21 +319,34 @@ async function parsePdfBinaryStreamOffline(arrayBuffer) {
         }
 
         const streamText = decompressedBytes ? textDecoder.decode(decompressedBytes) : textDecoder.decode(chunk);
-        fullDecodedText += ' ' + streamText + ' ';
+        allStreamTexts.push(streamText);
 
-        const pTokens = streamText.match(/\(([^()]+)\)/g) || [];
-        const hTokens = streamText.match(/<([0-9A-Fa-f]{4,})>/g) || [];
-
-        const decodedTokens = [
-          ...pTokens.map(s => decodePdfOctalString(s.slice(1, -1))),
-          ...hTokens.map(h => decodePdfHexString(h.slice(1, -1)))
-        ].filter(str => str.length >= 1);
-
-        if (decodedTokens.length > 0) {
-          fullDecodedText += ' ' + decodedTokens.join(' ');
+        if (streamText.includes('beginbfchar') || streamText.includes('beginbfrange')) {
+          const parsedCMap = parsePdfCMapTable(streamText);
+          parsedCMap.forEach((v, k) => globalCMap.set(k, v));
         }
       } catch (streamErr) {
         console.warn('Stream chunk decode warning:', streamErr);
+      }
+    }
+
+    for (const streamText of allStreamTexts) {
+      fullDecodedText += ' ' + streamText + ' ';
+
+      const pTokens = streamText.match(/\(([^()]+)\)/g) || [];
+      const hTokens = streamText.match(/<([0-9A-Fa-f]{2,})>/g) || [];
+
+      const decodedTokens = [
+        ...pTokens.map(s => decodePdfOctalString(s.slice(1, -1))),
+        ...hTokens.map(h => {
+          const rawHex = h.slice(1, -1);
+          const cmapDecoded = decodeHexWithCMap(rawHex, globalCMap);
+          return cmapDecoded || decodePdfHexString(rawHex);
+        })
+      ].filter(str => str.length >= 1);
+
+      if (decodedTokens.length > 0) {
+        fullDecodedText += ' ' + decodedTokens.join(' ');
       }
     }
   } catch (err) {
