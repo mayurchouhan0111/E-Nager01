@@ -366,7 +366,13 @@ export async function getWaterConnections(filterEmail = null, isOfficer = false)
       const activeUid = citizen?.uid;
       const activeMobile = cleanMobile(citizen?.mobile);
 
-      if (!activeEmail && !activeUid && !activeMobile) {
+      let derivedMobile = activeMobile;
+      if (!derivedMobile && activeEmail) {
+        const m = activeEmail.match(/^([6-9]\d{9})/);
+        if (m) derivedMobile = m[1];
+      }
+
+      if (!activeEmail && !activeUid && !derivedMobile) {
         return localItems;
       }
 
@@ -378,11 +384,17 @@ export async function getWaterConnections(filterEmail = null, isOfficer = false)
         const itemUid = item.userUid;
         const itemMobile = cleanMobile(item.userMobile || item.applicantDetails?.mobile);
 
-        return (
-          (activeEmail && itemEmail && itemEmail === activeEmail) ||
-          (activeUid && itemUid && itemUid === activeUid) ||
-          (activeMobile && itemMobile && itemMobile === activeMobile)
-        );
+        let itemDerivedMobile = itemMobile;
+        if (!itemDerivedMobile && itemEmail) {
+          const m = itemEmail.match(/^([6-9]\d{9})/);
+          if (m) itemDerivedMobile = m[1];
+        }
+
+        const emailMatch = activeEmail && itemEmail && (itemEmail === activeEmail || itemEmail.includes(activeEmail) || activeEmail.includes(itemEmail));
+        const uidMatch = activeUid && itemUid && itemUid === activeUid;
+        const mobileMatch = derivedMobile && itemDerivedMobile && derivedMobile === itemDerivedMobile;
+
+        return Boolean(emailMatch || uidMatch || mobileMatch);
       });
     }
 
@@ -397,7 +409,13 @@ export async function getWaterConnections(filterEmail = null, isOfficer = false)
       const activeUid = citizen?.uid;
       const activeMobile = cleanMobile(citizen?.mobile);
 
-      if (!activeEmail && !activeUid && !activeMobile) {
+      let derivedMobile = activeMobile;
+      if (!derivedMobile && activeEmail) {
+        const m = activeEmail.match(/^([6-9]\d{9})/);
+        if (m) derivedMobile = m[1];
+      }
+
+      if (!activeEmail && !activeUid && !derivedMobile) {
         return localItems;
       }
 
@@ -409,11 +427,17 @@ export async function getWaterConnections(filterEmail = null, isOfficer = false)
         const itemUid = item.userUid;
         const itemMobile = cleanMobile(item.userMobile || item.applicantDetails?.mobile);
 
-        return (
-          (activeEmail && itemEmail && itemEmail === activeEmail) ||
-          (activeUid && itemUid && itemUid === activeUid) ||
-          (activeMobile && itemMobile && itemMobile === activeMobile)
-        );
+        let itemDerivedMobile = itemMobile;
+        if (!itemDerivedMobile && itemEmail) {
+          const m = itemEmail.match(/^([6-9]\d{9})/);
+          if (m) itemDerivedMobile = m[1];
+        }
+
+        const emailMatch = activeEmail && itemEmail && (itemEmail === activeEmail || itemEmail.includes(activeEmail) || activeEmail.includes(itemEmail));
+        const uidMatch = activeUid && itemUid && itemUid === activeUid;
+        const mobileMatch = derivedMobile && itemDerivedMobile && derivedMobile === itemDerivedMobile;
+
+        return Boolean(emailMatch || uidMatch || mobileMatch);
       });
     }
     return items;
