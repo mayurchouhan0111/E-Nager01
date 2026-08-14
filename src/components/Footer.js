@@ -206,12 +206,7 @@ export default function Footer() {
               </div>
 
               {/* Secondary Details Grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-slate-300 pt-1">
-                <div className="flex items-center gap-2 p-2 rounded-lg bg-slate-950/60 border border-slate-800/60">
-                  <PhoneCall className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
-                  <span className="text-[11px]">कार्यालय: <a href="tel:+917392243201" className="font-bold text-white hover:underline">+91-7392-243201</a></span>
-                </div>
-
+              <div className="grid grid-cols-1 gap-2 text-xs text-slate-300 pt-1">
                 <a 
                   href="mailto:cmomjhabua@mp.gov.in" 
                   className="flex items-center gap-2 p-2 rounded-lg bg-slate-950/60 border border-slate-800/60 hover:border-slate-700 transition-colors"

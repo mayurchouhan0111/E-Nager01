@@ -274,10 +274,10 @@ export default function NoDuesCertificatePage() {
               </span>
             </div>
             <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
-              नो ड्यूज प्रमाण पत्र (Property Tax NOC) ऑनलाइन आवेदन
+              नो ड्यूज प्रमाण पत्र ऑनलाइन आवेदन
             </h1>
             <p className="text-slate-200 text-xs sm:text-sm max-w-3xl leading-relaxed">
-              ई-सेवा पोर्टल संपत्ति कर नो ड्यूज ऑनलाइन आवेदन करें, वर्तमान वित्तीय वर्ष कर भुगतान रसीद अपलोड करें एवं 1 से 3 दिनों में डिजिटल सत्यापन उपरांत हस्ताक्षरित प्रमाण पत्र प्राप्त करें। <strong className="text-emerald-300 font-extrabold">(नोट: नगर पालिका कार्यालय में भौतिक प्रति / Hard Copy जमा करना अनिवार्य नहीं है)।</strong>
+              ई-सेवा पोर्टल संपत्ति कर नो ड्यूज ऑनलाइन आवेदन करें, वर्तमान वित्तीय वर्ष कर भुगतान रसीद अपलोड करें एवं 1 से 3 दिनों में डिजिटल सत्यापन उपरांत हस्ताक्षरित प्रमाण पत्र प्राप्त करें। <strong className="text-emerald-300 font-extrabold">(नोट: नगर पालिका कार्यालय में भौतिक प्रति जमा करना अनिवार्य नहीं है)।</strong>
             </p>
           </div>
         </div>
@@ -286,13 +286,22 @@ export default function NoDuesCertificatePage() {
         <div className="bg-white border border-emerald-200 rounded-3xl p-5 shadow-sm space-y-3">
           <div className="flex items-center justify-between flex-wrap gap-2 border-b border-slate-100 pb-2.5">
             <span className="text-xs sm:text-sm font-extrabold text-slate-900 flex items-center gap-2">
-              <span className="p-1 rounded-lg bg-emerald-100 text-emerald-800 text-xs">📞</span> संपत्ति कर नो ड्यूज विभागीय संपर्क सूत्र (Official Department Contact)
+              <span className="p-1 rounded-lg bg-emerald-100 text-emerald-800 text-xs">📞</span> संपत्ति कर नो ड्यूज विभागीय संपर्क सूत्र
             </span>
             <span className="text-[10px] font-mono font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
               नगर पालिका परिषद झाबुआ (म.प्र.)
             </span>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
+            <div className="bg-slate-50/80 p-3.5 rounded-2xl border border-slate-200 flex items-center justify-between">
+              <div>
+                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">राजस्व शाखा प्रभारी</span>
+                <span className="font-extrabold text-slate-900 text-sm">श्री प्रेमसिंह वसुनिया</span>
+              </div>
+              <a href="tel:9424032601" className="font-mono font-extrabold text-emerald-800 bg-emerald-100 hover:bg-emerald-200 px-3 py-1.5 rounded-xl border border-emerald-300 text-xs transition">
+                📞 9424032601
+              </a>
+            </div>
             <div className="bg-slate-50/80 p-3.5 rounded-2xl border border-slate-200 flex items-center justify-between">
               <div>
                 <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">संपत्ति कर विभाग नोडल अधिकारी</span>
@@ -315,7 +324,7 @@ export default function NoDuesCertificatePage() {
 
           <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-3 text-xs text-emerald-950 font-bold flex items-center gap-2">
             <span className="text-base">⚡</span>
-            <span>100% ऑनलाइन/डिजिटल सेवा: नो ड्यूज (Property Tax NOC) हेतु नगर पालिका कार्यालय में भौतिक आवेदन (Hard Copy) जमा करना अनिवार्य नहीं है।</span>
+            <span>100% ऑनलाइन/डिजिटल सेवा: नो ड्यूज प्रमाण पत्र हेतु नगर पालिका कार्यालय में भौतिक आवेदन जमा करना अनिवार्य नहीं है।</span>
           </div>
         </div>
 
@@ -331,7 +340,7 @@ export default function NoDuesCertificatePage() {
               }`}
             >
               <FileText className="w-4 h-4 text-emerald-700" />
-              <span>नया नो ड्यूज आवेदन (New NOC Apply)</span>
+              <span>नया नो ड्यूज आवेदन</span>
             </button>
 
             <button
@@ -355,7 +364,7 @@ export default function NoDuesCertificatePage() {
               }`}
             >
               <CheckSquare className="w-4 h-4 text-emerald-700" />
-              <span>नियम व चेकलिस्ट (Checklist)</span>
+              <span>नियम व चेकलिस्ट</span>
             </button>
           </div>
         </div>
@@ -380,11 +389,11 @@ export default function NoDuesCertificatePage() {
               {/* SECTION 1: APPLICANT DETAILS */}
               <div className="bg-white border border-slate-200 rounded-2xl p-5 space-y-4 shadow-sm">
                 <h3 className="font-extrabold text-sm text-slate-900 uppercase tracking-wider flex items-center gap-2 border-b border-slate-100 pb-2">
-                  <span>👤</span> 1. आवेदक का विवरण (Applicant Information)
+                  <span>👤</span> 1. आवेदक का विवरण
                 </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-xs">
                   <div>
-                    <label className="block font-bold text-slate-700 mb-1">आवेदक का नाम (Full Name) *</label>
+                    <label className="block font-bold text-slate-700 mb-1">आवेदक का नाम *</label>
                     <input
                       type="text"
                       required
@@ -396,7 +405,7 @@ export default function NoDuesCertificatePage() {
                   </div>
 
                   <div>
-                    <label className="block font-bold text-slate-700 mb-1">पिता / पति का नाम (Father/Husband Name) *</label>
+                    <label className="block font-bold text-slate-700 mb-1">पिता / पति का नाम *</label>
                     <input
                       type="text"
                       required
@@ -408,7 +417,7 @@ export default function NoDuesCertificatePage() {
                   </div>
 
                   <div>
-                    <label className="block font-bold text-slate-700 mb-1">मोबाइल नंबर (Mobile No) *</label>
+                    <label className="block font-bold text-slate-700 mb-1">मोबाइल नंबर *</label>
                     <input
                       type="tel"
                       required
@@ -421,7 +430,7 @@ export default function NoDuesCertificatePage() {
                   </div>
 
                   <div>
-                    <label className="block font-bold text-slate-700 mb-1">ईमेल पता (Email Address)</label>
+                    <label className="block font-bold text-slate-700 mb-1">ईमेल पता</label>
                     <input
                       type="email"
                       value={formData.applicantDetails.email}
@@ -432,7 +441,7 @@ export default function NoDuesCertificatePage() {
                   </div>
 
                   <div>
-                    <label className="block font-bold text-slate-700 mb-1">आधार नंबर (12 Digits Aadhaar)</label>
+                    <label className="block font-bold text-slate-700 mb-1">आधार नंबर</label>
                     <input
                       type="text"
                       maxLength={14}
@@ -444,7 +453,7 @@ export default function NoDuesCertificatePage() {
                   </div>
 
                   <div>
-                    <label className="block font-bold text-slate-700 mb-1">वार्ड नंबर (Ward No)</label>
+                    <label className="block font-bold text-slate-700 mb-1">वार्ड नंबर</label>
                     <select
                       value={formData.applicantDetails.wardNo}
                       onChange={e => handleInputChange('applicantDetails', 'wardNo', e.target.value)}
@@ -461,11 +470,11 @@ export default function NoDuesCertificatePage() {
               {/* SECTION 2: PROPERTY DETAILS */}
               <div className="bg-white border border-slate-200 rounded-2xl p-5 space-y-4 shadow-sm">
                 <h3 className="font-extrabold text-sm text-slate-900 uppercase tracking-wider flex items-center gap-2 border-b border-slate-100 pb-2">
-                  <span>🏢</span> 2. संपत्ति का विवरण (Property Details)
+                  <span>🏢</span> 2. संपत्ति का विवरण
                 </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-xs">
                   <div>
-                    <label className="block font-bold text-slate-700 mb-1">संपत्ति क्रमांक / प्रॉपर्टी आईडी (Property ID) *</label>
+                    <label className="block font-bold text-slate-700 mb-1">संपत्ति क्रमांक / प्रॉपर्टी आईडी *</label>
                     <input
                       type="text"
                       required
@@ -477,7 +486,7 @@ export default function NoDuesCertificatePage() {
                   </div>
 
                   <div>
-                    <label className="block font-bold text-slate-700 mb-1">कुल प्लॉट क्षेत्रफल (Plot Area sq.ft) *</label>
+                    <label className="block font-bold text-slate-700 mb-1">कुल प्लॉट क्षेत्रफल (वर्ग फीट) *</label>
                     <input
                       type="text"
                       required
@@ -489,7 +498,7 @@ export default function NoDuesCertificatePage() {
                   </div>
 
                   <div>
-                    <label className="block font-bold text-slate-700 mb-1">बिल्ट-अप एरिया (Built-up Area sq.ft) *</label>
+                    <label className="block font-bold text-slate-700 mb-1">बिल्ट-अप एरिया (वर्ग फीट) *</label>
                     <input
                       type="text"
                       required
@@ -501,7 +510,7 @@ export default function NoDuesCertificatePage() {
                   </div>
 
                   <div>
-                    <label className="block font-bold text-slate-700 mb-1">ओपन एरिया (Open Area sq.ft)</label>
+                    <label className="block font-bold text-slate-700 mb-1">ओपन एरिया (वर्ग फीट)</label>
                     <input
                       type="text"
                       value={formData.propertyDetails.openArea}
@@ -512,7 +521,7 @@ export default function NoDuesCertificatePage() {
                   </div>
 
                   <div>
-                    <label className="block font-bold text-slate-700 mb-1">ज़ोन नंबर (Zone No)</label>
+                    <label className="block font-bold text-slate-700 mb-1">ज़ोन नंबर</label>
                     <input
                       type="text"
                       value={formData.propertyDetails.zoneNo}
@@ -523,7 +532,7 @@ export default function NoDuesCertificatePage() {
                   </div>
 
                   <div className="sm:col-span-2 lg:col-span-3">
-                    <label className="block font-bold text-slate-700 mb-1">संपत्ति का पूर्ण पता (Full Property Address)</label>
+                    <label className="block font-bold text-slate-700 mb-1">संपत्ति का पूर्ण पता</label>
                     <input
                       type="text"
                       value={formData.propertyDetails.address}
@@ -538,11 +547,11 @@ export default function NoDuesCertificatePage() {
               {/* SECTION 3: TAX PAYMENT DETAILS */}
               <div className="bg-white border border-slate-200 rounded-2xl p-5 space-y-4 shadow-sm">
                 <h3 className="font-extrabold text-sm text-slate-900 uppercase tracking-wider flex items-center gap-2 border-b border-slate-100 pb-2">
-                  <span>💰</span> 3. कर भुगतान एवं रिफरेंस विवरण (Tax Payment Reference)
+                  <span>💰</span> 3. कर भुगतान एवं रिफरेंस विवरण
                 </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
                   <div>
-                    <label className="block font-bold text-slate-700 mb-1">कर वर्ष (Financial Year) *</label>
+                    <label className="block font-bold text-slate-700 mb-1">कर वर्ष *</label>
                     <select
                       value={formData.taxDetails.financialYear}
                       onChange={e => handleInputChange('taxDetails', 'financialYear', e.target.value)}
@@ -555,7 +564,7 @@ export default function NoDuesCertificatePage() {
                   </div>
 
                   <div>
-                    <label className="block font-bold text-slate-700 mb-1">T.R.I. / रिफरेंस नंबर (TRI Reference No) *</label>
+                    <label className="block font-bold text-slate-700 mb-1">टी.आर.आई. / रिफरेंस नंबर *</label>
                     <input
                       type="text"
                       required
@@ -567,7 +576,7 @@ export default function NoDuesCertificatePage() {
                   </div>
 
                   <div>
-                    <label className="block font-bold text-slate-700 mb-1">भुगतान दिनांक (Payment Date) *</label>
+                    <label className="block font-bold text-slate-700 mb-1">भुगतान दिनांक *</label>
                     <input
                       type="date"
                       required
@@ -578,7 +587,7 @@ export default function NoDuesCertificatePage() {
                   </div>
 
                   <div>
-                    <label className="block font-bold text-slate-700 mb-1">जमा कुल कर राशि (Amount Paid ₹) *</label>
+                    <label className="block font-bold text-slate-700 mb-1">जमा कुल कर राशि (₹) *</label>
                     <input
                       type="number"
                       step="0.01"
@@ -595,7 +604,7 @@ export default function NoDuesCertificatePage() {
               {/* SECTION 4: MANDATORY DOCUMENT UPLOAD */}
               <div className="bg-emerald-50/60 border border-emerald-200 rounded-2xl p-5 space-y-4">
                 <h3 className="font-extrabold text-sm text-emerald-950 uppercase tracking-wider flex items-center gap-2 border-b border-emerald-200 pb-2">
-                  <span>📤</span> 4. दस्तावेज अपलोड (Current Year Property Tax Receipt Mandatory Upload) *
+                  <span>📤</span> 4. दस्तावेज अपलोड (वर्तमान वर्ष संपत्ति कर रसीद अनिवार्य अपलोड) *
                 </h3>
                 <p className="text-xs text-slate-600">
                   वर्तमान वित्तीय वर्ष (2026-27) की चुकता संपत्ति कर रसीद अपलोड करना अनिवार्य है।
@@ -606,7 +615,7 @@ export default function NoDuesCertificatePage() {
                   {/* Tax Receipt (Mandatory) */}
                   <div className="bg-white p-4 rounded-xl border border-slate-300 space-y-2">
                     <label className="block font-extrabold text-slate-900">
-                      📄 संपत्ति कर रसीद (Tax Receipt) *
+                      📄 संपत्ति कर रसीद *
                     </label>
                     <input
                       type="file"
@@ -625,7 +634,7 @@ export default function NoDuesCertificatePage() {
                   {/* Applicant Aadhaar */}
                   <div className="bg-white p-4 rounded-xl border border-slate-300 space-y-2">
                     <label className="block font-bold text-slate-900">
-                      🆔 आवेदक आधार कार्ड (Optional)
+                      🆔 आवेदक आधार कार्ड (ऐच्छिक)
                     </label>
                     <input
                       type="file"
@@ -643,7 +652,7 @@ export default function NoDuesCertificatePage() {
                   {/* Property Document */}
                   <div className="bg-white p-4 rounded-xl border border-slate-300 space-y-2">
                     <label className="block font-bold text-slate-900">
-                      🏠 संपत्ति नामांतरण / रजिस्ट्री (Optional)
+                      🏠 संपत्ति नामांतरण / रजिस्ट्री (ऐच्छिक)
                     </label>
                     <input
                       type="file"
@@ -680,7 +689,7 @@ export default function NoDuesCertificatePage() {
         {activeTab === 'my-applications' && (
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <h2 className="text-lg font-bold text-white">आपके नो ड्यूज (Property Tax NOC) आवेदन</h2>
+              <h2 className="text-lg font-bold text-white">आपके नो ड्यूज आवेदन</h2>
               <button onClick={loadApplications} className="btn btn-secondary btn-sm flex items-center gap-1.5">
                 <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} /> ताज़ा करें
               </button>
@@ -731,7 +740,7 @@ export default function NoDuesCertificatePage() {
                         onClick={() => { setSelectedApp(app); setShowLetterModal(true); }}
                         className="btn btn-secondary btn-sm flex items-center gap-1 font-bold text-xs bg-slate-100"
                       >
-                        <Printer className="w-3.5 h-3.5" /> 🖨️ आवेदन पत्र देखें (Letter)
+                        <Printer className="w-3.5 h-3.5" /> 🖨️ आवेदन पत्र देखें
                       </button>
 
                       {app.officialUploadedCertificate ? (
@@ -743,7 +752,7 @@ export default function NoDuesCertificatePage() {
                           }}
                           className="btn btn-primary btn-sm bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs flex items-center gap-1 shadow-md cursor-pointer transition-all"
                         >
-                          <Download className="w-3.5 h-3.5" /> 📜 अधिकारी हस्ताक्षरित NOC डाउनलोड व देखें
+                          <Download className="w-3.5 h-3.5" /> 📜 अधिकारी हस्ताक्षरित प्रमाण पत्र डाउनलोड व देखें
                         </button>
                       ) : (
                         (app.status === 'Approved' || app.status === 'Sanctioned' || app.status === 'Completed') && (
@@ -773,9 +782,9 @@ export default function NoDuesCertificatePage() {
           <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-md z-[9999] overflow-y-auto p-2 sm:p-4 flex items-center justify-center pt-2 sm:pt-6">
             <div className="bg-white rounded-3xl max-w-4xl w-full p-4 sm:p-6 shadow-2xl space-y-3 sm:space-y-4 max-h-[92vh] flex flex-col relative overflow-hidden">
               <div className="flex items-center justify-between border-b border-slate-200 pb-3 shrink-0">
-                <h3 className="font-extrabold text-slate-900 text-xs sm:text-base flex items-center gap-2">📜 नो ड्यूज प्रमाण पत्र (No Dues Certificate Preview)</h3>
+                <h3 className="font-extrabold text-slate-900 text-xs sm:text-base flex items-center gap-2">📜 नो ड्यूज प्रमाण पत्र</h3>
                 <div className="flex items-center gap-2">
-                  <button onClick={() => window.print()} className="btn btn-primary btn-sm text-xs font-bold flex items-center gap-1"><Printer className="w-3.5 h-3.5" /> प्रिंट / PDF</button>
+                  <button onClick={() => window.print()} className="btn btn-primary btn-sm text-xs font-bold flex items-center gap-1"><Printer className="w-3.5 h-3.5" /> प्रिंट</button>
                   <button onClick={() => { setShowCertModal(false); setSelectedApp(null); }} className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100"><X className="w-5 h-5" /></button>
                 </div>
               </div>
@@ -791,9 +800,9 @@ export default function NoDuesCertificatePage() {
           <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-md z-[9999] overflow-y-auto p-2 sm:p-4 flex items-center justify-center pt-2 sm:pt-6">
             <div className="bg-white rounded-3xl max-w-4xl w-full p-4 sm:p-6 shadow-2xl space-y-3 sm:space-y-4 max-h-[92vh] flex flex-col relative overflow-hidden">
               <div className="flex items-center justify-between border-b border-slate-200 pb-3 shrink-0">
-                <h3 className="font-extrabold text-slate-900 text-xs sm:text-base flex items-center gap-2">📄 नो ड्यूज आवेदन पत्र (Application Submission Letter)</h3>
+                <h3 className="font-extrabold text-slate-900 text-xs sm:text-base flex items-center gap-2">📄 नो ड्यूज आवेदन पत्र</h3>
                 <div className="flex items-center gap-2">
-                  <button onClick={() => window.print()} className="btn btn-primary btn-sm text-xs font-bold flex items-center gap-1"><Printer className="w-3.5 h-3.5" /> प्रिंट / PDF</button>
+                  <button onClick={() => window.print()} className="btn btn-primary btn-sm text-xs font-bold flex items-center gap-1"><Printer className="w-3.5 h-3.5" /> प्रिंट</button>
                   <button onClick={() => { setShowLetterModal(false); setSelectedApp(null); }} className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100"><X className="w-5 h-5" /></button>
                 </div>
               </div>
@@ -811,7 +820,7 @@ export default function NoDuesCertificatePage() {
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5 border-b border-slate-200 pb-3 shrink-0 relative pr-10 sm:pr-0">
                 <div>
                   <h3 className="font-extrabold text-slate-900 text-xs sm:text-sm flex items-center gap-1.5 leading-tight">
-                    <span>📜</span> अधिकारी द्वारा जारी एवं हस्ताक्षरित नो ड्यूज प्रमाण पत्र (Official Signed NOC)
+                    <span>📜</span> अधिकारी द्वारा जारी एवं हस्ताक्षरित नो ड्यूज प्रमाण पत्र
                   </h3>
                   <p className="text-[11px] text-slate-500 font-mono mt-0.5 truncate max-w-[240px] sm:max-w-md">
                     {selectedApp.officialUploadedCertificate?.fileName || 'Official_Signed_No_Dues_NOC.pdf'}

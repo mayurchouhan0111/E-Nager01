@@ -123,7 +123,7 @@ export default function RootLayout({ children }) {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;600;700&family=Noto+Sans+Devanagari:wght@400;600;700&display=swap" />
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;600;700&family=Noto+Sans+Devanagari:wght@400;600;700;800;900&family=Rozha+One&family=Tiro+Devanagari+Hindi:ital@0;1&family=Mukta:wght@400;600;700;800&display=swap" />
         <link rel="preload" as="image" href="/mp-logo.png" type="image/png" />
         <link rel="icon" href="/mp-logo.png" type="image/png" />
         <link rel="apple-touch-icon" href="/mp-logo.png" />

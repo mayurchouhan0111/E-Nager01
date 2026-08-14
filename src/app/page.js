@@ -2,68 +2,167 @@
 import Link from 'next/link'
 import ServiceHeader from '@/components/ServiceHeader'
 import DocumentChecklist from '@/components/DocumentChecklist'
-import { FileText, Baby, Droplet, ShieldCheck, ArrowRight, Shield, Clock, CheckCircle2, AlertTriangle, ShieldAlert, ListChecks } from 'lucide-react'
+import { FileText, Baby, Droplet, ShieldCheck, ArrowRight, Shield, Clock, CheckCircle2, AlertTriangle, ShieldAlert, ListChecks, Droplets, FileCheck, MessageSquare, LayoutGrid } from 'lucide-react'
 
 export default function HomePage() {
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col antialiased">
       <ServiceHeader />
 
-      {/* Hero Banner */}
-      <div className="relative bg-gradient-to-br from-emerald-900 via-teal-900 to-slate-900 text-white overflow-hidden">
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wMyI+PHBhdGggZD0iTTM2IDM0djItSDI0di0yaDEyek0zNiAyNHYySDI0di0yaDEyeiIvPjwvZz48L2c+PC9zdmc+')] opacity-40" />
-        <div className="absolute top-0 right-0 w-96 h-96 bg-teal-400/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3" />
-        <div className="absolute bottom-0 left-0 w-72 h-72 bg-emerald-400/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/3" />
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 sm:py-20">
-          <div className="space-y-5 max-w-3xl">
-            <div className="flex items-center gap-3">
-              <img 
-                src="/mp-logo.png" 
-                alt="मध्य प्रदेश शासन" 
-                className="w-16 h-16 object-contain drop-shadow-md shrink-0" 
-              />
-              <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold bg-white/10 text-teal-200 border border-white/15 backdrop-blur-md">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                मध्य प्रदेश शासन - नगर पालिका परिषद झाबुआ
-              </span>
+      {/* Hero Banner with Full-Width Split Composition (Dark Emerald Content Left, Building Photo Right) */}
+      <div className="relative w-full bg-[#013524] overflow-hidden min-h-[520px] sm:min-h-[580px] flex items-center">
+        
+        {/* Background Nagarpalika Building Image - Positioned on the right */}
+        <div 
+          className="absolute inset-y-0 right-0 w-full lg:w-[65%] xl:w-[60%] bg-cover bg-center bg-no-repeat z-0"
+          style={{ backgroundImage: "url('/assets/nagarpalika.png')" }}
+        >
+          {/* Mobile Overlay Fallback */}
+          <div className="absolute inset-0 bg-slate-950/60 lg:hidden z-0" />
+        </div>
+
+        {/* Desktop Left Solid Green Content Area */}
+        <div className="absolute inset-y-0 left-0 w-full lg:w-[42%] bg-[#013524] z-0 hidden lg:block" />
+        
+        {/* Desktop Center Smooth Gradient Feather Blend (No sharp lines or dark center opacity) */}
+        <div className="absolute inset-y-0 left-[42%] w-[23%] bg-gradient-to-r from-[#013524] to-transparent z-0 hidden lg:block" />
+
+
+
+        {/* Hero Content Container */}
+        <div className="relative max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 z-20">
+          <div className="max-w-2xl space-y-6">
+            
+            {/* Top Logo Badge + Tagline Pill */}
+            <div className="flex items-center gap-3.5">
+              <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-white p-1.5 shadow-2xl flex items-center justify-center shrink-0 border-2 border-white/90">
+                <img 
+                  src="/mp-logo.png" 
+                  alt="मध्य प्रदेश शासन" 
+                  className="w-full h-full object-contain" 
+                />
+              </div>
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#044a37]/95 border border-[#0d7d5f] text-white text-xs sm:text-sm font-bold shadow-md backdrop-blur-md">
+                <CheckCircle2 className="w-4 h-4 text-[#20e3b2] shrink-0" />
+                <span>स्वच्छ झाबुआ • बेहतर भविष्य</span>
+              </div>
             </div>
-            <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight leading-tight">
-              नगर पालिका नागरिक ई-सेवाएँ<br />
-              <span className="bg-gradient-to-r from-emerald-300 via-teal-200 to-cyan-200 bg-clip-text text-transparent">जन्म, मृत्यु एवं जल कनेक्शन पोर्टल</span>
-            </h1>
-            <p className="text-slate-200 text-sm sm:text-base max-w-2xl leading-relaxed">
-              नगर पालिका परिषद झाबुआ (म.प्र.) द्वारा संचालित डिजिटल सेवा पोर्टल। 
-              अब घर बैठे अपने मृत्यु प्रमाण पत्र, जन्म प्रमाण पत्र एवं नए जल (नल) कनेक्शन के लिए ऑनलाइन आवेदन करें, 
-              पावती पत्र एवं स्वीकृत प्रमाण पत्र डाउनलोड करें।
-            </p>
-            <div className="flex flex-wrap gap-3 pt-2">
-              <a href="/death-certificate" className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white text-emerald-800 font-bold text-xs hover:bg-emerald-50 transition-all shadow-md">
-                मृत्यु प्रमाण पत्र <span className="text-emerald-600">→</span>
-              </a>
-              <a href="/birth-certificate" className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-600 text-white font-bold text-xs hover:bg-blue-700 transition-all shadow-md">
-                जन्म प्रमाण पत्र <span className="text-blue-200">→</span>
-              </a>
-              <a href="/water-connection" className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-teal-600 text-white font-bold text-xs hover:bg-teal-700 transition-all shadow-md">
-                जल कनेक्शन आवेदन <span className="text-teal-200">→</span>
-              </a>
-              <a href="/no-dues-certificate" className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-violet-600 text-white font-bold text-xs hover:bg-violet-700 transition-all shadow-md">
-                नो ड्यूज प्रमाण पत्र <span className="text-violet-200">→</span>
-              </a>
+
+            {/* Main Headlines */}
+            <div className="space-y-1" style={{ fontFamily: "'Mukta', 'Noto Sans Devanagari', sans-serif" }}>
+              <h1 className="text-3xl sm:text-4xl lg:text-[44px] font-black text-white tracking-tight leading-[1.18] drop-shadow-xs">
+                नगर पालिका नागरिक ई-सेवाएं
+              </h1>
+              <h2 className="text-2xl sm:text-3xl lg:text-[38px] font-black text-[#20e3b2] tracking-tight leading-[1.18] drop-shadow-xs">
+                जन्म, मृत्यु एवं जल कनेक्शन पोर्टल
+              </h2>
             </div>
+
+            {/* Description Paragraph */}
+            <div className="text-slate-100 text-xs sm:text-sm leading-relaxed space-y-1 font-medium max-w-xl text-opacity-95" style={{ fontFamily: "'Mukta', 'Noto Sans Devanagari', sans-serif" }}>
+              <p>नगर पालिका परिषद झाबुआ (म.प्र.) द्वारा संचालित डिजिटल सेवा पोर्टल।</p>
+              <p>अब घर बैठे अपने महत्वपूर्ण प्रमाण पत्र, जन्म प्रमाण पत्र, मृत्यु प्रमाण पत्र</p>
+              <p>एवं नल कनेक्शन के लिए ऑनलाइन आवेदन करें,</p>
+              <p>पावती पत्र एवं स्वीकृत प्रमाण पत्र डाउनलोड करें।</p>
+            </div>
+
+            {/* 4 Action Buttons in ONE Horizontal Row matching reference image */}
+            <div className="flex flex-wrap items-center gap-2.5 sm:gap-3 pt-3">
+              {/* Button 1: Death Cert */}
+              <Link 
+                href="/death-certificate" 
+                className="inline-flex items-center gap-2 px-4.5 py-2.5 rounded-full bg-white text-[#013524] font-bold text-xs sm:text-sm shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200"
+              >
+                <FileText className="w-4 h-4 text-[#013524] shrink-0" />
+                <span>मृत्यु प्रमाण पत्र</span>
+                <span className="text-[#013524] font-bold ml-0.5">&rarr;</span>
+              </Link>
+
+              {/* Button 2: Birth Cert */}
+              <Link 
+                href="/birth-certificate" 
+                className="inline-flex items-center gap-2 px-4.5 py-2.5 rounded-full bg-[#0088cc] hover:bg-[#007cbd] text-white font-bold text-xs sm:text-sm shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200"
+              >
+                <MessageSquare className="w-4 h-4 text-white shrink-0" />
+                <span>जन्म प्रमाण पत्र</span>
+                <span className="text-sky-100 font-bold ml-0.5">&rarr;</span>
+              </Link>
+
+              {/* Button 3: Water Conn */}
+              <Link 
+                href="/water-connection" 
+                className="inline-flex items-center gap-2 px-4.5 py-2.5 rounded-full bg-[#00a884] hover:bg-[#009676] text-white font-bold text-xs sm:text-sm shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200"
+              >
+                <Clock className="w-4 h-4 text-white shrink-0" />
+                <span>जल कनेक्शन आवेदन</span>
+                <span className="text-teal-100 font-bold ml-0.5">&rarr;</span>
+              </Link>
+
+              {/* Button 4: My Requests */}
+              <button 
+                onClick={() => {
+                  if (typeof window !== 'undefined') {
+                    window.dispatchEvent(new CustomEvent('open-track-modal'));
+                  }
+                }}
+                className="inline-flex items-center gap-2 px-4.5 py-2.5 rounded-full bg-[#5c54e5] hover:bg-[#4e45d9] text-white font-bold text-xs sm:text-sm shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200 cursor-pointer"
+              >
+                <LayoutGrid className="w-4 h-4 text-white shrink-0" />
+                <span>मेरे अनुरोध देखें</span>
+                <span className="text-indigo-100 font-bold ml-0.5">&rarr;</span>
+              </button>
+            </div>
+
           </div>
+        </div>
+
+        {/* Right Bottom Floating Text Overlay Centered on Nagarpalika Building Image */}
+        <div className="absolute bottom-6 right-0 w-full lg:w-[58%] xl:w-[55%] flex flex-col items-center text-center z-20 hidden sm:flex px-4 pointer-events-none">
+          <h2 
+            className="text-3xl sm:text-4xl lg:text-[42px] font-black text-white drop-shadow-[0_4px_14px_rgba(0,0,0,0.95)] tracking-wide"
+            style={{ fontFamily: "'Tiro Devanagari Hindi', 'Rozha One', 'Noto Sans Devanagari', serif" }}
+          >
+            झाबुआ नगर पालिका
+          </h2>
+          <div className="flex items-center justify-center gap-3 my-1.5 w-full max-w-md">
+            <span className="h-[2px] flex-1 bg-[#20e3b2] rounded-full shadow-sm" />
+            <span 
+              className="text-[#20e3b2] font-extrabold text-2xl sm:text-3xl tracking-widest drop-shadow-[0_2px_10px_rgba(0,0,0,0.95)] shrink-0"
+              style={{ fontFamily: "'Mukta', 'Noto Sans Devanagari', sans-serif" }}
+            >
+              आपके द्वारा
+            </span>
+            <span className="h-[2px] flex-1 bg-[#20e3b2] rounded-full shadow-sm" />
+          </div>
+          <p 
+            className="text-slate-100 font-semibold text-xs sm:text-sm drop-shadow-[0_2px_6px_rgba(0,0,0,0.95)] mt-1 max-w-lg tracking-wide"
+            style={{ fontFamily: "'Mukta', 'Noto Sans Devanagari', sans-serif" }}
+          >
+            नागरिक सेवाओं को सरल, पारदर्शी और सुलभ बनाना हमारा संकल्प है।
+          </p>
         </div>
       </div>
 
-      {/* Official Legal Responsibility & Hard Copy Submission Banner */}
-      <div className="bg-amber-50 border-b border-amber-200 py-4 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-3 text-amber-950 text-xs leading-relaxed font-medium">
-          <div className="flex items-center gap-2 font-bold text-amber-900 shrink-0">
-            <ShieldAlert className="w-5 h-5 text-amber-600" />
-            <span>वैधानिक चेतावनी (Official Disclaimer):</span>
+      {/* Official Legal Disclaimer Strip matching reference image */}
+      <div className="bg-[#FAF7F2] border-t border-b border-amber-200/70 py-3.5 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-3 text-slate-700 text-xs leading-relaxed font-medium">
+          <div className="flex items-center gap-2 font-extrabold text-[#c25e00] shrink-0">
+            <div className="w-6 h-6 rounded-lg bg-orange-500/15 flex items-center justify-center border border-orange-300 shrink-0">
+              <ShieldAlert className="w-3.5 h-3.5 text-[#c25e00]" />
+            </div>
+            <span>वैधानिक चेतावनी (Official Disclaimer)</span>
           </div>
-          <p className="flex-1">
-            समस्त प्रविष्टियाँ शासकीय रिकॉर्ड हेतु आधिकारिक हैं। यदि आवेदक द्वारा कोई असत्य जानकारी दर्ज की जाती है, तो उसके लिए आवेदक स्वयं जिम्मेदार रहेगा। फॉर्म भरने के पश्चात <strong>पावती पत्र (Hard Copy Application Letter)</strong> का प्रिंट निकाल कर <strong>नगर पालिका कार्यालय झाबुआ</strong> में मूल दस्तावेजों सहित भौतिक रूप से अनिवार्यतः जमा करें।
-          </p>
+          <div className="flex-1 w-full">
+            <p className="text-slate-700 font-medium block text-xs leading-relaxed">
+              समस्त नागरिकों, साथियों एवं संबंधितों से विनम्र अनुरोध है कि आवेदन द्वारा कोई असत्य जानकारी दर्ज की जाती है, तो उसके लिए आवेदककर्ता जिम्मेदार होगा।<br className="hidden sm:block" />
+              समस्त जानकारी व आवेदन विभागीय जाँच एवं सत्यापन के अधीन है।
+            </p>
+          </div>
+          <div className="shrink-0 hidden md:block">
+            <div className="w-8 h-8 rounded-full bg-amber-100 border border-amber-300 text-[#c25e00] flex items-center justify-center shadow-xs">
+              <FileCheck className="w-4 h-4" />
+            </div>
+          </div>
         </div>
       </div>
 
@@ -244,12 +343,6 @@ export default function HomePage() {
                   </div>
                   <div className="flex items-center gap-2 text-xs text-slate-600">
                     <div className="w-4 h-4 rounded-full bg-violet-100 flex items-center justify-center shrink-0">
-                      <Clock className="w-3 h-3 text-violet-600" />
-                    </div>
-                    <span>तत्काल डिजिटल प्रमाण पत्र</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-xs text-slate-600">
-                    <div className="w-4 h-4 rounded-full bg-violet-100 flex items-center justify-center shrink-0">
                       <Shield className="w-3 h-3 text-violet-600" />
                     </div>
                     <span>100% डिजिटल - कार्यालय जाने की आवश्यकता नहीं</span>
@@ -281,13 +374,22 @@ export default function HomePage() {
               <span className="text-xs text-slate-400 font-mono font-bold">MP e-Nagar Helpline</span>
             </h3>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-1.5 hover:border-emerald-300 transition-all">
                 <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">नोडल प्रशासक (Nodal Administrator)</span>
                 <p className="font-extrabold text-slate-900 text-sm">मुख्य नगर पालिका अधिकारी (CMO)</p>
                 <p className="text-xs text-slate-500 font-medium">समस्त नगर पालिका सेवाएँ व शिकायत निवारण</p>
                 <a href="tel:9713175838" className="inline-flex items-center gap-1.5 text-xs font-mono font-extrabold text-emerald-800 bg-emerald-100 hover:bg-emerald-200 px-3 py-1.5 rounded-xl border border-emerald-300 transition mt-1">
                   📞 9713175838
+                </a>
+              </div>
+
+              <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-1.5 hover:border-purple-300 transition-all">
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">राजस्व शाखा प्रभारी (नो ड्यूज NOC)</span>
+                <p className="font-extrabold text-slate-900 text-sm">श्री प्रेमसिंह वसुनिया</p>
+                <p className="text-xs text-slate-500 font-medium">संपत्ति कर एवं नो ड्यूज एनओसी प्रभारी</p>
+                <a href="tel:9424032601" className="inline-flex items-center gap-1.5 text-xs font-mono font-extrabold text-purple-800 bg-purple-100 hover:bg-purple-200 px-3 py-1.5 rounded-xl border border-purple-300 transition mt-1">
+                  📞 9424032601
                 </a>
               </div>
 

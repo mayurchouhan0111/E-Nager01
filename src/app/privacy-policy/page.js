@@ -157,7 +157,7 @@ export default function PrivacyPolicyPage() {
                 </div>
                 <div className="flex items-center gap-2">
                   <Phone className="w-4 h-4 text-emerald-600 shrink-0" />
-                  <span>हेल्पलाइन: +91-7392-243201</span>
+                  <span>हेल्पलाइन: +91 97131 75838</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Mail className="w-4 h-4 text-emerald-600 shrink-0" />
