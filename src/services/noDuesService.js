@@ -389,7 +389,7 @@ export async function updateNoDuesCertificateStatus({
   id,
   newStatus,
   remarks,
-  officerName = 'Zonal Revenue Officer',
+  officerName = 'Nagar Palika Officer',
   certificateNo = null,
   officialUploadedCertificate = null
 }) {
@@ -413,16 +413,33 @@ export async function updateNoDuesCertificateStatus({
   const localObj = localList.find(r => r.id === id || (r.applicationNo && r.applicationNo === id));
   if (localObj) existing = { ...localObj };
 
-  const targetId = existing.id || id;
+  let targetId = existing.id || id;
 
   try {
-    const docRef = doc(db, COLLECTION_NAME, targetId);
-    const snap = await getDoc(docRef);
+    let docRef = doc(db, COLLECTION_NAME, targetId);
+    let snap = await getDoc(docRef).catch(() => null);
+
+    if (!snap || !snap.exists()) {
+      const q = query(collection(db, COLLECTION_NAME), where('applicationNo', '==', id));
+      const qSnap = await getDocs(q).catch(() => null);
+      if (qSnap && !qSnap.empty) {
+        snap = qSnap.docs[0];
+        targetId = snap.id;
+      }
+    }
+
     if (snap && snap.exists()) {
-      existing = { ...existing, ...snap.data() };
+      existing = { ...snap.data(), ...existing, id: snap.id };
+      targetId = snap.id;
     }
   } catch (e) {}
 
+  if (!existing.applicationNo && !existing.propertyDetails && !existing.applicantDetails) {
+    console.error('[NoDuesService] Missing core details, aborting update for id:', id);
+    return { success: false, error: 'मूल आवेदन विवरण अप्राप्य है। कृपया पेज रिफ्रेश कर पुनः प्रयास करें।' };
+  }
+
+  const oldStatus = existing.status || 'Submitted';
   const updatedTimeline = [...(existing.timeline || []), timelineEntry];
 
   const updatePayload = {
@@ -437,10 +454,10 @@ export async function updateNoDuesCertificateStatus({
     updatePayload.officialUploadedCertificate = officialUploadedCertificate;
   }
 
-  if (newStatus === 'Approved' || newStatus === 'Certificate Generated' || newStatus === 'Sanctioned' || newStatus === 'Completed') {
+  if (newStatus === 'Approved' || newStatus === 'Certificate Generated' || newStatus === 'Completed' || newStatus === 'NOC Issued') {
     updatePayload.approvedAt = existing.approvedAt || now;
     updatePayload.approvedBy = officerName;
-    updatePayload.certificateNo = certificateNo || existing.certificateNo || `PT-NOC-0179-${Date.now().toString().slice(-5)}`;
+    updatePayload.certificateNo = certificateNo || existing.certificateNo || `ND-NOC-${Date.now().toString().slice(-6)}`;
   }
 
   await ensureFirebaseAuth();
@@ -449,7 +466,10 @@ export async function updateNoDuesCertificateStatus({
   try {
     const docRef = doc(db, COLLECTION_NAME, targetId);
     await setDoc(docRef, fullRecord, { merge: true });
-  } catch (error) {}
+    console.log('[NoDuesService] Status successfully updated in Firestore backend:', newStatus);
+  } catch (error) {
+    console.error('[NoDuesService] Firestore setDoc error:', error.message);
+  }
 
   syncLocalRecord(fullRecord);
 

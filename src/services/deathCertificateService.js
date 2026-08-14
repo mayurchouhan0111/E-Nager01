@@ -401,26 +401,6 @@ export async function getDeathCertificates(filterEmail = null, isOfficer = false
         if (!itemDerivedMobile && itemEmail) {
           const m = itemEmail.match(/^([6-9]\d{9})/);
           if (m) itemDerivedMobile = m[1];
-        }
-
-        const emailMatch = activeEmail && itemEmail && (itemEmail === activeEmail || itemEmail.includes(activeEmail) || activeEmail.includes(itemEmail));
-        const uidMatch = activeUid && itemUid && itemUid === activeUid;
-        const mobileMatch = derivedMobile && itemDerivedMobile && derivedMobile === itemDerivedMobile;
-        const nameMatch = activeName && itemName && activeName.length >= 3 && itemName.length >= 3 && (activeName.includes(itemName) || itemName.includes(activeName));
-
-        return Boolean(emailMatch || uidMatch || mobileMatch || nameMatch);
-      });
-    }
-
-    items.sort((a, b) => new Date(b.updatedAt || b.appliedAt || b.createdAt || 0) - new Date(a.updatedAt || a.appliedAt || a.createdAt || 0));
-    saveLocalDeathCertificates(items);
-    return items;
-  } catch (error) {
-    console.warn('[DeathCertificateService] Firestore read notice:', error.message);
-    return localItems;
-  }
-}
-
 export async function updateDeathCertificateStatus({
   id,
   newStatus,
@@ -449,15 +429,31 @@ export async function updateDeathCertificateStatus({
   const localObj = localList.find(r => r.id === id || (r.applicationNo && r.applicationNo === id));
   if (localObj) existing = { ...localObj };
 
-  const targetId = existing.id || id;
+  let targetId = existing.id || id;
 
   try {
-    const docRef = doc(db, COLLECTION_NAME, targetId);
-    const snap = await getDoc(docRef);
+    let docRef = doc(db, COLLECTION_NAME, targetId);
+    let snap = await getDoc(docRef).catch(() => null);
+
+    if (!snap || !snap.exists()) {
+      const q = query(collection(db, COLLECTION_NAME), where('applicationNo', '==', id));
+      const qSnap = await getDocs(q).catch(() => null);
+      if (qSnap && !qSnap.empty) {
+        snap = qSnap.docs[0];
+        targetId = snap.id;
+      }
+    }
+
     if (snap && snap.exists()) {
-      existing = { ...existing, ...snap.data() };
+      existing = { ...snap.data(), ...existing, id: snap.id };
+      targetId = snap.id;
     }
   } catch (e) {}
+
+  if (!existing.applicationNo && !existing.deceasedDetails && !existing.applicantDetails) {
+    console.error('[DeathCertificateService] Missing core details, aborting update for id:', id);
+    return { success: false, error: 'मूल आवेदन विवरण अप्राप्य है। कृपया पेज रिफ्रेश कर पुनः प्रयास करें।' };
+  }
 
   const oldStatus = existing.status || 'Submitted';
   const updatedTimeline = [...(existing.timeline || []), timelineEntry];
@@ -496,7 +492,7 @@ export async function updateDeathCertificateStatus({
   try {
     await addDoc(collection(db, AUDIT_LOGS_COLLECTION), {
       serviceType: 'death_certificate',
-      applicationId: id,
+      applicationId: targetId,
       applicationNo: existing.applicationNo || 'N/A',
       user: officerName,
       role: 'Officer',

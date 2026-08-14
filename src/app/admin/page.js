@@ -185,48 +185,6 @@ export default function AdminPage() {
       const snap = await getDocs(q)
       const notifs = snap.docs.map(d => ({ id: d.id, ...d.data() }))
       setOfficerNotifications(notifs)
-
-      // Merge any incoming application payloads embedded in notifications into record state
-      notifs.forEach(n => {
-        if (n.details && n.applicationNo) {
-          const appNo = n.applicationNo;
-          const st = (n.serviceType || '').toLowerCase();
-          const recObj = {
-            id: n.applicationId || n.details.id || `notif-app-${n.id}`,
-            applicationNo: appNo,
-            appliedAt: n.timestamp || new Date().toISOString(),
-            status: n.status || 'Submitted',
-            applicantDetails: {
-              fullName: n.applicantName || n.details.applicantDetails?.fullName || 'नागरिक',
-              mobile: n.applicantMobile || n.details.applicantDetails?.mobile || 'N/A',
-              email: n.applicantEmail || n.details.applicantDetails?.email || ''
-            },
-            ...n.details
-          };
-
-          if (st.includes('birth')) {
-            setBirthRecords(prev => {
-              if (prev.some(r => r.applicationNo === appNo || r.id === recObj.id)) return prev;
-              return [recObj, ...prev];
-            });
-          } else if (st.includes('death')) {
-            setDeathRecords(prev => {
-              if (prev.some(r => r.applicationNo === appNo || r.id === recObj.id)) return prev;
-              return [recObj, ...prev];
-            });
-          } else if (st.includes('water')) {
-            setWaterRecords(prev => {
-              if (prev.some(r => r.applicationNo === appNo || r.id === recObj.id)) return prev;
-              return [recObj, ...prev];
-            });
-          } else if (st.includes('no_dues') || st.includes('no-dues')) {
-            setNoDuesRecords(prev => {
-              if (prev.some(r => r.applicationNo === appNo || r.id === recObj.id)) return prev;
-              return [recObj, ...prev];
-            });
-          }
-        }
-      });
     } catch (e) {
       console.warn('Failed to load officer notifications:', e)
     }
