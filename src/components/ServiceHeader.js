@@ -150,27 +150,51 @@ export default function ServiceHeader() {
     setHasSearched(true);
     setSearchResults([]);
 
-    const cleanQuery = queryText.trim().toUpperCase();
+    if (!queryText || !queryText.trim()) {
+      setSearching(false);
+      return;
+    }
+
+    const cleanQuery = queryText.trim().toLowerCase();
+    const cleanDigits = cleanQuery.replace(/\D/g, '');
 
     try {
-      const collectionsToSearch = [
-        { name: 'deathCertificates', serviceName: 'मृत्यु प्रमाण पत्र', serviceType: 'death' },
-        { name: 'birthCertificates', serviceName: 'जन्म प्रमाण पत्र', serviceType: 'birth' },
-        { name: 'waterConnections', serviceName: 'जल कनेक्शन', serviceType: 'water_connection' },
-        { name: 'noDuesCertificates', serviceName: 'नो ड्यूज NOC', serviceType: 'no_dues' }
+      const [births, deaths, waters, noDues] = await Promise.all([
+        getBirthCertificates(null, true).catch(() => []),
+        getDeathCertificates(null, true).catch(() => []),
+        getWaterConnections(null, true).catch(() => []),
+        getNoDuesCertificates(null, true).catch(() => [])
+      ]);
+
+      const allRecords = [
+        ...births.map(r => ({ ...r, serviceName: 'जन्म प्रमाण पत्र', serviceType: 'birth' })),
+        ...deaths.map(r => ({ ...r, serviceName: 'मृत्यु प्रमाण पत्र', serviceType: 'death' })),
+        ...waters.map(r => ({ ...r, serviceName: 'जल कनेक्शन', serviceType: 'water_connection' })),
+        ...noDues.map(r => ({ ...r, serviceName: 'नो ड्यूज NOC', serviceType: 'no_dues' }))
       ];
 
-      const matches = [];
+      const matches = allRecords.filter(rec => {
+        const appNo = (rec.applicationNo || '').toLowerCase();
+        const recId = (rec.id || '').toLowerCase();
+        const name = (
+          rec.childDetails?.fullName || 
+          rec.deceasedDetails?.fullName || 
+          rec.applicantDetails?.fullName || 
+          ''
+        ).toLowerCase();
+        const mobile = (
+          rec.userMobile || 
+          rec.applicantDetails?.mobile || 
+          rec.informantMobile || 
+          ''
+        ).toString();
 
-      for (const col of collectionsToSearch) {
-        try {
-          const q = query(collection(db, col.name), where('applicationNo', '==', cleanQuery));
-          const snap = await getDocs(q);
-          snap.docs.forEach(docSnap => {
-            matches.push({ id: docSnap.id, ...docSnap.data(), serviceName: col.serviceName, serviceType: col.serviceType });
-          });
-        } catch (e) {}
-      }
+        if (appNo.includes(cleanQuery) || recId.includes(cleanQuery)) return true;
+        if (cleanQuery.length >= 3 && name.includes(cleanQuery)) return true;
+        if (cleanDigits.length >= 4 && mobile.includes(cleanDigits)) return true;
+
+        return false;
+      });
 
       setSearchResults(matches);
     } catch (err) {

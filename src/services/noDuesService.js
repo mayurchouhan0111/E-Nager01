@@ -312,15 +312,26 @@ export async function getNoDuesCertificates(param1 = null, param2 = false) {
     }));
 
     const mergedMap = new Map();
+
+    const findExistingKey = (item) => {
+      if (item.applicationNo && mergedMap.has(item.applicationNo)) return item.applicationNo;
+      if (item.id && mergedMap.has(item.id)) return item.id;
+      for (const [k, existing] of mergedMap.entries()) {
+        if (item.applicationNo && existing.applicationNo && existing.applicationNo === item.applicationNo) return k;
+        if (item.id && (existing.id === item.id || k === item.id)) return k;
+      }
+      return null;
+    };
+
     remoteItems.forEach(item => {
-      const key = item.applicationNo || item.id;
+      const key = findExistingKey(item) || item.applicationNo || item.id;
       const existing = mergedMap.get(key);
       mergedMap.set(key, mergeRecords(existing, item));
     });
 
     localItems.forEach(item => {
-      const key = item.applicationNo || item.id;
-      const existingRemote = mergedMap.get(key) || mergedMap.get(item.id);
+      const key = findExistingKey(item) || item.applicationNo || item.id;
+      const existingRemote = mergedMap.get(key);
       const merged = mergeRecords(existingRemote, item);
       mergedMap.set(key, merged);
     });
