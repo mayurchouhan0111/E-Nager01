@@ -1,4 +1,5 @@
 import { db, ensureFirebaseAuth, sanitizeFirestorePayload } from '../lib/firebase';
+import { enqueuePendingSyncItem } from './offlineSyncService';
 import { 
   collection, 
   addDoc, 
@@ -223,6 +224,9 @@ export async function submitNoDuesCertificate(data, existingId = null) {
 
   const finalRecord = { ...finalPayload, id: assignedId };
   syncLocalRecord(finalRecord);
+  if (String(assignedId).startsWith('local-')) {
+    enqueuePendingSyncItem('no_dues', finalRecord);
+  }
 
   try {
     await sendNotification({

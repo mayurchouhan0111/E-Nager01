@@ -1,4 +1,5 @@
 import { db, ensureFirebaseAuth, sanitizeFirestorePayload } from '../lib/firebase';
+import { enqueuePendingSyncItem } from './offlineSyncService';
 import { 
   collection, 
   addDoc, 
@@ -268,6 +269,7 @@ export async function submitBirthCertificate(data, existingId = null) {
       timeline: updatedTimeline
     };
     syncLocalRecord(localDoc);
+    enqueuePendingSyncItem('birth_certificate', localDoc);
   }
 
   await sendNotification({

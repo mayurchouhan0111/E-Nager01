@@ -18,6 +18,7 @@ import NoDuesCertificateTemplate from './NoDuesCertificateTemplate';
 import NoDuesLetterTemplate from './NoDuesLetterTemplate';
 import { Layers, ShieldAlert, Bell, X, Search, Printer, FileText, Baby, Droplets, ShieldCheck, Building2, Sparkles, CheckCircle2, Presentation, LogOut, User, Download } from 'lucide-react';
 import { subscribeToMaintenance } from '../services/maintenanceService';
+import { initOfflineSyncEngine } from '../services/offlineSyncService';
 import { loginWithGoogle, logoutCitizen, getCurrentCitizen, subscribeToCitizenAuth, loginWithMobileOrEmail } from '../services/citizenAuthService';
 import toast from 'react-hot-toast';
 import { downloadBlobFile } from '../utils/fileStorage';
@@ -46,10 +47,14 @@ export default function ServiceHeader() {
   const [authName, setAuthName] = useState('');
 
   useEffect(() => {
-    const unsub = subscribeToMaintenance((status) => {
+    const unsubMaint = subscribeToMaintenance((status) => {
       setMaintStatus(status);
     });
-    return () => unsub();
+    const unsubOfflineSync = initOfflineSyncEngine();
+    return () => {
+      unsubMaint();
+      unsubOfflineSync();
+    };
   }, []);
 
   useEffect(() => {
