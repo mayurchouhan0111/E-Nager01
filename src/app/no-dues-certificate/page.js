@@ -13,6 +13,7 @@ import {
 import { getCurrentCitizen, loginWithGoogle, createOrUpdateLocalCitizenProfile, subscribeToCitizenAuth } from '../../services/citizenAuthService';
 import toast from 'react-hot-toast';
 import { downloadBlobFile } from '../../utils/fileStorage';
+import { extractNoDuesReceiptData } from '../../utils/noDuesReceiptExtractor';
 import { 
   FileText, Activity, CheckCircle2, AlertCircle, RefreshCw, Printer, X, History, Plus, 
   Download, Building2, UploadCloud, Info, ShieldCheck, CheckSquare, Search, Phone
@@ -81,7 +82,40 @@ export default function NoDuesCertificatePage() {
       }
     });
 
-    return () => unsubAuth();
+    const handleGlobalDragOver = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+    };
+
+    const handleGlobalDrop = async (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const files = e.dataTransfer?.files;
+      if (files && files.length > 0) {
+        const file = files[0];
+        if (file.name.toLowerCase().endsWith('.pdf') || file.type.includes('pdf') || file.type.includes('image')) {
+          toast.loading(`⚡ '${file.name}' से ऑटो-एक्सट्रैक्शन शुरू हो रहा है...`, { id: 'global-drop' });
+          try {
+            const res = await extractNoDuesReceiptData(file);
+            toast.dismiss('global-drop');
+            if (res.success && res.data) {
+              handleApplyFastData(res.data);
+            }
+          } catch (err) {
+            toast.dismiss('global-drop');
+          }
+        }
+      }
+    };
+
+    window.addEventListener('dragover', handleGlobalDragOver);
+    window.addEventListener('drop', handleGlobalDrop);
+
+    return () => {
+      unsubAuth();
+      window.removeEventListener('dragover', handleGlobalDragOver);
+      window.removeEventListener('drop', handleGlobalDrop);
+    };
   }, []);
 
   const loadApplications = async (overrideEmail = null) => {
@@ -110,12 +144,12 @@ export default function NoDuesCertificatePage() {
 
   const handleFileUpload = (docKey, file) => {
     if (!file) return;
-    if (file.size > 1 * 1024 * 1024) {
-      toast.error('❌ फ़ाइल का आकार 1 MB (1024 KB) से अधिक है! कृपया 1 MB से कम साइज की PDF या Photo चुनें।', { duration: 5000 });
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error('❌ फ़ाइल का आकार 10 MB से अधिक है! कृपया 10 MB से कम साइज की PDF या Photo चुनें।', { duration: 5000 });
       return;
     }
     const reader = new FileReader();
-    reader.onload = (e) => {
+    reader.onload = async (e) => {
       setFormData(prev => ({
         ...prev,
         documents: {
@@ -128,6 +162,19 @@ export default function NoDuesCertificatePage() {
         }
       }));
       toast.success(`दस्तावेज '${file.name}' सफलतापूर्वक अपलोड हुआ!`);
+
+      if (docKey === 'taxReceipt') {
+        try {
+          toast.loading('⚡ रसीद से विवरण स्वतः फॉर्म में भरे जा रहे हैं...', { id: 'sec4-ocr' });
+          const res = await extractNoDuesReceiptData(file);
+          toast.dismiss('sec4-ocr');
+          if (res.success && res.data) {
+            handleApplyFastData(res.data);
+          }
+        } catch (err) {
+          toast.dismiss('sec4-ocr');
+        }
+      }
     };
     reader.readAsDataURL(file);
   };

@@ -12,9 +12,9 @@ export function cleanHindiText(str) {
 
   // 2. Truncate raw OCR labels & dump tokens from name/father/address fields
   const dumpTokens = [
-    'Father/Husband:', 'Father / Husband:', 'Father/Husband :', 
+    'Father/Husband:', 'Father / Husband:', 'Father/Husband :',
     'Joint Owner Name:', 'Joint Owner Name :',
-    'Rate Zone:', 'Property Tax', 'Usage Type', 'Construction Type', 
+    'Rate Zone:', 'Property Tax', 'Usage Type', 'Construction Type',
     'RESIDENCIAL', 'SELF OCCUPIED', 'Paid Amount:', 'Mode of Payment:',
     'Total Current:', 'Remarks Payment', 'Office Copy', 'Receipt No.',
     'JYSTMBTODGATEFR', 'Assessment Year:'
@@ -32,19 +32,20 @@ export function cleanHindiText(str) {
   cleaned = cleaned
     .replace(/कृ[^\s\w\u0900-\u097F]*णा/g, 'कृष्णा')
     .replace(/महे[^\s\w\u0900-\u097F]*सिंह/g, 'महेंद्र सिंह')
-    .replace(/महे[^\s\w\u0900-\u097F]*िसिंह/g, 'महेंद्र सिंह')
+    .replace(/महे\s*िसंह/g, 'महेंद्र सिंह')
     .replace(/शेले[^\s\w\u0900-\u097F]*सिंह/g, 'शैलेन्द्र सिंह')
-    .replace(/शेले[^\s\w\u0900-\u097F]*िसिंह/g, 'शैलेन्द्र सिंह')
-    .replace(/चेत[^\s\w\u0900-\u097F]*माग[^\s]*/g, 'चैतन्य मार्ग')
+    .replace(/शेले\s*िसंह/g, 'शैलेन्द्र सिंह')
+    .replace(/चेत[\s\u0900-\u097F]{0,3}माग/g, 'चैतन्य मार्ग')
     .replace(/सीमे[^\s\w\u0900-\u097F]*ट/g, 'सीमेंट')
     .replace(/यु[^\s\w\u0900-\u097F]*त/g, 'युक्त')
     .replace(/अवय\s*क/g, 'अवयस्क')
     .replace(/िपता/g, 'पिता')
-    .replace(/ििसिंह|िसिंह/g, 'सिंह');
+    .replace(/िसंह/g, 'सिंह')
+    .replace(/\s+\/[A-Z]{3,14}\s*/g, ' ');
 
   // 5. Remove box characters (🗎), unmapped unicode symbols, control chars
   cleaned = cleaned.replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]|[\uFFFD\uFFFC\uF5CE\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, '');
 
   // 6. Clean trailing periods, dashes, whitespace
-  return cleaned.replace(/^[\s:\.\-]+|[\s:\.\-]+$/g, '').replace(/\s+/g, ' ').trim();
+  return cleaned.replace(/^[\s:\.\-\/]+|[\s:\.\-\/]+$/g, '').replace(/\s+/g, ' ').trim();
 }
