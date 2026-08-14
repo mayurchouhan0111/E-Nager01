@@ -45,53 +45,246 @@ export const JHABUA_SAMPLE_RECEIPT = {
 };
 
 /**
- * Dynamically loads PDF.js library from CDN if not present on window
+ * Dynamically loads PDF.js library with multiple fallback CDNs
  */
 function loadPdfJs() {
   if (typeof window === 'undefined') return Promise.reject(new Error('SSR not supported'));
   if (window.pdfjsLib) return Promise.resolve(window.pdfjsLib);
 
+  const cdns = [
+    { src: 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js', worker: 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js' },
+    { src: 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js', worker: 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js' },
+    { src: 'https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.min.js', worker: 'https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js' }
+  ];
+
+  let currentIdx = 0;
+
   return new Promise((resolve, reject) => {
-    const script = document.createElement('script');
-    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
-    script.async = true;
-    script.onload = () => {
-      if (window.pdfjsLib) {
-        window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-        resolve(window.pdfjsLib);
-      } else {
-        reject(new Error('PDF.js load failed'));
+    function tryNextCdn() {
+      if (currentIdx >= cdns.length) {
+        return reject(new Error('All PDF.js CDNs failed to load'));
       }
-    };
-    script.onerror = () => reject(new Error('Failed to load PDF.js script from CDN'));
-    document.head.appendChild(script);
+      const cdn = cdns[currentIdx++];
+      const script = document.createElement('script');
+      script.src = cdn.src;
+      script.async = true;
+      script.onload = () => {
+        if (window.pdfjsLib) {
+          window.pdfjsLib.GlobalWorkerOptions.workerSrc = cdn.worker;
+          resolve(window.pdfjsLib);
+        } else {
+          tryNextCdn();
+        }
+      };
+      script.onerror = () => tryNextCdn();
+      document.head.appendChild(script);
+    }
+    tryNextCdn();
   });
 }
 
 /**
- * Dynamically loads Tesseract.js library from CDN for Image OCR if not present
+ * Dynamically loads Tesseract.js library with fallback CDNs
  */
 function loadTesseractJs() {
   if (typeof window === 'undefined') return Promise.reject(new Error('SSR not supported'));
   if (window.Tesseract) return Promise.resolve(window.Tesseract);
 
+  const cdns = [
+    'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js',
+    'https://cdnjs.cloudflare.com/ajax/libs/tesseract.js/5.0.4/tesseract.min.js',
+    'https://unpkg.com/tesseract.js@5/dist/tesseract.min.js'
+  ];
+
+  let currentIdx = 0;
+
   return new Promise((resolve, reject) => {
-    const script = document.createElement('script');
-    script.src = 'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js';
-    script.async = true;
-    script.onload = () => {
-      if (window.Tesseract) {
-        resolve(window.Tesseract);
-      } else {
-        reject(new Error('Tesseract load failed'));
+    function tryNextCdn() {
+      if (currentIdx >= cdns.length) {
+        return reject(new Error('All Tesseract CDNs failed to load'));
       }
-    };
-    script.onerror = () => reject(new Error('Failed to load Tesseract script from CDN'));
-    document.head.appendChild(script);
+      const src = cdns[currentIdx++];
+      const script = document.createElement('script');
+      script.src = src;
+      script.async = true;
+      script.onload = () => {
+        if (window.Tesseract) {
+          resolve(window.Tesseract);
+        } else {
+          tryNextCdn();
+        }
+      };
+      script.onerror = () => tryNextCdn();
+      document.head.appendChild(script);
+    }
+    tryNextCdn();
   });
 }
 
 /**
+ * Decodes PDF string containing octal escapes e.g. \340\244\225 or standard escape sequences
+ */
+function decodePdfOctalString(str) {
+  if (!str) return '';
+  const bytes = [];
+  for (let i = 0; i < str.length; i++) {
+    if (str[i] === '\\' && i + 1 < str.length) {
+      const slice = str.slice(i + 1, i + 4);
+      const octMatch = slice.match(/^[0-7]{1,3}/);
+      if (octMatch) {
+        bytes.push(parseInt(octMatch[0], 8));
+        i += octMatch[0].length;
+        continue;
+      }
+      if (str[i+1] === 'n') { bytes.push(10); i++; continue; }
+      if (str[i+1] === 'r') { bytes.push(13); i++; continue; }
+      if (str[i+1] === 't') { bytes.push(9); i++; continue; }
+      if (str[i+1] === '(' || str[i+1] === ')' || str[i+1] === '\\') {
+        bytes.push(str.charCodeAt(i+1));
+        i++;
+        continue;
+      }
+    }
+    bytes.push(str.charCodeAt(i) & 0xff);
+  }
+  try {
+    return new TextDecoder('utf-8').decode(new Uint8Array(bytes));
+  } catch (e) {
+    return String.fromCharCode(...bytes);
+  }
+}
+
+/**
+ * Decodes PDF hex string <4D617975722043686F7568616E>
+ */
+function decodePdfHexString(hex) {
+  if (!hex || hex.length % 2 !== 0) return '';
+  const bytes = [];
+  for (let i = 0; i < hex.length; i += 2) {
+    bytes.push(parseInt(hex.substr(i, 2), 16));
+  }
+  try {
+    if (bytes.length >= 4 && bytes[0] === 0xFE && bytes[1] === 0xFF) {
+      let str = '';
+      for (let i = 2; i < bytes.length; i += 2) {
+        const code = (bytes[i] << 8) | bytes[i+1];
+        str += String.fromCharCode(code);
+      }
+      return str;
+    }
+    return new TextDecoder('utf-8').decode(new Uint8Array(bytes));
+  } catch (e) {
+    return String.fromCharCode(...bytes);
+  }
+}
+
+/**
+ * Advanced Offline PDF Stream Text Extractor
+ * Decompresses FlateDecode zlib streams using browser DecompressionStream (or fallback inflater),
+ * parses PDF string objects `(...)` with octal/UTF-8 decoding, hex strings `<...>`, Tj/TJ operators.
+ */
+async function parsePdfBinaryStreamOffline(arrayBuffer) {
+  const bytes = new Uint8Array(arrayBuffer);
+  const textDecoder = new TextDecoder('utf-8');
+  let fullDecodedText = '';
+
+  try {
+    const rawString = textDecoder.decode(bytes);
+    
+    // Extract direct text tokens enclosed in parentheses or hex brackets
+    const directParentheses = rawString.match(/\(([^()]+)\)/g) || [];
+    const directHex = rawString.match(/<([0-9A-Fa-f]{6,})>/g) || [];
+
+    fullDecodedText += directParentheses.map(s => decodePdfOctalString(s.slice(1, -1))).join(' ') + ' ';
+    fullDecodedText += directHex.map(h => decodePdfHexString(h.slice(1, -1))).join(' ') + ' ';
+
+    // Extract stream ... endstream chunks and decompress zlib FlateDecode streams
+    const streamRegex = /stream[\r\n]+([\s\S]*?)[\r\n]+endstream/gi;
+    let match;
+    const streamChunks = [];
+
+    while ((match = streamRegex.exec(rawString)) !== null) {
+      const startPos = match.index + match[0].indexOf('stream') + 6;
+      let streamStart = startPos;
+      if (bytes[streamStart] === 0x0D) streamStart++;
+      if (bytes[streamStart] === 0x0A) streamStart++;
+      const endPos = match.index + match[0].lastIndexOf('endstream');
+      if (endPos > streamStart) {
+        streamChunks.push(bytes.subarray(streamStart, endPos));
+      }
+    }
+
+    for (const chunk of streamChunks) {
+      try {
+        let decompressedBytes = null;
+        if (typeof DecompressionStream !== 'undefined') {
+          try {
+            const payload = (chunk[0] === 0x78) ? chunk.subarray(2) : chunk;
+            const ds = new DecompressionStream('deflate-raw');
+            const writer = ds.writable.getWriter();
+            writer.write(payload);
+            writer.close();
+            const reader = ds.readable.getReader();
+            const chunks = [];
+            while (true) {
+              const { done, value } = await reader.read();
+              if (done) break;
+              chunks.push(value);
+            }
+            const totalLen = chunks.reduce((acc, c) => acc + c.length, 0);
+            decompressedBytes = new Uint8Array(totalLen);
+            let offset = 0;
+            for (const c of chunks) {
+              decompressedBytes.set(c, offset);
+              offset += c.length;
+            }
+          } catch (e1) {
+            try {
+              const ds = new DecompressionStream('deflate');
+              const writer = ds.writable.getWriter();
+              writer.write(chunk);
+              writer.close();
+              const reader = ds.readable.getReader();
+              const chunks = [];
+              while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+                chunks.push(value);
+              }
+              const totalLen = chunks.reduce((acc, c) => acc + c.length, 0);
+              decompressedBytes = new Uint8Array(totalLen);
+              let offset = 0;
+              for (const c of chunks) {
+                decompressedBytes.set(c, offset);
+                offset += c.length;
+              }
+            } catch (e2) {}
+          }
+        }
+
+        const streamText = decompressedBytes ? textDecoder.decode(decompressedBytes) : textDecoder.decode(chunk);
+        const pTokens = streamText.match(/\(([^()]+)\)/g) || [];
+        const hTokens = streamText.match(/<([0-9A-Fa-f]{4,})>/g) || [];
+
+        const decodedTokens = [
+          ...pTokens.map(s => decodePdfOctalString(s.slice(1, -1))),
+          ...hTokens.map(h => decodePdfHexString(h.slice(1, -1)))
+        ].filter(str => str.length >= 1);
+
+        if (decodedTokens.length > 0) {
+          fullDecodedText += ' ' + decodedTokens.join(' ');
+        }
+      } catch (streamErr) {
+        console.warn('Stream chunk decode warning:', streamErr);
+      }
+    }
+  } catch (err) {
+    console.error('Offline PDF binary stream parsing failed:', err);
+  }
+
+  return fullDecodedText.replace(/\s+/g, ' ').trim();
+}
+
 /**
  * Robust Regex & Text Parsing Engine specifically tuned for MP e-Nagar Palika & Property Tax Receipts
  * @param {string} text - Raw text extracted from PDF or OCR image
@@ -143,16 +336,16 @@ export function parseReceiptText(text, isDemoPreset = false) {
 
   // 1. TRI Reference Number / Receipt No (e.g. PC-0179-03-16-1-00473, PC-0179-03-6-1-00117, etc.)
   const triMatch = cleanText.match(/(PC-\d{4}-\d{2}-\d{1,2}-\d{1,2}-\d{5})/i) ||
-                   cleanText.match(/(?:Receipt|Ref(?:erence)?|TRI|ТRI)\s*(?:No|ID|Number)?\.?\s*[:\-]?\s*([A-Za-z0-9\-\/]{8,30})/i) ||
-                   cleanText.match(/(?:रसीद|टी\.आर\.आई)\s*(?:क्र|क्रमांक|नंबर)?\.?\s*[:\-]?\s*([A-Za-z0-9\-\/]{8,30})/i);
+                   cleanText.match(/(?:Receipt|Ref(?:erence)?|TRI|ТRI|TXN)\s*(?:No|ID|Number)?\.?\s*[:\-]?\s*([A-Za-z0-9\-\/]{8,30})/i) ||
+                   cleanText.match(/(?:रसीद|टी\.आर\.आई|रिफरेंस)\s*(?:क्र|क्रमांक|नंबर)?\.?\s*[:\-]?\s*([A-Za-z0-9\-\/]{8,30})/i);
   if (triMatch) {
     result.taxDetails.triRefNo = triMatch[1].trim();
     matchCount++;
   }
 
-  // 2. Property ID (e.g. 7001659374, 7001662737, 10-12 digit numbers)
+  // 2. Property ID (e.g. 7001659374, 7001662737, 6-12 digit numbers)
   const propIdMatch = cleanText.match(/(700\d{7})/i) ||
-                      cleanText.match(/(?:New\s*Property\s*Id|Property\s*(?:Id|ID|No|Number)|Asset\s*ID)\s*[:\-]?\s*(\d{6,12})/i) ||
+                      cleanText.match(/(?:New\s*Property\s*Id|Property\s*(?:Id|ID|No|Number)|Asset\s*ID|PID)\s*[:\-]?\s*(\d{6,12})/i) ||
                       cleanText.match(/(?:संपत्ति\s*(?:आईडी|क्रमांक|संख्या|सं\.?)|प्रॉपर्टी\s*आईडी)\s*[:\-]?\s*(\d{6,12})/i);
   if (propIdMatch) {
     result.propertyDetails.propertyId = propIdMatch[1].trim();
@@ -169,15 +362,16 @@ export function parseReceiptText(text, isDemoPreset = false) {
   }
 
   // 4. Property Owner / Applicant Name & Husband/Father Name Extraction
-  // Layer A: Label-based matching (multilingual English & Hindi)
   let rawOwnerName = '';
-  const ownerMatch = cleanText.match(/(?:Property\s*Owner\s*Name|Owner\s*Name|Taxpayer\s*Name|Tax\s*Payer\s*Name|Applicant\s*Name|Customer\s*Name|Consumer\s*Name|Name\s*of\s*(?:Owner|Taxpayer|Applicant)|करदाता\s*का\s*नाम|करदाता\s*नाम|आवेदक\s*का\s*नाम|आवेदक\s*नाम|स्वामी\s*का\s*नाम|संपत्ति\s*मालिक\s*का\s*नाम|नाम)\s*[:\-\/]?\s*([^\n\r\t,;]+)/i) ||
-                     cleanText.match(/(?:Property\s*Owner|Taxpayer|करदाता|आवेदक)\s*[:\-]?\s*([^\n\r\t,;]+)/i);
+  
+  // Layer A: Label-based matching (multilingual English & Hindi)
+  const ownerMatch = cleanText.match(/(?:Property\s*Owner\s*Name|Owner\s*Name|Taxpayer\s*Name|Tax\s*Payer\s*Name|Applicant\s*Name|Customer\s*Name|Consumer\s*Name|Name\s*of\s*(?:Owner|Taxpayer|Applicant)|Payee\s*Name|User\s*Name|करदाता\s*का\s*नाम|करदाता\s*नाम|आवेदक\s*का\s*नाम|आवेदक\s*नाम|स्वामी\s*का\s*नाम|संपत्ति\s*मालिक\s*का\s*नाम|नाम)\s*[:\-\/]?\s*([^\n\r\t,;]+)/i) ||
+                     cleanText.match(/(?:Property\s*Owner|Taxpayer|Tax\s*Payer|करदाता|आवेदक)\s*[:\-]?\s*([^\n\r\t,;]+)/i);
 
   if (ownerMatch && ownerMatch[1]?.trim()) {
     rawOwnerName = ownerMatch[1].trim();
   } else {
-    // Layer B: Honorifics matching (e.g. Shri Krishna Kumar Chauhan, Smt Anita Devi, श्री रमेश शर्मा)
+    // Layer B: Honorifics matching (e.g. Shri Mayur Chouhan, Smt Anita Devi, श्री मयूर चौहान)
     const honorificMatch = cleanText.match(/(?:Shri|Smt|Mr|Mrs|Miss|Dr|श्री|श्रीमती|डॉ|कुं\.|कु०)\s+([A-Za-z\u0900-\u097F\s]{3,40})/i);
     if (honorificMatch && honorificMatch[1]?.trim()) {
       rawOwnerName = honorificMatch[0].trim();
@@ -186,6 +380,18 @@ export function parseReceiptText(text, isDemoPreset = false) {
       const nextLineMatch = cleanText.match(/(?:Property\s*Owner\s*Name|Owner\s*Name|Taxpayer\s*Name|करदाता\s*का\s*नाम|आवेदक\s*का\s*नाम)\s*[:\-]?\s*[\r\n]+\s*([^\n\r\t,;]+)/i);
       if (nextLineMatch && nextLineMatch[1]?.trim()) {
         rawOwnerName = nextLineMatch[1].trim();
+      } else {
+        // Layer D: Standalone 2-3 capitalized English/Hindi name detection (e.g. Mayur Chouhan, Mayur Kumar Chouhan)
+        const standaloneNameMatch = cleanText.match(/\b([A-Z][a-z]{2,15}\s+(?:[A-Z][a-z]{1,15}\s+)?(?:Chouhan|Chauhan|Singh|Sharma|Verma|Gupta|Jain|Rathore|Patel|Pati|Kumar|Kumari|Devi|Shah|Joshi|Yadav|Mishra|Pandey|Tiwari|Shukla|Bhatt|Vaidya|Soni|Agrawal|Khan|Rawat|Solanki|Parmar|Vasuniya|Thakur))\b/i) ||
+                                     cleanText.match(/\b([A-Z][a-z]{2,15}\s+[A-Z][a-z]{2,15})\b/);
+        
+        const blacklist = ['Nagar Palika', 'Property Tax', 'Payment Receipt', 'Zone Ward', 'State Bank', 'Total Amount', 'Financial Year', 'No Dues', 'Building Tax', 'Assessment Year', 'Receipt No', 'Tax Payment'];
+        if (standaloneNameMatch && standaloneNameMatch[1]?.trim()) {
+          const cand = standaloneNameMatch[1].trim();
+          if (!blacklist.some(b => cand.toLowerCase().includes(b.toLowerCase()))) {
+            rawOwnerName = cand;
+          }
+        }
       }
     }
   }
@@ -253,8 +459,8 @@ export function parseReceiptText(text, isDemoPreset = false) {
     }
   }
 
-  // 8. Financial Year (e.g. 2026-27, 2026-2027)
-  const fyMatch = cleanText.match(/(?:Financial\s*Year|Year|वित्तीय\s*वर्ष)\s*[:\-]?\s*(\d{4}\s*[\-\/]\s*\d{2,4})/i) ||
+  // 8. Financial Year (e.g. 2026-27, 2026-2027, 2023-24)
+  const fyMatch = cleanText.match(/(?:Financial\s*Year|Year|कर\s*वर्ष|वित्तीय\s*वर्ष)\s*[:\-]?\s*(\d{4}\s*[\-\/]\s*\d{2,4})/i) ||
                   cleanText.match(/(\b20\d{2}\s*[\-\/]\s*\d{2,4}\b)/);
   if (fyMatch) {
     result.taxDetails.financialYear = fyMatch[1].replace(/\s+/g, '').trim();
@@ -328,7 +534,7 @@ export async function extractNoDuesReceiptData(file) {
   if (isPdf) {
     // PDF Extraction Pathway
     try {
-      // Step A: Attempt PDF.js parsing from CDN
+      // Step A: Attempt PDF.js parsing with CDN Fallbacks
       const pdfjs = await loadPdfJs();
       const arrayBuffer = await file.arrayBuffer();
       const loadingTask = pdfjs.getDocument({ data: arrayBuffer });
@@ -347,25 +553,18 @@ export async function extractNoDuesReceiptData(file) {
         extractionEngine = 'PDF.js High-Precision Engine';
       }
     } catch (pdfJsErr) {
-      console.warn('PDF.js engine warning, attempting native binary text stream extraction:', pdfJsErr);
+      console.warn('PDF.js engine warning, attempting advanced offline binary text stream extraction:', pdfJsErr);
     }
 
-    // Step B: Native Binary PDF Stream Parser Fallback if PDF.js is unavailable/offline
+    // Step B: Offline FlateDecode Stream Parser Fallback if PDF.js is unavailable/offline
     if (!extractedRawText) {
       try {
         const arrayBuffer = await file.arrayBuffer();
-        const decoder = new TextDecoder('utf-8');
-        const rawString = decoder.decode(arrayBuffer);
-
-        // Search for text stream tokens enclosed in parenthetical PDF objects e.g. (Property Owner)
-        const textTokens = rawString.match(/\(([^()]+)\)/g) || [];
-        const extractedTokens = textTokens
-          .map(t => t.slice(1, -1))
-          .filter(str => str.length > 1 && !/^[\x00-\x1F]+$/.test(str));
+        const streamText = await parsePdfBinaryStreamOffline(arrayBuffer);
         
-        if (extractedTokens.length > 0) {
-          extractedRawText = extractedTokens.join(' ');
-          extractionEngine = 'Native PDF Stream Parser';
+        if (streamText && streamText.length > 5) {
+          extractedRawText = streamText;
+          extractionEngine = 'Native PDF Stream Parser (Offline zlib)';
         }
       } catch (binErr) {
         console.error('Binary PDF stream parsing failed:', binErr);
@@ -398,3 +597,4 @@ export async function extractNoDuesReceiptData(file) {
     message: `${extractionEngine ? extractionEngine + ' द्वारा ' : ''}रसीद से विवरण सफलतापूर्वक एक्सट्रैक्ट हो गए!`
   };
 }
+
