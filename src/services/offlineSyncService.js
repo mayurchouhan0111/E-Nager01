@@ -1,5 +1,5 @@
-import { db, ensureFirebaseAuth, sanitizeFirestorePayload } from '../lib/firebase';
-import { collection, addDoc, doc, setDoc } from 'firebase/firestore';
+import { db, ensureFirebaseAuth, sanitizeFirestorePayload } from '../lib/firebase.js';
+import { collection, addDoc, doc, setDoc, query, where, getDocs } from 'firebase/firestore';
 import toast from 'react-hot-toast';
 
 const QUEUE_STORAGE_KEY = 'enagar_pending_sync_queue';
@@ -67,7 +67,7 @@ function getCollectionName(serviceType) {
 }
 
 /**
- * Flushes all pending applications from offline queue to Firestore Cloud Database
+ * Flushes all pending applications from offline queue to Firestore Cloud Database idempotently
  */
 export async function flushPendingSyncQueue() {
   if (typeof window === 'undefined' || isFlushing) return;
@@ -93,9 +93,22 @@ export async function flushPendingSyncQueue() {
         offlineSyncedAt: new Date().toISOString()
       });
 
+      let docRef = null;
+      if (item.applicationNo) {
+        const q = query(collection(db, colName), where('applicationNo', '==', item.applicationNo));
+        const snap = await getDocs(q).catch(() => null);
+        if (snap && !snap.empty) {
+          docRef = snap.docs[0].ref;
+        }
+      }
+
       const docId = item.payload.id || item.id;
-      if (docId && !docId.startsWith('local-') && !docId.startsWith('pending-')) {
-        await setDoc(doc(db, colName, docId), cleanPayload, { merge: true });
+      if (!docRef && docId && !docId.startsWith('local-') && !docId.startsWith('pending-')) {
+        docRef = doc(db, colName, docId);
+      }
+
+      if (docRef) {
+        await setDoc(docRef, cleanPayload, { merge: true });
       } else {
         await addDoc(collection(db, colName), cleanPayload);
       }

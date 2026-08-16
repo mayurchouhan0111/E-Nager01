@@ -1,4 +1,4 @@
-import { auth } from '../lib/firebase';
+import { auth } from '../lib/firebase.js';
 import { GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from 'firebase/auth';
 
 const googleProvider = new GoogleAuthProvider();
@@ -79,12 +79,47 @@ export function loginWithMobileOrEmail(identifier, fullName = '') {
   return { success: true, user: citizenData };
 }
 
+/**
+ * Purges all citizen-specific cached applications and draft keys from LocalStorage
+ * to guarantee complete privacy and zero cross-user cache leakage on shared devices.
+ */
+export function clearCitizenLocalCaches() {
+  if (typeof window === 'undefined') return;
+  try {
+    const keysToRemove = [
+      'enagar_citizen_user',
+      'bc_birth_certificates',
+      'dc_death_certificates',
+      'wc_water_connections',
+      'nd_no_dues_certificates',
+      'dc_notifications'
+    ];
+    keysToRemove.forEach(k => localStorage.removeItem(k));
+
+    // Also remove any namespaced user partition keys
+    for (let i = localStorage.length - 1; i >= 0; i--) {
+      const key = localStorage.key(i);
+      if (key && (
+        key.startsWith('bc_') || 
+        key.startsWith('dc_') || 
+        key.startsWith('wc_') || 
+        key.startsWith('nd_') || 
+        key.startsWith('user_cache_')
+      )) {
+        localStorage.removeItem(key);
+      }
+    }
+  } catch (e) {
+    console.warn('[CitizenAuth] Error purging local cache:', e);
+  }
+}
+
 export async function logoutCitizen() {
   try {
     await signOut(auth);
   } catch (error) {}
   if (typeof window !== 'undefined') {
-    localStorage.removeItem('enagar_citizen_user');
+    clearCitizenLocalCaches();
     broadcastAuthChange(null);
   }
   return { success: true };

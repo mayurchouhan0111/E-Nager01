@@ -54,7 +54,9 @@ test.describe('Birth Certificate Application Flow', () => {
     await page.locator('#field_dpdpConsent input[type="checkbox"]').check();
 
     // ── Save Draft ──────────────────────────────────────────
-    await page.getByRole('button', { name: /ड्राफ्ट सहेजें \(Save Draft\)/ }).click();
+    const draftBtn = page.getByRole('button', { name: /ड्राफ्ट सहेजें \(Save Draft\)/ });
+    await expect(draftBtn).toBeEnabled({ timeout: 10000 });
+    await draftBtn.click();
 
     // Success message with application number
     await expect(page.getByText(/प्रारूप सहेजा गया \(Draft saved! App No:/)).toBeVisible({ timeout: 15000 });

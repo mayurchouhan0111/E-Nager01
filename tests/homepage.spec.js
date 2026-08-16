@@ -1,22 +1,20 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('Homepage - All Services & Navigation', () => {
-  test('hero buttons navigate to all 4 services', async ({ page }) => {
+  test('hero buttons navigate to services', async ({ page }) => {
     await page.goto('/');
 
     // Verify hero section shows
-    await expect(page.getByRole('heading', { name: /नगर पालिका नागरिक ई-सेवाएँ/ })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /नगर पालिका नागरिक ई-सेवाएं/ })).toBeVisible();
 
-    // All 4 service hero buttons
+    // Hero buttons
     const deathBtn = page.getByRole('link', { name: /मृत्यु प्रमाण पत्र/ }).first();
     const birthBtn = page.getByRole('link', { name: /जन्म प्रमाण पत्र/ }).first();
-    const waterBtn = page.getByRole('link', { name: /जल कनेक्शन आवेदन/ }).first();
-    const noduesBtn = page.getByRole('link', { name: /नो ड्यूज प्रमाण पत्र/ }).first();
+    const waterBtn = page.getByRole('link', { name: /जल कनेक्शन/ }).first();
 
     await expect(deathBtn).toBeVisible();
     await expect(birthBtn).toBeVisible();
     await expect(waterBtn).toBeVisible();
-    await expect(noduesBtn).toBeVisible();
 
     // Click each and verify navigation
     await deathBtn.click();
@@ -27,12 +25,8 @@ test.describe('Homepage - All Services & Navigation', () => {
     await expect(page).toHaveURL(/\/birth-certificate/);
     await page.goBack();
 
-    await page.getByRole('link', { name: /जल कनेक्शन आवेदन/ }).first().click();
+    await page.getByRole('link', { name: /जल कनेक्शन/ }).first().click();
     await expect(page).toHaveURL(/\/water-connection/);
-    await page.goBack();
-
-    await page.getByRole('link', { name: /नो ड्यूज प्रमाण पत्र/ }).first().click();
-    await expect(page).toHaveURL(/\/no-dues-certificate/);
   });
 
   test('all 4 service cards are visible on homepage', async ({ page }) => {

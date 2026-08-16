@@ -241,52 +241,56 @@ export default function AdminPage() {
     officerName: 'Nagar Palika Officer'
   })
 
-  const loadDeathRecords = useCallback(async () => {
-    setDeathLoading(true)
+  const loadDeathRecords = useCallback(async (isBackground = false) => {
+    if (!isBackground) setDeathLoading(true)
     try {
       const list = await getDeathCertificates(null, true)
       setDeathRecords(list)
     } catch (e) {
-      toast.error('Failed to load death certificates: ' + e.message)
+      if (!isBackground) toast.error('Failed to load death certificates: ' + e.message)
+    } finally {
+      if (!isBackground) setDeathLoading(false)
     }
-    setDeathLoading(false)
   }, [])
 
-  const loadBirthRecords = useCallback(async () => {
-    setBirthLoading(true)
+  const loadBirthRecords = useCallback(async (isBackground = false) => {
+    if (!isBackground) setBirthLoading(true)
     try {
       const list = await getBirthCertificates(null, true)
       setBirthRecords(list)
     } catch (e) {
-      toast.error('Failed to load birth certificates: ' + e.message)
+      if (!isBackground) toast.error('Failed to load birth certificates: ' + e.message)
+    } finally {
+      if (!isBackground) setBirthLoading(false)
     }
-    setBirthLoading(false)
   }, [])
 
-  const loadWaterRecords = useCallback(async () => {
-    setWaterLoading(true)
+  const loadWaterRecords = useCallback(async (isBackground = false) => {
+    if (!isBackground) setWaterLoading(true)
     try {
       const list = await getWaterConnections(null, true)
       setWaterRecords(list)
     } catch (e) {
-      toast.error('Failed to load water connections: ' + e.message)
+      if (!isBackground) toast.error('Failed to load water connections: ' + e.message)
+    } finally {
+      if (!isBackground) setWaterLoading(false)
     }
-    setWaterLoading(false)
   }, [])
 
-  const loadNoDuesRecords = useCallback(async () => {
-    setNoDuesLoading(true)
+  const loadNoDuesRecords = useCallback(async (isBackground = false) => {
+    if (!isBackground) setNoDuesLoading(true)
     try {
       const list = await getNoDuesCertificates(true)
       setNoDuesRecords(list)
     } catch (e) {
-      toast.error('Failed to load no dues NOC: ' + e.message)
+      if (!isBackground) toast.error('Failed to load no dues NOC: ' + e.message)
+    } finally {
+      if (!isBackground) setNoDuesLoading(false)
     }
-    setNoDuesLoading(false)
   }, [])
 
-  const loadAuditLogs = useCallback(async () => {
-    setAuditLoading(true)
+  const loadAuditLogs = useCallback(async (isBackground = false) => {
+    if (!isBackground) setAuditLoading(true)
     try {
       let logs = []
       try {
@@ -306,8 +310,9 @@ export default function AdminPage() {
       setAuditLogs(combined)
     } catch (e) {
       console.error('Failed to load audit logs:', e)
+    } finally {
+      if (!isBackground) setAuditLoading(false)
     }
-    setAuditLoading(false)
   }, [])
 
   useEffect(() => {
@@ -319,17 +324,38 @@ export default function AdminPage() {
       loadAuditLogs()
       loadOfficerNotifications()
 
-      // Realtime Firestore listeners for immediate live updates when citizens submit forms
-      const unsubBirth = onSnapshot(collection(db, 'birthCertificates'), () => loadBirthRecords(), err => console.warn(err));
-      const unsubDeath = onSnapshot(collection(db, 'deathCertificates'), () => loadDeathRecords(), err => console.warn(err));
-      const unsubWater = onSnapshot(collection(db, 'waterConnections'), () => loadWaterRecords(), err => console.warn(err));
-      const unsubNoDues = onSnapshot(collection(db, 'noDuesCertificates'), () => loadNoDuesRecords(), err => console.warn(err));
+      let bTimer = null, dTimer = null, wTimer = null, ndTimer = null, nTimer = null;
+
+      // Realtime Firestore listeners with 300ms debounce for immediate live updates without duplicate network storms
+      const unsubBirth = onSnapshot(collection(db, 'birthCertificates'), () => {
+        if (bTimer) clearTimeout(bTimer);
+        bTimer = setTimeout(() => loadBirthRecords(true), 300);
+      }, err => console.warn(err));
+
+      const unsubDeath = onSnapshot(collection(db, 'deathCertificates'), () => {
+        if (dTimer) clearTimeout(dTimer);
+        dTimer = setTimeout(() => loadDeathRecords(true), 300);
+      }, err => console.warn(err));
+
+      const unsubWater = onSnapshot(collection(db, 'waterConnections'), () => {
+        if (wTimer) clearTimeout(wTimer);
+        wTimer = setTimeout(() => loadWaterRecords(true), 300);
+      }, err => console.warn(err));
+
+      const unsubNoDues = onSnapshot(collection(db, 'noDuesCertificates'), () => {
+        if (ndTimer) clearTimeout(ndTimer);
+        ndTimer = setTimeout(() => loadNoDuesRecords(true), 300);
+      }, err => console.warn(err));
+
       const unsubNotifs = onSnapshot(collection(db, 'notifications'), () => {
-        loadOfficerNotifications();
-        loadBirthRecords();
-        loadDeathRecords();
-        loadWaterRecords();
-        loadNoDuesRecords();
+        if (nTimer) clearTimeout(nTimer);
+        nTimer = setTimeout(() => {
+          loadOfficerNotifications();
+          loadBirthRecords(true);
+          loadDeathRecords(true);
+          loadWaterRecords(true);
+          loadNoDuesRecords(true);
+        }, 300);
       }, err => console.warn(err));
 
       return () => {
@@ -338,6 +364,11 @@ export default function AdminPage() {
         unsubWater();
         unsubNoDues();
         unsubNotifs();
+        if (bTimer) clearTimeout(bTimer);
+        if (dTimer) clearTimeout(dTimer);
+        if (wTimer) clearTimeout(wTimer);
+        if (ndTimer) clearTimeout(ndTimer);
+        if (nTimer) clearTimeout(nTimer);
       };
     }
   }, [isAdmin, loadDeathRecords, loadBirthRecords, loadWaterRecords, loadNoDuesRecords, loadAuditLogs, loadOfficerNotifications])

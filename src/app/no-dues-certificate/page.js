@@ -113,23 +113,33 @@ export default function NoDuesCertificatePage() {
     window.addEventListener('dragover', handleGlobalDragOver);
     window.addEventListener('drop', handleGlobalDrop);
 
+    let debounceTimer = null;
+    const triggerSilentRefresh = () => {
+      if (debounceTimer) clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => {
+        loadApplications(null, true);
+      }, 300);
+    };
+
+    const handleFocus = () => triggerSilentRefresh();
+    window.addEventListener('focus', handleFocus);
+    window.addEventListener('visibilitychange', handleFocus);
+
     let unsubFirestore = () => {};
     try {
       unsubFirestore = onSnapshot(collection(db, 'noDuesCertificates'), () => {
-        loadApplications();
+        triggerSilentRefresh();
       }, err => console.warn('[NoDues] Live listener note:', err));
     } catch (e) {}
-
-    const timer = setInterval(() => {
-      loadApplications();
-    }, 5000);
 
     return () => {
       unsubAuth();
       unsubFirestore();
-      clearInterval(timer);
+      if (debounceTimer) clearTimeout(debounceTimer);
       window.removeEventListener('dragover', handleGlobalDragOver);
       window.removeEventListener('drop', handleGlobalDrop);
+      window.removeEventListener('focus', handleFocus);
+      window.removeEventListener('visibilitychange', handleFocus);
     };
   }, []);
 
@@ -137,17 +147,17 @@ export default function NoDuesCertificatePage() {
     loadApplications();
   }, [activeTab]);
 
-  const loadApplications = async (overrideEmail = null) => {
-    setLoading(true);
+  const loadApplications = async (overrideEmail = null, isBackground = false) => {
+    if (!isBackground) setLoading(true);
     try {
       const citizen = getCurrentCitizen();
       const target = overrideEmail || citizen?.email;
       const data = await getNoDuesCertificates(target, false);
       setApplications(data);
     } catch (e) {
-      console.warn('Error loading applications:', e);
+      console.warn('Error loading no-dues applications:', e);
     } finally {
-      setLoading(false);
+      if (!isBackground) setLoading(false);
     }
   };
 

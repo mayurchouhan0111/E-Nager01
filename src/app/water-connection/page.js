@@ -110,25 +110,29 @@ export default function WaterConnectionPage() {
       }
     });
 
-    const handleFocus = () => loadApplications();
+    let debounceTimer = null;
+    const triggerSilentRefresh = () => {
+      if (debounceTimer) clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => {
+        loadApplications(null, true);
+      }, 300);
+    };
+
+    const handleFocus = () => triggerSilentRefresh();
     window.addEventListener('focus', handleFocus);
     window.addEventListener('visibilitychange', handleFocus);
 
     let unsubFirestore = () => {};
     try {
       unsubFirestore = onSnapshot(collection(db, 'waterConnections'), () => {
-        loadApplications();
+        triggerSilentRefresh();
       }, err => console.warn('[WaterConn] Live listener note:', err));
     } catch (e) {}
-
-    const timer = setInterval(() => {
-      loadApplications();
-    }, 5000);
 
     return () => {
       unsubAuth();
       unsubFirestore();
-      clearInterval(timer);
+      if (debounceTimer) clearTimeout(debounceTimer);
       window.removeEventListener('focus', handleFocus);
       window.removeEventListener('visibilitychange', handleFocus);
     };
@@ -147,13 +151,18 @@ export default function WaterConnectionPage() {
     }
   }, [applications, selectedApp]);
 
-  const loadApplications = async (overrideEmail = null) => {
-    setLoading(true);
-    const citizen = getCurrentCitizen();
-    const target = overrideEmail || citizen?.email;
-    const data = await getWaterConnections(target);
-    setApplications(data);
-    setLoading(false);
+  const loadApplications = async (overrideEmail = null, isBackground = false) => {
+    if (!isBackground) setLoading(true);
+    try {
+      const citizen = getCurrentCitizen();
+      const target = overrideEmail || citizen?.email;
+      const data = await getWaterConnections(target);
+      setApplications(data);
+    } catch (e) {
+      console.warn('Error loading water applications:', e);
+    } finally {
+      if (!isBackground) setLoading(false);
+    }
   };
 
   const handleInputChange = (section, field, value) => {

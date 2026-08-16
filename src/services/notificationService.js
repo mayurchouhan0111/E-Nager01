@@ -10,13 +10,23 @@ import {
 } from 'firebase/firestore';
 
 import { cleanHindiText } from '../utils/textSanitizer';
+import { getCurrentCitizen } from './citizenAuthService';
 
 const NOTIFICATIONS_COLLECTION = 'notifications';
+
+function getCitizenNotifStorageKey() {
+  if (typeof window === 'undefined') return 'dc_notifications_guest';
+  const citizen = getCurrentCitizen();
+  const raw = citizen?.email || citizen?.uid || 'guest';
+  const safeKey = raw.toLowerCase().replace(/[^a-z0-9]/g, '_');
+  return `dc_notifications_${safeKey}`;
+}
 
 function getLocalNotifications() {
   if (typeof window === 'undefined') return [];
   try {
-    const data = localStorage.getItem('dc_notifications');
+    const key = getCitizenNotifStorageKey();
+    const data = localStorage.getItem(key) || localStorage.getItem('dc_notifications');
     return data ? JSON.parse(data) : [];
   } catch (e) {
     return [];
@@ -26,7 +36,8 @@ function getLocalNotifications() {
 function saveLocalNotifications(list) {
   if (typeof window === 'undefined') return;
   try {
-    localStorage.setItem('dc_notifications', JSON.stringify(list));
+    const key = getCitizenNotifStorageKey();
+    localStorage.setItem(key, JSON.stringify(list));
   } catch (e) {}
 }
 

@@ -21,14 +21,24 @@ const AUDIT_LOGS_COLLECTION = 'auditLogs';
 
 function generateAppNumber() {
   const year = new Date().getFullYear();
-  const random = Math.floor(10000 + Math.random() * 90000);
-  return `BC-${year}-${random}`;
+  const timeSlice = Date.now().toString().slice(-6);
+  const randomSuffix = Math.floor(100 + Math.random() * 900);
+  return `BC-${year}-${timeSlice}${randomSuffix}`;
+}
+
+function getCitizenStorageKey() {
+  if (typeof window === 'undefined') return 'bc_birth_certificates_guest';
+  const citizen = getCurrentCitizen();
+  const raw = citizen?.email || citizen?.uid || 'guest';
+  const safeKey = raw.toLowerCase().replace(/[^a-z0-9]/g, '_');
+  return `bc_birth_certificates_${safeKey}`;
 }
 
 function getLocalBirthCertificates() {
   if (typeof window === 'undefined') return [];
   try {
-    const data = localStorage.getItem('bc_birth_certificates');
+    const key = getCitizenStorageKey();
+    const data = localStorage.getItem(key) || localStorage.getItem('bc_birth_certificates');
     return data ? JSON.parse(data) : [];
   } catch (e) {
     return [];
@@ -38,7 +48,8 @@ function getLocalBirthCertificates() {
 function saveLocalBirthCertificates(list) {
   if (typeof window === 'undefined') return;
   try {
-    localStorage.setItem('bc_birth_certificates', JSON.stringify(list));
+    const key = getCitizenStorageKey();
+    localStorage.setItem(key, JSON.stringify(list));
   } catch (e) {
     try {
       const sanitized = list.map(item => {
@@ -53,7 +64,8 @@ function saveLocalBirthCertificates(list) {
         }
         return item;
       });
-      localStorage.setItem('bc_birth_certificates', JSON.stringify(sanitized));
+      const key = getCitizenStorageKey();
+      localStorage.setItem(key, JSON.stringify(sanitized));
     } catch (err) {}
   }
 }
