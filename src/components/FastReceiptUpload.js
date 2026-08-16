@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { 
   Zap, UploadCloud, CheckCircle2, FileText, Sparkles, RefreshCw, AlertCircle, ArrowRight, ShieldCheck, Eye, EyeOff 
 } from 'lucide-react';
-import { extractNoDuesReceiptData, parseReceiptText, JHABUA_SAMPLE_RECEIPT, FAUZIYA_SAMPLE_RECEIPT } from '../utils/noDuesReceiptExtractor';
+import { extractNoDuesReceiptData, parseReceiptText } from '../utils/noDuesReceiptExtractor';
 import toast from 'react-hot-toast';
 
 export default function FastReceiptUpload({ onApplyData }) {
@@ -52,25 +52,6 @@ export default function FastReceiptUpload({ onApplyData }) {
     }
   };
 
-  const handleDemoFill = (preset = 1) => {
-    setLoading(true);
-    const targetData = preset === 2 ? FAUZIYA_SAMPLE_RECEIPT : JHABUA_SAMPLE_RECEIPT;
-    const nameStr = preset === 2 ? 'फौजीया खान (9000006757)' : 'कृष्णा कुंवर चौहान (7001659374)';
-    
-    setStatusMessage(`⚡ झाबुआ रसीद '${nameStr}' डेटा लोड हो रहा है...`);
-    toast.loading(`⚡ झाबुआ रसीद '${nameStr}' डेटा लोड हो रहा है...`, { id: 'demo-fill' });
-
-    setTimeout(() => {
-      setLoading(false);
-      setStatusMessage('');
-      toast.dismiss('demo-fill');
-      setExtractedResult(targetData);
-      toast.success(`⚡ ${nameStr} का रसीद विवरण फॉर्म में ऑटो-फिल हो गया!`);
-      if (onApplyData) {
-        onApplyData(targetData);
-      }
-    }, 100);
-  };
 
   const handleFileChange = (e) => {
     const file = e.target.files?.[0];
@@ -112,28 +93,7 @@ export default function FastReceiptUpload({ onApplyData }) {
           </div>
         </div>
 
-        {/* DEMO FAST-FILL BUTTONS */}
-        <div className="flex items-center gap-2 shrink-0 flex-wrap">
-          <button
-            type="button"
-            onClick={() => handleDemoFill(1)}
-            disabled={loading}
-            className="bg-gradient-to-r from-amber-500 to-emerald-500 hover:from-amber-600 hover:to-emerald-600 text-slate-950 font-black text-xs px-3.5 py-2 rounded-xl shadow-lg transition-all flex items-center gap-1.5 border border-amber-300/40 cursor-pointer"
-          >
-            <Sparkles className="w-3.5 h-3.5 text-slate-950" />
-            <span>⚡ 7001659374 ऑटो-फिल</span>
-          </button>
-          
-          <button
-            type="button"
-            onClick={() => handleDemoFill(2)}
-            disabled={loading}
-            className="bg-gradient-to-r from-teal-400 to-cyan-500 hover:from-teal-500 hover:to-cyan-600 text-slate-950 font-black text-xs px-3.5 py-2 rounded-xl shadow-lg transition-all flex items-center gap-1.5 border border-teal-300/40 cursor-pointer"
-          >
-            <Sparkles className="w-3.5 h-3.5 text-slate-950" />
-            <span>⚡ 9000006757 ऑटो-फिल</span>
-          </button>
-        </div>
+
       </div>
 
       {/* DROP ZONE & UPLOAD */}
