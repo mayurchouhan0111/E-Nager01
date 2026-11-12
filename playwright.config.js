@@ -1,22 +1,16 @@
 import { defineConfig, devices } from '@playwright/test';
 
 export default defineConfig({
-  testDir: './tests',
+  testDir: './tests/e2e',
   fullyParallel: false,
   forbidOnly: !!process.env.CI,
-  retries: 1,
+  retries: process.env.CI ? 1 : 0,
   workers: 1,
-  reporter: [
-    ['html', { open: 'never' }],
-    ['list']
-  ],
+  reporter: 'list',
   use: {
-    baseURL: 'http://localhost:3000',
+    baseURL: process.env.E2E_BASE_URL || 'http://127.0.0.1:3000',
     trace: 'on-first-retry',
-    screenshot: 'on',
-    video: 'on-first-retry',
-    actionTimeout: 15000,
-    navigationTimeout: 30000,
+    screenshot: 'only-on-failure',
   },
   projects: [
     {
@@ -24,10 +18,4 @@ export default defineConfig({
       use: { ...devices['Desktop Chrome'] },
     },
   ],
-  webServer: {
-    command: 'npm run dev',
-    url: 'http://localhost:3000',
-    reuseExistingServer: true,
-    timeout: 120000,
-  },
 });

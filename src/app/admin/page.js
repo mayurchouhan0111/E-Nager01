@@ -1,8 +1,8 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { db } from '@/lib/firebase'
-import { collection, getDocs, query, orderBy, serverTimestamp, addDoc, limit, onSnapshot } from 'firebase/firestore'
+import { collection, getDocs, query, orderBy, serverTimestamp, addDoc, limit, onSnapshot, doc, updateDoc } from 'firebase/firestore'
 import toast from 'react-hot-toast'
 import {
   getDeathCertificates,
@@ -20,7 +20,7 @@ import {
   getNoDuesCertificates,
   updateNoDuesCertificateStatus
 } from '@/services/noDuesService'
-import { markNotificationAsRead } from '@/services/notificationService'
+import { markNotificationAsRead, sendNotification } from '@/services/notificationService'
 import { cleanHindiText } from '@/utils/textSanitizer'
 import { processOfficialFile, downloadBlobFile } from '@/utils/fileStorage'
 import DeathCertificateTemplate from '@/components/DeathCertificateTemplate'
@@ -30,12 +30,24 @@ import NoDuesCertificateTemplate from '@/components/NoDuesCertificateTemplate'
 import NoDuesLetterTemplate from '@/components/NoDuesLetterTemplate'
 import ApplicationLetterTemplate from '@/components/ApplicationLetterTemplate'
 import ApplicationTimeline from '@/components/ApplicationTimeline'
-import { DEFAULT_ADMIN_ACCOUNTS, fetchAdminAccounts, updateAdminAccountCredential, ADMIN_USERNAME_ALIASES } from '@/services/adminAuthService'
+import {
+  DEFAULT_ADMIN_ACCOUNTS,
+  fetchAdminAccounts,
+  updateAdminAccountCredential,
+  loginAdminWithFirebase,
+  subscribeToAdminAuthState,
+  logoutAdminFromFirebase,
+  sendOfficerPasswordReset,
+  setOfficerDisabledStatus,
+  getAllowedTabsForClaimRole
+} from '@/services/adminAuthService'
 import { subscribeToMaintenance, toggleMaintenanceMode } from '@/services/maintenanceService'
 import {
   ShieldAlert, Search, Trash2, Download, Edit, Printer, Eye, Activity, FileText, CheckCircle2,
-  AlertCircle, Calendar, UserCheck, History, Info, Lock, LogOut, RefreshCw, X, Settings2, Baby, Eye as EyeIcon, Droplet, Key, Save, Building2, Bell, Mail, Clock, ChevronDown, ChevronRight, User, Phone, Paperclip, Upload, Loader2
+  AlertCircle, Calendar, UserCheck, History, Info, Lock, LogOut, RefreshCw, X, Settings2, Baby, Eye as EyeIcon, Droplet, Key, Save, Building2, Bell, Mail, Clock, ChevronDown, ChevronRight, User, Phone, Paperclip, Upload, Loader2, MessageSquareWarning
 } from 'lucide-react'
+
+const ADMIN_IDLE_TIMEOUT_MS = 20 * 60 * 1000 // 20 minutes inactivity auto-logout
 
 function formatTimestamp(ts) {
   if (!ts) return '—'
@@ -45,11 +57,15 @@ function formatTimestamp(ts) {
 
 export default function AdminPage() {
   const [isAdmin, setIsAdmin] = useState(false)
+  const [currentAdminUid, setCurrentAdminUid] = useState('')
   const [currentAdminUser, setCurrentAdminUser] = useState('')
   const [currentAdminRole, setCurrentAdminRole] = useState('')
+  const [claimedAllowedTabs, setClaimedAllowedTabs] = useState([])
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
+  const [rememberMe, setRememberMe] = useState(false)
   const [loginError, setLoginError] = useState('')
+  const idleTimerRef = useRef(null)
 
   // Operation Progress Loading Indicators
   const [isSubmittingStatus, setIsSubmittingStatus] = useState(false)
@@ -60,21 +76,15 @@ export default function AdminPage() {
 
   const [adminAccounts, setAdminAccounts] = useState(DEFAULT_ADMIN_ACCOUNTS)
   const [credEditState, setCredEditState] = useState({
-    admin: { password: '', name: '', email: '' },
-    water_admin: { password: '', name: '', email: '' },
-    nodues_admin: { password: '', name: '', email: '' },
-    super_admin: { password: '', name: '', email: '' }
+    admin: { password: '', name: DEFAULT_ADMIN_ACCOUNTS.admin.name, email: DEFAULT_ADMIN_ACCOUNTS.admin.email, disabled: false },
+    water_admin: { password: '', name: DEFAULT_ADMIN_ACCOUNTS.water_admin.name, email: DEFAULT_ADMIN_ACCOUNTS.water_admin.email, disabled: false },
+    nodues_admin: { password: '', name: DEFAULT_ADMIN_ACCOUNTS.nodues_admin.name, email: DEFAULT_ADMIN_ACCOUNTS.nodues_admin.email, disabled: false },
+    super_admin: { password: '', name: DEFAULT_ADMIN_ACCOUNTS.super_admin.name, email: DEFAULT_ADMIN_ACCOUNTS.super_admin.email, disabled: false }
   })
 
   const loadCloudAccounts = useCallback(async () => {
     const accs = await fetchAdminAccounts()
     setAdminAccounts(accs)
-    setCredEditState({
-      admin: { password: accs.admin?.password || '', name: accs.admin?.name || '', email: accs.admin?.email || '' },
-      water_admin: { password: accs.water_admin?.password || '', name: accs.water_admin?.name || '', email: accs.water_admin?.email || '' },
-      nodues_admin: { password: accs.nodues_admin?.password || '', name: accs.nodues_admin?.name || '', email: accs.nodues_admin?.email || '' },
-      super_admin: { password: accs.super_admin?.password || '', name: accs.super_admin?.name || '', email: accs.super_admin?.email || '' }
-    })
   }, [])
 
   const [maintState, setMaintState] = useState({ isMaintenanceMode: false })
@@ -86,21 +96,24 @@ export default function AdminPage() {
     return () => unsub()
   }, [])
 
+  // Subscribe to verified Firebase Auth ID token & custom claims (never trust sessionStorage)
   useEffect(() => {
-    loadCloudAccounts()
-  }, [loadCloudAccounts])
-
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const stored = sessionStorage.getItem('dc_admin_authenticated')
-      const storedUser = sessionStorage.getItem('dc_admin_username')
-      const storedRole = sessionStorage.getItem('dc_admin_role')
-      if (stored === 'true' && storedUser) {
+    const unsubAuth = subscribeToAdminAuthState((officerSession) => {
+      if (officerSession && officerSession.role) {
         setIsAdmin(true)
-        setCurrentAdminUser(storedUser)
-        setCurrentAdminRole(storedRole || 'super_admin')
+        setCurrentAdminUid(officerSession.uid)
+        setCurrentAdminUser(officerSession.usernameKey || 'admin')
+        setCurrentAdminRole(officerSession.role)
+        setClaimedAllowedTabs(officerSession.allowedTabs || getAllowedTabsForClaimRole(officerSession.role))
+      } else {
+        setIsAdmin(false)
+        setCurrentAdminUid('')
+        setCurrentAdminUser('')
+        setCurrentAdminRole('')
+        setClaimedAllowedTabs([])
       }
-    }
+    })
+    return () => unsubAuth()
   }, [])
 
   // Death Certificate state
@@ -140,6 +153,18 @@ export default function AdminPage() {
   const [auditPage, setAuditPage] = useState(1)
   const [auditRowsPerPage, setAuditRowsPerPage] = useState(10)
   const [expandedAuditId, setExpandedAuditId] = useState(null)
+
+  // Citizen Grievances State
+  const [grievances, setGrievances] = useState([])
+  const [grievancesLoading, setGrievancesLoading] = useState(false)
+  const [grievanceSearch, setGrievanceSearch] = useState('')
+  const [grievanceStatusFilter, setGrievanceStatusFilter] = useState('all')
+  const [grievanceModal, setGrievanceModal] = useState({
+    isOpen: false,
+    record: null,
+    targetStatus: 'In Progress',
+    replyText: ''
+  })
 
   // Application Letter Modal State
   const [letterModal, setLetterModal] = useState({ isOpen: false, record: null, serviceType: 'death' })
@@ -315,6 +340,21 @@ export default function AdminPage() {
     }
   }, [])
 
+  const loadGrievances = useCallback(async (isBackground = false) => {
+    if (!isBackground) setGrievancesLoading(true)
+    try {
+      const q = query(collection(db, 'grievances'), limit(100))
+      const snap = await getDocs(q)
+      const items = snap.docs.map(d => ({ id: d.id, ...d.data() }))
+      items.sort((a, b) => new Date(b.createdAt || b.timestamp || 0) - new Date(a.createdAt || a.timestamp || 0))
+      setGrievances(items)
+    } catch (e) {
+      console.warn('Failed to load grievances:', e.message)
+    } finally {
+      if (!isBackground) setGrievancesLoading(false)
+    }
+  }, [])
+
   useEffect(() => {
     if (isAdmin) {
       loadDeathRecords()
@@ -322,6 +362,7 @@ export default function AdminPage() {
       loadWaterRecords()
       loadNoDuesRecords()
       loadAuditLogs()
+      loadGrievances()
       loadOfficerNotifications()
 
       let bTimer = null, dTimer = null, wTimer = null, ndTimer = null, nTimer = null;
@@ -376,30 +417,25 @@ export default function AdminPage() {
   async function handleLogin(e) {
     e.preventDefault()
     setIsLoggingIn(true)
+    setLoginError('')
     try {
-      let cleanUser = username.trim().toLowerCase()
-      if (ADMIN_USERNAME_ALIASES && ADMIN_USERNAME_ALIASES[cleanUser]) {
-        cleanUser = ADMIN_USERNAME_ALIASES[cleanUser]
-      }
-      const latestAccounts = await fetchAdminAccounts()
-      setAdminAccounts(latestAccounts)
-      const account = latestAccounts[cleanUser]
+      const res = await loginAdminWithFirebase({
+        usernameOrEmail: username,
+        password,
+        rememberMe
+      })
 
-      if (account && password === account.password) {
+      if (res.success && res.officer) {
         setIsAdmin(true)
-        setCurrentAdminUser(cleanUser)
-        setCurrentAdminRole(account.role)
-        setActiveTab(account.defaultTab || 'death-certificates')
-
-        if (typeof window !== 'undefined') {
-          sessionStorage.setItem('dc_admin_authenticated', 'true')
-          sessionStorage.setItem('dc_admin_username', cleanUser)
-          sessionStorage.setItem('dc_admin_role', account.role)
-        }
-        setLoginError('')
-        toast.success(`लॉगिन सफल: ${account.name}`)
+        setCurrentAdminUid(res.officer.uid)
+        setCurrentAdminUser(res.officer.usernameKey)
+        setCurrentAdminRole(res.officer.role)
+        setClaimedAllowedTabs(res.officer.allowedTabs)
+        setActiveTab(res.officer.defaultTab || 'death-certificates')
+        setPassword('')
+        toast.success(`लॉगिन सफल: ${res.officer.name}`)
       } else {
-        setLoginError('अमान्य उपयोगकर्ता नाम (Username) या पासवर्ड (Password)')
+        setLoginError(res.error || 'अमान्य उपयोगकर्ता नाम (Username) या पासवर्ड (Password)')
       }
     } finally {
       setIsLoggingIn(false)
@@ -409,30 +445,116 @@ export default function AdminPage() {
   async function handleUpdateCredentials(targetUsername) {
     const editData = credEditState[targetUsername]
     if (!editData || (!editData.password && !editData.name && !editData.email)) {
-      toast.error('कृपया पासवर्ड, नाम या ईमेल दर्ज करें (Please enter details to update)')
+      toast.error('कृपया नया पासवर्ड (>=10 अक्षर), नाम या ईमेल दर्ज करें (Please enter details to update)')
       return
     }
 
     setUpdatingCredUser(targetUsername)
-    const toastId = toast.loading(`'${targetUsername}' के क्रेडेंशियल अद्यतन हो रहे हैं...`)
+    const toastId = toast.loading(`'${targetUsername}' के Firebase Auth क्रेडेंशियल व कस्टम क्लेम अद्यतन हो रहे हैं...`)
     try {
       const result = await updateAdminAccountCredential({
         targetUsername,
         newPassword: editData.password,
         newName: editData.name,
         newEmail: editData.email,
-        updatedBy: currentAdminUser
+        disabled: Boolean(editData.disabled)
       })
 
       if (result.success) {
-        toast.success(`✅ '${targetUsername}' का क्रेडेंशियल फायरस्टोर में अद्यतन हो गया!`, { id: toastId })
+        toast.success(`✅ '${targetUsername}' के Firebase Auth क्रेडेंशियल व कस्टम क्लेम अपडेट हो गए!`, { id: toastId })
         setAdminAccounts(result.updatedAccounts)
+        setCredEditState(prev => ({
+          ...prev,
+          [targetUsername]: { ...prev[targetUsername], password: '' }
+        }))
         loadAuditLogs()
       } else {
         toast.error(`अपडेट विफल: ${result.error}`, { id: toastId })
       }
     } finally {
       setUpdatingCredUser(null)
+    }
+  }
+
+  async function handleSendResetEmail(targetUsername) {
+    const targetEmail = credEditState[targetUsername]?.email || DEFAULT_ADMIN_ACCOUNTS[targetUsername]?.email
+    const toastId = toast.loading(`${targetEmail} पर पासवर्ड रीसेट लिंक भेजा जा रहा है...`)
+    const res = await sendOfficerPasswordReset(targetEmail)
+    if (res.success) {
+      toast.success(`📧 ${res.email} पर पासवर्ड रीसेट ईमेल भेज दिया गया!`, { id: toastId })
+    } else {
+      toast.error(`त्रुटि: ${res.error}`, { id: toastId })
+    }
+  }
+
+  async function handleToggleOfficerDisabled(targetUsername) {
+    const targetEmail = credEditState[targetUsername]?.email || DEFAULT_ADMIN_ACCOUNTS[targetUsername]?.email
+    const nextDisabled = !credEditState[targetUsername]?.disabled
+    const toastId = toast.loading(`${targetEmail} खाता ${nextDisabled ? 'निष्क्रिय (Disable)' : 'सक्रिय (Enable)'} किया जा रहा है...`)
+    const res = await setOfficerDisabledStatus({ email: targetEmail, disabled: nextDisabled })
+    if (res.success) {
+      setCredEditState(prev => ({
+        ...prev,
+        [targetUsername]: { ...prev[targetUsername], disabled: nextDisabled }
+      }))
+      toast.success(
+        nextDisabled
+          ? `🔒 अधिकारी खाता निष्क्रिय किया गया एवं सभी सक्रिय रिफ्रेश टोकन रद्द कर दिए गए!`
+          : `✅ अधिकारी खाता पुनः सक्रिय किया गया!`,
+        { id: toastId }
+      )
+      loadAuditLogs()
+    } else {
+      toast.error(`त्रुटि: ${res.error}`, { id: toastId })
+    }
+  }
+
+  async function handleUpdateGrievanceStatus(e) {
+    e.preventDefault()
+    if (!grievanceModal.record) return
+    if (!grievanceModal.replyText.trim()) {
+      toast.error('कृपया अधिकारी समाधान टिप्पणी दर्ज करें (Officer reply is required)')
+      return
+    }
+    const toastId = toast.loading('शिकायत स्थिति अपडेट की जा रही है...')
+    try {
+      const gRef = doc(db, 'grievances', grievanceModal.record.id)
+      const nowIso = new Date().toISOString()
+      const officerName = adminAccounts[currentAdminUser]?.name || 'Municipal Officer'
+      await updateDoc(gRef, {
+        status: grievanceModal.targetStatus,
+        officerReply: grievanceModal.replyText.trim(),
+        resolvedBy: officerName,
+        updatedAt: nowIso
+      })
+
+      try {
+        await addDoc(collection(db, 'auditLogs'), {
+          action: `GRIEVANCE_STATUS_${grievanceModal.targetStatus.toUpperCase().replace(/\s+/g, '_')}`,
+          actorUid: currentAdminUid,
+          serviceType: 'grievance',
+          applicationId: grievanceModal.record.id,
+          applicationNo: grievanceModal.record.grievanceId || grievanceModal.record.id,
+          performedBy: officerName,
+          officerName,
+          role: currentAdminRole,
+          remarks: grievanceModal.replyText.trim(),
+          timestamp: nowIso,
+          createdAt: serverTimestamp()
+        })
+      } catch (auditErr) {}
+
+      setGrievances(prev =>
+        prev.map(g =>
+          g.id === grievanceModal.record.id
+            ? { ...g, status: grievanceModal.targetStatus, officerReply: grievanceModal.replyText.trim(), resolvedBy: officerName, updatedAt: nowIso }
+            : g
+        )
+      )
+      setGrievanceModal({ isOpen: false, record: null, targetStatus: 'In Progress', replyText: '' })
+      toast.success('शिकायत की स्थिति सफलतापूर्वक अपडेट की गई!', { id: toastId })
+    } catch (err) {
+      toast.error('शिकायत अपडेट में त्रुटि: ' + err.message, { id: toastId })
     }
   }
 
@@ -463,17 +585,39 @@ export default function AdminPage() {
     }
   }
 
-  function handleLogout() {
+  const handleLogout = useCallback(async () => {
+    await logoutAdminFromFirebase()
     setIsAdmin(false)
+    setCurrentAdminUid('')
     setCurrentAdminUser('')
     setCurrentAdminRole('')
+    setClaimedAllowedTabs([])
     if (typeof window !== 'undefined') {
-      sessionStorage.removeItem('dc_admin_authenticated')
-      sessionStorage.removeItem('dc_admin_username')
-      sessionStorage.removeItem('dc_admin_role')
       window.dispatchEvent(new CustomEvent('admin-auth-changed', { detail: false }))
     }
-  }
+  }, [])
+
+  // 20-minute inactivity auto-logout timer for authenticated officers
+  useEffect(() => {
+    if (!isAdmin || typeof window === 'undefined') return
+
+    const resetIdleTimer = () => {
+      if (idleTimerRef.current) clearTimeout(idleTimerRef.current)
+      idleTimerRef.current = setTimeout(() => {
+        toast.error('⏰ 20 मिनट की निष्क्रियता के कारण अधिकारी सत्र स्वतः लॉगआउट हो गया (Session expired due to 20m inactivity).')
+        handleLogout()
+      }, ADMIN_IDLE_TIMEOUT_MS)
+    }
+
+    const events = ['mousemove', 'mousedown', 'keydown', 'touchstart', 'scroll']
+    events.forEach(evt => window.addEventListener(evt, resetIdleTimer, { passive: true }))
+    resetIdleTimer()
+
+    return () => {
+      if (idleTimerRef.current) clearTimeout(idleTimerRef.current)
+      events.forEach(evt => window.removeEventListener(evt, resetIdleTimer))
+    }
+  }, [isAdmin, handleLogout])
 
   async function handleConfirmStatusUpdate(e) {
     e.preventDefault()
@@ -541,6 +685,7 @@ export default function AdminPage() {
         try {
           addDoc(collection(db, 'auditLogs'), {
             action: remarkModal.officialCertFile ? 'OFFICIAL_CERTIFICATE_UPLOADED_OR_UPDATED' : `STATUS_CHANGE_TO_${remarkModal.targetStatus.toUpperCase().replace(/\s+/g, '_')}`,
+            actorUid: currentAdminUid,
             status: remarkModal.targetStatus,
             serviceType: remarkModal.serviceType,
             applicationId: remarkModal.record.id,
@@ -548,7 +693,7 @@ export default function AdminPage() {
             user: officerName,
             performedBy: officerName,
             officerName: officerName,
-            role: 'Chief Municipal Officer - CMO',
+            role: currentAdminRole || 'Officer',
             remarks: remarkModal.remarkText.trim(),
             officialCertFileName: remarkModal.officialCertFile?.fileName || null,
             timestamp: nowIso,
@@ -711,16 +856,18 @@ export default function AdminPage() {
     .sort((a, b) => new Date(b.appliedAt || b.createdAt || 0) - new Date(a.appliedAt || a.createdAt || 0))
 
   const currentAccount = adminAccounts[currentAdminUser]
-  const isSuperAdmin = currentAdminRole === 'super_admin' || currentAdminUser === 'super_admin'
-  const allowedTabs = isSuperAdmin 
-    ? ['death-certificates', 'birth-certificates', 'water-connections', 'no-dues-certificates', 'audit', 'security-settings']
-    : (currentAccount?.allowedTabs || ['death-certificates', 'birth-certificates', 'water-connections', 'no-dues-certificates', 'audit', 'security-settings'])
+  const isSuperAdmin = currentAdminRole === 'super_admin'
+  // Derive allowedTabs strictly from verified Firebase Auth custom claim `role`
+  const allowedTabs = claimedAllowedTabs.length > 0
+    ? claimedAllowedTabs
+    : getAllowedTabsForClaimRole(currentAdminRole)
 
   const allTabDefs = [
     { key: 'death-certificates', label: 'मृत्यु प्रमाण पत्र आवेदन', labelShort: 'मृत्यु', icon: FileText },
     { key: 'birth-certificates', label: 'जन्म प्रमाण पत्र आवेदन', labelShort: 'जन्म', icon: Baby },
     { key: 'water-connections', label: 'जल कनेक्शन आवेदन', labelShort: 'जल', icon: Droplet },
     { key: 'no-dues-certificates', label: 'नो ड्यूज NOC प्रभाग', labelShort: 'नो ड्यूज NOC', icon: Building2 },
+    { key: 'grievances', label: 'नागरिक शिकायत निवारण', labelShort: 'शिकायतें', icon: MessageSquareWarning },
     { key: 'audit', label: 'ऑडिट लॉग', labelShort: 'ऑडिट', icon: History },
     { key: 'security-settings', label: 'सुरक्षा एवं क्रेडेंशियल', labelShort: 'सुरक्षा', icon: Key },
   ]
@@ -875,24 +1022,54 @@ export default function AdminPage() {
 
               <form onSubmit={handleLogin} className="space-y-4">
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">उपयोगकर्ता नाम (Username)</label>
+                  <label htmlFor="admin-username" className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">अधिकारी ईमेल या यूज़रनेम (Official Email / Username Alias)</label>
                   <input
+                    id="admin-username"
+                    type="text"
                     value={username} 
                     onChange={e => setUsername(e.target.value)}
                     className="w-full border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs font-medium focus:outline-none focus:border-emerald-600"
-                    placeholder="User ID / Username"
+                    placeholder="cmo.jhabua@mp.gov.in / admin"
+                    autoComplete="username"
                   />
                 </div>
                 
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">पासवर्ड (Password)</label>
+                  <label htmlFor="admin-password" className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">पासवर्ड (Password)</label>
                   <input
+                    id="admin-password"
                     type="password" 
                     value={password} 
                     onChange={e => setPassword(e.target.value)}
                     className="w-full border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs font-medium focus:outline-none focus:border-emerald-600"
-                    placeholder="••••••••"
+                    placeholder="••••••••••••"
+                    autoComplete="current-password"
                   />
+                </div>
+
+                <div className="flex items-center justify-between text-xs text-slate-600">
+                  <label className="inline-flex items-center gap-2 cursor-pointer select-none">
+                    <input
+                      type="checkbox"
+                      checked={rememberMe}
+                      onChange={e => setRememberMe(e.target.checked)}
+                      className="rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
+                    />
+                    <span className="text-[11px] font-medium">लॉगिन याद रखें (Remember session)</span>
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (!username.trim()) {
+                        toast.error('पासवर्ड रीसेट हेतु पहले अधिकारी ईमेल या यूज़रनेम दर्ज करें')
+                        return
+                      }
+                      handleSendResetEmail(username.trim())
+                    }}
+                    className="text-[11px] font-bold text-emerald-700 hover:underline"
+                  >
+                    पासवर्ड भूल गए?
+                  </button>
                 </div>
                 
                 <button 
@@ -903,7 +1080,7 @@ export default function AdminPage() {
                   {isLoggingIn ? (
                     <>
                       <Loader2 className="w-4 h-4 animate-spin text-white" />
-                      <span>सत्यापित हो रहा है...</span>
+                      <span>Firebase Auth क्लेम सत्यापित हो रहे हैं...</span>
                     </>
                   ) : (
                     <span>प्रमाण सत्यापित करें एवं लॉगिन करें (Verify Credentials)</span>
@@ -2144,27 +2321,42 @@ export default function AdminPage() {
                       />
                     </div>
                     <div>
-                      <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">सुरक्षा पासवर्ड (Password)</label>
+                      <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">नया पासवर्ड सेट करें (New Password &ge; 10 chars)</label>
                       <input
-                        type="text"
+                        type="password"
                         value={credEditState.admin?.password || ''}
                         onChange={(e) => setCredEditState(prev => ({ ...prev, admin: { ...prev.admin, password: e.target.value } }))}
                         className="w-full border border-slate-300 rounded-xl px-3 py-2 text-xs font-mono font-bold focus:outline-none focus:border-emerald-600 bg-white"
-                        placeholder="jhabua@2024"
+                        placeholder="नया पासवर्ड (खाली छोड़ने पर अपरिवर्तित)"
+                        autoComplete="new-password"
                       />
                     </div>
-                    <button
-                      onClick={() => handleUpdateCredentials('admin')}
-                      disabled={updatingCredUser === 'admin'}
-                      className="w-full btn btn-primary btn-sm text-xs font-bold flex items-center justify-center gap-1.5 mt-2 cursor-pointer disabled:opacity-60"
-                    >
-                      {updatingCredUser === 'admin' ? (
-                        <Loader2 className="w-3.5 h-3.5 animate-spin text-white" />
-                      ) : (
-                        <Save className="w-3.5 h-3.5" />
-                      )}
-                      <span>क्रेडेंशियल सहेजें</span>
-                    </button>
+                    <div className="flex flex-col gap-1.5 pt-1">
+                      <button
+                        onClick={() => handleUpdateCredentials('admin')}
+                        disabled={updatingCredUser === 'admin'}
+                        className="w-full btn btn-primary btn-sm text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-60"
+                      >
+                        {updatingCredUser === 'admin' ? <Loader2 className="w-3.5 h-3.5 animate-spin text-white" /> : <Save className="w-3.5 h-3.5" />}
+                        <span>Firebase Auth क्लेम सहेजें</span>
+                      </button>
+                      <div className="flex gap-1.5">
+                        <button
+                          type="button"
+                          onClick={() => handleSendResetEmail('admin')}
+                          className="flex-1 px-2 py-1.5 rounded-lg border border-slate-300 bg-white text-[10px] font-bold text-slate-700 hover:bg-slate-100"
+                        >
+                          रीसेट ईमेल
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleToggleOfficerDisabled('admin')}
+                          className="flex-1 px-2 py-1.5 rounded-lg border border-rose-200 bg-rose-50 text-[10px] font-bold text-rose-700 hover:bg-rose-100"
+                        >
+                          {credEditState.admin?.disabled ? 'खाता सक्रिय करें' : 'निष्क्रिय / टोकन रद्द'}
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 </div>
 
@@ -2174,7 +2366,7 @@ export default function AdminPage() {
                     <div className="w-8 h-8 rounded-lg bg-cyan-100 text-cyan-800 flex items-center justify-center font-bold text-xs">2</div>
                     <div>
                       <h4 className="font-extrabold text-slate-900 text-sm">जल प्रदाय विभाग अधिकारी</h4>
-                      <p className="text-[10px] text-slate-500 font-mono font-bold">यूजर: water_admin</p>
+                      <p className="text-[10px] text-slate-500 font-mono font-bold">क्लेम: water_admin</p>
                     </div>
                   </div>
 
@@ -2199,27 +2391,42 @@ export default function AdminPage() {
                       />
                     </div>
                     <div>
-                      <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">सुरक्षा पासवर्ड (Password)</label>
+                      <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">नया पासवर्ड सेट करें (New Password &ge; 10 chars)</label>
                       <input
-                        type="text"
+                        type="password"
                         value={credEditState.water_admin?.password || ''}
                         onChange={(e) => setCredEditState(prev => ({ ...prev, water_admin: { ...prev.water_admin, password: e.target.value } }))}
                         className="w-full border border-slate-300 rounded-xl px-3 py-2 text-xs font-mono font-bold focus:outline-none focus:border-emerald-600 bg-white"
-                        placeholder="water@jhabua2024"
+                        placeholder="नया पासवर्ड (खाली छोड़ने पर अपरिवर्तित)"
+                        autoComplete="new-password"
                       />
                     </div>
-                    <button
-                      onClick={() => handleUpdateCredentials('water_admin')}
-                      disabled={updatingCredUser === 'water_admin'}
-                      className="w-full btn btn-primary btn-sm text-xs font-bold flex items-center justify-center gap-1.5 mt-2 cursor-pointer disabled:opacity-60"
-                    >
-                      {updatingCredUser === 'water_admin' ? (
-                        <Loader2 className="w-3.5 h-3.5 animate-spin text-white" />
-                      ) : (
-                        <Save className="w-3.5 h-3.5" />
-                      )}
-                      <span>क्रेडेंशियल सहेजें</span>
-                    </button>
+                    <div className="flex flex-col gap-1.5 pt-1">
+                      <button
+                        onClick={() => handleUpdateCredentials('water_admin')}
+                        disabled={updatingCredUser === 'water_admin'}
+                        className="w-full btn btn-primary btn-sm text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-60"
+                      >
+                        {updatingCredUser === 'water_admin' ? <Loader2 className="w-3.5 h-3.5 animate-spin text-white" /> : <Save className="w-3.5 h-3.5" />}
+                        <span>Firebase Auth क्लेम सहेजें</span>
+                      </button>
+                      <div className="flex gap-1.5">
+                        <button
+                          type="button"
+                          onClick={() => handleSendResetEmail('water_admin')}
+                          className="flex-1 px-2 py-1.5 rounded-lg border border-slate-300 bg-white text-[10px] font-bold text-slate-700 hover:bg-slate-100"
+                        >
+                          रीसेट ईमेल
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleToggleOfficerDisabled('water_admin')}
+                          className="flex-1 px-2 py-1.5 rounded-lg border border-rose-200 bg-rose-50 text-[10px] font-bold text-rose-700 hover:bg-rose-100"
+                        >
+                          {credEditState.water_admin?.disabled ? 'खाता सक्रिय करें' : 'निष्क्रिय / टोकन रद्द'}
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 </div>
 
@@ -2229,7 +2436,7 @@ export default function AdminPage() {
                     <div className="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-xs">3</div>
                     <div>
                       <h4 className="font-extrabold text-slate-900 text-sm">संपत्ति कर व नो ड्यूज अधिकारी</h4>
-                      <p className="text-[10px] text-slate-500 font-mono font-bold">यूजर: nodues_admin</p>
+                      <p className="text-[10px] text-slate-500 font-mono font-bold">क्लेम: nodues_admin</p>
                     </div>
                   </div>
 
@@ -2254,27 +2461,42 @@ export default function AdminPage() {
                       />
                     </div>
                     <div>
-                      <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">सुरक्षा पासवर्ड (Password)</label>
+                      <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">नया पासवर्ड सेट करें (New Password &ge; 10 chars)</label>
                       <input
-                        type="text"
+                        type="password"
                         value={credEditState.nodues_admin?.password || ''}
                         onChange={(e) => setCredEditState(prev => ({ ...prev, nodues_admin: { ...prev.nodues_admin, password: e.target.value } }))}
                         className="w-full border border-slate-300 rounded-xl px-3 py-2 text-xs font-mono font-bold focus:outline-none focus:border-emerald-600 bg-white"
-                        placeholder="nodues@jhabua2024"
+                        placeholder="नया पासवर्ड (खाली छोड़ने पर अपरिवर्तित)"
+                        autoComplete="new-password"
                       />
                     </div>
-                    <button
-                      onClick={() => handleUpdateCredentials('nodues_admin')}
-                      disabled={updatingCredUser === 'nodues_admin'}
-                      className="w-full btn btn-primary btn-sm text-xs font-bold flex items-center justify-center gap-1.5 mt-2 cursor-pointer disabled:opacity-60"
-                    >
-                      {updatingCredUser === 'nodues_admin' ? (
-                        <Loader2 className="w-3.5 h-3.5 animate-spin text-white" />
-                      ) : (
-                        <Save className="w-3.5 h-3.5" />
-                      )}
-                      <span>क्रेडेंशियल सहेजें</span>
-                    </button>
+                    <div className="flex flex-col gap-1.5 pt-1">
+                      <button
+                        onClick={() => handleUpdateCredentials('nodues_admin')}
+                        disabled={updatingCredUser === 'nodues_admin'}
+                        className="w-full btn btn-primary btn-sm text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-60"
+                      >
+                        {updatingCredUser === 'nodues_admin' ? <Loader2 className="w-3.5 h-3.5 animate-spin text-white" /> : <Save className="w-3.5 h-3.5" />}
+                        <span>Firebase Auth क्लेम सहेजें</span>
+                      </button>
+                      <div className="flex gap-1.5">
+                        <button
+                          type="button"
+                          onClick={() => handleSendResetEmail('nodues_admin')}
+                          className="flex-1 px-2 py-1.5 rounded-lg border border-slate-300 bg-white text-[10px] font-bold text-slate-700 hover:bg-slate-100"
+                        >
+                          रीसेट ईमेल
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleToggleOfficerDisabled('nodues_admin')}
+                          className="flex-1 px-2 py-1.5 rounded-lg border border-rose-200 bg-rose-50 text-[10px] font-bold text-rose-700 hover:bg-rose-100"
+                        >
+                          {credEditState.nodues_admin?.disabled ? 'खाता सक्रिय करें' : 'निष्क्रिय / टोकन रद्द'}
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 </div>
 
@@ -2284,7 +2506,7 @@ export default function AdminPage() {
                     <div className="w-8 h-8 rounded-lg bg-purple-700 text-white flex items-center justify-center font-bold text-xs">4</div>
                     <div>
                       <h4 className="font-extrabold text-slate-900 text-sm">मुख्य अधिकारी (Super Admin)</h4>
-                      <p className="text-[10px] text-purple-700 font-mono font-bold">यूजर: super_admin</p>
+                      <p className="text-[10px] text-purple-700 font-mono font-bold">क्लेम: super_admin</p>
                     </div>
                   </div>
 
@@ -2309,13 +2531,14 @@ export default function AdminPage() {
                       />
                     </div>
                     <div>
-                      <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">सुरक्षा पासवर्ड (Password)</label>
+                      <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">नया पासवर्ड सेट करें (New Password &ge; 10 chars)</label>
                       <input
-                        type="text"
+                        type="password"
                         value={credEditState.super_admin?.password || ''}
                         onChange={(e) => setCredEditState(prev => ({ ...prev, super_admin: { ...prev.super_admin, password: e.target.value } }))}
                         className="w-full border border-slate-300 rounded-xl px-3 py-2 text-xs font-mono font-bold focus:outline-none focus:border-purple-600 bg-white"
-                        placeholder="jhabua@super2024"
+                        placeholder="नया पासवर्ड (खाली छोड़ने पर अपरिवर्तित)"
+                        autoComplete="new-password"
                       />
                     </div>
                     <button
@@ -2328,12 +2551,195 @@ export default function AdminPage() {
                       ) : (
                         <Save className="w-3.5 h-3.5" />
                       )}
-                      <span>सुपर एडमिन सहेजें</span>
+                      <span>सुपर एडमिन क्लेम सहेजें</span>
                     </button>
                   </div>
                 </div>
               </div>
             </div>
+          </div>
+        )}
+
+        {/* ── GRIEVANCE MANAGEMENT TAB (Task 4e) ──────────────────────────── */}
+        {activeTab === 'grievances' && isSuperAdmin && (
+          <div className="space-y-6 animate-fade-in">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div>
+                <h2 className="text-base sm:text-lg font-extrabold text-slate-900">नागरिक शिकायत एवं सहायता निवारण (Grievance Redressal)</h2>
+                <p className="text-xs text-slate-500 mt-0.5">नागरिकों द्वारा दर्ज शिकायतों की समीक्षा, स्थिति परिवर्तन एवं आधिकारिक समाधान उत्तर</p>
+              </div>
+              <div className="flex items-center gap-2 flex-wrap">
+                <input
+                  type="text"
+                  value={grievanceSearch}
+                  onChange={e => setGrievanceSearch(e.target.value)}
+                  placeholder="शिकायत क्र., नागरिक नाम या मोबाइल..."
+                  className="px-3 py-2 border border-slate-300 rounded-xl text-xs focus:outline-none focus:border-emerald-600"
+                />
+                <select
+                  value={grievanceStatusFilter}
+                  onChange={e => setGrievanceStatusFilter(e.target.value)}
+                  className="px-3 py-2 border border-slate-300 rounded-xl text-xs font-bold bg-white"
+                >
+                  <option value="all">सभी स्थितियां (All)</option>
+                  <option value="Open">लंबित (Open)</option>
+                  <option value="In Progress">प्रक्रियाधीन (In Progress)</option>
+                  <option value="Resolved">निराकृत (Resolved)</option>
+                  <option value="Rejected">अस्वीकृत (Rejected)</option>
+                </select>
+                <button onClick={() => loadGrievances(false)} className="btn btn-secondary btn-sm">
+                  <RefreshCw className={`w-3.5 h-3.5 ${grievancesLoading ? 'animate-spin' : ''}`} />
+                </button>
+              </div>
+            </div>
+
+            {grievancesLoading ? (
+              <div className="text-center py-12 bg-white border border-slate-200 rounded-2xl">
+                <RefreshCw className="animate-spin w-7 h-7 text-emerald-600 mx-auto mb-2" />
+                <p className="text-xs text-slate-500">शिकायतें लोड हो रही हैं...</p>
+              </div>
+            ) : grievances.length === 0 ? (
+              <div className="text-center py-12 bg-white border border-dashed border-slate-200 rounded-2xl">
+                <MessageSquareWarning className="w-9 h-9 text-slate-400 mx-auto mb-2" />
+                <p className="text-xs font-semibold text-slate-500">कोई नागरिक शिकायत लंबित नहीं है</p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {grievances
+                  .filter(g => grievanceStatusFilter === 'all' || g.status === grievanceStatusFilter)
+                  .filter(g => {
+                    if (!grievanceSearch.trim()) return true
+                    const q = grievanceSearch.toLowerCase()
+                    return (
+                      (g.grievanceId || g.id || '').toLowerCase().includes(q) ||
+                      (g.fullName || '').toLowerCase().includes(q) ||
+                      (g.mobile || '').toLowerCase().includes(q) ||
+                      (g.applicationNo || '').toLowerCase().includes(q) ||
+                      (g.description || '').toLowerCase().includes(q)
+                    )
+                  })
+                  .map(g => (
+                    <div key={g.id} className="bg-white border border-slate-200 rounded-2xl p-4 sm:p-5 space-y-3 shadow-xs">
+                      <div className="flex items-center justify-between gap-2 flex-wrap border-b border-slate-100 pb-2.5">
+                        <div className="flex items-center gap-2 text-xs">
+                          <span className="font-mono font-extrabold text-emerald-900 bg-emerald-100 px-2.5 py-0.5 rounded">
+                            {g.grievanceId || g.id}
+                          </span>
+                          <span className="text-slate-500 font-semibold">{g.serviceType}</span>
+                          {g.applicationNo && (
+                            <span className="font-mono text-slate-700 bg-slate-100 px-2 py-0.5 rounded">
+                              आवेदन: {g.applicationNo}
+                            </span>
+                          )}
+                        </div>
+                        <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase ${getStatusChip(g.status)}`}>
+                          {g.status || 'Open'}
+                        </span>
+                      </div>
+
+                      <div className="text-xs text-slate-700 space-y-1">
+                        <p>
+                          <strong>नागरिक:</strong> {g.fullName} | <strong>मोबाइल:</strong> <span className="font-mono">{g.mobile}</span> | <strong>विषय:</strong> {g.issueType}
+                        </p>
+                        <p className="bg-slate-50 p-3 rounded-xl border border-slate-200/80 text-slate-800">
+                          {g.description}
+                        </p>
+                        {g.officerReply && (
+                          <p className="bg-emerald-50 p-2.5 rounded-xl border border-emerald-200 text-emerald-900 font-medium">
+                            <strong>अधिकारी समाधान उत्तर ({g.resolvedBy || 'Officer'}):</strong> {g.officerReply}
+                          </p>
+                        )}
+                      </div>
+
+                      <div className="flex items-center justify-end gap-2 pt-1">
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setGrievanceModal({
+                              isOpen: true,
+                              record: g,
+                              targetStatus: 'In Progress',
+                              replyText: g.officerReply || 'प्रकरण की जांच संबंधित शाखा द्वारा की जा रही है।'
+                            })
+                          }
+                          className="px-3 py-1.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-xs font-bold hover:bg-amber-100"
+                        >
+                          प्रक्रियाधीन चिह्नित करें
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setGrievanceModal({
+                              isOpen: true,
+                              record: g,
+                              targetStatus: 'Resolved',
+                              replyText: g.officerReply || 'आपकी समस्या का समाधान कर दिया गया है।'
+                            })
+                          }
+                          className="px-3.5 py-1.5 rounded-xl bg-emerald-600 text-white text-xs font-bold hover:bg-emerald-700"
+                        >
+                          समाधान दर्ज करें (Resolve)
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {grievanceModal.isOpen && (
+          <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-[10000] p-4 flex items-center justify-center">
+            <form onSubmit={handleUpdateGrievanceStatus} className="bg-white rounded-3xl max-w-md w-full p-6 space-y-4 shadow-2xl">
+              <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                <h3 className="font-extrabold text-sm text-slate-900">
+                  शिकायत निवारण अपडेट ({grievanceModal.record?.grievanceId || grievanceModal.record?.id})
+                </h3>
+                <button
+                  type="button"
+                  onClick={() => setGrievanceModal({ isOpen: false, record: null, targetStatus: 'In Progress', replyText: '' })}
+                  className="text-slate-400 hover:text-slate-700"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">नई स्थिति (Target Status)</label>
+                <select
+                  value={grievanceModal.targetStatus}
+                  onChange={e => setGrievanceModal(prev => ({ ...prev, targetStatus: e.target.value }))}
+                  className="w-full border border-slate-300 rounded-xl px-3 py-2 text-xs font-bold"
+                >
+                  <option value="Open">Open (लंबित)</option>
+                  <option value="In Progress">In Progress (प्रक्रियाधीन)</option>
+                  <option value="Resolved">Resolved (निराकृत)</option>
+                  <option value="Rejected">Rejected (अस्वीकृत)</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">अधिकारी समाधान उत्तर (Officer Reply) *</label>
+                <textarea
+                  required
+                  rows={3}
+                  value={grievanceModal.replyText}
+                  onChange={e => setGrievanceModal(prev => ({ ...prev, replyText: e.target.value }))}
+                  className="w-full border border-slate-300 rounded-xl p-3 text-xs font-medium"
+                  placeholder="नागरिक की शिकायत पर की गई कार्यवाही का विवरण लिखें..."
+                />
+              </div>
+              <div className="flex justify-end gap-2 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setGrievanceModal({ isOpen: false, record: null, targetStatus: 'In Progress', replyText: '' })}
+                  className="px-4 py-2 rounded-xl border border-slate-200 text-xs font-bold text-slate-600"
+                >
+                  रद्द करें
+                </button>
+                <button type="submit" className="px-4 py-2 rounded-xl bg-emerald-700 text-white text-xs font-bold">
+                  समाधान सहेजें
+                </button>
+              </div>
+            </form>
           </div>
         )}
       </div>

@@ -1,0 +1,6 @@
+{
+  "name": "E-Nagar (Jhabua Nagar Palika Aapke Dwar)",
+  "description": "Citizen service portal for birth, death, water connection, and no dues certificates for Jhabua Nagar Palika.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

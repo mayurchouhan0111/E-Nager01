@@ -3,114 +3,215 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Helper functions for security validation
+    // ── Helper Functions ──────────────────────────────────────────────
     function isAuthenticated() {
-      return request.auth != null;
+      return request.auth != null && request.auth.token.get('disabled', false) != true;
     }
 
-    function hasRequiredFields(requiredFields) {
-      return request.resource.data.keys().hasAll(requiredFields);
-    }
-    
-    function isValidStatus(status) {
-      return status in ['Submitted', 'Under Review', 'Correction Requested', 'Approved', 'Rejected', 'Certificate Generated', 'Completed', 'Sanctioned'];
+    function hasRole(allowedRoles) {
+      return isAuthenticated() &&
+             request.auth.token.get('role', '') in allowedRoles;
     }
 
-    // Death Certificates Collection
-    match /deathCertificates/{docId} {
-      // Citizens can submit new applications with required fields
-      allow create: if hasRequiredFields(['applicationNo', 'deceasedDetails', 'applicantDetails', 'status'])
-                    && request.resource.data.status == 'Submitted';
-      
-      // Restrict bulk listing to authenticated users, allow single document get by appNo query
-      allow list: if isAuthenticated();
-      allow get: if true;
-
-      // Allow status updates by authenticated admin users only
-      allow update: if isAuthenticated() && isValidStatus(request.resource.data.status);
-      
-      // Disallow unauthorized deletion
-      allow delete: if false;
+    function isSuperAdmin() {
+      return hasRole(['super_admin']);
     }
 
-    // Birth Certificates Collection
+    function isBirthDeathAdmin() {
+      return hasRole(['birth_death_admin', 'super_admin']);
+    }
+
+    function isWaterAdmin() {
+      return hasRole(['water_admin', 'super_admin']);
+    }
+
+    function isNoDuesAdmin() {
+      return hasRole(['nodues_admin', 'super_admin']);
+    }
+
+    function isAnyOfficer() {
+      return hasRole(['birth_death_admin', 'water_admin', 'nodues_admin', 'super_admin']);
+    }
+
+    function isOwner(docData) {
+      return isAuthenticated() &&
+             docData.userUid != null &&
+             docData.userUid == request.auth.uid;
+    }
+
+    function isCreatingOwnRecord() {
+      return isAuthenticated() &&
+             request.resource.data.userUid == request.auth.uid &&
+             request.resource.data.status in ['Draft', 'Submitted'] &&
+             request.resource.data.get('paymentStatus', 'Pending') != 'Paid' &&
+             request.resource.data.get('officialUploadedCertificate', null) == null &&
+             request.resource.data.get('lastOfficerRemark', null) == null;
+    }
+
+    function isCitizenValidUpdate() {
+      return isOwner(resource.data) &&
+             resource.data.status in ['Draft', 'Correction Requested'] &&
+             request.resource.data.status in ['Draft', 'Submitted'] &&
+             request.resource.data.userUid == resource.data.userUid &&
+             request.resource.data.applicationNo == resource.data.applicationNo &&
+             !request.resource.data.diff(resource.data).affectedKeys()
+               .hasAny([
+                 'applicationNo',
+                 'userUid',
+                 'lastOfficerRemark',
+                 'lastOfficerName',
+                 'officialUploadedCertificate',
+                 'paymentStatus',
+                 'paymentUTR',
+                 'paymentAmount',
+                 'timeline'
+               ]);
+    }
+
+    // Standard Certificate Transition Matrix (Birth, Death, No-Dues)
+    function isStandardCertTransition(oldStatus, newStatus) {
+      return (
+        (oldStatus == 'Submitted' && newStatus in ['Under Review', 'Correction Requested', 'Rejected', 'Approved']) ||
+        (oldStatus == 'Under Review' && newStatus in ['Correction Requested', 'Rejected', 'Approved', 'Certificate Generated']) ||
+        (oldStatus == 'Correction Requested' && newStatus in ['Under Review', 'Approved', 'Rejected']) ||
+        (oldStatus == 'Approved' && newStatus in ['Certificate Generated', 'Completed', 'Approved']) ||
+        (oldStatus == 'Certificate Generated' && newStatus in ['Completed', 'Certificate Generated']) ||
+        (oldStatus == 'Completed' && newStatus == 'Completed') ||
+        (oldStatus == 'Rejected' && newStatus == 'Rejected')
+      );
+    }
+
+    // Water Connection Transition Matrix (includes 'Sanctioned')
+    function isWaterTransition(oldStatus, newStatus) {
+      return (
+        (oldStatus == 'Submitted' && newStatus in ['Under Review', 'Correction Requested', 'Rejected', 'Approved', 'Sanctioned']) ||
+        (oldStatus == 'Under Review' && newStatus in ['Correction Requested', 'Rejected', 'Approved', 'Sanctioned', 'Certificate Generated']) ||
+        (oldStatus == 'Correction Requested' && newStatus in ['Under Review', 'Approved', 'Sanctioned', 'Rejected']) ||
+        (oldStatus in ['Approved', 'Sanctioned'] && newStatus in ['Certificate Generated', 'Completed', 'Approved', 'Sanctioned']) ||
+        (oldStatus == 'Certificate Generated' && newStatus in ['Completed', 'Certificate Generated']) ||
+        (oldStatus == 'Completed' && newStatus == 'Completed') ||
+        (oldStatus == 'Rejected' && newStatus == 'Rejected')
+      );
+    }
+
+    function hasImmutableCoreFields() {
+      return request.resource.data.applicationNo == resource.data.applicationNo &&
+             request.resource.data.userUid == resource.data.userUid;
+    }
+
+    // ── 1. Birth Certificate Applications ─────────────────────────────
     match /birthCertificates/{docId} {
-      // Citizens can submit new applications with required fields
-      allow create: if hasRequiredFields(['applicationNo', 'childDetails', 'applicantDetails', 'status'])
-                    && request.resource.data.status == 'Submitted';
-      
-      // Restrict bulk listing to authenticated users, allow single document get by appNo query
-      allow list: if isAuthenticated();
-      allow get: if true;
+      allow create: if isCreatingOwnRecord()
+                    && request.resource.data.keys().hasAll(['childDetails', 'motherDetails', 'fatherDetails', 'applicantDetails', 'status', 'userUid']);
 
-      // Allow status updates by authenticated admin users only
-      allow update: if isAuthenticated() && isValidStatus(request.resource.data.status);
-      
-      // Disallow unauthorized deletion
-      allow delete: if false;
+      allow get, list: if isOwner(resource.data) || isBirthDeathAdmin();
+
+      allow update: if (isBirthDeathAdmin() && isStandardCertTransition(resource.data.status, request.resource.data.status) && hasImmutableCoreFields())
+                    || isCitizenValidUpdate();
+
+      allow delete: if isSuperAdmin() || (isOwner(resource.data) && resource.data.status == 'Draft');
     }
 
-    // Water Connections Collection
+    // ── 2. Death Certificate Applications ─────────────────────────────
+    match /deathCertificates/{docId} {
+      allow create: if isCreatingOwnRecord()
+                    && request.resource.data.keys().hasAll(['deceasedDetails', 'applicantDetails', 'status', 'userUid']);
+
+      allow get, list: if isOwner(resource.data) || isBirthDeathAdmin();
+
+      allow update: if (isBirthDeathAdmin() && isStandardCertTransition(resource.data.status, request.resource.data.status) && hasImmutableCoreFields())
+                    || isCitizenValidUpdate();
+
+      allow delete: if isSuperAdmin() || (isOwner(resource.data) && resource.data.status == 'Draft');
+    }
+
+    // ── 3. Water Connection Applications ──────────────────────────────
     match /waterConnections/{docId} {
-      // Citizens can submit new applications with required fields
-      allow create: if hasRequiredFields(['applicationNo', 'applicantDetails', 'propertyDetails', 'status'])
-                    && request.resource.data.status == 'Submitted';
-      
-      // Restrict bulk listing to authenticated users, allow single document get by appNo query
-      allow list: if isAuthenticated();
-      allow get: if true;
+      allow create: if isCreatingOwnRecord()
+                    && request.resource.data.keys().hasAll(['applicantDetails', 'propertyDetails', 'status', 'userUid']);
 
-      // Allow status updates by authenticated admin users only
-      allow update: if isAuthenticated() && isValidStatus(request.resource.data.status);
-      
-      // Disallow unauthorized deletion
-      allow delete: if false;
+      allow get, list: if isOwner(resource.data) || isWaterAdmin();
+
+      allow update: if (isWaterAdmin() && isWaterTransition(resource.data.status, request.resource.data.status) && hasImmutableCoreFields())
+                    || isCitizenValidUpdate();
+
+      allow delete: if isSuperAdmin() || (isOwner(resource.data) && resource.data.status == 'Draft');
     }
 
-    // Property Tax No Dues NOC Collection
+    // ── 4. No-Dues Certificate (NOC) Applications ─────────────────────
     match /noDuesCertificates/{docId} {
-      // Citizens can submit new applications with required fields
-      allow create: if hasRequiredFields(['applicationNo', 'applicantDetails', 'propertyDetails', 'status'])
-                    && request.resource.data.status == 'Submitted';
-      
-      // Restrict bulk listing to authenticated users, allow single document get by appNo query
-      allow list: if isAuthenticated();
-      allow get: if true;
+      allow create: if isCreatingOwnRecord()
+                    && request.resource.data.keys().hasAll(['applicantDetails', 'propertyDetails', 'status', 'userUid']);
 
-      // Allow status updates by authenticated users or payment update
-      allow update: if (isAuthenticated() || request.resource.data.paymentStatus == 'Paid') && isValidStatus(request.resource.data.status);
-      
-      // Disallow unauthorized deletion
-      allow delete: if false;
+      allow get, list: if isOwner(resource.data) || isNoDuesAdmin();
+
+      allow update: if (isNoDuesAdmin() && isStandardCertTransition(resource.data.status, request.resource.data.status) && hasImmutableCoreFields())
+                    || isCitizenValidUpdate();
+
+      allow delete: if isSuperAdmin() || (isOwner(resource.data) && resource.data.status == 'Draft');
     }
 
-    // Audit Logs Collection (Compliance & Security Audit Trail)
+    // ── 5. Grievances Collection ──────────────────────────────────────
+    match /grievances/{docId} {
+      allow create: if isAuthenticated()
+                    && request.resource.data.userUid == request.auth.uid
+                    && request.resource.data.keys().hasAll(['fullName', 'mobile', 'serviceType', 'issueType', 'description', 'status', 'userUid'])
+                    && request.resource.data.status == 'Open'
+                    && request.resource.data.description is string
+                    && request.resource.data.description.size() >= 10
+                    && request.resource.data.description.size() <= 5000;
+
+      allow get, list: if isAnyOfficer() || isOwner(resource.data);
+
+      allow update: if isAnyOfficer()
+                    && request.resource.data.userUid == resource.data.userUid
+                    && request.resource.data.status in ['Open', 'In Progress', 'Resolved', 'Rejected'];
+
+      allow delete: if isSuperAdmin();
+    }
+
+    // ── 6. Immutable Audit Trail Logs ─────────────────────────────────
     match /auditLogs/{docId} {
-      allow create: if request.resource.data.keys().hasAll(['action', 'timestamp']);
-      allow read: if isAuthenticated();
-      allow update, delete: if false; // Audit logs are immutable
+      allow create: if isAnyOfficer()
+                    && request.resource.data.actorUid == request.auth.uid;
+      allow get, list: if isSuperAdmin();
+      allow update, delete: if false;
     }
 
-    match /audit_logs/{docId} {
-      allow create: if request.resource.data.keys().hasAll(['action', 'timestamp']);
-      allow read: if isAuthenticated();
-      allow update, delete: if false; // Audit logs are immutable
-    }
-
-    // Notifications Collection
+    // ── 7. Notifications Collection ───────────────────────────────────
     match /notifications/{docId} {
-      allow create: if true;
-      allow read: if true;
-      allow update: if isAuthenticated();
-      allow delete: if false;
+      allow create: if isAuthenticated()
+                    && (request.resource.data.userUid == request.auth.uid || isAnyOfficer());
+      allow get, list: if isAnyOfficer() || isOwner(resource.data);
+      allow update: if (isAnyOfficer() || isOwner(resource.data))
+                    && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['isRead', 'readAt']);
+      allow delete: if isSuperAdmin();
     }
 
-    // Admin Settings Collection
+    // ── 8. Aadhaar Reference Vault (Write-Only by Owner, Client Read Denied) ──
+    match /aadhaarVault/{refId} {
+      allow create: if isAuthenticated()
+                    && request.resource.data.userUid == request.auth.uid
+                    && request.resource.data.keys().hasAll(['refId', 'aadhaarSha256', 'maskedAadhaar', 'userUid']);
+      allow read, update, delete: if false;
+    }
+
+    // ── 9. Admin Settings (Maintenance Public Get, Accounts Permanently Removed) ──
+    match /admin_settings/maintenance {
+      allow get: if true;
+      allow list: if isAnyOfficer();
+      allow write: if isSuperAdmin();
+    }
+
+    match /admin_settings/accounts {
+      allow read, write: if false;
+    }
+
     match /admin_settings/{docId} {
-      allow read, write: if isAuthenticated();
+      allow read, write: if docId != 'accounts' && isSuperAdmin();
     }
 
-    // Default deny all other collections
+    // ── 10. Default Deny for All Other Collections ────────────────────
     match /{document=**} {
       allow read, write: if false;
     }

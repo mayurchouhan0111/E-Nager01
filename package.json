@@ -1,32 +1,46 @@
 {
-  "name": "birth-death-certificate",
-  "version": "1.0.0",
+  "name": "e-nagar-jhabua",
   "private": true,
+  "version": "1.0.0",
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev -p 3000 -H 0.0.0.0",
     "build": "next build",
-    "start": "next start",
-    "test": "npx playwright test",
-    "test:ui": "npx playwright test --ui",
-    "test:report": "npx playwright show-report"
+    "start": "next start -p 3000 -H 0.0.0.0",
+    "lint": "tsc --noEmit",
+    "emulators:start": "firebase emulators:start --only auth,firestore,storage",
+    "claims:emulator": "node scripts/set-admin-claims.mjs --emulator",
+    "seed:test": "node scripts/seed-test-data.mjs",
+    "reset:test": "node scripts/reset-emulator.mjs",
+    "test:rules": "firebase emulators:exec --project demo-e-nagar-jhabua-rules --only firestore,storage \"node --test tests/rules/firestore.rules.test.mjs\"",
+    "test:e2e": "firebase emulators:exec --project demo-e-nagar-jhabua --only auth,firestore,storage \"node scripts/seed-test-data.mjs && node --test tests/e2e/portal.spec.mjs\""
   },
   "dependencies": {
+    "@firebase/rules-unit-testing": "^6.0.0",
     "@formkit/auto-animate": "^0.10.0",
+    "@google/genai": "^2.4.0",
     "@tailwindcss/postcss": "^4.3.1",
+    "dotenv": "^17.2.3",
+    "express": "^4.21.2",
     "firebase": "^12.15.0",
-    "html2pdf.js": "^0.14.0",
-    "lucide-react": "^1.21.0",
-    "motion": "^12.43.0",
+    "firebase-admin": "^14.5.0",
+    "lucide-react": "^0.546.0",
+    "motion": "^12.23.24",
     "next": "^16.2.9",
-    "react": "^19.2.7",
-    "react-dom": "^19.2.7",
+    "playwright": "^1.65.0",
+    "react": "^19.0.1",
+    "react-dom": "^19.0.1",
     "react-hot-toast": "^2.6.0"
   },
   "devDependencies": {
-    "@playwright/test": "^1.62.1",
+    "@axe-core/playwright": "^4.14.0",
     "@tailwindcss/typography": "^0.5.12",
-    "autoprefixer": "^10.5.2",
+    "@types/node": "^22.14.0",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "autoprefixer": "^10.4.21",
     "postcss": "^8.5.15",
-    "tailwindcss": "^4.3.1"
+    "tailwindcss": "^4.3.3",
+    "tsx": "^4.21.0",
+    "typescript": "^7.0.2"
   }
 }

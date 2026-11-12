@@ -1,45 +1,40 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
-import { FileText, Baby, Droplets, Building2, History } from 'lucide-react';
+import { FileText, Baby, Droplets, Building2, History, MessageSquareWarning } from 'lucide-react';
+import { subscribeToAdminAuthState } from '@/services/adminAuthService';
 
 export default function AdminMobileBottomNav() {
   const pathname = usePathname();
   const [activeTab, setActiveTab] = useState('death-certificates');
-  const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(false);
+  const [officerSession, setOfficerSession] = useState(null);
 
   useEffect(() => {
+    const unsub = subscribeToAdminAuthState((session) => {
+      setOfficerSession(session);
+    });
+
+    const handleTabChange = (e) => {
+      if (e.detail?.tab) {
+        setActiveTab(e.detail.tab);
+      } else if (typeof e.detail === 'string') {
+        setActiveTab(e.detail);
+      }
+    };
+
     if (typeof window !== 'undefined') {
-      const checkAuth = () => {
-        const stored = sessionStorage.getItem('dc_admin_authenticated');
-        setIsAdminAuthenticated(stored === 'true');
-      };
-      
-      checkAuth();
-
-      const handleTabChange = (e) => {
-        if (e.detail?.tab) {
-          setActiveTab(e.detail.tab);
-        } else if (typeof e.detail === 'string') {
-          setActiveTab(e.detail);
-        }
-      };
-
-      const handleAuthChange = (e) => {
-        setIsAdminAuthenticated(!!e.detail);
-      };
-
       window.addEventListener('admin-tab-changed', handleTabChange);
-      window.addEventListener('admin-auth-changed', handleAuthChange);
-      
-      return () => {
-        window.removeEventListener('admin-tab-changed', handleTabChange);
-        window.removeEventListener('admin-auth-changed', handleAuthChange);
-      };
     }
+
+    return () => {
+      unsub();
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('admin-tab-changed', handleTabChange);
+      }
+    };
   }, [pathname]);
 
-  if (!pathname?.startsWith('/admin') || !isAdminAuthenticated) {
+  if (!pathname?.startsWith('/admin') || !officerSession) {
     return null;
   }
 
@@ -50,7 +45,7 @@ export default function AdminMobileBottomNav() {
     }
   };
 
-  const navItems = [
+  const allNavItems = [
     {
       key: 'death-certificates',
       label: 'मृत्यु',
@@ -72,11 +67,19 @@ export default function AdminMobileBottomNav() {
       icon: Building2,
     },
     {
+      key: 'grievances',
+      label: 'शिकायत',
+      icon: MessageSquareWarning,
+    },
+    {
       key: 'audit',
       label: 'ऑडिट',
       icon: History,
     },
   ];
+
+  const allowedTabs = officerSession.allowedTabs || [];
+  const navItems = allNavItems.filter((item) => allowedTabs.includes(item.key));
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 lg:hidden bg-white/95 backdrop-blur-xl border-t border-slate-200 text-slate-900 shadow-[0_-4px_24px_rgba(0,0,0,0.07)] no-print pb-safe">
@@ -94,24 +97,29 @@ export default function AdminMobileBottomNav() {
               aria-label={item.label}
             >
               <div className="relative flex flex-col items-center justify-center w-full h-full py-1">
-                {/* Sleek Top Active Accent Line */}
                 {active && (
                   <div className="absolute top-0 w-8 h-1 bg-gradient-to-r from-emerald-600 to-teal-500 rounded-b-full shadow-xs animate-scale-in" />
                 )}
 
-                {/* Icon Container with Pill Highlight */}
-                <div className={`px-3 py-1 rounded-full transition-all duration-300 flex items-center justify-center ${
-                  active
-                    ? 'bg-emerald-100/90 text-emerald-800 scale-105 shadow-xs'
-                    : 'text-slate-500 hover:text-slate-900 bg-transparent'
-                }`}>
-                  <Icon className={`w-5 h-5 transition-transform duration-300 ${active ? 'stroke-[2.4] text-emerald-800' : 'stroke-[1.8]'}`} />
+                <div
+                  className={`px-3 py-1 rounded-full transition-all duration-300 flex items-center justify-center ${
+                    active
+                      ? 'bg-emerald-100/90 text-emerald-800 scale-105 shadow-xs'
+                      : 'text-slate-500 hover:text-slate-900 bg-transparent'
+                  }`}
+                >
+                  <Icon
+                    className={`w-5 h-5 transition-transform duration-300 ${
+                      active ? 'stroke-[2.4] text-emerald-800' : 'stroke-[1.8]'
+                    }`}
+                  />
                 </div>
 
-                {/* Text Label */}
-                <span className={`text-[10px] leading-tight mt-0.5 tracking-tight transition-colors ${
-                  active ? 'font-extrabold text-emerald-900' : 'font-semibold text-slate-500'
-                }`}>
+                <span
+                  className={`text-[10px] leading-tight mt-0.5 tracking-tight transition-colors ${
+                    active ? 'font-extrabold text-emerald-900' : 'font-semibold text-slate-500'
+                  }`}
+                >
                   {item.label}
                 </span>
               </div>

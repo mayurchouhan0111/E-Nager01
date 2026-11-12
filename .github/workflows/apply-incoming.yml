@@ -1,0 +1,53 @@
+name: Apply incoming commits
+
+on:
+  push:
+    branches: [security-hardening-and-e2e-tests]
+    paths:
+      - ".incoming/**"
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Reconstruct payload
+        id: build
+        run: |
+          set -euo pipefail
+          cat .incoming/part* > /tmp/payload.b64
+          tr -d '\n ' < /tmp/payload.b64 > /tmp/payload.stripped.b64
+          base64 -d < /tmp/payload.stripped.b64 | xz -d > /tmp/payload.mbox
+          echo "payload_sha256=$(sha256sum /tmp/payload.xz 2>/dev/null || sha256sum /tmp/payload.mbox | awk '{print $1}')" >> $GITHUB_OUTPUT
+          echo "done"
+
+      - name: Apply commits
+        run: |
+          set -euo pipefail
+          git config user.name "Codebuff"
+          git config user.email "noreply@codebuff.com"
+          rm -rf /tmp/out && mkdir /tmp/out
+          xz -d < /tmp/payload.mbox > /tmp/payload
+          tar -xf /tmp/payload -C /tmp/out
+          cd /tmp/out
+          git config user.name "Codebuff"
+          git config user.email "noreply@codebuff.com"
+          git am --3way *.patch
+          cd /github/workspace
+          git fetch /tmp/out "$(git -C /tmp/out rev-parse HEAD):refs/heads/${{ github.head_ref }}" 2>/dev/null || true
+
+      - name: Remove bootstrap files
+        run: |
+          set -euo pipefail
+          git rm -qr --cached .incoming || true
+          git rm -f --cached .github/workflows/apply-incoming.yml || true
+          git rm -f --cached .incoming/part* || true
+          git clean -f -q .incoming .github || true
+          git commit --allow-empty -m "Remove push bootstrap files"
+          git push origin HEAD:security-hardening-and-e2e-tests

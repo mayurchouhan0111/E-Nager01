@@ -40,7 +40,7 @@ export default function NoDuesCertificateTemplate({ record }) {
   const triRefNo = tax.triRefNo || 'PC-0179-03-6-1-00117';
   const amountPaid = tax.amountPaid ? `${parseFloat(tax.amountPaid).toFixed(1)}` : '7098.0';
 
-  const officerName = record.lastOfficerName || 'Milan Patel';
+  const officerName = record.lastOfficerName || 'मुख्य नगर पालिका अधिकारी (CMO)';
 
   return (
     <div className="print-page-a4 print-container bg-white text-slate-900 p-8 sm:p-12 max-w-4xl mx-auto border-2 border-slate-900 shadow-2xl relative font-sans text-sm leading-relaxed print:p-6 print:max-h-none print:shadow-none">
@@ -101,7 +101,7 @@ export default function NoDuesCertificateTemplate({ record }) {
           <div className="text-center space-y-1">
             <div className="p-1.5 bg-white border border-slate-300 rounded inline-block">
               <QRCodeGenerator 
-                value={`https://jhabua-nagarpalika-aapke-dwar.netlify.app/verify?type=no_dues&certNo=${encodeURIComponent(certificateNo)}&propertyId=${encodeURIComponent(propertyId)}`}
+                value={`${typeof window !== 'undefined' ? window.location.origin : 'https://jhabua-nagarpalika-aapke-dwar.netlify.app'}/verify/${encodeURIComponent(record.applicationNo || certificateNo)}`}
                 size={85}
               />
             </div>

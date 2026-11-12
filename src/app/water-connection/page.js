@@ -405,7 +405,7 @@ export default function WaterConnectionPage() {
             <div className="bg-slate-50/80 p-3.5 rounded-2xl border border-slate-200 flex items-center justify-between">
               <div>
                 <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">मुख्य नगर पालिका अधिकारी (नोडल प्रशासक)</span>
-                <span className="font-extrabold text-slate-900 text-sm">CMO मिलन सर (Milan Sir)</span>
+                <span className="font-extrabold text-slate-900 text-sm">मुख्य नगर पालिका अधिकारी (CMO)</span>
                 <span className="text-[10px] text-slate-500 block font-medium">समय: सोमवार से शुक्रवार (10:30 AM - 05:30 PM)</span>
               </div>
               <a href="tel:9713175838" className="font-mono font-extrabold text-teal-800 bg-teal-100 hover:bg-teal-200 px-3 py-1.5 rounded-xl border border-teal-300 text-xs transition">
@@ -551,19 +551,6 @@ export default function WaterConnectionPage() {
                     value={formData.applicantDetails.fatherHusbandName}
                     onChange={(e) => handleInputChange('applicantDetails', 'fatherHusbandName', e.target.value)}
                     placeholder="पिता / पति का नाम दर्ज करें"
-                    className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-slate-900 focus:outline-none focus:border-teal-600 focus:ring-2 focus:ring-teal-600/20 font-medium"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-[10px] sm:text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">
-                    जाति (Caste)
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.applicantDetails.caste}
-                    onChange={(e) => handleInputChange('applicantDetails', 'caste', e.target.value)}
-                    placeholder="जाति दर्ज करें"
                     className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-slate-900 focus:outline-none focus:border-teal-600 focus:ring-2 focus:ring-teal-600/20 font-medium"
                   />
                 </div>

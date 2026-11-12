@@ -1,39 +1,88 @@
-/**
- * Professional e-Governance Document Vault Formatter
- * Organizes uploaded files into standardized government directory structure & metadata:
- * Directory: applications/[serviceType]/[year]/[applicationNo]/documents/
- * Standardized File Name: [applicationNo]_[DocumentKey].[ext]
- */
-export function formatOfficialDocumentVault(documents, applicationNo, serviceType = 'general') {
-  if (!documents || typeof documents !== 'object') return {};
+const DB_NAME = 'NagarPalikaDocVault';
+const STORE_NAME = 'documents';
+const DB_VERSION = 1;
 
-  const year = new Date().getFullYear();
-  const folderPath = `applications/${serviceType}/${year}/${applicationNo}/documents/`;
-
-  const formattedVault = {};
-
-  Object.entries(documents).forEach(([docKey, docObj]) => {
-    if (docObj && typeof docObj === 'object' && (docObj.fileData || docObj.fileUrl || docObj.url)) {
-      const originalName = docObj.fileName || `${docKey}.jpg`;
-      const ext = originalName.includes('.')
-        ? originalName.split('.').pop()
-        : (docObj.fileType?.includes('pdf') ? 'pdf' : 'jpg');
-
-      const officialFileName = `${applicationNo}_${docKey}.${ext}`;
-      const fullVirtualPath = `${folderPath}${officialFileName}`;
-
-      formattedVault[docKey] = {
-        ...docObj,
-        docKey,
-        folderPath,
-        fullVirtualPath,
-        officialFileName,
-        storageBucket: 'e-nagar-jhabua-vault',
-        vaultCategory: serviceType,
-        archivedAt: docObj.uploadedAt || new Date().toISOString()
-      };
+function openDB() {
+  return new Promise((resolve, reject) => {
+    if (typeof window === 'undefined' || !window.indexedDB) {
+      return reject(new Error('IndexedDB not supported'));
     }
+    const request = window.indexedDB.open(DB_NAME, DB_VERSION);
+    request.onupgradeneeded = (e) => {
+      const db = e.target.result;
+      if (!db.objectStoreNames.contains(STORE_NAME)) {
+        db.createObjectStore(STORE_NAME, { keyPath: 'id' });
+      }
+    };
+    request.onsuccess = (e) => resolve(e.target.result);
+    request.onerror = (e) => reject(e.target.error);
   });
+}
 
-  return formattedVault;
+export function formatOfficialDocumentVault(documents, metadata = {}) {
+  if (!documents || typeof documents !== 'object') return {};
+  const formatted = {};
+  for (const [key, docObj] of Object.entries(documents)) {
+    if (!docObj) continue;
+    formatted[key] = {
+      ...docObj,
+      vaultVerified: true,
+      serviceType: metadata.serviceType || 'municipal_service',
+      applicationNo: metadata.applicationNo || '',
+      applicantName: metadata.applicantName || '',
+      applicantMobile: metadata.applicantMobile || '',
+      archivedAt: docObj.uploadedAt || new Date().toISOString(),
+    };
+  }
+  return formatted;
+}
+
+export async function saveDocumentToVault(id, docPayload) {
+  try {
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(STORE_NAME, 'readwrite');
+      const store = tx.objectStore(STORE_NAME);
+      store.put({ id, ...docPayload, savedAt: new Date().toISOString() });
+      tx.oncomplete = () => resolve(true);
+      tx.onerror = (e) => reject(e.target.error);
+    });
+  } catch (err) {
+    console.warn('IndexedDB save fallback:', err);
+    return false;
+  }
+}
+
+export async function getDocumentFromVault(id) {
+  try {
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(STORE_NAME, 'readonly');
+      const store = tx.objectStore(STORE_NAME);
+      const req = store.get(id);
+      req.onsuccess = () => resolve(req.result || null);
+      req.onerror = (e) => reject(e.target.error);
+    });
+  } catch (err) {
+    return null;
+  }
+}
+
+export async function clearVaultDocuments() {
+  try {
+    if (typeof window === 'undefined' || !window.indexedDB) return false;
+    const db = await openDB();
+    await new Promise((resolve, reject) => {
+      const tx = db.transaction(STORE_NAME, 'readwrite');
+      const store = tx.objectStore(STORE_NAME);
+      store.clear();
+      tx.oncomplete = () => resolve(true);
+      tx.onerror = (e) => reject(e.target.error);
+    });
+    db.close();
+    return true;
+  } catch (err) {
+    console.warn('IndexedDB clear error:', err);
+    return false;
+  }
 }

@@ -283,7 +283,7 @@ export default function DeathCertificateTemplate({ record }) {
           <div className="text-center space-y-1">
             <div className="p-1 bg-white border border-slate-300 rounded inline-block">
               <QRCodeGenerator 
-                value={`https://jhabua-nagarpalika-aapke-dwar.netlify.app/verify?type=death&regNo=${encodeURIComponent(regNo)}&name=${encodeURIComponent(deceased.fullName || '')}`}
+                value={`${typeof window !== 'undefined' ? window.location.origin : 'https://jhabua-nagarpalika-aapke-dwar.netlify.app'}/verify/${encodeURIComponent(record.applicationNo || regNo)}`}
                 size={80}
               />
             </div>

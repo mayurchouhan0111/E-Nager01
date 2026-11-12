@@ -128,7 +128,7 @@ export default function WaterConnectionTemplate({ record }) {
           <div className="text-center">
             <div className="w-24 h-24 border-2 border-slate-800 p-1 mx-auto mb-1 bg-white flex items-center justify-center">
               <QRCodeGenerator 
-                value={`https://jhabua-nagarpalika-aapke-dwar.netlify.app/?appNo=${record.applicationNo || record.id}`}
+                value={`${typeof window !== 'undefined' ? window.location.origin : 'https://jhabua-nagarpalika-aapke-dwar.netlify.app'}/verify/${encodeURIComponent(record.applicationNo || record.id)}`}
                 size={84}
               />
             </div>

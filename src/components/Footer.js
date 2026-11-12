@@ -192,7 +192,7 @@ export default function Footer() {
                     <PhoneCall className="w-4 h-4 animate-bounce" />
                   </div>
                   <div>
-                    <div className="text-[10px] text-emerald-400 font-bold uppercase tracking-wider">मुख्य हेल्पलाइन (CMO मिलन सर)</div>
+                    <div className="text-[10px] text-emerald-400 font-bold uppercase tracking-wider">मुख्य हेल्पलाइन (मुख्य नगर पालिका अधिकारी - CMO)</div>
                     <div className="text-sm font-black text-white">+91 97131 75838</div>
                   </div>
                 </div>

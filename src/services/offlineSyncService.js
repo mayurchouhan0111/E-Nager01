@@ -1,176 +1,175 @@
-import { db, ensureFirebaseAuth, sanitizeFirestorePayload } from '../lib/firebase.js';
-import { collection, addDoc, doc, setDoc, query, where, getDocs } from 'firebase/firestore';
-import toast from 'react-hot-toast';
+import { db, ensureFirebaseAuth, sanitizeFirestorePayload } from '../lib/firebase';
+import { doc, setDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
 
-const QUEUE_STORAGE_KEY = 'enagar_pending_sync_queue';
-let isFlushing = false;
+const SYNC_QUEUE_KEY = 'enagar_offline_sync_queue_v1';
+let isSyncing = false;
 
-/**
- * Returns current array of pending applications waiting to be synced to Firestore
- */
-export function getPendingSyncQueue() {
+function getSyncQueue() {
   if (typeof window === 'undefined') return [];
   try {
-    const raw = localStorage.getItem(QUEUE_STORAGE_KEY);
+    const raw = localStorage.getItem(SYNC_QUEUE_KEY);
     return raw ? JSON.parse(raw) : [];
   } catch (e) {
     return [];
   }
 }
 
+function saveSyncQueue(queue) {
+  if (typeof window === 'undefined') return;
+  try {
+    localStorage.setItem(SYNC_QUEUE_KEY, JSON.stringify(queue));
+    window.dispatchEvent(new CustomEvent('enagar_sync_queue_updated', { detail: { count: queue.length } }));
+  } catch (e) {
+    console.warn('[OfflineSync] Storage quota warning while saving sync queue:', e.message);
+  }
+}
+
+export function getPendingSyncCount() {
+  return getSyncQueue().length;
+}
+
+export function clearSyncQueue() {
+  saveSyncQueue([]);
+}
+
 /**
- * Enqueues an application payload that failed to write to Firestore due to offline/network drop
+ * Adds or updates an item in the offline sync queue so that if the user submits an application
+ * while offline or on an unstable 2G network, it will automatically push to Firestore using an
+ * idempotent document ID as soon as internet connectivity is restored.
  */
-export function enqueuePendingSyncItem(serviceType, payload) {
-  if (typeof window === 'undefined' || !payload) return;
-  const queue = getPendingSyncQueue();
-  
-  const appNo = payload.applicationNo || `APP-${Date.now()}`;
-  const existingIdx = queue.findIndex(item => item.applicationNo === appNo || (payload.id && item.id === payload.id));
-  
+export function enqueuePendingSyncItem({ collectionName, collection, operation = 'create', action, docId = null, id = null, payload, localStorageKey = null }) {
+  if (typeof window === 'undefined') return;
+  const col = collectionName || collection;
+  const op = action || operation;
+  const deterministicId = docId || id || payload?.id || payload?.applicationNo || `sync-${Date.now()}`;
+
+  const queue = getSyncQueue();
+  const appNo = payload?.applicationNo;
+
+  const existingIndex = queue.findIndex(
+    item =>
+      (item.collectionName === col && item.docId === deterministicId) ||
+      (appNo && item.payload?.applicationNo === appNo && item.collectionName === col && item.operation === op)
+  );
+
   const queueItem = {
-    id: payload.id || `pending-${Date.now()}`,
-    applicationNo: appNo,
-    serviceType,
-    payload,
-    enqueuedAt: new Date().toISOString(),
-    retries: 0
+    queueId: `sync-${deterministicId}`,
+    collectionName: col,
+    operation: op,
+    docId: deterministicId,
+    payload: { ...payload, id: deterministicId },
+    localStorageKey,
+    queuedAt: new Date().toISOString(),
+    retryCount: 0
   };
 
-  if (existingIdx >= 0) {
-    queue[existingIdx] = queueItem;
+  if (existingIndex >= 0) {
+    queue[existingIndex] = queueItem;
   } else {
     queue.push(queueItem);
   }
 
-  try {
-    localStorage.setItem(QUEUE_STORAGE_KEY, JSON.stringify(queue));
-    toast.error(`⚠️ नेटवर्क डिस्कनेक्ट! आपका आवेदन (${appNo}) ऑफ़लाइन कतार में सहेजा गया है। ऑनलाइन होते ही स्वतः सिंक हो जाएगा।`, { duration: 6000 });
-  } catch (e) {
-    console.error('[OfflineSyncEngine] LocalStorage enqueue error:', e);
-  }
-
-  // Attempt immediate flush if network is restored
-  flushPendingSyncQueue();
+  saveSyncQueue(queue);
 }
 
-/**
- * Map serviceType to Firestore collection name
- */
-function getCollectionName(serviceType) {
-  const st = (serviceType || '').toLowerCase();
-  if (st.includes('birth')) return 'birthCertificates';
-  if (st.includes('death')) return 'deathCertificates';
-  if (st.includes('water')) return 'waterConnections';
-  if (st.includes('no_dues') || st.includes('no-dues')) return 'noDuesCertificates';
-  return 'applications';
-}
+export const enqueueOfflineSync = enqueuePendingSyncItem;
 
 /**
- * Flushes all pending applications from offline queue to Firestore Cloud Database idempotently
+ * Flushes all pending items in the queue to Firestore using idempotent setDoc(..., { merge: true }).
  */
 export async function flushPendingSyncQueue() {
-  if (typeof window === 'undefined' || isFlushing) return;
-  
-  const queue = getPendingSyncQueue();
-  if (queue.length === 0) return;
+  if (typeof window === 'undefined' || isSyncing) return { synced: 0, remaining: getPendingSyncCount() };
+  if (typeof navigator !== 'undefined' && !navigator.onLine) return { synced: 0, remaining: getPendingSyncCount() };
 
-  if (navigator && !navigator.onLine) {
-    return; // Device is still offline
-  }
+  const queue = getSyncQueue();
+  if (queue.length === 0) return { synced: 0, remaining: 0 };
 
-  isFlushing = true;
-  const remainingQueue = [];
+  isSyncing = true;
   let syncedCount = 0;
-
-  for (const item of queue) {
-    try {
-      await ensureFirebaseAuth();
-      const colName = getCollectionName(item.serviceType);
-      const cleanPayload = sanitizeFirestorePayload({
-        ...item.payload,
-        updatedAt: new Date().toISOString(),
-        offlineSyncedAt: new Date().toISOString()
-      });
-
-      let docRef = null;
-      if (item.applicationNo) {
-        const q = query(collection(db, colName), where('applicationNo', '==', item.applicationNo));
-        const snap = await getDocs(q).catch(() => null);
-        if (snap && !snap.empty) {
-          docRef = snap.docs[0].ref;
-        }
-      }
-
-      const docId = item.payload.id || item.id;
-      if (!docRef && docId && !docId.startsWith('local-') && !docId.startsWith('pending-')) {
-        docRef = doc(db, colName, docId);
-      }
-
-      if (docRef) {
-        await setDoc(docRef, cleanPayload, { merge: true });
-      } else {
-        await addDoc(collection(db, colName), cleanPayload);
-      }
-
-      // Add Notification for Officer Visibility
-      try {
-        await addDoc(collection(db, 'notifications'), {
-          serviceType: item.serviceType,
-          applicationNo: item.applicationNo,
-          recipientId: 'all',
-          event: 'OFFLINE_SYNCED',
-          status: cleanPayload.status || 'Submitted',
-          message: `⚡ ऑफ़लाइन आवेदन (${item.applicationNo}) बैकएंड पर ऑटो-सिंक हो गया।`,
-          officerName: 'Offline Sync System',
-          timestamp: new Date().toISOString()
-        });
-      } catch (ne) {}
-
-      syncedCount++;
-    } catch (err) {
-      console.warn(`[OfflineSyncEngine] Retry failed for ${item.applicationNo}:`, err.message);
-      item.retries = (item.retries || 0) + 1;
-      if (item.retries < 10) {
-        remainingQueue.push(item);
-      }
-    }
-  }
+  const remainingQueue = [];
 
   try {
-    localStorage.setItem(QUEUE_STORAGE_KEY, JSON.stringify(remainingQueue));
-  } catch (e) {}
+    await ensureFirebaseAuth();
 
-  if (syncedCount > 0) {
-    toast.success(`⚡ सफलता! ${syncedCount} बकाया ऑफ़लाइन आवेदन नगर पालिका बैकएंड पर ऑटो-सिंक हो गए हैं।`, { duration: 6000 });
+    for (const item of queue) {
+      try {
+        const cleanPayload = sanitizeFirestorePayload({ ...item.payload });
+        const targetId = String(item.docId || cleanPayload.id || cleanPayload.applicationNo);
+        delete cleanPayload.id;
+        delete cleanPayload.pendingCloudSync;
+
+        const docRef = doc(db, item.collectionName, targetId);
+
+        if (item.operation === 'create') {
+          await setDoc(docRef, {
+            ...cleanPayload,
+            createdAt: serverTimestamp(),
+            updatedAt: serverTimestamp(),
+            syncedFromOfflineAt: new Date().toISOString()
+          }, { merge: true });
+
+          if (item.localStorageKey && item.payload?.applicationNo) {
+            try {
+              const rawLocal = localStorage.getItem(item.localStorageKey);
+              if (rawLocal) {
+                const parsed = JSON.parse(rawLocal);
+                const updated = parsed.map(rec =>
+                  rec.applicationNo === item.payload.applicationNo
+                    ? { ...rec, id: targetId, pendingCloudSync: false }
+                    : rec
+                );
+                localStorage.setItem(item.localStorageKey, JSON.stringify(updated));
+              }
+            } catch (e) {}
+          }
+          syncedCount++;
+        } else if (item.operation === 'update' && targetId) {
+          await updateDoc(docRef, {
+            ...cleanPayload,
+            updatedAt: serverTimestamp()
+          });
+          syncedCount++;
+        }
+      } catch (err) {
+        console.warn(`[OfflineSync] Retry deferred for ${item.collectionName}:`, err.message);
+        item.retryCount = (item.retryCount || 0) + 1;
+        if (item.retryCount < 15) {
+          remainingQueue.push(item);
+        }
+      }
+    }
+
+    saveSyncQueue(remainingQueue);
+    if (syncedCount > 0 && typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('enagar_offline_sync_completed', { detail: { syncedCount } }));
+    }
+  } finally {
+    isSyncing = false;
   }
 
-  isFlushing = false;
+  return { synced: syncedCount, remaining: remainingQueue.length };
 }
 
-/**
- * Initializes the global background offline sync engine
- */
-export function initOfflineSyncEngine() {
-  if (typeof window === 'undefined') return () => {};
+let listenersInitialized = false;
 
-  const handleOnline = () => {
-    toast.success('🌐 इंटरनेट पुनः कनेक्ट हो गया! ऑफ़लाइन आवेदनों की जाँच की जा रही है...', { id: 'online-toast' });
+export function initOfflineSyncListeners() {
+  if (typeof window === 'undefined' || listenersInitialized) return;
+  listenersInitialized = true;
+
+  window.addEventListener('online', () => {
     flushPendingSyncQueue();
-  };
+  });
 
-  window.addEventListener('online', handleOnline);
-
-  // Periodic 15-second background sync check
-  const timer = setInterval(() => {
+  setTimeout(() => {
     flushPendingSyncQueue();
-  }, 15000);
+  }, 2500);
 
-  // Initial flush on load
-  flushPendingSyncQueue();
-
-  return () => {
-    window.removeEventListener('online', handleOnline);
-    clearInterval(timer);
-  };
+  setInterval(() => {
+    if (typeof navigator !== 'undefined' && navigator.onLine && getPendingSyncCount() > 0) {
+      flushPendingSyncQueue();
+    }
+  }, 30000);
 }
+
+export const initOfflineSyncWatcher = initOfflineSyncListeners;
+export const initOfflineSyncEngine = initOfflineSyncListeners;
