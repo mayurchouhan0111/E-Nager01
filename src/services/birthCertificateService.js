@@ -21,9 +21,14 @@ const AUDIT_LOGS_COLLECTION = 'auditLogs';
 
 function generateAppNumber() {
   const year = new Date().getFullYear();
-  const timeSlice = Date.now().toString().slice(-6);
-  const randomSuffix = Math.floor(100 + Math.random() * 900);
-  return `BC-${year}-${timeSlice}${randomSuffix}`;
+  const timeSlice = Date.now().toString().slice(-5);
+  let rand = Math.floor(1000 + Math.random() * 9000).toString();
+  if (typeof globalThis !== 'undefined' && globalThis.crypto?.getRandomValues) {
+    const arr = new Uint32Array(1);
+    globalThis.crypto.getRandomValues(arr);
+    rand = String(1000 + (arr[0] % 9000));
+  }
+  return `BC-${year}-${timeSlice}${rand}`;
 }
 
 function getCitizenStorageKey() {
@@ -400,10 +405,8 @@ export async function getBirthCertificates(filterEmail = null, isOfficer = false
         if (m) derivedMobile = m[1];
       }
 
-      if (!activeEmail && !activeUid && !derivedMobile && !activeName) {
-        items.sort((a, b) => new Date(b.updatedAt || b.appliedAt || b.createdAt || 0) - new Date(a.updatedAt || a.appliedAt || a.createdAt || 0));
-        saveLocalBirthCertificates(items);
-        return items;
+      if (!activeEmail && !activeUid && !derivedMobile) {
+        return localItems;
       }
 
       items = items.filter(item => {
@@ -416,7 +419,6 @@ export async function getBirthCertificates(filterEmail = null, isOfficer = false
         const itemEmail = cleanEmail(item.userEmail || item.applicantDetails?.email);
         const itemUid = item.userUid;
         const itemMobile = cleanMobile(item.userMobile || item.applicantDetails?.mobile);
-        const itemName = cleanEmail(item.userDisplayName || item.applicantDetails?.fullName);
 
         let itemDerivedMobile = itemMobile;
         if (!itemDerivedMobile && itemEmail) {
@@ -424,12 +426,11 @@ export async function getBirthCertificates(filterEmail = null, isOfficer = false
           if (m) itemDerivedMobile = m[1];
         }
 
-        const emailMatch = activeEmail && itemEmail && (itemEmail === activeEmail || itemEmail.includes(activeEmail) || activeEmail.includes(itemEmail));
+        const emailMatch = activeEmail && itemEmail && itemEmail === activeEmail;
         const uidMatch = activeUid && itemUid && itemUid === activeUid;
         const mobileMatch = derivedMobile && itemDerivedMobile && derivedMobile === itemDerivedMobile;
-        const nameMatch = activeName && itemName && activeName.length >= 3 && itemName.length >= 3 && (activeName.includes(itemName) || itemName.includes(activeName));
 
-        return Boolean(emailMatch || uidMatch || mobileMatch || nameMatch);
+        return Boolean(emailMatch || uidMatch || mobileMatch);
       });
     }
 

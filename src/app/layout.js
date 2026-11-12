@@ -79,14 +79,20 @@ export const metadata = {
       'en-IN': `${baseUrl}?lang=en`,
     },
   },
-  verification: {
-    google: 'your-google-verification-code',
+  ...(process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION
+    ? { verification: { google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION } }
+    : {}),
+  icons: {
+    icon: '/mp-logo.png',
+    apple: '/mp-logo.png',
   },
+  manifest: '/manifest.json',
 }
 
 export const viewport = {
   width: 'device-width',
   initialScale: 1,
+  themeColor: '#047857',
 }
 
 const jsonLd = {
@@ -105,7 +111,7 @@ const jsonLd = {
     },
     telephone: '+91-7392-XXXXXX',
   },
-  serviceType: 'Certificate Issuance - Death Certificate, Birth Certificate',
+  serviceType: 'Certificate Issuance - Death Certificate, Birth Certificate, Water Connection, No-Dues NOC',
   areaServed: {
     '@type': 'AdministrativeArea',
     name: 'Jhabua, Madhya Pradesh, India',
@@ -119,22 +125,11 @@ const jsonLd = {
 export default function RootLayout({ children }) {
   return (
     <html lang="hi-IN">
-      <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;600;700&family=Noto+Sans+Devanagari:wght@400;600;700;800;900&family=Rozha+One&family=Tiro+Devanagari+Hindi:ital@0;1&family=Mukta:wght@400;600;700;800&display=swap" />
-        <link rel="preload" as="image" href="/mp-logo.png" type="image/png" />
-        <link rel="icon" href="/mp-logo.png" type="image/png" />
-        <link rel="apple-touch-icon" href="/mp-logo.png" />
-        <link rel="manifest" href="/manifest.json" />
-        <meta name="theme-color" content="#047857" />
+      <body className="bg-surface-950 text-surface-100 min-h-screen antialiased">
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
-      </head>
-      <body className="bg-surface-950 text-surface-100 min-h-screen antialiased">
         <AuthProvider>
           <Toaster 
             position="top-center"

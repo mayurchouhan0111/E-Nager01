@@ -1303,6 +1303,26 @@ export default function DeathCertificatePage() {
                       onRemove={() => handleDocumentRemove('panchnamaLetter')}
                     />
                   </>
+                ) : formData.deceasedDetails.placeType.includes('अन्य') ? (
+                  <>
+                    <DocumentUploader
+                      title="4. पुलिस मर्ग रिपोर्ट / पंचनामा अथवा वार्ड पार्षद प्रमाणित पत्र"
+                      description="अन्य स्थान / दुर्घटना में मृत्यु होने पर पुलिस पंचनामा, पोस्टमार्टम रिपोर्ट अथवा पार्षद प्रमाणित पत्र"
+                      required={true}
+                      documentData={getDoc('panchnamaLetter') || getDoc('hospitalDeathSlip')}
+                      onUpload={(doc) => handleDocumentUpload('panchnamaLetter', doc)}
+                      onRemove={() => handleDocumentRemove('panchnamaLetter')}
+                    />
+
+                    <DocumentUploader
+                      title="5. मुक्तिधाम / कब्रिस्तान अंतिम संस्कार रसीद"
+                      description="अंतिम संस्कार / दफन की आधिकारिक रसीद फोटोकॉपी"
+                      required={true}
+                      documentData={getDoc('cremationReceipt')}
+                      onUpload={(doc) => handleDocumentUpload('cremationReceipt', doc)}
+                      onRemove={() => handleDocumentRemove('cremationReceipt')}
+                    />
+                  </>
                 ) : (
                   <DocumentUploader
                     title="4. अस्पताल मृत्यु प्रमाण पत्र (Form 4/4A)"

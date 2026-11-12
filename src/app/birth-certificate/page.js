@@ -58,8 +58,8 @@ const defaultChildDetails = {
 const defaultMotherDetails = {
   fullName: '',
   aadhaarNo: '',
-  education: 'माध्यमिक (Secondary)',
-  occupation: 'गृहणी (Housewife)',
+  education: '',
+  occupation: '',
   ageAtMarriage: '',
   ageAtChildBirth: ''
 };
@@ -67,8 +67,8 @@ const defaultMotherDetails = {
 const defaultFatherDetails = {
   fullName: '',
   aadhaarNo: '',
-  education: 'उच्चतर माध्यमिक (Higher Secondary)',
-  occupation: 'कृषि / व्यापार (Agriculture / Business)'
+  education: '',
+  occupation: ''
 };
 
 const defaultApplicantDetails = {
@@ -1047,6 +1047,7 @@ export default function BirthCertificatePage() {
                     onChange={(e) => handleInputChange('motherDetails', 'education', e.target.value)}
                     className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 font-medium"
                   >
+                    <option value="">-- शिक्षा का स्तर चुनें (Select Education) --</option>
                     <option>प्राथमिक (Primary)</option>
                     <option>माध्यमिक (Secondary)</option>
                     <option>उच्चतर माध्यमिक (Higher Secondary)</option>
@@ -1172,6 +1173,7 @@ export default function BirthCertificatePage() {
                     onChange={(e) => handleInputChange('fatherDetails', 'education', e.target.value)}
                     className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 font-medium"
                   >
+                    <option value="">-- शिक्षा का स्तर चुनें (Select Education) --</option>
                     <option>प्राथमिक (Primary)</option>
                     <option>माध्यमिक (Secondary)</option>
                     <option>उच्चतर माध्यमिक (Higher Secondary)</option>
@@ -1388,6 +1390,15 @@ export default function BirthCertificatePage() {
                       onRemove={() => handleDocumentRemove('mcpCard')}
                     />
                   </>
+                ) : formData.childDetails.placeType.includes('अन्य') ? (
+                  <DocumentUploader
+                    title="4. जन्म स्थान पंचनामा / वार्ड पार्षद या एम्बुलेंस प्रमाणित पत्र"
+                    description="अन्य स्थान पर जन्म होने की स्थिति में पंचनामा, शपथ पत्र अथवा एम्बुलेंस/चिकित्सा प्रमाणित पर्ची"
+                    required={true}
+                    documentData={formData.documents?.hospitalSlip || formData.documents?.anganwadiLetter}
+                    onUpload={(doc) => handleDocumentUpload('hospitalSlip', doc)}
+                    onRemove={() => handleDocumentRemove('hospitalSlip')}
+                  />
                 ) : (
                   <DocumentUploader
                     title={formData.childDetails.hospitalName?.includes('वरदान') ? "4. वरदान हॉस्पिटल रजिस्ट्रेशन व डिस्चार्ज कार्ड" : "4. अस्पताल प्रसव सूचना / डिस्चार्ज कार्ड"}

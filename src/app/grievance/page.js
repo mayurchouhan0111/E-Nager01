@@ -4,7 +4,8 @@ import { useState } from 'react'
 import Link from 'next/link'
 import ServiceHeader from '@/components/ServiceHeader'
 import toast from 'react-hot-toast'
-import { db } from '@/lib/firebase'
+import { db, auth } from '@/lib/firebase'
+import { ensureCitizenFirebaseUid } from '@/services/citizenAuthService'
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore'
 import { Shield, Mail, Phone, MapPin, Send, HelpCircle, CheckCircle2, ArrowLeft, AlertCircle } from 'lucide-react'
 
@@ -14,6 +15,7 @@ export default function GrievancePage() {
     mobile: '',
     email: '',
     applicationNo: '',
+    serviceType: 'General / Municipal Service',
     grievanceType: 'Data Protection & Privacy',
     description: '',
   })
@@ -26,16 +28,32 @@ export default function GrievancePage() {
       toast.error('कृपया नाम, मोबाइल नंबर एवं शिकायत का विवरण दर्ज करें')
       return
     }
+    if (formData.description.trim().length < 10) {
+      toast.error('शिकायत का विवरण कम से कम 10 अक्षरों का होना चाहिए')
+      return
+    }
 
     setIsSubmitting(true)
     const toastId = toast.loading('शिकायत दर्ज की जा रही है...')
 
     try {
+      const userUid = auth.currentUser?.uid || (await ensureCitizenFirebaseUid())
       const ticketNo = 'GRV-' + Date.now().toString().slice(-6)
-      const docRef = await addDoc(collection(db, 'grievances'), {
+      await addDoc(collection(db, 'grievances'), {
         ticketNo,
-        ...formData,
+        grievanceId: ticketNo,
+        userUid,
+        fullName: formData.fullName.trim(),
+        mobile: formData.mobile.replace(/\D/g, '').slice(-10),
+        email: formData.email.trim(),
+        applicationNo: formData.applicationNo.trim(),
+        serviceType: formData.serviceType || 'General',
+        issueType: formData.grievanceType,
+        grievanceType: formData.grievanceType,
+        description: formData.description.trim(),
         status: 'Open',
+        dpdpConsentAt: new Date().toISOString(),
+        dpdpPolicyVersion: '2026.1',
         createdAt: serverTimestamp(),
       })
 

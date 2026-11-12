@@ -35,6 +35,8 @@ export default function ServiceHeader() {
   // Public Track Search Modal State
   const [showTrackModal, setShowTrackModal] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [searchMobile, setSearchMobile] = useState('');
+  const [trackError, setTrackError] = useState('');
   const [searching, setSearching] = useState(false);
   const [searchResults, setSearchResults] = useState([]);
   const [hasSearched, setHasSearched] = useState(false);
@@ -119,13 +121,13 @@ export default function ServiceHeader() {
     }
   };
 
-  const handleEmailOrMobileSubmit = (e) => {
+  const handleEmailOrMobileSubmit = async (e) => {
     e.preventDefault();
     if (!authInput || !authInput.trim()) {
       toast.error('कृपया अपना ईमेल या मोबाइल नंबर दर्ज करें');
       return;
     }
-    const res = loginWithMobileOrEmail(authInput.trim(), authName.trim());
+    const res = await loginWithMobileOrEmail(authInput.trim(), authName.trim());
     if (res.success) {
       toast.success(`नमस्ते ${res.user.displayName}! नागरिक खाता लॉग इन हो गया।`);
       setShowAuthModal(false);
@@ -150,67 +152,58 @@ export default function ServiceHeader() {
     await markNotificationAsRead(notifId);
   };
 
-  const performQuerySearch = async (queryText) => {
+  const performQuerySearch = async (queryText, mobileText = searchMobile) => {
     setSearching(true);
     setHasSearched(true);
+    setTrackError('');
     setSearchResults([]);
 
-    if (!queryText || !queryText.trim()) {
+    const appNo = (queryText || '').trim().toUpperCase();
+    const mobileDigits = String(mobileText || citizenUser?.mobile || '').replace(/\D/g, '').slice(-10);
+
+    if (!appNo) {
       setSearching(false);
       return;
     }
 
-      try {
-      const cleanQuery = queryText.trim().toLowerCase();
-      const cleanDigits = cleanQuery.replace(/\D/g, '');
-      const cleanAlphaNum = cleanQuery.replace(/[^a-z0-9]/gi, '');
+    if (!/^[6-9]\d{9}$/.test(mobileDigits)) {
+      setTrackError('सत्यापन हेतु कृपया 10 अंकों का पंजीकृत मोबाइल नंबर भी दर्ज करें (Please enter 10-digit registered mobile number).');
+      setSearching(false);
+      return;
+    }
 
-      const [births, deaths, waters, noDues] = await Promise.all([
-        getBirthCertificates(null, true).catch(() => []),
-        getDeathCertificates(null, true).catch(() => []),
-        getWaterConnections(null, true).catch(() => []),
-        getNoDuesCertificates(null, true).catch(() => [])
-      ]);
-
-      const allRecords = [
-        ...births.map(r => ({ ...r, serviceName: 'जन्म प्रमाण पत्र', serviceType: 'birth' })),
-        ...deaths.map(r => ({ ...r, serviceName: 'मृत्यु प्रमाण पत्र', serviceType: 'death' })),
-        ...waters.map(r => ({ ...r, serviceName: 'जल कनेक्शन', serviceType: 'water_connection' })),
-        ...noDues.map(r => ({ ...r, serviceName: 'नो ड्यूज NOC', serviceType: 'no_dues' }))
-      ];
-
-      const matches = allRecords.filter(rec => {
-        const appNo = (rec.applicationNo || '').toLowerCase();
-        const appNoAlphaNum = appNo.replace(/[^a-z0-9]/gi, '');
-        const appNoDigits = appNo.replace(/\D/g, '');
-        const recId = (rec.id || '').toLowerCase();
-
-        const name = (
-          rec.childDetails?.childName || 
-          rec.childDetails?.fullName || 
-          rec.deceasedDetails?.fullName || 
-          rec.applicantDetails?.fullName || 
-          ''
-        ).toLowerCase();
-        const mobile = (
-          rec.userMobile || 
-          rec.applicantDetails?.mobile || 
-          rec.informantMobile || 
-          ''
-        ).toString();
-
-        if (appNo.includes(cleanQuery) || recId.includes(cleanQuery)) return true;
-        if (cleanAlphaNum && appNoAlphaNum.includes(cleanAlphaNum)) return true;
-        if (cleanDigits.length >= 3 && appNoDigits.includes(cleanDigits)) return true;
-        if (cleanQuery.length >= 2 && name.includes(cleanQuery)) return true;
-        if (cleanDigits.length >= 4 && mobile.includes(cleanDigits)) return true;
-
-        return false;
+    try {
+      const res = await fetch('/api/track', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ applicationNo: appNo, mobile: mobileDigits })
       });
-
-      setSearchResults(matches);
+      const data = await res.json();
+      if (!res.ok || !data.found || !data.result) {
+        setTrackError(data.error || 'कोई आवेदन नहीं मिला।');
+      } else {
+        const r = data.result;
+        setSearchResults([
+          {
+            id: r.applicationNo,
+            applicationNo: r.applicationNo,
+            serviceName: r.serviceLabel,
+            serviceType: r.serviceKey === 'water' ? 'water_connection' : r.serviceKey,
+            status: r.status,
+            statusHi: r.statusHi,
+            statusEn: r.statusEn,
+            maskedSubjectName: r.maskedSubjectName,
+            maskedApplicantName: r.maskedApplicantName,
+            maskedMobile: r.maskedMobile,
+            appliedAt: r.appliedAt,
+            lastOfficerRemark: r.lastOfficerRemark,
+            canDownloadCertificate: r.canDownloadCertificate
+          }
+        ]);
+      }
     } catch (err) {
-      console.error('Search error:', err);
+      console.error('Track API error:', err);
+      setTrackError('स्थिति जांचने में त्रुटि हुई। कृपया पुनः प्रयास करें।');
     }
     setSearching(false);
   };
@@ -218,7 +211,7 @@ export default function ServiceHeader() {
   const handlePublicSearch = async (e) => {
     e.preventDefault();
     if (!searchQuery || !searchQuery.trim()) return;
-    performQuerySearch(searchQuery.trim());
+    performQuerySearch(searchQuery.trim(), searchMobile.trim());
   };
 
   const isCurrentTab = (path) => {
@@ -397,18 +390,14 @@ export default function ServiceHeader() {
 
         {/* Synchronized Continuous Right-to-Left Marquee Loop */}
         <div className="flex-1 overflow-hidden relative flex items-center z-10">
-          <marquee
-            direction="left"
-            scrollamount="5"
-            scrolldelay="15"
-            loop="infinite"
-            className="w-full font-extrabold text-[#003d2b] text-xs sm:text-sm tracking-wide"
+          <div
+            role="status"
+            aria-live="polite"
+            className="w-full font-extrabold text-[#003d2b] text-xs sm:text-sm tracking-wide text-center truncate"
             style={{ fontFamily: "'Mukta', 'Noto Sans Devanagari', sans-serif" }}
-            onMouseOver={(e) => e.target?.stop && e.target.stop()}
-            onMouseOut={(e) => e.target?.start && e.target.start()}
           >
-            🌟 विशेष पहल: &apos;झाबुआ नगर पालिका आपके द्वारा&apos; — उक्त सेवा 15 अगस्त 2026 से प्रारंभ होगी। नागरिकों की सुविधा हेतु समस्त ई-सेवाएं 100% ऑनलाइन उपलब्ध हैं! &nbsp;&nbsp;&nbsp;&nbsp;•&nbsp;&nbsp;&nbsp;&nbsp; 🌟 विशेष पहल: &apos;झाबुआ नगर पालिका आपके द्वारा&apos; — उक्त सेवा 15 अगस्त 2026 से प्रारंभ होगी। नागरिकों की सुविधा हेतु समस्त ई-सेवाएं 100% ऑनलाइन उपलब्ध हैं!
-          </marquee>
+            🌟 विशेष पहल: &apos;झाबुआ नगर पालिका आपके द्वार&apos; — नागरिकों की सुविधा हेतु जन्म, मृत्यु, जल प्रदाय एवं नो-ड्यूज (NOC) ई-सेवाएं 100% ऑनलाइन उपलब्ध हैं!
+          </div>
         </div>
       </div>
 
@@ -430,14 +419,23 @@ export default function ServiceHeader() {
               </button>
             </div>
 
-            <form onSubmit={handlePublicSearch} className="py-3 sm:py-4 flex gap-2 shrink-0">
+            <form onSubmit={handlePublicSearch} className="py-3 sm:py-4 flex flex-col sm:flex-row gap-2 shrink-0">
               <input 
                 type="text" 
                 required 
                 value={searchQuery} 
                 onChange={(e) => setSearchQuery(e.target.value)} 
-                placeholder="आवेदन क्र. या मोबाइल नंबर दर्ज करें..." 
-                className="input flex-1 text-xs sm:text-sm" 
+                placeholder="आवेदन क्र. (उदा. BC-2026-12345)..." 
+                className="input flex-1 text-xs sm:text-sm font-mono" 
+              />
+              <input 
+                type="tel" 
+                required 
+                maxLength={10}
+                value={searchMobile} 
+                onChange={(e) => setSearchMobile(e.target.value.replace(/\D/g, '').slice(0, 10))} 
+                placeholder="पंजीकृत 10-अंकीय मोबाइल नंबर..." 
+                className="input sm:w-52 text-xs sm:text-sm font-mono" 
               />
               <button 
                 type="submit" 
@@ -451,8 +449,8 @@ export default function ServiceHeader() {
               {hasSearched && (
                 <div className="space-y-3 pt-1">
                   {searchResults.length === 0 ? (
-                    <div className="text-center py-8 text-slate-500 text-xs font-medium bg-slate-50 rounded-2xl border border-dashed border-slate-200">
-                      कोई आवेदन नहीं मिला। कृपया सही आवेदन क्रमांक या मोबाइल नंबर दर्ज करें।
+                    <div className="text-center py-8 text-slate-500 text-xs font-medium bg-slate-50 rounded-2xl border border-dashed border-slate-200 px-4">
+                      {trackError || 'कोई आवेदन नहीं मिला। कृपया सही आवेदन क्रमांक एवं पंजीकृत मोबाइल नंबर दर्ज करें।'}
                     </div>
                   ) : (
                     searchResults.map((rec) => (
@@ -462,43 +460,33 @@ export default function ServiceHeader() {
                             <span className="font-mono text-emerald-900 bg-emerald-100 px-2.5 py-0.5 rounded border border-emerald-200">{rec.applicationNo}</span>
                             <span className="text-slate-500 font-medium text-[11px]">({rec.serviceName})</span>
                           </div>
-                          <span className={`px-2.5 py-0.5 rounded-full text-[10px] uppercase font-bold border ${getStatusChip(rec.status)}`}>{rec.status}</span>
+                          <span className={`px-2.5 py-0.5 rounded-full text-[10px] uppercase font-bold border ${getStatusChip(rec.status)}`}>
+                            {rec.statusHi ? `${rec.statusHi} (${rec.statusEn})` : rec.status}
+                          </span>
                         </div>
 
-                        <div className="text-xs text-slate-800 font-medium">
-                          <p><span className="text-slate-500">नाम:</span> {rec.deceasedDetails?.fullName ? `स्व. ${rec.deceasedDetails.fullName}` : rec.childDetails?.fullName || rec.applicantDetails?.fullName || 'N/A'}</p>
-                          <p className="text-[11px] text-slate-500 mt-0.5">आवेदन तिथि: {new Date(rec.appliedAt || rec.createdAt || Date.now()).toLocaleDateString('hi-IN')}</p>
-                        </div>
-
-                        <div className="flex items-center gap-2 pt-1 border-t border-slate-200/60 flex-wrap">
-                          <button 
-                            onClick={() => { setSelectedRecord(rec); setModalType('letter'); }} 
-                            className="btn btn-secondary btn-sm text-[11px] font-bold text-slate-800 flex items-center gap-1 bg-white"
-                          >
-                            <Printer className="w-3.5 h-3.5 text-slate-600" /> पावती पत्र देखें
-                          </button>
-
-                          {rec.officialUploadedCertificate ? (
-                            <button
-                              type="button"
-                              onClick={() => {
-                                setSelectedRecord(rec);
-                                setModalType('official_doc');
-                              }}
-                              className="btn btn-primary btn-sm text-[11px] font-bold flex items-center gap-1 bg-emerald-700 hover:bg-emerald-800 text-white shadow-md cursor-pointer transition-all"
-                            >
-                              <Download className="w-3.5 h-3.5" /> 📜 अधिकारी हस्ताक्षरित प्रमाण पत्र देखें व डाउनलोड
-                            </button>
-                          ) : (
-                            (rec.status === 'Approved' || rec.status === 'Sanctioned' || rec.status === 'Certificate Generated' || rec.status === 'Completed') && (
-                              <button 
-                                onClick={() => { setSelectedRecord(rec); setModalType('certificate'); }} 
-                                className="btn btn-primary btn-sm text-[11px] font-bold flex items-center gap-1"
-                              >
-                                📜 प्रमाण पत्र डाउनलोड
-                              </button>
-                            )
+                        <div className="text-xs text-slate-800 font-medium space-y-0.5">
+                          <p><span className="text-slate-500">नाम (गोपनीय):</span> {rec.maskedSubjectName || rec.maskedApplicantName || 'N/A'}</p>
+                          <p><span className="text-slate-500">मोबाइल:</span> <span className="font-mono">{rec.maskedMobile || '******'}</span></p>
+                          <p className="text-[11px] text-slate-500 mt-0.5">आवेदन तिथि: {new Date(rec.appliedAt || Date.now()).toLocaleDateString('hi-IN')}</p>
+                          {rec.lastOfficerRemark && (
+                            <p className="text-[11px] text-amber-800 bg-amber-50 border border-amber-200 rounded-lg px-2.5 py-1 mt-1">
+                              अधिकारी टिप्पणी: {rec.lastOfficerRemark}
+                            </p>
                           )}
+                        </div>
+
+                        <div className="flex items-center justify-between gap-2 pt-2 border-t border-slate-200/60 flex-wrap text-[11px]">
+                          <Link
+                            href={`/verify/${encodeURIComponent(rec.applicationNo)}`}
+                            onClick={() => setShowTrackModal(false)}
+                            className="btn btn-secondary btn-sm text-[11px] font-bold text-emerald-800 flex items-center gap-1 bg-white"
+                          >
+                            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" /> QR सत्यापन पृष्ठ देखें
+                          </Link>
+                          <span className="text-slate-500">
+                            पूर्ण प्रमाण पत्र डाउनलोड करने हेतु कृपया अपने पंजीकृत खाते से साइन-इन करें।
+                          </span>
                         </div>
                       </div>
                     ))

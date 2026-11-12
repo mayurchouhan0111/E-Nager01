@@ -51,7 +51,7 @@ export default function TermsPage() {
               पोर्टल की आधिकारिक स्थिति एवं दायरा (Scope of Portal)
             </h3>
             <p className="text-slate-600">
-              यह डिजिटल पोर्टल <strong>नगर पालिका परिषद झाबुआ (म.प्र.)</strong> द्वारा नागरिकों को जन्म प्रमाण पत्र, मृत्यु प्रमाण पत्र एवं जल (नल) कनेक्शन हेतु ऑनलाइन आवेदन पत्र प्रस्तुत करने की सुविधा हेतु उपलब्ध कराया गया है।
+              यह डिजिटल पोर्टल <strong>नगर पालिका परिषद झाबुआ (म.प्र.)</strong> द्वारा नागरिकों को <strong>जन्म प्रमाण पत्र, मृत्यु प्रमाण पत्र, नवीन नल-जल कनेक्शन तथा बकाया रहित (नो-ड्यूज NOC) प्रमाण पत्र</strong> हेतु ऑनलाइन आवेदन पत्र प्रस्तुत करने, स्थिति ट्रैक करने एवं QR-सत्यापित डिजिटल प्रमाण पत्र प्राप्त करने की सुविधा हेतु उपलब्ध कराया गया है।
             </p>
           </section>
 
@@ -59,23 +59,23 @@ export default function TermsPage() {
           <section className="space-y-3 border-b border-slate-100 pb-6">
             <h3 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
               <span className="w-7 h-7 rounded-xl bg-slate-100 text-teal-700 flex items-center justify-center text-xs font-extrabold">2</span>
-              भौतिक सत्यापन एवं पावती पत्र जमा करना (Physical Verification Mandatory)
+              सेवा-अनुसार डिजिटल एवं भौतिक सत्यापन नीति (Digital vs. Physical Verification Policy)
             </h3>
             <p className="text-slate-600">
-              ऑनलाइन आवेदन पत्र सफलतापूर्वक जमा करने के पश्चात आवेदक को निम्नलिखित शर्तों का पालन करना अनिवार्य होगा:
+              विभिन्न नागरिक सेवाओं हेतु दस्तावेज़ सत्यापन प्रक्रिया निम्नानुसार निर्धारित है:
             </p>
             <ul className="space-y-2 text-slate-700 font-medium">
               <li className="flex items-start gap-2 bg-slate-50 p-3 rounded-xl border border-slate-100">
                 <CheckCircle2 className="w-4 h-4 text-teal-600 shrink-0 mt-0.5" />
-                <span>जनरेटेड <strong>पावती पत्र (Printed Application Letter)</strong> का प्रिंट निकालें।</span>
+                <span><strong>नो-ड्यूज (बकाया रहित) प्रमाण पत्र (100% डिजिटल NOC):</strong> ऑनलाइन संपत्ति कर रसीद (OCR सत्यापन) एवं निर्धारित शुल्क के UPI भुगतान के पश्चात राजस्व अधिकारी के ऑनलाइन अनुमोदन से डिजिटल हस्ताक्षरित प्रमाण पत्र जारी होता है; इसके लिए कार्यालय में हार्ड कॉपी जमा करने की आवश्यकता नहीं है।</span>
               </li>
               <li className="flex items-start gap-2 bg-slate-50 p-3 rounded-xl border border-slate-100">
                 <CheckCircle2 className="w-4 h-4 text-teal-600 shrink-0 mt-0.5" />
-                <span>समस्त मूल दस्तावेजों (आधार कार्ड, अस्पताल डिस्चार्ज/मृत्यु पर्ची, संपत्ति रसीद) की स्व-प्रमाणित प्रतियों के साथ <strong>नगर पालिका कार्यालय झाबुआ</strong> में जमा करें।</span>
+                <span><strong>जन्म एवं मृत्यु प्रमाण पत्र (RBD Act 1969):</strong> सामान्य पंजीकरण (21 दिवस के भीतर) ऑनलाइन अपलोड किए गए अस्पताल/संस्थागत प्रमाणों के आधार पर डिजिटल रूप से सत्यापित किए जाते हैं। विलंबित पंजीकरण (&gt;21 दिवस / &gt;1 वर्ष) या संदेहास्पद प्रकरणों में रजिस्ट्रार द्वारा मूल शपथ पत्र एवं दस्तावेजों के भौतिक सत्यापन हेतु बुलाया जा सकता है।</span>
               </li>
               <li className="flex items-start gap-2 bg-slate-50 p-3 rounded-xl border border-slate-100">
                 <CheckCircle2 className="w-4 h-4 text-teal-600 shrink-0 mt-0.5" />
-                <span>प्रमाण पत्र अथवा स्वीकृति केवल सक्षम रजिस्ट्रार / मुख्य नगर पालिका अधिकारी के अंतिम भौतिक सत्यापन के उपरांत ही निर्गत होगी।</span>
+                <span><strong>नवीन नल-जल कनेक्शन:</strong> ऑनलाइन आवेदन के उपरांत जल प्रदाय शाखा के तकनीकी अमले द्वारा स्थल निरीक्षण (Site Inspection) एवं पाइपलाइन उपलब्धता सत्यापन के पश्चात स्वीकृति आदेश जारी किया जाता है।</span>
               </li>
             </ul>
           </section>

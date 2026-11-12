@@ -17,8 +17,9 @@ export default function MaintenanceGuard() {
   }, []);
 
   useEffect(() => {
-    const isCitizenPage = pathname && !pathname.startsWith('/admin');
-    if (maintStatus.isMaintenanceMode && isCitizenPage) {
+    const isExemptRoute =
+      pathname && (pathname.startsWith('/admin') || pathname.startsWith('/verify'));
+    if (maintStatus.isMaintenanceMode && !isExemptRoute) {
       document.body.style.overflow = 'hidden';
     } else {
       document.body.style.overflow = 'unset';
@@ -28,9 +29,10 @@ export default function MaintenanceGuard() {
     };
   }, [maintStatus.isMaintenanceMode, pathname]);
 
-  const isAdminRoute = pathname && pathname.startsWith('/admin');
+  const isExemptRoute =
+    pathname && (pathname.startsWith('/admin') || pathname.startsWith('/verify'));
 
-  if (!maintStatus.isMaintenanceMode || isAdminRoute) {
+  if (!maintStatus.isMaintenanceMode || isExemptRoute) {
     return null;
   }
 
@@ -77,7 +79,7 @@ export default function MaintenanceGuard() {
             {maintStatus.message || 'सुरक्षा एवं तकनीकी रखरखाव हेतु पोर्टल अस्थायी रूप से स्थगित है। शीघ्र सेवाएं पुनः शुरू की जाएंगी।'}
           </p>
           <div className="border-t border-amber-200/80 pt-2.5 flex flex-col gap-1.5 text-[11px] text-amber-900 font-medium">
-            <span>हेल्पलाइन (CMO मिलन सर, सोम-शुक्र): <strong className="font-mono text-amber-950">+91 97131 75838</strong></span>
+            <span>हेल्पलाइन (मुख्य नगर पालिका अधिकारी - CMO, सोम-शुक्र): <strong className="font-mono text-amber-950">+91 97131 75838</strong></span>
             <span>ई-मेल: <strong className="font-mono text-amber-950">cmomjhabua@mp.gov.in</strong></span>
           </div>
         </div>

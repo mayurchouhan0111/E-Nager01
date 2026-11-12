@@ -1,0 +1,70 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isActiveAdmin() {
+      return isSignedIn()
+        && request.auth.token.get('disabled', false) != true
+        && request.auth.token.get('role', '') in [
+          'birth_death_admin',
+          'water_admin',
+          'nodues_admin',
+          'super_admin'
+        ];
+    }
+
+    function isDepartmentOfficerForService(serviceType) {
+      return isActiveAdmin() && (
+        request.auth.token.get('role', '') == 'super_admin' ||
+        (serviceType in ['birth', 'death'] && request.auth.token.get('role', '') == 'birth_death_admin') ||
+        (serviceType == 'water' && request.auth.token.get('role', '') == 'water_admin') ||
+        (serviceType == 'no_dues' && request.auth.token.get('role', '') == 'nodues_admin')
+      );
+    }
+
+    function isValidCitizenAttachment() {
+      // Allow images up to 1 MB or PDFs up to 5 MB
+      return (
+        (request.resource.contentType.matches('image/(jpeg|png|webp)') &&
+          request.resource.size > 0 &&
+          request.resource.size <= 1 * 1024 * 1024) ||
+        (request.resource.contentType == 'application/pdf' &&
+          request.resource.size > 0 &&
+          request.resource.size <= 5 * 1024 * 1024)
+      );
+    }
+
+    // Citizen application attachments:
+    // Path: applications/{serviceType}/{userUid}/{applicationNo}/{fileName}
+    match /applications/{serviceType}/{userUid}/{applicationNo}/{fileName} {
+      allow read: if (isSignedIn() && request.auth.uid == userUid)
+                  || isDepartmentOfficerForService(serviceType);
+
+      allow create, update: if isSignedIn()
+                            && request.auth.uid == userUid
+                            && serviceType in ['birth', 'death', 'water', 'no_dues']
+                            && isValidCitizenAttachment();
+
+      allow delete: if false;
+    }
+
+    // Official signed certificates uploaded by department officers:
+    // Path: official_certificates/{serviceType}/{applicationNo}/{fileName}
+    match /official_certificates/{serviceType}/{applicationNo}/{fileName} {
+      allow read: if isSignedIn();
+      allow create, update: if isDepartmentOfficerForService(serviceType)
+                            && isValidCitizenAttachment();
+      allow delete: if false;
+    }
+
+    // Default deny all other paths
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

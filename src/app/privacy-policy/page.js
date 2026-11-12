@@ -58,12 +58,12 @@ export default function PrivacyPolicyPage() {
               एकत्रित की जाने वाली व्यक्तिगत जानकारी (Personal Data Collected)
             </h3>
             <p className="text-slate-600">
-              नगर पालिका नागरिक सेवाओं (जन्म प्रमाण पत्र, मृत्यु प्रमाण पत्र, जल कनेक्शन) के सुचारू निष्पादन हेतु निम्नलिखित डेटा एकत्र किया जाता है:
+              नगर पालिका नागरिक सेवाओं (जन्म प्रमाण पत्र, मृत्यु प्रमाण पत्र, जल कनेक्शन एवं नो-ड्यूज NOC) के सुचारू निष्पादन हेतु निम्नलिखित न्यूनतम डेटा एकत्र किया जाता है:
             </p>
             <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-2 text-slate-700 font-medium">
               <li className="flex items-start gap-2 bg-slate-50 p-3 rounded-xl border border-slate-100">
                 <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-                <span><strong>पहचान विवरण:</strong> आवेदक का नाम, पिता/पति का नाम, जन्म तिथि, आधार नंबर।</span>
+                <span><strong>पहचान विवरण:</strong> आवेदक का नाम, पिता/पति का नाम, जन्म तिथि तथा मास्क्ड आधार संदर्भ (केवल अंतिम 4 अंक `XXXX-XXXX-1234` एवं SHA-256 टोकन)।</span>
               </li>
               <li className="flex items-start gap-2 bg-slate-50 p-3 rounded-xl border border-slate-100">
                 <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
@@ -126,15 +126,15 @@ export default function PrivacyPolicyPage() {
           <section className="space-y-3 border-b border-slate-100 pb-6">
             <h3 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
               <span className="w-7 h-7 rounded-xl bg-slate-100 text-emerald-700 flex items-center justify-center text-xs font-extrabold">4</span>
-              सुरक्षा उपाय एवं एन्क्रिप्शन (Cyber Security Safeguards - CERT-In Guidelines)
+              सुरक्षा उपाय, आधार वॉल्ट एवं डेटा प्रतिधारण अवधि (Cyber Security & Data Retention Policy)
             </h3>
             <p className="text-slate-600">
-              भारतीय कंप्यूटर आपातकालीन प्रतिक्रिया टीम (CERT-In) के सुरक्षा मानकों के अनुसार पोर्टल पर निम्नलिखित तकनीकी सुरक्षा उपाय लागू हैं:
+              भारतीय कंप्यूटर आपातकालीन प्रतिक्रिया टीम (CERT-In) एवं DPDP Act 2023 की धारा 8(7) के अनुसार पोर्टल पर निम्नलिखित तकनीकी सुरक्षा एवं प्रतिधारण नियम लागू हैं:
             </p>
-            <ul className="space-y-1 text-slate-700">
-              <li>• SSL / HTTPS एन्क्रिप्शन द्वारा डेटा ट्रांसमिशन सुरक्षा।</li>
-              <li>• डेटाबेस स्तर पर Role-Based Access Control (RBAC) ताकि केवल अधिकृत रजिस्ट्रार अधिकारी ही डेटा देख सकें।</li>
-              <li>• संवेदनशील दस्तावेजों की अनधिकृत पहुंच से सुरक्षा।</li>
+            <ul className="space-y-1.5 text-slate-700">
+              <li>• <strong>आधार डेटा न्यूनीकरण (UIDAI Compliance):</strong> पूर्ण 12-अंकीय आधार संख्या मुख्य आवेदन दस्तावेज़ों में कभी संग्रहीत नहीं की जाती; केवल मास्क्ड रूप (`XXXX-XXXX-1234`) और अपठनीय SHA-256 वॉल्ट टोकन रखा जाता है।</li>
+              <li>• <strong>दस्तावेज़ प्रतिधारण अवधि (Retention Period):</strong> सत्यापन हेतु अपलोड किए गए कच्चे पहचान दस्तावेज (आधार/राशन कार्ड/रसीद की स्कैन प्रतियां) प्रमाण पत्र जारी होने के <strong>90 दिवस पश्चात</strong> सक्रिय स्टोरेज से स्वतः विलोपित (Purge) करने योग्य होते हैं, जबकि जन्म एवं मृत्यु के वैधानिक रजिस्टर प्रविष्टियां (RBD Act 1969 के तहत) स्थायी रूप से सुरक्षित रखी जाती हैं।</li>
+              <li>• <strong>प्रवेश नियंत्रण (Custom Claims RBAC):</strong> डेटाबेस स्तर पर केवल संबंधित विभाग के अधिकृत अधिकारी ही अपने विभाग के आवेदन देख सकते हैं।</li>
             </ul>
           </section>
 
