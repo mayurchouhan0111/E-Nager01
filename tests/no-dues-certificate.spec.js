@@ -18,7 +18,7 @@ test.describe('No Dues Certificate (NOC) Flow', () => {
     await page.goto('/no-dues-certificate');
     await page.getByRole('button', { name: /मेरे आवेदन एवं स्थिति/ }).click();
 
-    await expect(page.getByText(/आपके नो ड्यूज आवेदन|आपने अभी तक कोई नो ड्यूज NOC आवेदन प्रस्तुत नहीं किया है/)).toBeVisible();
+    await expect(page.getByText(/आपके नो ड्यूज आवेदन|आपने अभी तक कोई नो ड्यूज NOC आवेदन प्रस्तुत नहीं किया है/).first()).toBeVisible();
   });
 
   test('validation errors on empty submit', async ({ page }) => {

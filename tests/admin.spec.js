@@ -31,11 +31,16 @@ test.describe('Admin Panel', () => {
     await expect(page.getByText(/मृत्यु प्रमाण पत्र आवेदन प्रबंधन/)).toBeVisible({ timeout: 15000 });
 
     // All tab buttons
+    const isMobile = (page.viewportSize()?.width || 1280) < 1024;
     await expect(page.getByRole('button', { name: /मृत्यु/ }).first()).toBeVisible();
     await expect(page.getByRole('button', { name: /जन्म/ }).first()).toBeVisible();
     await expect(page.getByRole('button', { name: /जल/ }).first()).toBeVisible();
     await expect(page.getByRole('button', { name: /नो ड्यूज/ }).first()).toBeVisible();
-    await expect(page.getByRole('button', { name: /सुरक्षा/ }).first()).toBeVisible();
+    if (!isMobile) {
+      await expect(page.getByRole('button', { name: /सुरक्षा/ }).first()).toBeVisible();
+    } else {
+      await expect(page.getByRole('button', { name: /ऑडिट/ }).first()).toBeVisible();
+    }
   });
 
   test('admin login shows death and birth tabs only', async ({ page }) => {

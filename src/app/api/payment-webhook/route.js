@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { db, sanitizeFirestorePayload } from '@/lib/firebase';
-import { collection, query, where, getDocs, updateDoc, doc } from 'firebase/firestore';
+import { collection, query, where, getDocs, getDoc, updateDoc, doc } from 'firebase/firestore';
 
 export async function POST(req) {
   try {
@@ -33,8 +33,8 @@ export async function POST(req) {
     const utrMatch = notificationText.match(/\b\d{12}\b/);
     const utr = utrMatch ? utrMatch[0] : null;
 
-    // Extract Application No (e.g., ND-2026-12345)
-    const appNoMatch = notificationText.match(/ND-\d{4}-\d{5}/i);
+    // Extract Application No (e.g., ND-2026-12345 or ND-2026-004002)
+    const appNoMatch = notificationText.match(/ND-\d{4}-\d+/i);
     const applicationNo = appNoMatch ? appNoMatch[0] : null;
 
     if (!applicationNo) {
@@ -44,19 +44,39 @@ export async function POST(req) {
       );
     }
 
-    const colRef = collection(db, 'noDuesCertificates');
-    const q = query(colRef, where('applicationNo', '==', applicationNo));
+    // First check direct document lookup by applicationNo (key strategy)
+    let appDoc = null;
+    try {
+      const directRef = doc(db, 'noDuesCertificates', applicationNo);
+      const directSnap = await getDoc(directRef);
+      if (directSnap.exists()) {
+        appDoc = directSnap;
+      }
+    } catch (e) {
+      // Direct doc lookup note
+    }
 
-    const snap = await getDocs(q);
+    // Fallback to query if not found by primary doc ID
+    if (!appDoc) {
+      try {
+        const colRef = collection(db, 'noDuesCertificates');
+        const q = query(colRef, where('applicationNo', '==', applicationNo));
+        const snap = await getDocs(q);
+        if (!snap.empty) {
+          appDoc = snap.docs[0];
+        }
+      } catch (e) {
+        // Query fallback note
+      }
+    }
 
-    if (!snap.empty) {
-      const appDoc = snap.docs[0];
+    if (appDoc && appDoc.exists()) {
       const now = new Date().toISOString();
 
       await updateDoc(doc(db, 'noDuesCertificates', appDoc.id), sanitizeFirestorePayload({
         paymentStatus: 'Paid',
         paymentAmount: 1,
-        utrNumber: utr || appDoc.data().utrNumber || 'AUTO_SMS_VERIFIED',
+        utrNumber: utr || appDoc.data()?.utrNumber || 'AUTO_SMS_VERIFIED',
         status: 'Submitted', // Auto-accept form upon verified payment
         paymentMethod: 'Automated Notification Listener',
         paymentVerifiedAt: now,
@@ -66,7 +86,7 @@ export async function POST(req) {
       return NextResponse.json({
         success: true,
         message: 'Payment verified and form accepted automatically!',
-        applicationNo: appDoc.data().applicationNo || applicationNo,
+        applicationNo: appDoc.data()?.applicationNo || applicationNo,
         utr
       });
     }

@@ -4,8 +4,14 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "dev:test": "cross-env NEXT_PUBLIC_USE_EMULATOR=true FIRESTORE_EMULATOR_HOST=127.0.0.1:8080 FIREBASE_AUTH_EMULATOR_HOST=127.0.0.1:9099 WEBHOOK_SECRET=test-webhook-secret-token-xyz next dev",
     "build": "next build",
     "start": "next start",
+    "emulators": "firebase emulators:start --project demo-test",
+    "seed": "tsx scripts/seed.ts",
+    "test:rules": "node --import tsx --test tests/rules.test.ts",
+    "test:e2e": "playwright test",
+    "test:all": "npm run test:rules && npm run seed && npm run test:e2e",
     "test": "npx playwright test",
     "test:ui": "npx playwright test --ui",
     "test:report": "npx playwright show-report"
@@ -23,10 +29,17 @@
     "react-hot-toast": "^2.6.0"
   },
   "devDependencies": {
+    "@firebase/rules-unit-testing": "^5.0.2",
     "@playwright/test": "^1.62.1",
     "@tailwindcss/typography": "^0.5.12",
+    "@types/node": "^26.6.6",
     "autoprefixer": "^10.5.2",
+    "cross-env": "^10.1.0",
+    "dotenv": "^18.0.10",
+    "firebase-tools": "^15.36.0",
     "postcss": "^8.5.15",
-    "tailwindcss": "^4.3.1"
+    "tailwindcss": "^4.3.1",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2"
   }
 }

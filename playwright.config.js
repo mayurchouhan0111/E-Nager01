@@ -2,6 +2,8 @@ import { defineConfig, devices } from '@playwright/test';
 
 export default defineConfig({
   testDir: './tests',
+  testMatch: /.*\.spec\.js/,
+  testIgnore: '**/rules.test.ts',
   fullyParallel: false,
   forbidOnly: !!process.env.CI,
   retries: 1,
@@ -23,9 +25,13 @@ export default defineConfig({
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
     },
+    {
+      name: 'mobile-chrome',
+      use: { ...devices['Pixel 5'] },
+    },
   ],
   webServer: {
-    command: 'npm run dev',
+    command: 'npm run dev:test',
     url: 'http://localhost:3000',
     reuseExistingServer: true,
     timeout: 120000,

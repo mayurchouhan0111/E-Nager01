@@ -12,9 +12,11 @@ export const ADMIN_USERNAME_ALIASES = {
   'super': 'super_admin'
 };
 
+const isEmulator = process.env.NEXT_PUBLIC_USE_EMULATOR === 'true';
+
 export const DEFAULT_ADMIN_ACCOUNTS = {
   admin: {
-    password: process.env.NEXT_PUBLIC_ADMIN_PASSWORD_BIRTH_DEATH || process.env.ADMIN_PASSWORD_BIRTH_DEATH || '',
+    password: process.env.NEXT_PUBLIC_ADMIN_PASSWORD_BIRTH_DEATH || process.env.ADMIN_PASSWORD_BIRTH_DEATH || (isEmulator ? 'test_admin_pass' : ''),
     role: 'birth_death_admin',
     name: 'जन्म-मृत्यु रजिस्ट्रार अधिकारी (Birth & Death Registrar)',
     email: 'birthdeath.jhabua@mp.gov.in',
@@ -22,7 +24,7 @@ export const DEFAULT_ADMIN_ACCOUNTS = {
     allowedTabs: ['death-certificates', 'birth-certificates']
   },
   water_admin: {
-    password: process.env.NEXT_PUBLIC_ADMIN_PASSWORD_WATER || process.env.ADMIN_PASSWORD_WATER || '',
+    password: process.env.NEXT_PUBLIC_ADMIN_PASSWORD_WATER || process.env.ADMIN_PASSWORD_WATER || (isEmulator ? 'test_water_pass' : ''),
     role: 'water_admin',
     name: 'जल प्रदाय विभाग अधिकारी (Water Supply Officer)',
     email: 'water.jhabua@mp.gov.in',
@@ -30,7 +32,7 @@ export const DEFAULT_ADMIN_ACCOUNTS = {
     allowedTabs: ['water-connections']
   },
   nodues_admin: {
-    password: process.env.NEXT_PUBLIC_ADMIN_PASSWORD_NODUES || process.env.ADMIN_PASSWORD_NODUES || '',
+    password: process.env.NEXT_PUBLIC_ADMIN_PASSWORD_NODUES || process.env.ADMIN_PASSWORD_NODUES || (isEmulator ? 'test_nodues_pass' : ''),
     role: 'nodues_admin',
     name: 'संपत्ति कर व नो ड्यूज अधिकारी (Revenue & No-Dues NOC Officer)',
     email: 'revenue.jhabua@mp.gov.in',
@@ -38,7 +40,7 @@ export const DEFAULT_ADMIN_ACCOUNTS = {
     allowedTabs: ['no-dues-certificates']
   },
   super_admin: {
-    password: process.env.NEXT_PUBLIC_ADMIN_PASSWORD_SUPER || process.env.ADMIN_PASSWORD_SUPER || '',
+    password: process.env.NEXT_PUBLIC_ADMIN_PASSWORD_SUPER || process.env.ADMIN_PASSWORD_SUPER || (isEmulator ? 'test_super_pass' : ''),
     role: 'super_admin',
     name: 'मुख्य नगर पालिका अधिकारी (Chief Municipal Officer - CMO)',
     email: 'cmo.jhabua@mp.gov.in',

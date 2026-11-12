@@ -1,4 +1,15 @@
 /** @type {import('next').NextConfig} */
+const path = require('path');
+const dotenv = require('dotenv');
+
+if (process.env.NEXT_PUBLIC_USE_EMULATOR === 'true') {
+  dotenv.config({ path: path.resolve(process.cwd(), '.env.test'), override: true });
+}
+
+const isEmulator = process.env.NEXT_PUBLIC_USE_EMULATOR === 'true';
+const emulatorConnectSources = isEmulator ? ' http://127.0.0.1:* http://localhost:* ws://127.0.0.1:* ws://localhost:*' : '';
+const emulatorFrameSources = isEmulator ? ' http://127.0.0.1:* http://localhost:*' : '';
+
 const nextConfig = {
   compress: true,
   images: {
@@ -39,7 +50,7 @@ const nextConfig = {
           },
           {
             key: 'Content-Security-Policy',
-            value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://apis.google.com https://www.gstatic.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://unpkg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: blob: https:; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' data: blob: https://*.firebaseio.com https://*.googleapis.com https://*.firebaseapp.com wss://*.firebaseio.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://unpkg.com https://tessdata.projectnaptha.com; worker-src 'self' blob: data: https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://unpkg.com; frame-src 'self' data: blob: https://*.firebaseapp.com;",
+            value: `default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://apis.google.com https://www.gstatic.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://unpkg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: blob: https:; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' data: blob:${emulatorConnectSources} https://*.firebaseio.com https://*.googleapis.com https://*.firebaseapp.com wss://*.firebaseio.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://unpkg.com https://tessdata.projectnaptha.com; worker-src 'self' blob: data: https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://unpkg.com; frame-src 'self' data: blob:${emulatorFrameSources} https://*.firebaseapp.com;`,
           },
         ],
       },

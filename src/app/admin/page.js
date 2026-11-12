@@ -845,6 +845,7 @@ export default function AdminPage() {
               </span>
               <button 
                 onClick={handleLogout} 
+                aria-label="लॉगआउट"
                 className="btn btn-secondary btn-sm flex items-center gap-1"
               >
                 <LogOut className="w-3.5 h-3.5" /> <span className="hidden sm:inline">लॉगआउट</span>

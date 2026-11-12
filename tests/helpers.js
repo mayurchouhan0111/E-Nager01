@@ -33,8 +33,8 @@ export const deathTestData = (suffix = uniqueSuffix()) => ({
 });
 
 export const adminCredentials = {
-  admin: { username: 'admin', password: 'jhabua@2024' },
-  super_admin: { username: 'super_admin', password: 'jhabua@super2024' },
-  water_admin: { username: 'water_admin', password: 'water@jhabua2024' },
-  nodues_admin: { username: 'nodues_admin', password: 'nodues@jhabua2024' },
+  admin: { username: 'admin', password: process.env.NEXT_PUBLIC_ADMIN_PASSWORD_BIRTH_DEATH || 'test_admin_pass' },
+  super_admin: { username: 'super_admin', password: process.env.NEXT_PUBLIC_ADMIN_PASSWORD_SUPER || 'test_super_pass' },
+  water_admin: { username: 'water_admin', password: process.env.NEXT_PUBLIC_ADMIN_PASSWORD_WATER || 'test_water_pass' },
+  nodues_admin: { username: 'nodues_admin', password: process.env.NEXT_PUBLIC_ADMIN_PASSWORD_NODUES || 'test_nodues_pass' },
 };

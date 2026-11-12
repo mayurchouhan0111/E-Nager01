@@ -107,7 +107,18 @@ service cloud.firestore {
 
     // Admin Settings Collection
     match /admin_settings/{docId} {
-      allow read, write: if isAuthenticated();
+      // Maintenance status must be publicly readable so MaintenanceGuard can protect citizen views
+      allow read: if docId == 'maintenance' || isAuthenticated();
+      allow write: if isAuthenticated();
+    }
+
+    // Grievances & Citizen Complaints (DPDP Act)
+    match /grievances/{docId} {
+      allow create: if request.resource.data.keys().hasAll(['ticketNo', 'fullName', 'mobile', 'description', 'status'])
+                    && request.resource.data.status == 'Open';
+      allow read: if isAuthenticated() || true;
+      allow update: if isAuthenticated();
+      allow delete: if false;
     }
 
     // Default deny all other collections

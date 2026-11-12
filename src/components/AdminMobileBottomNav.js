@@ -7,12 +7,15 @@ export default function AdminMobileBottomNav() {
   const pathname = usePathname();
   const [activeTab, setActiveTab] = useState('death-certificates');
   const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(false);
+  const [adminRole, setAdminRole] = useState('');
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const checkAuth = () => {
         const stored = sessionStorage.getItem('dc_admin_authenticated');
+        const role = sessionStorage.getItem('dc_admin_role') || '';
         setIsAdminAuthenticated(stored === 'true');
+        setAdminRole(role);
       };
       
       checkAuth();
@@ -27,6 +30,7 @@ export default function AdminMobileBottomNav() {
 
       const handleAuthChange = (e) => {
         setIsAdminAuthenticated(!!e.detail);
+        setAdminRole(sessionStorage.getItem('dc_admin_role') || '');
       };
 
       window.addEventListener('admin-tab-changed', handleTabChange);
@@ -50,33 +54,42 @@ export default function AdminMobileBottomNav() {
     }
   };
 
-  const navItems = [
+  const allNavItems = [
     {
       key: 'death-certificates',
       label: 'मृत्यु',
       icon: FileText,
+      roles: ['birth_death_admin', 'super_admin']
     },
     {
       key: 'birth-certificates',
       label: 'जन्म',
       icon: Baby,
+      roles: ['birth_death_admin', 'super_admin']
     },
     {
       key: 'water-connections',
       label: 'जल',
       icon: Droplets,
+      roles: ['water_admin', 'super_admin']
     },
     {
       key: 'no-dues-certificates',
       label: 'नो ड्यूज',
       icon: Building2,
+      roles: ['nodues_admin', 'super_admin']
     },
     {
       key: 'audit',
       label: 'ऑडिट',
       icon: History,
+      roles: ['super_admin']
     },
   ];
+
+  const navItems = adminRole
+    ? allNavItems.filter(item => !item.roles || item.roles.includes(adminRole))
+    : allNavItems;
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 lg:hidden bg-white/95 backdrop-blur-xl border-t border-slate-200 text-slate-900 shadow-[0_-4px_24px_rgba(0,0,0,0.07)] no-print pb-safe">
