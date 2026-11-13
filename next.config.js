@@ -11,6 +11,7 @@ const emulatorConnectSources = isEmulator ? ' http://127.0.0.1:* http://localhos
 const emulatorFrameSources = isEmulator ? ' http://127.0.0.1:* http://localhost:*' : '';
 
 const nextConfig = {
+  allowedDevOrigins: ['127.0.0.1', 'localhost'],
   compress: true,
   images: {
     formats: ['image/avif', 'image/webp'],

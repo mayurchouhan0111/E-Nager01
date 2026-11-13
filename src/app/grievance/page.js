@@ -6,6 +6,8 @@ import ServiceHeader from '@/components/ServiceHeader'
 import toast from 'react-hot-toast'
 import { db } from '@/lib/firebase'
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore'
+import HelplineCard from '@/components/HelplineCard'
+import styles from '@/styles/uiRedesign.module.css'
 import { Shield, Mail, Phone, MapPin, Send, HelpCircle, CheckCircle2, ArrowLeft, AlertCircle } from 'lucide-react'
 
 export default function GrievancePage() {
@@ -166,6 +168,7 @@ export default function GrievancePage() {
                   </label>
                   <input
                     type="tel"
+                    inputMode="tel"
                     required
                     maxLength={10}
                     value={formData.mobile}
@@ -183,6 +186,7 @@ export default function GrievancePage() {
                   </label>
                   <input
                     type="email"
+                    inputMode="email"
                     value={formData.email}
                     onChange={e => setFormData({ ...formData, email: e.target.value })}
                     className="w-full border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs focus:outline-none focus:border-emerald-600"
@@ -237,7 +241,8 @@ export default function GrievancePage() {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full btn btn-primary py-3 font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2"
+                aria-label="शिकायत सबमिट करें"
+                className={`${styles.primaryButton} w-full`}
               >
                 <Send className="w-4 h-4" />
                 {isSubmitting ? 'शिकायत जमा हो रही है...' : 'शिकायत सबमिट करें (Submit Grievance)'}
@@ -254,6 +259,11 @@ export default function GrievancePage() {
           <Link href="/privacy-policy" className="inline-flex items-center gap-2 text-xs font-extrabold text-slate-600 hover:text-slate-900">
             प्राइवेसी नीति देखें (Privacy Policy) →
           </Link>
+        </div>
+
+        {/* Persistent Helpline & Contact Card */}
+        <div className="pt-2">
+          <HelplineCard title="नागरिक शिकायत एवं सहायता केंद्र (Citizen Grievance Helpdesk)" />
         </div>
 
       </div>

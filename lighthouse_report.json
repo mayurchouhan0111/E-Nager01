@@ -1,0 +1,44 @@
+{
+  "/": {
+    "name": "Home",
+    "performance": 34,
+    "accessibility": 94,
+    "bestPractices": 100,
+    "seo": 100
+  },
+  "/birth-certificate": {
+    "name": "Birth Certificate",
+    "performance": 68,
+    "accessibility": 86,
+    "bestPractices": 100,
+    "seo": 100
+  },
+  "/death-certificate": {
+    "name": "Death Certificate",
+    "performance": 76,
+    "accessibility": 90,
+    "bestPractices": 96,
+    "seo": 100
+  },
+  "/water-connection": {
+    "name": "Water Connection",
+    "performance": 69,
+    "accessibility": 90,
+    "bestPractices": 100,
+    "seo": 100
+  },
+  "/no-dues-certificate": {
+    "name": "No Dues Certificate",
+    "performance": 73,
+    "accessibility": 85,
+    "bestPractices": 96,
+    "seo": 100
+  },
+  "/grievance": {
+    "name": "Grievance",
+    "performance": 85,
+    "accessibility": 89,
+    "bestPractices": 96,
+    "seo": 100
+  }
+}

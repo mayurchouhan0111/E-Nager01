@@ -167,6 +167,7 @@ export default function DocumentUploader({
               onClick={() => setPreviewModal(true)}
               className="p-2 text-slate-600 hover:text-emerald-700 hover:bg-emerald-50 rounded-lg transition-colors text-xs font-medium flex items-center gap-1"
               title="पूर्वावलोकन देखें (Preview)"
+              aria-label={`${title} पूर्वावलोकन देखें`}
             >
               <Eye className="w-4 h-4" />
             </button>
@@ -175,6 +176,7 @@ export default function DocumentUploader({
               onClick={onRemove}
               className="p-2 text-slate-400 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors"
               title="हटाएं (Remove)"
+              aria-label={`${title} दस्तावेज हटाएं`}
             >
               <Trash2 className="w-4 h-4" />
             </button>
@@ -191,6 +193,7 @@ export default function DocumentUploader({
           </span>
           <input
             type="file"
+            aria-label={`${title} फ़ाइल चुनें (अधिकतम 1 MB)`}
             accept="image/jpeg,image/png,image/jpg,image/webp,application/pdf"
             onChange={handleFileChange}
             className="hidden"

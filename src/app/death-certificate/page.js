@@ -18,6 +18,11 @@ import { db } from '../../lib/firebase';
 import toast from 'react-hot-toast';
 import { downloadBlobFile } from '../../utils/fileStorage';
 import { validateDeathCertificateForm, navigateToFirstErrorField } from '../../utils/formValidationHelper';
+import Stepper from '@/components/Stepper';
+import Accordion from '@/components/Accordion';
+import StatusCard from '@/components/StatusCard';
+import HelplineCard from '@/components/HelplineCard';
+import styles from '@/styles/uiRedesign.module.css';
 import { 
   FileText, Activity, CheckCircle2, AlertCircle, RefreshCw, Printer, X, History, Plus, 
   Building2, User, Home, HeartPulse, CheckSquare, Download, ShieldAlert, ListChecks 
@@ -102,6 +107,7 @@ export default function DeathCertificatePage() {
   const [showLetterModal, setShowLetterModal] = useState(false);
   const [showOfficialDocModal, setShowOfficialDocModal] = useState(false);
   const [dpdpConsent, setDpdpConsent] = useState(false);
+  const [currentStep, setCurrentStep] = useState(1);
 
   // Form State
   const [formData, setFormData] = useState({
@@ -122,6 +128,43 @@ export default function DeathCertificatePage() {
       addressProof: null
     }
   });
+
+  // LocalStorage Draft Autosave & Restore
+  useEffect(() => {
+    try {
+      const savedDraft = localStorage.getItem('gov_death_draft');
+      if (savedDraft) {
+        const parsed = JSON.parse(savedDraft);
+        if (parsed && typeof parsed === 'object' && !parsed.id) {
+          setFormData(prev => ({
+            ...prev,
+            id: null,
+            applicationNo: '',
+            status: 'Draft',
+            deceasedDetails: { ...prev.deceasedDetails, ...(parsed.deceasedDetails || {}) },
+            applicantDetails: { ...prev.applicantDetails, ...(parsed.applicantDetails || {}) },
+            parentSpouseDetails: { ...prev.parentSpouseDetails, ...(parsed.parentSpouseDetails || {}) },
+            statisticalDetails: { ...prev.statisticalDetails, ...(parsed.statisticalDetails || {}) },
+            documents: { ...prev.documents, ...(parsed.documents || {}) }
+          }));
+        }
+      }
+    } catch (e) {}
+  }, []);
+
+  useEffect(() => {
+    try {
+      if (formData && !formData.id && (formData.deceasedDetails?.fullName || formData.applicantDetails?.fullName)) {
+        localStorage.setItem('gov_death_draft', JSON.stringify({
+          deceasedDetails: formData.deceasedDetails,
+          applicantDetails: formData.applicantDetails,
+          parentSpouseDetails: formData.parentSpouseDetails,
+          statisticalDetails: formData.statisticalDetails,
+          documents: formData.documents
+        }));
+      }
+    } catch (e) {}
+  }, [formData]);
 
   useEffect(() => {
     const unsubAuth = subscribeToCitizenAuth((user) => {
@@ -410,6 +453,7 @@ export default function DeathCertificatePage() {
     setLoading(false);
 
     if (res.success) {
+      try { localStorage.removeItem('gov_death_draft'); } catch (e) {}
       setMessage({ type: 'success', text: `आवेदन जमा हो गया है (Application submitted! App No: ${res.applicationNo})` });
       
       // Auto open letter preview for current submitted application
@@ -449,6 +493,7 @@ export default function DeathCertificatePage() {
   };
 
   const resetForm = () => {
+    try { localStorage.removeItem('gov_death_draft'); } catch (e) {}
     setFormErrors([]);
     setFormData({
       id: null,
@@ -647,6 +692,18 @@ export default function DeathCertificatePage() {
         {activeTab === 'apply' && (
           <form onSubmit={handleSubmit} className="space-y-6">
             
+            {/* Stepper with Hindi Labels and ARIA Progress */}
+            <Stepper
+              steps={[
+                { label: '1. मृतक विवरण' },
+                { label: '2. मृत्यु स्थान व पता' },
+                { label: '3. आवेदक विवरण' },
+                { label: '4. दस्तावेज व घोषणा' }
+              ]}
+              currentStep={currentStep}
+              onStepClick={(step) => setCurrentStep(step)}
+            />
+
             {/* Correction Warning Banner */}
             {formData.status === 'Correction Requested' && (
               <div className="bg-amber-50 border border-amber-200 rounded-2xl p-5 text-amber-900 space-y-1 shadow-sm">
@@ -1347,7 +1404,8 @@ export default function DeathCertificatePage() {
                 type="button"
                 onClick={handleSaveDraft}
                 disabled={loading}
-                className="btn btn-secondary w-full sm:w-auto flex items-center justify-center gap-1.5 font-bold text-slate-700"
+                aria-label="प्रारूप सहेजें"
+                className={`${styles.secondaryButton} w-full sm:w-auto`}
               >
                 💾 ड्राफ्ट सहेजें (Save Draft)
               </button>
@@ -1355,14 +1413,15 @@ export default function DeathCertificatePage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="btn btn-primary w-full sm:w-auto flex items-center justify-center gap-2 shadow-lg shadow-emerald-700/20 font-bold"
+                aria-label="मृत्यु प्रमाण पत्र ऑनलाइन आवेदन जमा करें"
+                className={`${styles.primaryButton} w-full sm:w-auto shadow-md`}
               >
                 {loading ? (
                   <RefreshCw className="animate-spin w-4 h-4 text-white" />
                 ) : formData.status === 'Correction Requested' ? (
                   '🔄 आवेदन पुनः प्रस्तुत करें (Resubmit Application)'
                 ) : (
-                  '🚀 ऑनलाइन आवेदन जमा करें (Submit Application)'
+                  '🚀 मृत्यु प्रमाण पत्र ऑनलाइन आवेदन जमा करें (Submit Application)'
                 )}
               </button>
             </div>
@@ -1389,78 +1448,63 @@ export default function DeathCertificatePage() {
             ) : (
               <div className="grid grid-cols-1 gap-4">
                 {applications.map((app, index) => (
-                  <div key={app.id} className="bg-white border border-slate-200 rounded-2xl p-5 hover:border-slate-300 transition-all flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-sm">
-                    <div>
-                      <div className="flex items-center gap-2 mb-1 flex-wrap">
-                        <span className="text-xs font-mono font-extrabold text-slate-900 bg-slate-100 border border-slate-300 px-2.5 py-0.5 rounded-full shadow-2xs">
-                          #{index + 1}
-                        </span>
-                        <span className="text-xs font-mono font-bold text-slate-700 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
-                          📅 {app.appliedAt ? new Date(app.appliedAt).toLocaleDateString('hi-IN') : 'Draft'}
-                        </span>
-                        <span className="text-xs font-mono font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded border border-emerald-200">{app.applicationNo || 'DRAFT'}</span>
-                        <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold border uppercase tracking-wider ${getStatusChip(app.status)}`}>
-                          {app.status}
-                        </span>
-                      </div>
-                      <h3 className="text-slate-900 font-extrabold text-base"> स्व. {app.deceasedDetails?.fullName || 'N/A'}</h3>
-                      <p className="text-xs text-slate-500 mt-0.5 font-medium">आवेदक: {app.applicantDetails?.fullName} ({app.applicantDetails?.relationWithDeceased}) | मृत्यु तिथि: {app.deceasedDetails?.dateOfDeath}</p>
-                      {app.deceasedDetails?.presentAddress?.villageCity && (
-                        <p className="text-[11px] text-slate-400 font-medium mt-0.5">पता: {app.deceasedDetails.presentAddress.villageCity}, {app.deceasedDetails.presentAddress.district}</p>
-                      )}
-                    </div>
-
-                    <div className="flex flex-wrap items-center gap-2">
-                      {/* Hard Copy Submission Letter */}
-                      <button
-                        onClick={() => { setSelectedApp(app); setShowLetterModal(true); }}
-                        className="btn btn-secondary btn-sm flex items-center gap-1 font-bold text-emerald-900 bg-emerald-50 hover:bg-emerald-100 border-emerald-200"
-                      >
-                        <Printer className="w-3.5 h-3.5 text-emerald-700" /> 🖨️ आवेदन पत्र (Hard Copy Letter)
-                      </button>
-
-                      {/* Resubmit Action if Correction Requested */}
-                      {app.status === 'Correction Requested' && (
+                  <StatusCard
+                    key={app.id || index}
+                    status={app.status}
+                    applicationNo={app.applicationNo || 'DRAFT'}
+                    title={`स्व. ${app.deceasedDetails?.fullName || 'N/A'}`}
+                    description={`आवेदक: ${app.applicantDetails?.fullName || 'N/A'} (${app.applicantDetails?.relationWithDeceased || 'N/A'}) • मृत्यु तिथि: ${app.deceasedDetails?.dateOfDeath || 'N/A'} ${app.deceasedDetails?.presentAddress?.villageCity ? `• पता: ${app.deceasedDetails.presentAddress.villageCity}` : ''}`}
+                    date={app.appliedAt ? new Date(app.appliedAt).toLocaleDateString('hi-IN') : 'प्रारूप'}
+                    officerRemarks={app.lastOfficerRemark}
+                    actions={
+                      <>
                         <button
-                          onClick={() => handleEditForResubmit(app)}
-                          className="btn btn-primary btn-sm bg-gradient-to-r from-amber-500 to-amber-600 text-white font-bold"
+                          onClick={() => { setSelectedApp(app); setShowLetterModal(true); }}
+                          className="btn btn-secondary btn-sm flex items-center gap-1 font-bold text-emerald-900 bg-emerald-50 hover:bg-emerald-100 border-emerald-200"
                         >
-                          ✏️ सुधारें व पुनः प्रस्तुत करें
+                          <Printer className="w-3.5 h-3.5 text-emerald-700" /> 🖨️ आवेदन पत्र (Hard Copy Letter)
                         </button>
-                      )}
 
-                      {/* View & Download Official Uploaded Certificate or Auto Generated Certificate */}
-                      {app.officialUploadedCertificate ? (
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setSelectedApp(app);
-                            setShowOfficialDocModal(true);
-                          }}
-                          className="btn btn-primary btn-sm bg-gradient-to-r from-emerald-700 to-emerald-800 text-white font-bold flex items-center gap-1 shadow-md cursor-pointer transition-all"
-                        >
-                          <Download className="w-3.5 h-3.5" /> 📜 अधिकारी हस्ताक्षरित प्रमाण पत्र देखें व डाउनलोड
-                        </button>
-                      ) : (
-                        (app.status === 'Approved' || app.status === 'Certificate Generated' || app.status === 'Completed') && (
+                        {app.status === 'Correction Requested' && (
                           <button
-                            onClick={() => { setSelectedApp(app); setShowCertModal(true); }}
-                            className="btn btn-primary btn-sm bg-gradient-to-r from-emerald-600 to-emerald-700 text-white font-bold"
+                            onClick={() => handleEditForResubmit(app)}
+                            className="btn btn-primary btn-sm bg-gradient-to-r from-amber-500 to-amber-600 text-white font-bold"
                           >
-                            📜 प्रमाण पत्र डाउनलोड करें
+                            ✏️ सुधारें व पुनः प्रस्तुत करें
                           </button>
-                        )
-                      )}
+                        )}
 
-                      {/* View Timeline Modal Button */}
-                      <button
-                        onClick={() => setSelectedApp(app)}
-                        className="btn btn-secondary btn-sm flex items-center gap-1 font-bold text-slate-700"
-                      >
-                        <History className="w-3.5 h-3.5 text-slate-500" /> स्थिति देखें
-                      </button>
-                    </div>
-                  </div>
+                        {app.officialUploadedCertificate ? (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setSelectedApp(app);
+                              setShowOfficialDocModal(true);
+                            }}
+                            className="btn btn-primary btn-sm bg-gradient-to-r from-emerald-700 to-emerald-800 text-white font-bold flex items-center gap-1 shadow-md cursor-pointer transition-all"
+                          >
+                            <Download className="w-3.5 h-3.5" /> 📜 अधिकारी हस्ताक्षरित प्रमाण पत्र देखें व डाउनलोड
+                          </button>
+                        ) : (
+                          (app.status === 'Approved' || app.status === 'Certificate Generated' || app.status === 'Completed') && (
+                            <button
+                              onClick={() => { setSelectedApp(app); setShowCertModal(true); }}
+                              className="btn btn-primary btn-sm bg-gradient-to-r from-emerald-600 to-emerald-700 text-white font-bold"
+                            >
+                              📜 प्रमाण पत्र डाउनलोड करें
+                            </button>
+                          )
+                        )}
+
+                        <button
+                          onClick={() => setSelectedApp(app)}
+                          className="btn btn-secondary btn-sm flex items-center gap-1 font-bold text-slate-700"
+                        >
+                          <History className="w-3.5 h-3.5 text-slate-500" /> स्थिति देखें
+                        </button>
+                      </>
+                    }
+                  />
                 ))}
               </div>
             )}
@@ -1660,6 +1704,11 @@ export default function DeathCertificatePage() {
             </div>
           </div>
         )}
+
+        {/* Persistent Helpline & Contact Card */}
+        <div className="pt-4">
+          <HelplineCard title="मृत्यु पंजीयन नागरिक सहायता केंद्र (Death Certificate Helpdesk)" />
+        </div>
 
       </main>
     </div>

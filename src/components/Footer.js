@@ -198,7 +198,8 @@ export default function Footer() {
                 </div>
                 <a 
                   href="tel:9713175838" 
-                  className="px-3.5 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-all shadow-md shadow-emerald-900/40"
+                  aria-label="मुख्य हेल्पलाइन पर कॉल करें: 9713175838"
+                  className="px-3.5 py-2 rounded-lg bg-emerald-700 hover:bg-emerald-800 active:scale-95 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-all shadow-md shadow-emerald-950/40 min-h-[44px]"
                 >
                   <PhoneCall className="w-3.5 h-3.5" />
                   <span>कॉल करें</span>

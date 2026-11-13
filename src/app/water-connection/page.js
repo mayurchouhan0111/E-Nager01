@@ -17,6 +17,11 @@ import { collection, onSnapshot } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import toast from 'react-hot-toast';
 import { downloadBlobFile } from '../../utils/fileStorage';
+import Stepper from '@/components/Stepper';
+import Accordion from '@/components/Accordion';
+import StatusCard from '@/components/StatusCard';
+import HelplineCard from '@/components/HelplineCard';
+import styles from '@/styles/uiRedesign.module.css';
 import { 
   Droplet, Activity, CheckCircle2, AlertCircle, RefreshCw, Printer, X, History, Plus, 
   Building2, User, Home, FileText, Download, ShieldAlert, CheckSquare, Wrench, ListChecks
@@ -75,6 +80,7 @@ export default function WaterConnectionPage() {
   const [showLetterModal, setShowLetterModal] = useState(false);
   const [showOfficialDocModal, setShowOfficialDocModal] = useState(false);
   const [dpdpConsent, setDpdpConsent] = useState(false);
+  const [currentStep, setCurrentStep] = useState(1);
 
   // Form State
   const [formData, setFormData] = useState({
@@ -91,6 +97,35 @@ export default function WaterConnectionPage() {
       roadCuttingReceipt: null
     }
   });
+
+  // LocalStorage Draft Autosave & Restore
+  useEffect(() => {
+    try {
+      const savedDraft = localStorage.getItem('gov_water_draft');
+      if (savedDraft) {
+        const parsed = JSON.parse(savedDraft);
+        if (parsed && typeof parsed === 'object') {
+          setFormData(prev => ({
+            ...prev,
+            ...parsed,
+            applicantDetails: { ...prev.applicantDetails, ...(parsed.applicantDetails || {}) },
+            propertyDetails: { ...prev.propertyDetails, ...(parsed.propertyDetails || {}) },
+            existingConnectionDetails: { ...prev.existingConnectionDetails, ...(parsed.existingConnectionDetails || {}) },
+            plumberDetails: { ...prev.plumberDetails, ...(parsed.plumberDetails || {}) },
+            documents: { ...prev.documents, ...(parsed.documents || {}) }
+          }));
+        }
+      }
+    } catch (e) {}
+  }, []);
+
+  useEffect(() => {
+    try {
+      if (formData && !formData.id) {
+        localStorage.setItem('gov_water_draft', JSON.stringify(formData));
+      }
+    } catch (e) {}
+  }, [formData]);
 
   useEffect(() => {
     const unsubAuth = subscribeToCitizenAuth((user) => {
@@ -292,6 +327,7 @@ export default function WaterConnectionPage() {
     setLoading(false);
 
     if (res.success) {
+      try { localStorage.removeItem('gov_water_draft'); } catch (e) {}
       setMessage({ 
         type: 'success', 
         text: `जल कनेक्शन आवेदन सफलतापूर्वक जमा हुआ (Application submitted! App No: ${res.applicationNo})` 
@@ -323,6 +359,7 @@ export default function WaterConnectionPage() {
   };
 
   const resetForm = () => {
+    try { localStorage.removeItem('gov_water_draft'); } catch (e) {}
     setFormErrors([]);
     setFormData({
       id: null,
@@ -506,6 +543,17 @@ export default function WaterConnectionPage() {
         {activeTab === 'apply' && (
           <form onSubmit={handleSubmit} className="space-y-6">
             
+            {/* Stepper with Hindi Labels and ARIA Progress */}
+            <Stepper
+              steps={[
+                { label: '1. आवेदक विवरण' },
+                { label: '2. संपत्ति व कनेक्शन' },
+                { label: '3. दस्तावेज व शपथ पत्र' }
+              ]}
+              currentStep={currentStep}
+              onStepClick={(step) => setCurrentStep(step)}
+            />
+
             {/* Correction Warning Banner */}
             {formData.status === 'Correction Requested' && (
               <div className="bg-amber-50 border border-amber-200 rounded-2xl p-5 text-amber-900 space-y-1 shadow-sm">
@@ -907,7 +955,8 @@ export default function WaterConnectionPage() {
                 type="button"
                 onClick={handleSaveDraft}
                 disabled={loading}
-                className="w-full sm:w-auto btn btn-secondary py-3 px-6 text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2"
+                aria-label="जल कनेक्शन प्रारूप सहेजें"
+                className={`${styles.secondaryButton} w-full sm:w-auto`}
               >
                 <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
                 प्रारूप सहेजें (Save Draft)
@@ -917,7 +966,8 @@ export default function WaterConnectionPage() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full sm:w-auto btn btn-primary bg-gradient-to-r from-teal-700 to-emerald-700 py-3.5 px-8 text-xs font-extrabold uppercase tracking-wider shadow-lg shadow-teal-700/20 flex items-center justify-center gap-2"
+                  aria-label="जल कनेक्शन आवेदन प्रस्तुत करें"
+                  className={`${styles.primaryButton} w-full sm:w-auto shadow-md`}
                 >
                   {loading ? (
                     <>
@@ -970,32 +1020,16 @@ export default function WaterConnectionPage() {
             ) : (
               <div className="space-y-4">
                 {applications.map((app, index) => (
-                  <div key={app.id} className="bg-white border border-slate-200 rounded-3xl p-5 sm:p-6 shadow-sm space-y-4 hover:border-teal-200 transition-all">
-                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-                      <div>
-                        <div className="flex items-center gap-2 mb-1 flex-wrap">
-                          <span className="text-xs font-mono font-extrabold text-slate-900 bg-slate-100 border border-slate-300 px-2.5 py-0.5 rounded-full shadow-2xs">
-                            #{index + 1}
-                          </span>
-                          <span className="text-xs font-mono font-bold text-slate-700 bg-slate-100 px-2.5 py-0.5 rounded-full border border-slate-300">
-                            📅 {app.appliedAt ? new Date(app.appliedAt).toLocaleDateString('hi-IN') : 'Draft'}
-                          </span>
-                          <span className="font-mono text-xs font-bold text-teal-900 bg-teal-50 border border-teal-200 px-2.5 py-0.5 rounded-full">
-                            {app.applicationNo || 'DRAFT'}
-                          </span>
-                          <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold border uppercase tracking-wider ${getStatusChip(app.status)}`}>
-                            {app.status}
-                          </span>
-                        </div>
-                        <h3 className="text-slate-900 font-extrabold text-sm sm:text-base">
-                          आवेदक: {app.applicantDetails?.fullName || 'N/A'} (भवन क्र. {app.propertyDetails?.houseNo || 'N/A'}, वार्ड {app.applicantDetails?.wardNo || 'N/A'})
-                        </h3>
-                        <p className="text-xs text-slate-500 mt-0.5">
-                          कनेक्शन साइज: {app.propertyDetails?.connectionSize} | मोबाइल: {app.applicantDetails?.mobile} | आवेदन तिथि: {app.appliedAt ? new Date(app.appliedAt).toLocaleDateString('hi-IN') : 'Draft'}
-                        </p>
-                      </div>
-
-                      <div className="flex items-center gap-2 flex-wrap">
+                  <StatusCard
+                    key={app.id || index}
+                    status={app.status}
+                    applicationNo={app.applicationNo || 'DRAFT'}
+                    title={`आवेदक: ${app.applicantDetails?.fullName || 'N/A'} (भवन क्र. ${app.propertyDetails?.houseNo || 'N/A'}, वार्ड ${app.applicantDetails?.wardNo || 'N/A'})`}
+                    description={`कनेक्शन साइज: ${app.propertyDetails?.connectionSize || 'N/A'} | मोबाइल: ${app.applicantDetails?.mobile || 'N/A'}`}
+                    date={app.appliedAt ? new Date(app.appliedAt).toLocaleDateString('hi-IN') : 'प्रारूप'}
+                    officerRemarks={app.lastOfficerRemark}
+                    actions={
+                      <>
                         <button
                           onClick={() => { setSelectedApp(app); setShowLetterModal(true); }}
                           className="btn btn-secondary btn-sm flex items-center gap-1 font-bold text-teal-900 bg-teal-50 hover:bg-teal-100 border-teal-200 text-xs"
@@ -1033,14 +1067,9 @@ export default function WaterConnectionPage() {
                             ✏️ सुधारें व पुनः प्रस्तुत करें
                           </button>
                         )}
-                      </div>
-                    </div>
-
-                    {/* Timeline */}
-                    <div className="pt-3 border-t border-slate-100">
-                      <ApplicationTimeline timeline={app.timeline || []} currentStatus={app.status} />
-                    </div>
-                  </div>
+                      </>
+                    }
+                  />
                 ))}
               </div>
             )}
@@ -1051,6 +1080,11 @@ export default function WaterConnectionPage() {
         {activeTab === 'checklist' && (
           <DocumentChecklist defaultCategory="water" />
         )}
+
+        {/* Persistent Helpline & Contact Card */}
+        <div className="pt-4">
+          <HelplineCard title="जल प्रदाय विभाग सहायता केंद्र (Water Supply Helpdesk)" />
+        </div>
 
       </main>
 

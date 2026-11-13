@@ -16,6 +16,10 @@ import { db } from '../../lib/firebase';
 import toast from 'react-hot-toast';
 import { downloadBlobFile } from '../../utils/fileStorage';
 import { extractNoDuesReceiptData } from '../../utils/noDuesReceiptExtractor';
+import Stepper from '@/components/Stepper';
+import StatusCard from '@/components/StatusCard';
+import HelplineCard from '@/components/HelplineCard';
+import styles from '@/styles/uiRedesign.module.css';
 import { 
   FileText, Activity, CheckCircle2, AlertCircle, RefreshCw, Printer, X, History, Plus, 
   Download, Building2, UploadCloud, Info, ShieldCheck, CheckSquare, Search, Phone
@@ -65,6 +69,35 @@ export default function NoDuesCertificatePage() {
   const [showCertModal, setShowCertModal] = useState(false);
   const [showLetterModal, setShowLetterModal] = useState(false);
   const [showOfficialDocModal, setShowOfficialDocModal] = useState(false);
+  const [currentStep, setCurrentStep] = useState(1);
+
+  // LocalStorage Draft Autosave & Restore
+  useEffect(() => {
+    try {
+      const savedDraft = localStorage.getItem('gov_nodues_draft');
+      if (savedDraft) {
+        const parsed = JSON.parse(savedDraft);
+        if (parsed && typeof parsed === 'object') {
+          setFormData(prev => ({
+            ...prev,
+            ...parsed,
+            applicantDetails: { ...prev.applicantDetails, ...(parsed.applicantDetails || {}) },
+            propertyDetails: { ...prev.propertyDetails, ...(parsed.propertyDetails || {}) },
+            taxDetails: { ...prev.taxDetails, ...(parsed.taxDetails || {}) },
+            documents: { ...prev.documents, ...(parsed.documents || {}) }
+          }));
+        }
+      }
+    } catch (e) {}
+  }, []);
+
+  useEffect(() => {
+    try {
+      if (formData && !formData.id) {
+        localStorage.setItem('gov_nodues_draft', JSON.stringify(formData));
+      }
+    } catch (e) {}
+  }, [formData]);
 
   useEffect(() => {
     const unsubAuth = subscribeToCitizenAuth((user) => {
@@ -472,6 +505,17 @@ export default function NoDuesCertificatePage() {
 
             <form onSubmit={handleSubmit} className="space-y-8">
               
+              {/* Stepper with Hindi Labels and ARIA Progress */}
+              <Stepper
+                steps={[
+                  { label: '1. आवेदक विवरण' },
+                  { label: '2. संपत्ति व कर' },
+                  { label: '3. दस्तावेज व रसीद' }
+                ]}
+                currentStep={currentStep}
+                onStepClick={(step) => setCurrentStep(step)}
+              />
+
               {/* FAST RECEIPT UPLOAD & AUTO-EXTRACT HEADER */}
               <FastReceiptUpload onApplyData={handleApplyFastData} />
 
@@ -759,12 +803,28 @@ export default function NoDuesCertificatePage() {
                 </div>
               </div>
 
-              {/* SUBMIT BUTTON */}
-              <div className="flex justify-end gap-3 pt-4 border-t border-slate-200">
+              {/* SUBMIT & DRAFT BUTTONS */}
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-4 border-t border-slate-200">
+                <button
+                  type="button"
+                  onClick={() => {
+                    try {
+                      localStorage.setItem('gov_nodues_draft', JSON.stringify(formData));
+                      toast.success('नो ड्यूज प्रारूप सुरक्षित सहेजा गया (Draft Saved)!');
+                    } catch (e) {}
+                  }}
+                  disabled={loading}
+                  aria-label="नो ड्यूज प्रारूप सहेजें"
+                  className={`${styles.secondaryButton} w-full sm:w-auto`}
+                >
+                  💾 ड्राफ्ट सहेजें (Save Draft)
+                </button>
+
                 <button
                   type="submit"
                   disabled={loading}
-                  className="btn btn-primary bg-emerald-700 hover:bg-emerald-800 text-white font-extrabold text-sm px-8 py-3.5 rounded-2xl shadow-xl transition-all"
+                  aria-label="नो ड्यूज प्रमाण पत्र हेतु आवेदन प्रस्तुत करें"
+                  className={`${styles.primaryButton} w-full sm:w-auto shadow-md`}
                 >
                   {loading ? 'जमा हो रहा है...' : '📝 नो ड्यूज प्रमाण पत्र हेतु आवेदन प्रस्तुत करें'}
                 </button>
@@ -798,63 +858,47 @@ export default function NoDuesCertificatePage() {
             ) : (
               <div className="space-y-4">
                 {applications.map((app, index) => (
-                  <div key={app.id} className="bg-white text-slate-900 rounded-3xl p-5 sm:p-6 shadow-xl space-y-4 border border-slate-200">
-                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-slate-100 pb-3">
-                      <div>
-                        <div className="flex items-center gap-2 flex-wrap mb-1">
-                          <span className="text-xs font-mono font-extrabold text-slate-900 bg-slate-100 border border-slate-300 px-2.5 py-0.5 rounded-full shadow-2xs">
-                            #{index + 1}
-                          </span>
-                          <span className="text-xs font-mono font-bold text-slate-700 bg-slate-100 px-2.5 py-0.5 rounded-full border border-slate-300">
-                            📅 {app.appliedAt ? new Date(app.appliedAt).toLocaleDateString('hi-IN') : 'Draft'}
-                          </span>
-                          <span className="font-mono text-xs font-bold text-emerald-900 bg-emerald-100 border border-emerald-300 px-3 py-1 rounded-full">
-                            {app.applicationNo}
-                          </span>
-                        </div>
-                        <h3 className="font-black text-slate-950 text-base mt-1">
-                          {app.applicantDetails?.fullName} (संपत्ति क्र: {app.propertyDetails?.propertyId})
-                        </h3>
-                        <p className="text-xs text-slate-500">
-                          टी.आर.आई. रिफरेंस: {app.taxDetails?.triRefNo} | संपत्ति कर: ₹{app.taxDetails?.amountPaid}
-                        </p>
-                      </div>
-                      <span className={`px-3 py-1 rounded-full text-xs font-extrabold border ${getStatusChip(app.status)}`}>
-                        {app.status}
-                      </span>
-                    </div>
-
-                    <div className="flex items-center gap-2 flex-wrap pt-1">
-                      <button
-                        onClick={() => { setSelectedApp(app); setShowLetterModal(true); }}
-                        className="btn btn-secondary btn-sm flex items-center gap-1 font-bold text-xs bg-slate-100"
-                      >
-                        <Printer className="w-3.5 h-3.5" /> 🖨️ आवेदन पत्र देखें
-                      </button>
-
-                      {app.officialUploadedCertificate ? (
+                  <StatusCard
+                    key={app.id || index}
+                    status={app.status}
+                    applicationNo={app.applicationNo || 'DRAFT'}
+                    title={`${app.applicantDetails?.fullName || 'N/A'} (संपत्ति क्र: ${app.propertyDetails?.propertyId || 'N/A'})`}
+                    description={`टी.आर.आई. रिफरेंस: ${app.taxDetails?.triRefNo || 'N/A'} | जमा कर राशि: ₹${app.taxDetails?.amountPaid || '0'}`}
+                    date={app.appliedAt ? new Date(app.appliedAt).toLocaleDateString('hi-IN') : 'प्रारूप'}
+                    officerRemarks={app.lastOfficerRemark}
+                    actions={
+                      <>
                         <button
-                          type="button"
-                          onClick={() => {
-                            setSelectedApp(app);
-                            setShowOfficialDocModal(true);
-                          }}
-                          className="btn btn-primary btn-sm bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs flex items-center gap-1 shadow-md cursor-pointer transition-all"
+                          onClick={() => { setSelectedApp(app); setShowLetterModal(true); }}
+                          className="btn btn-secondary btn-sm flex items-center gap-1 font-bold text-xs bg-slate-100"
                         >
-                          <Download className="w-3.5 h-3.5" /> 📜 अधिकारी हस्ताक्षरित प्रमाण पत्र डाउनलोड व देखें
+                          <Printer className="w-3.5 h-3.5" /> 🖨️ आवेदन पत्र देखें
                         </button>
-                      ) : (
-                        (app.status === 'Approved' || app.status === 'Sanctioned' || app.status === 'Completed') && (
+
+                        {app.officialUploadedCertificate ? (
                           <button
-                            onClick={() => { setSelectedApp(app); setShowCertModal(true); }}
-                            className="btn btn-primary btn-sm bg-emerald-700 text-white font-bold text-xs"
+                            type="button"
+                            onClick={() => {
+                              setSelectedApp(app);
+                              setShowOfficialDocModal(true);
+                            }}
+                            className="btn btn-primary btn-sm bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs flex items-center gap-1 shadow-md cursor-pointer transition-all"
                           >
-                            📜 नो ड्यूज प्रमाण पत्र डाउनलोड
+                            <Download className="w-3.5 h-3.5" /> 📜 अधिकारी हस्ताक्षरित प्रमाण पत्र डाउनलोड व देखें
                           </button>
-                        )
-                      )}
-                    </div>
-                  </div>
+                        ) : (
+                          (app.status === 'Approved' || app.status === 'Sanctioned' || app.status === 'Completed') && (
+                            <button
+                              onClick={() => { setSelectedApp(app); setShowCertModal(true); }}
+                              className="btn btn-primary btn-sm bg-emerald-700 text-white font-bold text-xs"
+                            >
+                              📜 नो ड्यूज प्रमाण पत्र डाउनलोड
+                            </button>
+                          )
+                        )}
+                      </>
+                    }
+                  />
                 ))}
               </div>
             )}
@@ -968,6 +1012,11 @@ export default function NoDuesCertificatePage() {
             </div>
           </div>
         )}
+
+        {/* Persistent Helpline & Contact Card */}
+        <div className="pt-4">
+          <HelplineCard title="राजस्व एवं नो ड्यूज (NOC) सहायता केंद्र (Revenue & NOC Helpdesk)" />
+        </div>
 
       </main>
     </div>

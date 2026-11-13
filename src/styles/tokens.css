@@ -1,0 +1,80 @@
+/**
+ * Government Portal Design Tokens (Gov Design System)
+ * Conforming to WCAG AA, Mobile-First, Hindi-First Gov Portal Specification
+ */
+
+:root {
+  /* Government Green Primary Palette */
+  --gov-green-primary: #047857;
+  --gov-green-dark: #065f46;
+  --gov-green-darker: #013524;
+  --gov-green-hover: #059669;
+  --gov-green-light: #ecfdf5;
+  --gov-green-border: #a7f3d0;
+  --gov-green-text: #064e3b;
+
+  /* Warning Amber Palette */
+  --gov-amber-primary: #d97706;
+  --gov-amber-dark: #b45309;
+  --gov-amber-light: #fffbeb;
+  --gov-amber-border: #fde68a;
+  --gov-amber-text: #78350f;
+
+  /* Neutral Scale (Grays) */
+  --gov-gray-50: #f8fafc;
+  --gov-gray-100: #f1f5f9;
+  --gov-gray-200: #e2e8f0;
+  --gov-gray-300: #cbd5e1;
+  --gov-gray-400: #94a3b8;
+  --gov-gray-500: #64748b;
+  --gov-gray-600: #475569;
+  --gov-gray-700: #334155;
+  --gov-gray-800: #1e293b;
+  --gov-gray-900: #0f172a;
+
+  /* Semantic Error & Info */
+  --gov-error-primary: #dc2626;
+  --gov-error-light: #fef2f2;
+  --gov-error-border: #fecaca;
+  --gov-info-primary: #0284c7;
+  --gov-info-light: #f0f9ff;
+  --gov-info-border: #bae6fd;
+
+  /* Spacing Scale (4px / 8px Grid) */
+  --gov-space-1: 4px;
+  --gov-space-2: 8px;
+  --gov-space-3: 12px;
+  --gov-space-4: 16px;
+  --gov-space-5: 20px;
+  --gov-space-6: 24px;
+  --gov-space-8: 32px;
+  --gov-space-10: 40px;
+  --gov-space-12: 48px;
+  --gov-space-16: 64px;
+
+  /* Border Radii */
+  --gov-radius-sm: 6px;
+  --gov-radius-md: 10px;
+  --gov-radius-lg: 14px;
+  --gov-radius-xl: 18px;
+  --gov-radius-full: 9999px;
+
+  /* Typography */
+  --gov-font-family: 'Noto Sans Devanagari', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --gov-font-size-xs: 0.75rem;    /* 12px */
+  --gov-font-size-sm: 0.875rem;   /* 14px */
+  --gov-font-size-base: 1rem;     /* 16px - Standard WCAG readable */
+  --gov-font-size-lg: 1.125rem;   /* 18px - Mobile instructions */
+  --gov-font-size-xl: 1.25rem;    /* 20px */
+  --gov-font-size-2xl: 1.5rem;    /* 24px */
+  --gov-line-height-normal: 1.6;
+  --gov-line-height-relaxed: 1.75;
+  --gov-line-height-loose: 1.8;
+
+  /* Min Touch Target (WCAG 2.5.5 / 2.5.8) */
+  --gov-min-touch-target: 48px;
+
+  /* Shadows (Subtle, Official, No Glassmorphism) */
+  --gov-shadow-card: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04);
+  --gov-shadow-card-hover: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -1px rgba(0, 0, 0, 0.04);
+}

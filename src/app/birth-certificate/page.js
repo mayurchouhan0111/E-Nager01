@@ -18,6 +18,11 @@ import { db } from '@/lib/firebase';
 import toast from 'react-hot-toast';
 import { downloadBlobFile } from '../../utils/fileStorage';
 import { validateBirthCertificateForm, navigateToFirstErrorField } from '../../utils/formValidationHelper';
+import Stepper from '@/components/Stepper';
+import Accordion from '@/components/Accordion';
+import StatusCard from '@/components/StatusCard';
+import HelplineCard from '@/components/HelplineCard';
+import styles from '@/styles/uiRedesign.module.css';
 import { 
   Baby, Activity, CheckCircle2, AlertCircle, RefreshCw, Printer, X, History, Plus, 
   Building2, User, Home, HeartPulse, CheckSquare, FileText, Download, ShieldAlert, ListChecks, Layers, Sparkles
@@ -96,6 +101,7 @@ export default function BirthCertificatePage() {
   const [showLetterModal, setShowLetterModal] = useState(false);
   const [showOfficialDocModal, setShowOfficialDocModal] = useState(false);
   const [dpdpConsent, setDpdpConsent] = useState(false);
+  const [currentStep, setCurrentStep] = useState(1);
 
   // Form State
   const [formData, setFormData] = useState({
@@ -116,6 +122,43 @@ export default function BirthCertificatePage() {
       addressProof: null
     }
   });
+
+  // LocalStorage Draft Autosave & Restore
+  useEffect(() => {
+    try {
+      const savedDraft = localStorage.getItem('gov_birth_draft');
+      if (savedDraft) {
+        const parsed = JSON.parse(savedDraft);
+        if (parsed && typeof parsed === 'object' && !parsed.id) {
+          setFormData(prev => ({
+            ...prev,
+            id: null,
+            applicationNo: '',
+            status: 'Draft',
+            childDetails: { ...prev.childDetails, ...(parsed.childDetails || {}) },
+            motherDetails: { ...prev.motherDetails, ...(parsed.motherDetails || {}) },
+            fatherDetails: { ...prev.fatherDetails, ...(parsed.fatherDetails || {}) },
+            applicantDetails: { ...prev.applicantDetails, ...(parsed.applicantDetails || {}) },
+            documents: { ...prev.documents, ...(parsed.documents || {}) }
+          }));
+        }
+      }
+    } catch (e) {}
+  }, []);
+
+  useEffect(() => {
+    try {
+      if (formData && !formData.id && (formData.childDetails?.fullName || formData.applicantDetails?.fullName)) {
+        localStorage.setItem('gov_birth_draft', JSON.stringify({
+          childDetails: formData.childDetails,
+          motherDetails: formData.motherDetails,
+          fatherDetails: formData.fatherDetails,
+          applicantDetails: formData.applicantDetails,
+          documents: formData.documents
+        }));
+      }
+    } catch (e) {}
+  }, [formData]);
 
   useEffect(() => {
     const unsubAuth = subscribeToCitizenAuth((user) => {
@@ -405,6 +448,7 @@ export default function BirthCertificatePage() {
     setLoading(false);
 
     if (res.success) {
+      try { localStorage.removeItem('gov_birth_draft'); } catch (e) {}
       setMessage({ 
         type: 'success', 
         text: `जन्म प्रमाण पत्र आवेदन सफलतापूर्वक जमा हुआ (Application submitted! App No: ${res.applicationNo})` 
@@ -443,6 +487,7 @@ export default function BirthCertificatePage() {
   };
 
   const resetForm = () => {
+    try { localStorage.removeItem('gov_birth_draft'); } catch (e) {}
     setFormErrors([]);
     setFormData({
       id: null,
@@ -629,6 +674,18 @@ export default function BirthCertificatePage() {
         {activeTab === 'apply' && (
           <form onSubmit={handleSubmit} className="space-y-6">
             
+            {/* Stepper with Hindi Labels and ARIA Progress */}
+            <Stepper
+              steps={[
+                { label: '1. शिशु विवरण' },
+                { label: '2. माता-पिता विवरण' },
+                { label: '3. आवेदक व पता' },
+                { label: '4. दस्तावेज व घोषणा' }
+              ]}
+              currentStep={currentStep}
+              onStepClick={(step) => setCurrentStep(step)}
+            />
+
             {/* Correction Warning Banner */}
             {formData.status === 'Correction Requested' && (
               <div className="bg-amber-50 border border-amber-200 rounded-2xl p-5 text-amber-900 space-y-1 shadow-sm">
@@ -1450,7 +1507,8 @@ export default function BirthCertificatePage() {
                 type="button"
                 onClick={handleSaveDraft}
                 disabled={loading}
-                className="btn btn-secondary w-full sm:w-auto flex items-center justify-center gap-1.5 font-bold text-slate-700"
+                aria-label="ड्राफ्ट सहेजें (Save Draft)"
+                className={`${styles.secondaryButton} w-full sm:w-auto`}
               >
                 💾 ड्राफ्ट सहेजें (Save Draft)
               </button>
@@ -1458,7 +1516,8 @@ export default function BirthCertificatePage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="btn btn-primary bg-emerald-700 hover:bg-emerald-800 w-full sm:w-auto flex items-center justify-center gap-2 shadow-lg shadow-emerald-700/20 font-bold"
+                aria-label="जन्म प्रमाण पत्र आवेदन जमा करें"
+                className={`${styles.primaryButton} w-full sm:w-auto shadow-md`}
               >
                 {loading ? (
                   <RefreshCw className="animate-spin w-4 h-4 text-white" />
@@ -1492,82 +1551,63 @@ export default function BirthCertificatePage() {
             ) : (
               <div className="grid grid-cols-1 gap-4">
                 {applications.map((app, index) => (
-                  <div key={app.id} className="bg-white border border-slate-200 rounded-2xl p-5 hover:border-slate-300 transition-all flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-sm">
-                    <div>
-                      <div className="flex items-center gap-2 mb-1 flex-wrap">
-                        <span className="text-xs font-mono font-extrabold text-slate-900 bg-slate-100 border border-slate-300 px-2.5 py-0.5 rounded-full shadow-2xs">
-                          #{index + 1}
-                        </span>
-                        <span className="text-xs font-mono font-bold text-slate-700 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
-                          📅 {app.appliedAt ? new Date(app.appliedAt).toLocaleDateString('hi-IN') : 'Draft'}
-                        </span>
-                        <span className="text-xs font-mono font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded border border-emerald-200">{app.applicationNo || 'DRAFT'}</span>
-                        <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold border uppercase tracking-wider ${getStatusChip(app.status)}`}>
-                          {app.status}
-                        </span>
-                      </div>
-                      <h3 className="text-slate-900 font-extrabold text-base">
-                        👶 {app.childDetails?.fullName || 'शिशु (अनाम)'} (जन्म तिथि: {app.childDetails?.dateOfBirth || 'N/A'})
-                      </h3>
-                      <p className="text-xs text-slate-500 mt-0.5 font-medium">
-                        माता: {app.motherDetails?.fullName} | पिता: {app.fatherDetails?.fullName} | आवेदक: {app.applicantDetails?.fullName}
-                      </p>
-                      {app.childDetails?.presentAddress?.villageCity && (
-                        <p className="text-[11px] text-slate-400 font-medium mt-0.5">पता: {app.childDetails.presentAddress.villageCity}, {app.childDetails.presentAddress.district}</p>
-                      )}
-                    </div>
-
-                    <div className="flex flex-wrap items-center gap-2">
-                      {/* Hard Copy Submission Letter */}
-                      <button
-                        onClick={() => { setSelectedApp(app); setShowLetterModal(true); }}
-                        className="btn btn-secondary btn-sm flex items-center gap-1 font-bold text-blue-900 bg-blue-50 hover:bg-blue-100 border-blue-200"
-                      >
-                        <Printer className="w-3.5 h-3.5 text-blue-700" /> 🖨️ आवेदन पत्र (Hard Copy Letter)
-                      </button>
-
-                      {/* Resubmit Action if Correction Requested */}
-                      {app.status === 'Correction Requested' && (
+                  <StatusCard
+                    key={app.id || index}
+                    status={app.status}
+                    applicationNo={app.applicationNo || 'DRAFT'}
+                    title={`👶 ${app.childDetails?.fullName || 'शिशु (अनाम)'} (जन्म तिथि: ${app.childDetails?.dateOfBirth || 'N/A'})`}
+                    description={`माता: ${app.motherDetails?.fullName || 'N/A'} | पिता: ${app.fatherDetails?.fullName || 'N/A'} | आवेदक: ${app.applicantDetails?.fullName || 'N/A'} ${app.childDetails?.presentAddress?.villageCity ? `• पता: ${app.childDetails.presentAddress.villageCity}` : ''}`}
+                    date={app.appliedAt ? new Date(app.appliedAt).toLocaleDateString('hi-IN') : 'प्रारूप'}
+                    officerRemarks={app.lastOfficerRemark}
+                    actions={
+                      <>
                         <button
-                          onClick={() => handleEditForResubmit(app)}
-                          className="btn btn-primary btn-sm bg-gradient-to-r from-amber-500 to-amber-600 text-white font-bold"
+                          onClick={() => { setSelectedApp(app); setShowLetterModal(true); }}
+                          className="btn btn-secondary btn-sm flex items-center gap-1 font-bold text-blue-900 bg-blue-50 hover:bg-blue-100 border-blue-200"
                         >
-                          ✏️ सुधारें व पुनः प्रस्तुत करें
+                          <Printer className="w-3.5 h-3.5 text-blue-700" /> 🖨️ आवेदन पत्र (Hard Copy Letter)
                         </button>
-                      )}
 
-                      {/* View & Download Official Uploaded Certificate or Auto Generated Certificate */}
-                      {app.officialUploadedCertificate ? (
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setSelectedApp(app);
-                            setShowOfficialDocModal(true);
-                          }}
-                          className="btn btn-primary btn-sm bg-gradient-to-r from-emerald-700 to-emerald-800 text-white font-bold flex items-center gap-1 shadow-md cursor-pointer transition-all"
-                        >
-                          <Download className="w-3.5 h-3.5" /> 📜 अधिकारी हस्ताक्षरित प्रमाण पत्र देखें व डाउनलोड
-                        </button>
-                      ) : (
-                        (app.status === 'Approved' || app.status === 'Certificate Generated' || app.status === 'Completed') && (
+                        {app.status === 'Correction Requested' && (
                           <button
-                            onClick={() => { setSelectedApp(app); setShowCertModal(true); }}
-                            className="btn btn-primary btn-sm bg-gradient-to-r from-emerald-600 to-emerald-700 text-white font-bold"
+                            onClick={() => handleEditForResubmit(app)}
+                            className="btn btn-primary btn-sm bg-gradient-to-r from-amber-500 to-amber-600 text-white font-bold"
                           >
-                            📜 प्रमाण पत्र डाउनलोड करें
+                            ✏️ सुधारें व पुनः प्रस्तुत करें
                           </button>
-                        )
-                      )}
+                        )}
 
-                      {/* View Timeline Modal Button */}
-                      <button
-                        onClick={() => setSelectedApp(app)}
-                        className="btn btn-secondary btn-sm flex items-center gap-1 font-bold text-slate-700"
-                      >
-                        <History className="w-3.5 h-3.5 text-slate-500" /> स्थिति देखें
-                      </button>
-                    </div>
-                  </div>
+                        {app.officialUploadedCertificate ? (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setSelectedApp(app);
+                              setShowOfficialDocModal(true);
+                            }}
+                            className="btn btn-primary btn-sm bg-gradient-to-r from-emerald-700 to-emerald-800 text-white font-bold flex items-center gap-1 shadow-md cursor-pointer transition-all"
+                          >
+                            <Download className="w-3.5 h-3.5" /> 📜 अधिकारी हस्ताक्षरित प्रमाण पत्र देखें व डाउनलोड
+                          </button>
+                        ) : (
+                          (app.status === 'Approved' || app.status === 'Certificate Generated' || app.status === 'Completed') && (
+                            <button
+                              onClick={() => { setSelectedApp(app); setShowCertModal(true); }}
+                              className="btn btn-primary btn-sm bg-gradient-to-r from-emerald-600 to-emerald-700 text-white font-bold"
+                            >
+                              📜 प्रमाण पत्र डाउनलोड करें
+                            </button>
+                          )
+                        )}
+
+                        <button
+                          onClick={() => setSelectedApp(app)}
+                          className="btn btn-secondary btn-sm flex items-center gap-1 font-bold text-slate-700"
+                        >
+                          <History className="w-3.5 h-3.5 text-slate-500" /> स्थिति देखें
+                        </button>
+                      </>
+                    }
+                  />
                 ))}
               </div>
             )}
@@ -1759,6 +1799,11 @@ export default function BirthCertificatePage() {
             </div>
           </div>
         )}
+
+        {/* Persistent Helpline & Contact Card */}
+        <div className="pt-4">
+          <HelplineCard title="जन्म पंजीयन नागरिक सहायता केंद्र (Birth Certificate Helpdesk)" />
+        </div>
 
       </main>
     </div>

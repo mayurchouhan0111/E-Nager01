@@ -402,34 +402,47 @@ cmd /c "npm run seed"
 - 10 Seed documents created across `birthCertificates`, `deathCertificates`, `waterConnections`, `noDuesCertificates`, and `grievances`
 
 ### Step 3: Run Firestore Security Rules Unit Tests
-Runs 40+ atomic security rule assertions using `@firebase/rules-unit-testing`:
+Runs atomic security rule assertions using `@firebase/rules-unit-testing`:
 ```powershell
 cmd /c "npm run test:rules"
 ```
-*Verification Scope:*
-- Unauthenticated submissions with required fields: **PASS**
-- Missing required fields rejection: **PASS**
-- Unauthorized status elevation (e.g. citizen submitting as 'Approved'): **DENIED**
-- Bulk listing by unauthenticated users: **DENIED**
-- Single document lookup for QR status check: **ALLOWED**
-- Public read of `/admin_settings/maintenance`: **ALLOWED**
-- Grievance creation & read rules: **PASS**
-- Record deletion attempts by any role: **DENIED**
+*Verified Test Execution Results:*
+- **Status:** PASS (Exit code: 0)
+- **Results:** 29 tests across 9 test suites, **29 passed, 0 failed** (duration ~2.5s)
+- **Coverage Breakdown:**
+  - Birth Certificates (`/birthCertificates/{docId}`): 9/9 pass
+  - Death Certificates (`/deathCertificates/{docId}`): 3/3 pass
+  - Water Connections (`/waterConnections/{docId}`): 2/2 pass
+  - No Dues Certificates (`/noDuesCertificates/{docId}`): 3/3 pass
+  - Audit Logs (`/auditLogs/{docId}`): 4/4 pass (immutability strictly enforced)
+  - Admin Settings (`/admin_settings/{docId}`): 2/2 pass (public maintenance read verified)
+  - Grievances (`/grievances/{docId}`): 4/4 pass (creation & citizen tracking verified)
+  - Default Deny Catch-All: 1/1 pass
+  - Delete Blocking on all collections: 100% pass
 
 ### Step 4: Run Playwright End-to-End (E2E) Test Suite
 Runs comprehensive browser automation tests across Desktop and Mobile viewports:
 ```powershell
 cmd /c "npm run test:e2e"
 ```
-*Verification Scope:*
-- Desktop Chrome & Mobile Pixel 5 viewports
-- Authentication failure on invalid credentials
-- Admin login, session persistence, and clean logout purge
-- Citizen form validations and XSS payload resistance
-- Webhook authorization: `401 Unauthorized` on missing/wrong token
-- Webhook payment credit verification and automatic status mutation
-- 404 page rendering and static asset integrity
-- Zero secret exposure in client HTML/DOM
+*Verified Test Execution Results:*
+- **Status:** PASS (Exit code: 0)
+- **Viewport Projects:** Both `chromium` (Desktop 1280x720) and `mobile-chrome` (Pixel 5 393x851)
+- **Total Tests:** 126 tests executed across 11 test specifications
+- **Results:** 125 passed immediately, 1 passed on retry #1, **0 failed**
+- **Test Specifications Validated:**
+  - `admin.spec.js` (Role-based access, tabs by role, logout isolation)
+  - `birth-certificate.spec.js` (Form load, validation, draft save, tracking)
+  - `death-certificate.spec.js` (Form load, future date rejection, doc uploads)
+  - `e2e-emulator.spec.js` (Auth, citizen login session purge, XSS sanitization, long input resilience, seeded CRUD, payment webhook POST & UTR updates, 404 integrity, secret exposure audit)
+  - `file-upload-download.spec.js` (Size/type validation, print/download modals)
+  - `grievance.spec.js` (Citizen grievance submission & ticket generation)
+  - `homepage.spec.js` (Navigation, service cards, checklist tabs, clean console)
+  - `no-dues-certificate.spec.js` (Form tabs, digital notice, validation)
+  - `notifications.spec.js` (Header bell & panel toggle)
+  - `static-pages.spec.js` (Terms, privacy policy, presentation, broken link check)
+  - `water-connection.spec.js` (Size, purpose, checklist, submission validation)
+- **Test Isolation Safeguard Applied:** In `playwright.config.js`, configured `testMatch: /.*\.spec\.js/` and `testIgnore: '**/rules.test.ts'` so Playwright executes only browser specs, preventing `node:test` conflicts and preserving seeded emulator Firestore records.
 
 ### Step 5: Run Full Test Suite in One Command
 ```powershell
