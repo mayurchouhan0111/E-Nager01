@@ -3,11 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import ServiceHeader from '@/components/ServiceHeader';
-import { 
-  Presentation, ChevronLeft, ChevronRight, Play, Pause, 
-  FileText, Baby, Droplets, ShieldCheck, CheckCircle2, AlertCircle, 
-  Clock, RefreshCw, Printer, ShieldAlert, Sparkles, Building2, Download
-} from 'lucide-react';
+import { Presentation, ChevronLeft, ChevronRightIcon, Play, Pause, DocumentTextIcon, BabyIcon, Droplets, ShieldCheck, CheckCircleIcon, ExclamationCircleIcon, ClockIcon, ArrowPathIcon, PrinterIcon, ShieldCheckIcon, Sparkles, BuildingOffice2Icon, ArrowDownTrayIcon } from '@heroicons/react/24/outline';
 
 const SLIDES = [
   {

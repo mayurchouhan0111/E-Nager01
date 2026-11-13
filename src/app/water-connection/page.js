@@ -22,10 +22,7 @@ import Accordion from '@/components/Accordion';
 import StatusCard from '@/components/StatusCard';
 import HelplineCard from '@/components/HelplineCard';
 import styles from '@/styles/uiRedesign.module.css';
-import { 
-  Droplet, Activity, CheckCircle2, AlertCircle, RefreshCw, Printer, X, History, Plus, 
-  Building2, User, Home, FileText, Download, ShieldAlert, CheckSquare, Wrench, ListChecks
-} from 'lucide-react';
+import { DropIcon, ChartBarIcon, CheckCircleIcon, ExclamationCircleIcon, ArrowPathIcon, PrinterIcon, XMarkIcon, ClockIcon, Plus, BuildingOffice2Icon, UserIcon, Home, DocumentTextIcon, ArrowDownTrayIcon, ShieldCheckIcon, CheckSquare, Wrench, ListChecks } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 
 const defaultApplicantDetails = {

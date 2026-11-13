@@ -1,6 +1,6 @@
 'use client';
 import React from 'react';
-import { Check, Clock, AlertTriangle, XCircle, FileCheck, Circle } from 'lucide-react';
+import { Check, ClockIcon, ExclamationTriangleIcon, XCircleIcon, FileCheck, Circle } from '@heroicons/react/24/outline';
 
 export default function ApplicationTimeline({ timeline = [], currentStatus = '' }) {
   // Normalize and ensure all timeline stages are fully rendered

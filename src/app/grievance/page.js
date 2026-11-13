@@ -8,7 +8,7 @@ import { db } from '@/lib/firebase'
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore'
 import HelplineCard from '@/components/HelplineCard'
 import styles from '@/styles/uiRedesign.module.css'
-import { Shield, Mail, Phone, MapPin, Send, HelpCircle, CheckCircle2, ArrowLeft, AlertCircle } from 'lucide-react'
+import { Shield, EnvelopeIcon, PhoneIcon, MapPin, Send, HelpCircle, CheckCircleIcon, ArrowLeft, ExclamationCircleIcon } from '@heroicons/react/24/outline'
 
 export default function GrievancePage() {
   const [formData, setFormData] = useState({

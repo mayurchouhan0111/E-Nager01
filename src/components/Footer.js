@@ -1,20 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import { 
-  FileText, 
-  Baby, 
-  Droplets, 
-  Building2, 
-  ShieldCheck, 
-  FileCheck, 
-  Headphones, 
-  Lock, 
-  PhoneCall, 
-  Mail, 
-  Clock, 
-  Shield, 
-  ChevronRight 
-} from 'lucide-react';
+import { DocumentTextIcon, BabyIcon, Droplets, BuildingOffice2Icon, ShieldCheck, FileCheck, Headphones, LockClosedIcon, PhoneCall, EnvelopeIcon, ClockIcon, Shield, ChevronRightIcon } from '@heroicons/react/24/outline';
 
 export default function Footer() {
   return (

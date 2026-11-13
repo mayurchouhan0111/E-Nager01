@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { PhoneCall, Clock, MapPin, Mail, Building2 } from 'lucide-react';
+import { PhoneCall, ClockIcon, MapPin, EnvelopeIcon, BuildingOffice2Icon } from '@heroicons/react/24/outline';
 import styles from '@/styles/uiRedesign.module.css';
 
 /**

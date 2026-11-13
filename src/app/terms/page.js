@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import ServiceHeader from '@/components/ServiceHeader'
-import { FileText, ShieldAlert, CheckCircle2, AlertTriangle, ArrowLeft, Scale, Building2 } from 'lucide-react'
+import { DocumentTextIcon, ShieldCheckIcon, CheckCircleIcon, ExclamationTriangleIcon, ArrowLeft, Scale, BuildingOffice2Icon } from '@heroicons/react/24/outline'
 
 export default function TermsPage() {
   return (

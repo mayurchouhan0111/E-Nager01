@@ -20,10 +20,7 @@ import Stepper from '@/components/Stepper';
 import StatusCard from '@/components/StatusCard';
 import HelplineCard from '@/components/HelplineCard';
 import styles from '@/styles/uiRedesign.module.css';
-import { 
-  FileText, Activity, CheckCircle2, AlertCircle, RefreshCw, Printer, X, History, Plus, 
-  Download, Building2, UploadCloud, Info, ShieldCheck, CheckSquare, Search, Phone
-} from 'lucide-react';
+import { DocumentTextIcon, ChartBarIcon, CheckCircleIcon, ExclamationCircleIcon, ArrowPathIcon, PrinterIcon, XMarkIcon, ClockIcon, Plus, ArrowDownTrayIcon, BuildingOffice2Icon, UploadCloud, InformationCircleIcon, ShieldCheck, CheckSquare, MagnifyingGlassIcon, PhoneIcon } from '@heroicons/react/24/outline';
 
 const INITIAL_FORM = {
   applicantDetails: {

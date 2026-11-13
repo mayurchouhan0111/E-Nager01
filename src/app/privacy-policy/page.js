@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import ServiceHeader from '@/components/ServiceHeader'
-import { Shield, Lock, Eye, FileText, CheckCircle2, UserCheck, HelpCircle, ArrowLeft, Mail, Phone, MapPin } from 'lucide-react'
+import { Shield, LockClosedIcon, EyeIcon, DocumentTextIcon, CheckCircleIcon, UserCheckIcon, HelpCircle, ArrowLeft, EnvelopeIcon, PhoneIcon, MapPin } from '@heroicons/react/24/outline'
 
 export default function PrivacyPolicyPage() {
   return (

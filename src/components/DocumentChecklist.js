@@ -1,10 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import {
-  CheckSquare, Square, FileText, Home, Building2, HelpCircle,
-  Printer, Info, Sparkles, CheckCircle2, ShieldCheck, Download
-} from 'lucide-react';
+import { CheckSquare, Square, DocumentTextIcon, Home, BuildingOffice2Icon, HelpCircle, PrinterIcon, InformationCircleIcon, Sparkles, CheckCircleIcon, ShieldCheck, ArrowDownTrayIcon } from '@heroicons/react/24/outline';
 
 export const CHECKLIST_DATA = {
   homeBirth: {
