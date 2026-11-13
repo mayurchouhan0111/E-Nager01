@@ -32,7 +32,10 @@ import ApplicationLetterTemplate from '@/components/ApplicationLetterTemplate'
 import ApplicationTimeline from '@/components/ApplicationTimeline'
 import { DEFAULT_ADMIN_ACCOUNTS, fetchAdminAccounts, updateAdminAccountCredential, ADMIN_USERNAME_ALIASES } from '@/services/adminAuthService'
 import { subscribeToMaintenance, toggleMaintenanceMode } from '@/services/maintenanceService'
-import { ShieldCheckIcon, MagnifyingGlassIcon, TrashIcon, ArrowDownTrayIcon, PencilIcon, PrinterIcon, EyeIcon, ChartBarIcon, DocumentTextIcon, CheckCircleIcon, ExclamationCircleIcon, CalendarIcon, UserCheckIcon, ClockIcon, InformationCircleIcon, LockClosedIcon, ArrowLeftOnRectangleIcon, ArrowPathIcon, XMarkIcon, Cog8ToothIcon, BabyIcon, Eye as EyeIcon, DropIcon, KeyIcon, ArrowDownTrayIcon, BuildingOffice2Icon, BellIcon, EnvelopeIcon, ClockIcon, ChevronDownIcon, ChevronRightIcon, UserIcon, PhoneIcon, PaperClipIcon, ArrowUpTrayIcon, ArrowPathIcon } from '@heroicons/react/24/outline'
+import {
+  ShieldAlert, Search, Trash2, Download, Edit, Printer, Eye, Activity, FileText, CheckCircle2,
+  AlertCircle, Calendar, UserCheck, History, Info, Lock, LogOut, RefreshCw, X, Settings2, Baby, Eye as EyeIcon, Droplet, Key, Save, Building2, Bell, Mail, Clock, ChevronDown, ChevronRight, User, Phone, Paperclip, Upload, Loader2
+} from 'lucide-react'
 
 function formatTimestamp(ts) {
   if (!ts) return '—'

@@ -23,7 +23,10 @@ import Accordion from '@/components/Accordion';
 import StatusCard from '@/components/StatusCard';
 import HelplineCard from '@/components/HelplineCard';
 import styles from '@/styles/uiRedesign.module.css';
-import { DocumentTextIcon, ChartBarIcon, CheckCircleIcon, ExclamationCircleIcon, ArrowPathIcon, PrinterIcon, XMarkIcon, ClockIcon, Plus, BuildingOffice2Icon, UserIcon, Home, HeartPulse, CheckSquare, ArrowDownTrayIcon, ShieldCheckIcon, ListChecks } from '@heroicons/react/24/outline';
+import { 
+  FileText, Activity, CheckCircle2, AlertCircle, RefreshCw, Printer, X, History, Plus, 
+  Building2, User, Home, HeartPulse, CheckSquare, Download, ShieldAlert, ListChecks 
+} from 'lucide-react';
 
 const defaultDeceasedDetails = {
   fullName: '',

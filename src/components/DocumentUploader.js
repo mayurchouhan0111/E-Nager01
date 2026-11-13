@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { ArrowUpTrayIcon, DocumentTextIcon, CheckCircleIcon, TrashIcon, EyeIcon, ExclamationCircleIcon, XMarkIcon, Image as ImageIcon } from '@heroicons/react/24/outline';
+import { Upload, FileText, CheckCircle2, Trash2, Eye, AlertCircle, X, Image as ImageIcon } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 export default function DocumentUploader({

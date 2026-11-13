@@ -1,7 +1,9 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Zap, UploadCloud, CheckCircleIcon, DocumentTextIcon, Sparkles, ArrowPathIcon, ExclamationCircleIcon, ArrowRight, ShieldCheck, EyeIcon, EyeOff } from '@heroicons/react/24/outline';
+import { 
+  Zap, UploadCloud, CheckCircle2, FileText, Sparkles, RefreshCw, AlertCircle, ArrowRight, ShieldCheck, Eye, EyeOff 
+} from 'lucide-react';
 import { extractNoDuesReceiptData, parseReceiptText } from '../utils/noDuesReceiptExtractor';
 import toast from 'react-hot-toast';
 

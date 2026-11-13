@@ -1,7 +1,7 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
-import { DocumentTextIcon, BabyIcon, Droplets, BuildingOffice2Icon, ClockIcon } from '@heroicons/react/24/outline';
+import { FileText, Baby, Droplets, Building2, History } from 'lucide-react';
 
 export default function AdminMobileBottomNav() {
   const pathname = usePathname();

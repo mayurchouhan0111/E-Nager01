@@ -23,7 +23,10 @@ import Accordion from '@/components/Accordion';
 import StatusCard from '@/components/StatusCard';
 import HelplineCard from '@/components/HelplineCard';
 import styles from '@/styles/uiRedesign.module.css';
-import { BabyIcon, ChartBarIcon, CheckCircleIcon, ExclamationCircleIcon, ArrowPathIcon, PrinterIcon, XMarkIcon, ClockIcon, Plus, BuildingOffice2Icon, UserIcon, Home, HeartPulse, CheckSquare, DocumentTextIcon, ArrowDownTrayIcon, ShieldCheckIcon, ListChecks, Layers, Sparkles } from '@heroicons/react/24/outline';
+import { 
+  Baby, Activity, CheckCircle2, AlertCircle, RefreshCw, Printer, X, History, Plus, 
+  Building2, User, Home, HeartPulse, CheckSquare, FileText, Download, ShieldAlert, ListChecks, Layers, Sparkles
+} from 'lucide-react';
 import Link from 'next/link';
 
 const defaultChildDetails = {

@@ -2,7 +2,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, DocumentTextIcon, BabyIcon, Droplets, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
+import { Home, FileText, Baby, Droplets, Search } from 'lucide-react';
 
 export default function MobileBottomNav() {
   const pathname = usePathname();

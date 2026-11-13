@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { subscribeToMaintenance } from '../services/maintenanceService';
-import { KeyIcon, Wrench } from '@heroicons/react/24/outline';
+import { Key, Wrench } from 'lucide-react';
 
 export default function MaintenanceGuard() {
   const pathname = usePathname();

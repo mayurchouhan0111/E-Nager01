@@ -1,7 +1,15 @@
 'use client';
 
 import React from 'react';
-import { CheckCircleIcon, ExclamationTriangleIcon, ClockIcon, XCircleIcon, PencilIcon, ShieldCheck, ExclamationCircleIcon } from '@heroicons/react/24/outline';
+import { 
+  CheckCircle2, 
+  AlertTriangle, 
+  Clock, 
+  XCircle, 
+  FileEdit,
+  ShieldCheck,
+  AlertCircle
+} from 'lucide-react';
 import styles from '@/styles/uiRedesign.module.css';
 
 /**
